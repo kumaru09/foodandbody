@@ -1,21 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:foodandbody/theme.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: _Home(),
-      theme: AppTheme.themeData,
-    );
-  }
+  _HomeState createState() => _HomeState();
 }
 
-class _Home extends StatelessWidget {
-  const _Home({Key? key}) : super(key: key);
-
+class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,7 +35,11 @@ class _Home extends StatelessWidget {
               Container(
                   height: 51,
                   color: Colors.amber,
-                  child: Text("แคลอรี่วันนี้")),
+                  child: Text(
+                    "แคลอรี่วันนี้",
+                    style: Theme.of(context).textTheme.bodyText1!.merge(
+                        TextStyle(color: AppTheme.themeData.primaryColor)),
+                  )),
               Container(
                 height: 287,
                 color: Colors.blue,
