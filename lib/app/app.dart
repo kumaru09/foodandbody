@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:foodandbody/app/routes.dart';
 import 'package:foodandbody/repositories/authen_repository.dart';
+import 'package:foodandbody/theme.dart';
 
 class App extends StatelessWidget {
   const App({ Key? key, required AuthenRepository authenRepository })
@@ -32,6 +33,7 @@ class AppView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: AppTheme.themeData,
       home: FlowBuilder<AppStatus>(
         state: context.select((AppBloc bloc) => bloc.state.status),
         onGeneratePages: onGenerateAppViewPages,
