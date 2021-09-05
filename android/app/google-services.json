@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "581411196555",
+    "project_id": "foodbody-bnn",
+    "storage_bucket": "foodbody-bnn.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:581411196555:android:bfd69719e79ab371a3ce8e",
+        "android_client_info": {
+          "package_name": "com.bnnproject.foodandbody"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "581411196555-0m05ar9v939pfe2840nfbecbg3pbrak7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bnnproject.foodandbody",
+            "certificate_hash": "fde2b874e32437a4925f7e5988fcd1a3e6a09ab4"
+          }
+        },
+        {
+          "client_id": "581411196555-fsq0nu0d8sr70o98u3mg7sflbo44o93e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDof71EAMlV-hNv5Y56O8qLW376Gmd8uiU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "581411196555-fsq0nu0d8sr70o98u3mg7sflbo44o93e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
