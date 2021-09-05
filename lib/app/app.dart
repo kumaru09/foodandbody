@@ -7,10 +7,10 @@ import 'package:foodandbody/repositories/authen_repository.dart';
 import 'package:foodandbody/theme.dart';
 
 class App extends StatelessWidget {
-  const App({ Key? key, required AuthenRepository authenRepository })
-    : _authenRepository = authenRepository,
-      super(key: key);
-  
+  const App({Key? key, required AuthenRepository authenRepository})
+      : _authenRepository = authenRepository,
+        super(key: key);
+
   final AuthenRepository _authenRepository;
 
   @override
@@ -18,9 +18,7 @@ class App extends StatelessWidget {
     return RepositoryProvider.value(
       value: _authenRepository,
       child: BlocProvider(
-        create: (_) => AppBloc(
-          authenRepository: _authenRepository
-        ),
+        create: (_) => AppBloc(authenRepository: _authenRepository),
         child: const AppView(),
       ),
     );
@@ -28,7 +26,7 @@ class App extends StatelessWidget {
 }
 
 class AppView extends StatelessWidget {
-  const AppView({ Key? key }) : super(key: key);
+  const AppView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
