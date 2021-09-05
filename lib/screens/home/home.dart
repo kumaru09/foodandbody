@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:foodandbody/menuCard.dart';
 import 'package:foodandbody/theme.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:foodandbody/app/bloc/app_bloc.dart';
+import 'package:foodandbody/theme.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class Home extends StatefulWidget {
-  // const Home({Key? key}) : super(key: key);
+  const Home({Key? key}) : super(key: key);
+
+  static Page page() => const MaterialPage<void>(child: Home());
 
   @override
   _HomeState createState() => _HomeState();
@@ -33,7 +38,11 @@ class _HomeState extends State<Home> {
                 print("setting");
               },
               icon:
-                  Icon(Icons.settings, color: AppTheme.themeData.primaryColor))
+                  Icon(Icons.settings, color: AppTheme.themeData.primaryColor)),
+          ElevatedButton(
+              onPressed: () =>
+                  context.read<AppBloc>().add(AppLogoutRequested()),
+              child: Text('Logout'))
         ],
       ),
       body: SafeArea(
