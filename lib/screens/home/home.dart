@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:foodandbody/buttomAppBar.dart';
 import 'package:foodandbody/menuCard.dart';
 import 'package:foodandbody/theme.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
-import 'package:foodandbody/theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class Home extends StatefulWidget {
@@ -24,331 +24,367 @@ class _HomeState extends State<Home> {
     this.cardItems = getMenuCard(); //get recommend menu from DB
 
     return Scaffold(
-      extendBody: true,
-      appBar: AppBar(
-        backgroundColor: Color(0xFFF6F6F6),
-        elevation: 0,
-        title: Text("หน้าหลัก",
-            style: AppTheme.themeData.textTheme.headline5!
-                .merge(TextStyle(color: AppTheme.themeData.primaryColor))),
-        actions: [
-          IconButton(
-              onPressed: () {
-                // change page to setting page
-                print("setting");
-              },
-              icon:
-                  Icon(Icons.settings, color: AppTheme.themeData.primaryColor)),
-          ElevatedButton(
-              onPressed: () =>
-                  context.read<AppBloc>().add(AppLogoutRequested()),
-              child: Text('Logout'))
-        ],
-      ),
-      body: SafeArea(
-        child: ListView(
-          children: <Widget>[
-            //today's calories
-            Container(
-                color: Color(0xFFF6F6F6),
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
-                  child: Text(
-                    "แคลอรีวันนี้",
-                    style: AppTheme.themeData.textTheme.bodyText1!.merge(
-                      TextStyle(color: AppTheme.themeData.primaryColor),
-                    ),
-                  ),
-                )),
-
-            //calories progress card
-            Container(
-              color: Color(0xFFF6F6F6),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-                child: Card(
-                  color: AppTheme.themeData.primaryColor,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15)),
-                  elevation: 2,
-                  child: Center(
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(102, 18, 95, 0),
-                          //circular progress
-                          child: CircularPercentIndicator(
-                            radius: 183,
-                            lineWidth: 8,
-                            percent: getRemainCal()[0],
-                            animation: true,
-                            animationDuration: 750,
-                            progressColor: Colors.white,
-                            center: Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "กินได้อีก",
-                                    style: AppTheme
-                                        .themeData.textTheme.subtitle1!
-                                        .merge(TextStyle(color: Colors.white)),
-                                  ),
-                                  Text(
-                                    //Show remain calories
-                                    getRemainCal()[1].toInt().toString(),
-                                    style: AppTheme
-                                        .themeData.textTheme.headline3!
-                                        .merge(TextStyle(color: Colors.white)),
-                                  ),
-                                  Text(
-                                    "แคล",
-                                    style: AppTheme
-                                        .themeData.textTheme.subtitle1!
-                                        .merge(TextStyle(color: Colors.white)),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.all(10),
-                          //show line progress
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: <Widget>[
-                              //protein
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "โปรตีน",
-                                    style: AppTheme
-                                        .themeData.textTheme.bodyText2!
-                                        .merge(TextStyle(color: Colors.white)),
-                                  ),
-                                  LinearPercentIndicator(
-                                    width: 97,
-                                    animation: true,
-                                    animationDuration: 750,
-                                    lineHeight: 6,
-                                    percent: double.parse(getNutrient()[0]),
-                                    linearStrokeCap: LinearStrokeCap.roundAll,
-                                    progressColor: Colors.white,
-                                  ),
-                                  Text(
-                                    getNutrient()[1],
-                                    style: AppTheme
-                                        .themeData.textTheme.bodyText2!
-                                        .merge(TextStyle(color: Colors.white)),
-                                  ),
-                                ],
-                              ),
-                              //carb
-                              Column(
-                                children: [
-                                  Text(
-                                    "คาร์บ",
-                                    style: AppTheme
-                                        .themeData.textTheme.bodyText2!
-                                        .merge(TextStyle(color: Colors.white)),
-                                  ),
-                                  LinearPercentIndicator(
-                                    width: 97,
-                                    animation: true,
-                                    animationDuration: 750,
-                                    lineHeight: 6,
-                                    percent: double.parse(getNutrient()[2]),
-                                    linearStrokeCap: LinearStrokeCap.roundAll,
-                                    progressColor: Colors.white,
-                                  ),
-                                  Text(
-                                    getNutrient()[3],
-                                    style: AppTheme
-                                        .themeData.textTheme.bodyText2!
-                                        .merge(TextStyle(color: Colors.white)),
-                                  ),
-                                ],
-                              ),
-                              //fat
-                              Column(
-                                children: [
-                                  Text(
-                                    "ไขมัน",
-                                    style: AppTheme
-                                        .themeData.textTheme.bodyText2!
-                                        .merge(TextStyle(color: Colors.white)),
-                                  ),
-                                  LinearPercentIndicator(
-                                    width: 97,
-                                    animation: true,
-                                    animationDuration: 750,
-                                    lineHeight: 6,
-                                    percent: double.parse(getNutrient()[4]),
-                                    linearStrokeCap: LinearStrokeCap.roundAll,
-                                    progressColor: Colors.white,
-                                  ),
-                                  Text(
-                                    getNutrient()[5],
-                                    style: AppTheme
-                                        .themeData.textTheme.bodyText2!
-                                        .merge(TextStyle(color: Colors.white)),
-                                  ),
-                                ],
-                              )
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Container(
-                color: Color(0xFFF6F6F6),
-                child: Padding(
-                    padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "เมนูแนะนำ",
-                          style: AppTheme.themeData.textTheme.bodyText1!.merge(
-                            TextStyle(color: AppTheme.themeData.primaryColor),
-                          ),
-                        ),
-                        TextButton.icon(
-                          onPressed: () {
-                            //change page
-                            print("menu all");
-                          },
-                          style: TextButton.styleFrom(
-                              padding: EdgeInsets.all(0),
-                              alignment: Alignment.centerLeft),
-                          label: Text(
-                            "ดูทั้งหมด",
-                            style: AppTheme.themeData.textTheme.button!.merge(
-                                TextStyle(
-                                    color: AppTheme.themeData.primaryColor)),
-                          ),
-                          icon: Icon(Icons.add,
-                              color: AppTheme.themeData.primaryColor),
-                        )
-                      ],
-                    ))),
-            Container(
-              height: 200,
-              color: Color(0xFFF6F6F6),
-              child: ListView.builder(
-                  itemCount: cardItems.length, //show 5 card
-                  scrollDirection: Axis.horizontal,
-                  shrinkWrap: true,
-                  padding: EdgeInsets.only(left: 8),
-                  itemBuilder: (BuildContext context, int index) {
-                    return buildMenuCard(index);
-                  }),
-            ),
-            Container(
-              height: 51,
-              color: Color(0xFFF6F6F6),
-              child: Padding(
-                padding: EdgeInsets.only(left: 16, top: 16),
-                child: Text(
-                  "น้ำวันนี้",
-                  style: AppTheme.themeData.textTheme.bodyText1!
-                      .merge(TextStyle(color: AppTheme.themeData.primaryColor)),
-                ),
-              ),
-            ),
-            Container(
-              height: 74,
-              color: Color(0xFFF6F6F6),
-              padding: EdgeInsets.only(left: 16, right: 16),
-              child: Card(
-                color: Colors.white,
-                elevation: 2,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15)),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Text(
-                      "วันนี้คุณดื่มน้ำไปแล้ว",
-                      style: AppTheme.themeData.textTheme.bodyText2!.merge(
-                          TextStyle(color: AppTheme.themeData.accentColor)),
-                    ),
-                    Container(
-                        height: 50,
-                        width: 135,
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 35,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(10),
-                                      bottomLeft: Radius.circular(10)),
-                                  border: Border.all(
-                                      color: Color(0xFFC4C4C4), width: 1)),
-                              child: IconButton(
-                                icon: Icon(
-                                  Icons.remove,
-                                  color: AppTheme.themeData.accentColor,
-                                ),
-                                onPressed: removeWater,
-                                color: AppTheme.themeData.accentColor,
-                                padding: EdgeInsets.only(left: 0),
-                              ),
-                            ),
-                            Container(
-                              width: 57,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                  border: Border.all(
-                                      color: Color(0xFFC4C4C4), width: 1)),
-                              child: Text("${_water.toString()}",
-                                  style: AppTheme.themeData.textTheme.headline5!
-                                      .merge(
-                                    TextStyle(
-                                        color: AppTheme.themeData.accentColor),
-                                  )),
-                            ),
-                            Container(
-                              width: 35,
-                              alignment: Alignment.centerLeft,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.only(
-                                      topRight: Radius.circular(10),
-                                      bottomRight: Radius.circular(10)),
-                                  border: Border.all(
-                                      color: Color(0xFFC4C4C4), width: 1)),
-                              child: IconButton(
-                                icon: Icon(
-                                  Icons.add,
-                                  color: AppTheme.themeData.accentColor,
-                                ),
-                                onPressed: addWater,
-                                padding: EdgeInsets.only(left: 0),
-                              ),
-                            )
-                          ],
-                        )),
-                    Text(
-                      "แก้ว",
-                      style: AppTheme.themeData.textTheme.bodyText2!.merge(
-                          TextStyle(color: AppTheme.themeData.accentColor)),
-                    )
-                  ],
-                ),
-              ),
-            ),
+        extendBody: true,
+        appBar: AppBar(
+          backgroundColor: Color(0xFFF6F6F6),
+          elevation: 0,
+          title: Text("หน้าหลัก",
+              style: AppTheme.themeData.textTheme.headline5!
+                  .merge(TextStyle(color: AppTheme.themeData.primaryColor))),
+          actions: [
+            IconButton(
+                onPressed: () {
+                  // change page to setting page
+                  print("setting");
+                },
+                icon: Icon(Icons.settings,
+                    color: AppTheme.themeData.primaryColor)),
+            ElevatedButton(
+                onPressed: () =>
+                    context.read<AppBloc>().add(AppLogoutRequested()),
+                child: Text('Logout'))
           ],
         ),
-      ),
-    );
+        body: SafeArea(
+          child: ListView(
+            children: <Widget>[
+              //today's calories
+              Container(
+                  color: Color(0xFFF6F6F6),
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+                    child: Text(
+                      "แคลอรีวันนี้",
+                      style: AppTheme.themeData.textTheme.bodyText1!.merge(
+                        TextStyle(color: AppTheme.themeData.primaryColor),
+                      ),
+                    ),
+                  )),
+
+              //calories progress card
+              Container(
+                color: Color(0xFFF6F6F6),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                  child: Card(
+                    color: AppTheme.themeData.primaryColor,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                    elevation: 2,
+                    child: Center(
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(102, 18, 95, 0),
+                            //circular progress
+                            child: CircularPercentIndicator(
+                              radius: 183,
+                              lineWidth: 8,
+                              percent: getRemainCal()[0],
+                              animation: true,
+                              animationDuration: 750,
+                              progressColor: Colors.white,
+                              center: Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "กินได้อีก",
+                                      style: AppTheme
+                                          .themeData.textTheme.subtitle1!
+                                          .merge(
+                                              TextStyle(color: Colors.white)),
+                                    ),
+                                    Text(
+                                      //Show remain calories
+                                      getRemainCal()[1].toInt().toString(),
+                                      style: AppTheme
+                                          .themeData.textTheme.headline3!
+                                          .merge(
+                                              TextStyle(color: Colors.white)),
+                                    ),
+                                    Text(
+                                      "แคล",
+                                      style: AppTheme
+                                          .themeData.textTheme.subtitle1!
+                                          .merge(
+                                              TextStyle(color: Colors.white)),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(10),
+                            //show line progress
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: <Widget>[
+                                //protein
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "โปรตีน",
+                                      style: AppTheme
+                                          .themeData.textTheme.bodyText2!
+                                          .merge(
+                                              TextStyle(color: Colors.white)),
+                                    ),
+                                    LinearPercentIndicator(
+                                      width: 97,
+                                      animation: true,
+                                      animationDuration: 750,
+                                      lineHeight: 6,
+                                      percent: double.parse(getNutrient()[0]),
+                                      linearStrokeCap: LinearStrokeCap.roundAll,
+                                      progressColor: Colors.white,
+                                    ),
+                                    Text(
+                                      getNutrient()[1],
+                                      style: AppTheme
+                                          .themeData.textTheme.bodyText2!
+                                          .merge(
+                                              TextStyle(color: Colors.white)),
+                                    ),
+                                  ],
+                                ),
+                                //carb
+                                Column(
+                                  children: [
+                                    Text(
+                                      "คาร์บ",
+                                      style: AppTheme
+                                          .themeData.textTheme.bodyText2!
+                                          .merge(
+                                              TextStyle(color: Colors.white)),
+                                    ),
+                                    LinearPercentIndicator(
+                                      width: 97,
+                                      animation: true,
+                                      animationDuration: 750,
+                                      lineHeight: 6,
+                                      percent: double.parse(getNutrient()[2]),
+                                      linearStrokeCap: LinearStrokeCap.roundAll,
+                                      progressColor: Colors.white,
+                                    ),
+                                    Text(
+                                      getNutrient()[3],
+                                      style: AppTheme
+                                          .themeData.textTheme.bodyText2!
+                                          .merge(
+                                              TextStyle(color: Colors.white)),
+                                    ),
+                                  ],
+                                ),
+                                //fat
+                                Column(
+                                  children: [
+                                    Text(
+                                      "ไขมัน",
+                                      style: AppTheme
+                                          .themeData.textTheme.bodyText2!
+                                          .merge(
+                                              TextStyle(color: Colors.white)),
+                                    ),
+                                    LinearPercentIndicator(
+                                      width: 97,
+                                      animation: true,
+                                      animationDuration: 750,
+                                      lineHeight: 6,
+                                      percent: double.parse(getNutrient()[4]),
+                                      linearStrokeCap: LinearStrokeCap.roundAll,
+                                      progressColor: Colors.white,
+                                    ),
+                                    Text(
+                                      getNutrient()[5],
+                                      style: AppTheme
+                                          .themeData.textTheme.bodyText2!
+                                          .merge(
+                                              TextStyle(color: Colors.white)),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                  color: Color(0xFFF6F6F6),
+                  child: Padding(
+                      padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "เมนูแนะนำ",
+                            style:
+                                AppTheme.themeData.textTheme.bodyText1!.merge(
+                              TextStyle(color: AppTheme.themeData.primaryColor),
+                            ),
+                          ),
+                          TextButton.icon(
+                            onPressed: () {
+                              //change page
+                              print("menu all");
+                            },
+                            style: TextButton.styleFrom(
+                                padding: EdgeInsets.all(0),
+                                alignment: Alignment.centerLeft),
+                            label: Text(
+                              "ดูทั้งหมด",
+                              style: AppTheme.themeData.textTheme.button!.merge(
+                                  TextStyle(
+                                      color: AppTheme.themeData.primaryColor)),
+                            ),
+                            icon: Icon(Icons.add,
+                                color: AppTheme.themeData.primaryColor),
+                          )
+                        ],
+                      ))),
+              Container(
+                height: 200,
+                color: Color(0xFFF6F6F6),
+                child: ListView.builder(
+                    itemCount: cardItems.length, //show 5 card
+                    scrollDirection: Axis.horizontal,
+                    shrinkWrap: true,
+                    padding: EdgeInsets.only(left: 8),
+                    itemBuilder: (BuildContext context, int index) {
+                      return buildMenuCard(index);
+                    }),
+              ),
+              Container(
+                height: 51,
+                color: Color(0xFFF6F6F6),
+                child: Padding(
+                  padding: EdgeInsets.only(left: 16, top: 16),
+                  child: Text(
+                    "น้ำวันนี้",
+                    style: AppTheme.themeData.textTheme.bodyText1!.merge(
+                        TextStyle(color: AppTheme.themeData.primaryColor)),
+                  ),
+                ),
+              ),
+              Container(
+                height: 74,
+                color: Color(0xFFF6F6F6),
+                margin: EdgeInsets.only(left: 16, right: 16, bottom: 30),
+                child: Card(
+                  color: Colors.white,
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Text(
+                        "วันนี้คุณดื่มน้ำไปแล้ว",
+                        style: AppTheme.themeData.textTheme.bodyText2!.merge(
+                            TextStyle(color: AppTheme.themeData.accentColor)),
+                      ),
+                      Container(
+                          height: 50,
+                          width: 135,
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 35,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(10),
+                                        bottomLeft: Radius.circular(10)),
+                                    border: Border.all(
+                                        color: Color(0xFFC4C4C4), width: 1)),
+                                child: IconButton(
+                                  icon: Icon(
+                                    Icons.remove,
+                                    color: AppTheme.themeData.accentColor,
+                                  ),
+                                  onPressed: removeWater,
+                                  color: AppTheme.themeData.accentColor,
+                                  padding: EdgeInsets.only(left: 0),
+                                ),
+                              ),
+                              Container(
+                                width: 57,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                        color: Color(0xFFC4C4C4), width: 1)),
+                                child: Text("${_water.toString()}",
+                                    style: AppTheme
+                                        .themeData.textTheme.headline5!
+                                        .merge(
+                                      TextStyle(
+                                          color:
+                                              AppTheme.themeData.accentColor),
+                                    )),
+                              ),
+                              Container(
+                                width: 35,
+                                alignment: Alignment.centerLeft,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.only(
+                                        topRight: Radius.circular(10),
+                                        bottomRight: Radius.circular(10)),
+                                    border: Border.all(
+                                        color: Color(0xFFC4C4C4), width: 1)),
+                                child: IconButton(
+                                  icon: Icon(
+                                    Icons.add,
+                                    color: AppTheme.themeData.accentColor,
+                                  ),
+                                  onPressed: addWater,
+                                  padding: EdgeInsets.only(left: 0),
+                                ),
+                              )
+                            ],
+                          )),
+                      Text(
+                        "แก้ว",
+                        style: AppTheme.themeData.textTheme.bodyText2!.merge(
+                            TextStyle(color: AppTheme.themeData.accentColor)),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            //change to camera mode
+            print("camera");
+          },
+          elevation: 0.4,
+          child: Icon(Icons.photo_camera),
+          backgroundColor: AppTheme.themeData.accentColor,
+        ),
+        bottomNavigationBar: FABBottomAppBar(
+            items: [
+              FABBottomAppBarItem(iconData: Icons.home, text: "หน้าหลัก"),
+              FABBottomAppBarItem(iconData: Icons.book, text: "แผน"),
+              FABBottomAppBarItem(
+                  iconData: Icons.accessibility, text: "ร่างกาย"),
+              FABBottomAppBarItem(
+                  iconData: Icons.calendar_today, text: "ประวัติ")
+            ],
+            centerItemText: "",
+            backgroundColor: AppTheme.themeData.primaryColor,
+            color: Colors.white,
+            selectedColor: Colors.white,
+            notchedShape: CircularNotchedRectangle(),
+            onTabSelected: selectedTab));
   }
 
   List<double> getRemainCal() {
@@ -475,6 +511,12 @@ class _HomeState extends State<Home> {
       print("remove water");
       _water--;
       if (_water < 0) _water = 0;
+    });
+  }
+
+  void selectedTab(int index) {
+    setState(() {
+      print(index);
     });
   }
 }
