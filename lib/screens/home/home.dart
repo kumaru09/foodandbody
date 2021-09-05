@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:foodandbody/theme.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class Home extends StatelessWidget {
   const Home({Key? key}) : super(key: key);
+
+  static Page page() => const MaterialPage<void>(child: Home());
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +37,11 @@ class _Home extends StatelessWidget {
                   // change page to setting page
                 },
                 icon: Icon(Icons.settings,
-                    color: AppTheme.themeData.primaryColor))
+                    color: AppTheme.themeData.primaryColor)),
+            ElevatedButton(
+              onPressed: () => context.read<AppBloc>().add(AppLogoutRequested()), 
+              child: Text('Logout'),
+            )
           ],
         ),
         body: SafeArea(
