@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:foodandbody/cache.dart';
@@ -27,6 +28,7 @@ class AuthenRepository {
   Stream<User> get user {
     return _firebaseAuth.authStateChanges().map((firebaseUser) {
       final user = firebaseUser == null ? User.empty : firebaseUser.toUser;
+      log(user.toString());
       _cache.wirte(key: userCacheKey, value: user);
       return user;
     });
