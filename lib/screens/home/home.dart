@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:foodandbody/screens/home/circularCaIndicator.dart';
 import 'package:foodandbody/widget/buttomAppBar.dart';
+import 'package:foodandbody/widget/linearNutrientIndicator.dart';
 import 'package:foodandbody/widget/menuCard.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
@@ -82,106 +83,8 @@ class _HomeState extends State<Home> {
                           ),
                           Padding(
                             padding: EdgeInsets.all(10),
-                            //show line progress
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: <Widget>[
-                                //protein
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "โปรตีน",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyText2!
-                                          .merge(
-                                              TextStyle(color: Colors.white)),
-                                    ),
-                                    LinearPercentIndicator(
-                                      width: 97,
-                                      animation: true,
-                                      animationDuration: 750,
-                                      lineHeight: 6,
-                                      percent: double.parse(getNutrient()[0]),
-                                      linearStrokeCap: LinearStrokeCap.roundAll,
-                                      progressColor: Colors.white,
-                                      backgroundColor: Color(0xFFFFBB91),
-                                    ),
-                                    Text(
-                                      getNutrient()[1],
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyText2!
-                                          .merge(
-                                              TextStyle(color: Colors.white)),
-                                    ),
-                                  ],
-                                ),
-                                //carb
-                                Column(
-                                  children: [
-                                    Text(
-                                      "คาร์บ",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyText2!
-                                          .merge(
-                                              TextStyle(color: Colors.white)),
-                                    ),
-                                    LinearPercentIndicator(
-                                      width: 97,
-                                      animation: true,
-                                      animationDuration: 750,
-                                      lineHeight: 6,
-                                      percent: double.parse(getNutrient()[2]),
-                                      linearStrokeCap: LinearStrokeCap.roundAll,
-                                      progressColor: Colors.white,
-                                      backgroundColor: Color(0xFFFFBB91),
-                                    ),
-                                    Text(
-                                      getNutrient()[3],
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyText2!
-                                          .merge(
-                                              TextStyle(color: Colors.white)),
-                                    ),
-                                  ],
-                                ),
-                                //fat
-                                Column(
-                                  children: [
-                                    Text(
-                                      "ไขมัน",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyText2!
-                                          .merge(
-                                              TextStyle(color: Colors.white)),
-                                    ),
-                                    LinearPercentIndicator(
-                                      width: 97,
-                                      animation: true,
-                                      animationDuration: 750,
-                                      lineHeight: 6,
-                                      percent: double.parse(getNutrient()[4]),
-                                      linearStrokeCap: LinearStrokeCap.roundAll,
-                                      progressColor: Colors.white,
-                                      backgroundColor: Color(0xFFFFBB91),
-                                    ),
-                                    Text(
-                                      getNutrient()[5],
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyText2!
-                                          .merge(
-                                              TextStyle(color: Colors.white)),
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
+                            child:
+                                LinearNutrientIndicator(), //show line progress
                           )
                         ],
                       ),
