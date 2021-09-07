@@ -8,7 +8,7 @@ class CircularCalIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     var totalCal = getTotalCal();
     var goalCal = getGoalCal();
-    double percentCal = getPercentOfRemainCal(totalCal, goalCal);
+    double percentCal = totalCal / goalCal;
 
     Color progressColor;
     Color backgroundColor;
@@ -74,9 +74,5 @@ class CircularCalIndicator extends StatelessWidget {
   int getGoalCal() {
     //query from DB
     return 1800;
-  }
-
-  double getPercentOfRemainCal(int totalCal, int goalCal) {
-    return (totalCal / goalCal);
   }
 }
