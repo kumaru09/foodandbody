@@ -17,14 +17,11 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List<MenuCard> cardItems = [];
   var _water = 0;
   int bottomAppBarIndex = 0;
 
   @override
   Widget build(BuildContext context) {
-    this.cardItems = getMenuCard(); //get recommend menu from DB
-
     return Scaffold(
         extendBody: true,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -64,7 +61,6 @@ class _HomeState extends State<Home> {
                       ),
                 ),
               )),
-
               //calories progress card
               Container(
                 child: Padding(
@@ -130,17 +126,7 @@ class _HomeState extends State<Home> {
                           )
                         ],
                       ))),
-              Container(
-                height: 200,
-                child: ListView.builder(
-                    itemCount: cardItems.length, //show 5 card
-                    scrollDirection: Axis.horizontal,
-                    shrinkWrap: true,
-                    padding: EdgeInsets.only(left: 8),
-                    itemBuilder: (BuildContext context, int index) {
-                      return buildMenuCard(index);
-                    }),
-              ),
+              MenuCardWidget(), //show menu card
               Container(
                 height: 51,
                 child: Padding(
@@ -154,7 +140,6 @@ class _HomeState extends State<Home> {
               ),
               Container(
                 height: 74,
-                // color: Color(0xFFF6F6F6),
                 margin: EdgeInsets.only(left: 16, right: 16, bottom: 30),
                 child: Card(
                   color: Colors.white,
@@ -261,118 +246,6 @@ class _HomeState extends State<Home> {
         ),
         bottomNavigationBar: BottomAppBarWidget(
             index: bottomAppBarIndex, onChangedTab: onChangedTab));
-  }
-
-  List<double> getRemainCal() {
-    var goal = 1800; //query goalCalories
-    var total = 1182; //query totalCalories
-    double remainCal = goal.toDouble() - total.toDouble();
-    return [getPercent(total, goal), remainCal];
-  }
-
-  List<String> getNutrient() {
-    var goalProtein = 85;
-    var totalProtein = 47;
-    var goalCarb = 200;
-    var totalCarb = 145;
-    var goalFat = 51;
-    var totalFat = 14;
-    return [
-      getPercent(totalProtein, goalProtein).toString(), //% protein
-      "$totalProtein/$goalProtein g", //protein description
-      getPercent(totalCarb, goalCarb).toString(), //% carb
-      "$totalCarb/$goalCarb g", //carb description
-      getPercent(totalFat, goalFat).toString(), //% fat
-      "$totalFat/$goalFat g" //fat description
-    ];
-  }
-
-  double getPercent(int total, int goal) {
-    return (total / goal);
-  }
-
-  List<MenuCard> getMenuCard() {
-    //query menu image, menu name, calories
-    return [
-      MenuCard(
-          "https://www.haveazeed.com/wp-content/uploads/2019/08/3.%E0%B8%AA%E0%B9%89%E0%B8%A1%E0%B8%95%E0%B8%B3%E0%B9%84%E0%B8%97%E0%B8%A2%E0%B9%84%E0%B8%82%E0%B9%88%E0%B9%80%E0%B8%84%E0%B9%87%E0%B8%A1-1.png",
-          "ตำไทยไข่เค็ม",
-          "172"),
-      MenuCard("https://dilafashionshop.files.wordpress.com/2019/03/71.jpg",
-          "ข้าวกะเพราไก่ไข่ดาว", "480"),
-      MenuCard(
-          "https://img.kapook.com/u/pirawan/Cooking1/thai%20spicy%20mushrooms%20salad.jpg",
-          "ยำเห็ดรวมมิตร",
-          "104"),
-      MenuCard(
-          "https://snpfood.com/wp-content/uploads/2020/01/Breakfast-00002-scaled-1-1536x1536.jpg",
-          "ข้าวต้มปลา",
-          "220"),
-      MenuCard(
-          "https://snpfood.com/wp-content/uploads/2020/01/Highlight-Menu-0059-scaled-1-1536x1536.jpg",
-          "ข้าวผัดปู",
-          "551"),
-    ]; //dummy data
-  }
-
-  Widget buildMenuCard(int index) {
-    final item = cardItems[index];
-    return Container(
-      height: 200,
-      padding: EdgeInsets.only(left: 8),
-      child: Card(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          elevation: 2,
-          semanticContainer: true,
-          child: InkWell(
-            onTap: () {
-              //change page
-              print("tap menu card");
-            },
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                ClipRRect(
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(15),
-                      topRight: Radius.circular(15)),
-                  child: Image.network(
-                    item.image,
-                    height: 150,
-                    width: 200,
-                    fit: BoxFit.fill,
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 150,
-                      padding: EdgeInsets.only(left: 8, top: 6),
-                      child: Text(
-                        item.menu,
-                        textAlign: TextAlign.left,
-                        style: Theme.of(context).textTheme.bodyText2!.merge(
-                            TextStyle(color: Theme.of(context).accentColor)),
-                      ),
-                    ),
-                    Container(
-                      width: 50,
-                      padding: EdgeInsets.only(top: 3, right: 8),
-                      child: Text(
-                        "${item.calories}",
-                        textAlign: TextAlign.right,
-                        style: Theme.of(context).textTheme.headline6!.merge(
-                            TextStyle(color: Theme.of(context).accentColor)),
-                      ),
-                    )
-                  ],
-                ),
-              ],
-            ),
-          )),
-    );
   }
 
   void addWater() {
