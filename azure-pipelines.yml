@@ -3,17 +3,49 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
+variables:
+  projectDirectory: 'signapp'
+
 trigger:
 - develop
 
-pool:
-  vmImage: ubuntu-latest
+jobs:
+  - job: Android
+    pool:
+      vmImage: 'macOS-lastest'
+    steps:
+    - task: FlutterInstall@0
+      inputs:
+        mode: 'auto'
+        channel: 'stable'
+        version: 'latest'
+    - task: FlutterTest@0
+      inputs:
+        projectDirectory: '.'
+        generateCodeCoverageReport: true
+    - task: FlutterBuild@0
+      inputs:
+        target: 'apk'
+        projectDirectory: '.'    
+    - task: AndroidSigning@3
+      displayName: 'Signing and aligning APK file(s) **/*.apk'
+      inputs:
+        apksign: true
+        apkFiles: '**/*.apk'
+        apksignerKeystoreFile: 'key.jks'
+        apksignerKeystorePassword: '$(keypassword)'
+        apksignerKeystoreAlias: '$(key)'
+        apksignerKeyPassword: '$(keypassword)'
+    - task: CopyFiles@2
+      inputs:
+        contents: '**/*.apk'
+        targetFolder: '$(build.artifactStagingDirectory)'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        artifactName: 'drop'
+    
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+
+        
+
