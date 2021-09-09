@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:foodandbody/screens/home/circularCaIndicator.dart';
+import 'package:foodandbody/screens/menu/menu.dart';
 import 'package:foodandbody/widget/buttomAppBar.dart';
 import 'package:foodandbody/widget/linearNutrientIndicator.dart';
 import 'package:foodandbody/widget/menuCard.dart';
@@ -43,6 +44,7 @@ class _HomeState extends State<Home> {
             ElevatedButton(
                 onPressed: () =>
                     context.read<AppBloc>().add(AppLogoutRequested()),
+                key: const Key('homePage_logout_iconButton'),
                 child: Text('Logout'))
           ],
         ),
@@ -101,13 +103,16 @@ class _HomeState extends State<Home> {
                                 ),
                           ),
                           ElevatedButton.icon(
+                            key: const Key('menu_all_button'),
                             style: ElevatedButton.styleFrom(
                                 primary:
                                     Theme.of(context).scaffoldBackgroundColor,
                                 elevation: 0),
                             onPressed: () {
                               //chage page
-                              print("menu all");
+                              Navigator.push(
+                                context, MaterialPageRoute(builder: (context) => Menu())
+                              );
                             },
                             icon: Icon(
                               Icons.add,

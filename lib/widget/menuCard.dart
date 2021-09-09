@@ -39,15 +39,18 @@ class MenuCardWidget extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                ClipRRect(
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(15),
-                      topRight: Radius.circular(15)),
-                  child: Image.network(
-                    item.image,
-                    height: 150,
-                    width: 200,
-                    fit: BoxFit.fill,
+                Expanded(
+                  flex: 1,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(15),
+                        topRight: Radius.circular(15)),
+                    child: Image.network(
+                      item.image,
+                      height: 150,
+                      width: 200,
+                      fit: BoxFit.fill,
+                    ),
                   ),
                 ),
                 Row(
@@ -55,7 +58,7 @@ class MenuCardWidget extends StatelessWidget {
                   children: [
                     Container(
                       width: 150,
-                      padding: EdgeInsets.only(left: 8, top: 6),
+                      padding: EdgeInsets.only(left: 8, top: 3),
                       child: Text(
                         item.name,
                         textAlign: TextAlign.left,
