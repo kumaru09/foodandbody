@@ -122,7 +122,6 @@ class _EmailInput extends StatelessWidget {
             onChanged: (email) =>
                 context.read<LoginCubit>().emailChanged(email),
             keyboardType: TextInputType.emailAddress,
-            autofocus: true,
             textInputAction: TextInputAction.next,
             decoration: InputDecoration(
               // hintText: 'ชื่อผู้ใช้งาน',
