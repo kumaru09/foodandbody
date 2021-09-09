@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
-class Menu extends StatelessWidget {
-  const Menu({Key? key}) : super(key: key);
+class MenuDetail extends StatelessWidget {
+  const MenuDetail({Key? key, required this.menuName}) : super(key: key);
+  final String menuName;
 
   @override
   Widget build(BuildContext context) {
@@ -11,7 +12,7 @@ class Menu extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: Theme.of(context).primaryColor,
           elevation: 0,
-          title: Text("เมนู",
+          title: Text("$menuName",
               style: Theme.of(context)
                   .textTheme
                   .headline6!

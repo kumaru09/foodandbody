@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:foodandbody/screens/home/circularCaIndicator.dart';
+import 'package:foodandbody/screens/body/body.dart';
+import 'package:foodandbody/screens/camera/camera.dart';
+import 'package:foodandbody/screens/history/history.dart';
+import 'package:foodandbody/screens/home/circular_cal_indicator.dart';
 import 'package:foodandbody/screens/menu/menu.dart';
+import 'package:foodandbody/screens/plan/plan.dart';
+import 'package:foodandbody/screens/setting/setting.dart';
 import 'package:foodandbody/widget/buttom_appbar.dart';
 import 'package:foodandbody/widget/linear_nutrient_indicator.dart';
 import 'package:foodandbody/widget/menu_card.dart';
@@ -17,7 +22,8 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  var _water = 0;
+  List page = [Home(), Plan(), Body(), History()];
+  var _water;
   int bottomAppBarIndex = 0;
 
   @override
@@ -38,6 +44,8 @@ class _HomeState extends State<Home> {
                 onPressed: () {
                   // change page to setting page
                   print("setting");
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => Setting()));
                 },
                 icon: Icon(Icons.settings,
                     color: Theme.of(context).primaryColor)),
@@ -111,8 +119,9 @@ class _HomeState extends State<Home> {
                             onPressed: () {
                               //chage page
                               Navigator.push(
-                                context, MaterialPageRoute(builder: (context) => Menu())
-                              );
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => Menu()));
                             },
                             icon: Icon(
                               Icons.add,
@@ -192,7 +201,8 @@ class _HomeState extends State<Home> {
                                 decoration: BoxDecoration(
                                     border: Border.all(
                                         color: Color(0xFFC4C4C4), width: 1)),
-                                child: Text("${_water.toString()}",
+                                child: Text(
+                                    "${_water == null ? 0 : _water.toString()}",
                                     style: Theme.of(context)
                                         .textTheme
                                         .headline5!
@@ -242,7 +252,8 @@ class _HomeState extends State<Home> {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             //change to camera mode
-            print("camera");
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => Camera()));
           },
           elevation: 0.4,
           child: Icon(Icons.photo_camera),
@@ -254,14 +265,15 @@ class _HomeState extends State<Home> {
 
   void addWater() {
     setState(() {
-      print("add water");
-      _water++;
+      if (_water == null)
+        _water = 1;
+      else
+        _water++;
     });
   }
 
   void removeWater() {
     setState(() {
-      print("remove water");
       _water--;
       if (_water < 0) _water = 0;
     });
@@ -270,6 +282,9 @@ class _HomeState extends State<Home> {
   void onChangedTab(int index) {
     setState(() {
       this.bottomAppBarIndex = index;
+      Navigator.pop(context);
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => page[index]));
     });
   }
 }
