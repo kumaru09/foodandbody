@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:foodandbody/screens/menu_detail/menu_detail.dart';
 
 class MenuCardWidget extends StatelessWidget {
   const MenuCardWidget({Key? key}) : super(key: key);
@@ -24,9 +25,9 @@ class MenuCardWidget extends StatelessWidget {
   Widget buildMenuCard(BuildContext context, MenuCardInfo menu) {
     final item = menu;
     return Container(
-      height: 200,
-      padding: EdgeInsets.only(left: 8),
-      child: Card(
+        height: 200,
+        padding: EdgeInsets.only(left: 8),
+        child: Card(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           elevation: 2,
@@ -34,10 +35,10 @@ class MenuCardWidget extends StatelessWidget {
           child: InkWell(
             onTap: () {
               //change page
-              print("tap menu card");
+              Navigator.push(context, MaterialPageRoute(builder: (context) => MenuDetail(menuName: menu.name)));
             },
-            child: SingleChildScrollView(
-              child: Column(
+            // child: SingleChildScrollView(
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 Expanded(
@@ -81,9 +82,10 @@ class MenuCardWidget extends StatelessWidget {
                 ),
               ],
             ),
-            ),
-          )),
-    );
+          ),
+        )
+        // ),
+        );
   }
 
   List<MenuCardInfo> getMenuInfo() {
