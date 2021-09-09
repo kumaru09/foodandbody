@@ -36,7 +36,8 @@ class MenuCardWidget extends StatelessWidget {
               //change page
               print("tap menu card");
             },
-            child: Column(
+            child: SingleChildScrollView(
+              child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 ClipRRect(
@@ -76,6 +77,7 @@ class MenuCardWidget extends StatelessWidget {
                   ],
                 ),
               ],
+            ),
             ),
           )),
     );
