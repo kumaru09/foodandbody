@@ -30,6 +30,7 @@ class CircularCalIndicator extends StatelessWidget {
     }
 
     return CircularPercentIndicator(
+      key: const Key('calories_circular_indicator'),
       radius: 183,
       lineWidth: 8,
       percent: percentCal,
