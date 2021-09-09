@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:foodandbody/screens/home/circularCaIndicator.dart';
 import 'package:foodandbody/screens/menu/menu.dart';
-import 'package:foodandbody/widget/buttomAppBar.dart';
-import 'package:foodandbody/widget/linearNutrientIndicator.dart';
-import 'package:foodandbody/widget/menuCard.dart';
+import 'package:foodandbody/widget/buttom_appbar.dart';
+import 'package:foodandbody/widget/linear_nutrient_indicator.dart';
+import 'package:foodandbody/widget/menu_card.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/screens/login/cubit/login_cubit.dart';
+import 'package:foodandbody/screens/register/register.dart';
+import 'package:foodandbody/screens/forgot_password/forgot_password.dart';
 import 'package:formz/formz.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class LoginForm extends StatelessWidget {
   const LoginForm({Key? key}) : super(key: key);
@@ -26,12 +29,13 @@ class LoginForm extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 Image(image: AssetImage('assets/logo.png')),
-                //เข้าสู่ระบบ
-                Text('เข้าสู่ระบบ',
-                    style: Theme.of(context)
-                        .textTheme
-                        .headline5!
-                        .merge(TextStyle(color: Colors.white))),
+                Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Text('เข้าสู่ระบบ',
+                        style: Theme.of(context)
+                            .textTheme
+                            .headline5!
+                            .merge(TextStyle(color: Colors.white)))),
                 Card(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15),
@@ -41,14 +45,13 @@ class LoginForm extends StatelessWidget {
                     child: Column(
                       children: <Widget>[
                         _EmailInput(),
-                        SizedBox(
-                          height: 16.0,
-                        ),
-                        _PasswordInput(),
+                        SizedBox(height: 16.0),
+                        PasswordInput(),
                         Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               TextButton(
+                                key: const Key('loginForm_forgotPassword'),
                                 child: Text('ลืมรหัสผ่าน?',
                                     style: Theme.of(context)
                                         .textTheme
@@ -56,22 +59,45 @@ class LoginForm extends StatelessWidget {
                                         .merge(TextStyle(
                                             color: Theme.of(context)
                                                 .accentColor))),
-                                onPressed: () {/*validation*/},
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => ForgotPassword()),
+                                  );
+                                },
                               ),
                             ]),
-                        _LoginButton(),
-                        Text('หรือ'),
-                        //Facebook+Google
-                        Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image(image: AssetImage('assets/facebook.png')),
-                              Image(image: AssetImage('assets/google.png')),
-                            ]),
-                        Text('ลงทะเบียน',
-                            style: Theme.of(context).textTheme.button!.merge(
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(16, 16, 16, 10),
+                          child: _LoginButton(),
+                        ),
+                        Text('หรือ',
+                            style: Theme.of(context).textTheme.bodyText2!.merge(
                                 TextStyle(
                                     color: Theme.of(context).accentColor))),
+                        Padding(
+                            padding: EdgeInsets.fromLTRB(16, 6, 16, 30),
+                            child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  _FacebookLoginButton(),
+                                  _GoogleLoginButton(),
+                                ])),
+                        TextButton(
+                          key: const Key('loginForm_createAccount'),
+                          child: Text('ลงทะเบียน',
+                              style: Theme.of(context).textTheme.button!.merge(
+                                  TextStyle(
+                                      color: Theme.of(context).accentColor))),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => Register()),
+                            );
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -103,32 +129,44 @@ class _EmailInput extends StatelessWidget {
               labelText: 'ชื่อผู้ใช้งาน',
               border: OutlineInputBorder(borderSide: BorderSide()),
               errorText: state.email.invalid ? 'invalid email' : null,
-              helperText: '',
             ),
           );
         });
   }
 }
 
-class _PasswordInput extends StatelessWidget {
+class PasswordInput extends StatefulWidget {
+  @override
+  _PasswordInputState createState() => _PasswordInputState();
+}
+
+class _PasswordInputState extends State<PasswordInput> {
+  bool _isHidden = true;
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<LoginCubit, LoginState>(
         buildWhen: (previous, current) => previous.password != current.password,
         builder: (context, state) {
-          return TextFormField(
+          return TextField(
             key: const Key('loginForm_passwordInput_textField'),
             onChanged: (password) =>
                 context.read<LoginCubit>().passwordChanged(password),
             decoration: InputDecoration(
-              labelText: 'รหัสผ่าน',
-              border: OutlineInputBorder(),
-              errorText: state.password.invalid ? 'invalid password' : null,
-              suffixIcon: Icon(
-                Icons.remove_red_eye,
-              ),
-            ),
-            obscureText: true,
+                labelText: 'รหัสผ่าน',
+                border: OutlineInputBorder(),
+                errorText: state.password.invalid ? 'invalid password' : null,
+                suffixIcon: InkWell(
+                  key: const Key('loginForm_visibilityIcon'),
+                  onTap: () {
+                    setState(() {
+                      _isHidden = !_isHidden;
+                    });
+                  },
+                  child:
+                      Icon(_isHidden ? Icons.visibility : Icons.visibility_off),
+                )),
+            obscureText: _isHidden,
           );
         });
   }
@@ -157,5 +195,41 @@ class _LoginButton extends StatelessWidget {
                   ),
                 );
         });
+  }
+}
+
+class _GoogleLoginButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton.icon(
+      key: const Key('loginForm_googleLogin'),
+      label: Text(''),
+      style: ElevatedButton.styleFrom(
+        shape: CircleBorder(),
+        primary: Color(0xFFEA4335),
+        padding: EdgeInsets.fromLTRB(13, 13, 6, 13),
+      ),
+      icon: const Icon(FontAwesomeIcons.google, color: Colors.white),
+      onPressed: () {},
+      // onPressed: () => context.read<LoginCubit>().logInWithGoogle(),
+    );
+  }
+}
+
+class _FacebookLoginButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton.icon(
+      key: const Key('loginForm_facebookLogin'),
+      label: Text(''),
+      style: ElevatedButton.styleFrom(
+        shape: CircleBorder(),
+        primary: Color(0xFF3B5998),
+        padding: EdgeInsets.fromLTRB(13, 13, 6, 13),
+      ),
+      icon: const Icon(FontAwesomeIcons.facebookF, color: Colors.white),
+      onPressed: () {},
+      // onPressed: () => context.read<LoginCubit>().logInWithGoogle(),
+    );
   }
 }
