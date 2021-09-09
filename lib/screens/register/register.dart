@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart'; 
+import 'package:flutter/material.dart';
+import 'package:foodandbody/screens/register/register_form1.dart'; 
 
 class Register extends StatelessWidget {
   const Register({ Key? key }) : super(key: key);
@@ -7,6 +8,9 @@ class Register extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
+      body: SafeArea(
+        child: const RegisterForm1(),
+      )
     );
   }
 }
