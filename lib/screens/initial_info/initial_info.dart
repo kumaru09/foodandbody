@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 // import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:foodandbody/screens/register/cubit/register_cubit.dart';
 
-class RegisterForm2 extends StatelessWidget {
-  const RegisterForm2({Key? key}) : super(key: key);
+class InnitialInfo extends StatelessWidget {
+  const InnitialInfo({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +18,7 @@ class RegisterForm2 extends StatelessWidget {
               Image(image: AssetImage('assets/logo.png')),
               Padding(
                   padding: EdgeInsets.all(16.0),
-                  child: Text('ลงทะเบียน',
+                  child: Text('ข้อมูลส่วนตัว',
                       style: Theme.of(context)
                           .textTheme
                           .headline5!
@@ -31,6 +31,8 @@ class RegisterForm2 extends StatelessWidget {
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: <Widget>[
+                      _UsernameInput(),
+                      SizedBox(height: 16.0),
                       _WeightInput(),
                       SizedBox(height: 16.0),
                       _HeightInput(),
@@ -49,6 +51,24 @@ class RegisterForm2 extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _UsernameInput extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      key: const Key('registerForm_emailInput_textField'),
+      // onChanged: (email) =>
+      //     context.read<LoginCubit>().emailChanged(email),
+      keyboardType: TextInputType.emailAddress,
+      textInputAction: TextInputAction.next,
+      decoration: InputDecoration(
+        labelText: 'ชื่อผู้ใช้งาน',
+        border: OutlineInputBorder(borderSide: BorderSide()),
+        // errorText: state.email.invalid ? 'invalid email' : null,
       ),
     );
   }
@@ -151,7 +171,7 @@ class _RegisterButton extends StatelessWidget {
       // onPressed: state.status.isValidated
       //     ? () => context.read<RegisterCubit>()
       //     .registerWithCredentials() : null,
-      child: Text('ลงทะเบียน'),
+      child: Text('บันทึก'),
       style: ElevatedButton.styleFrom(
         primary: Theme.of(context).accentColor,
         padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 50.0),
