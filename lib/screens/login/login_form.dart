@@ -227,8 +227,7 @@ class _FacebookLoginButton extends StatelessWidget {
         padding: EdgeInsets.fromLTRB(13, 13, 6, 13),
       ),
       icon: const Icon(FontAwesomeIcons.facebookF, color: Colors.white),
-      onPressed: () {},
-      // onPressed: () => context.read<LoginCubit>().logInWithGoogle(),
+      onPressed: () => context.read<LoginCubit>().logInWithFacebook(),
     );
   }
 }

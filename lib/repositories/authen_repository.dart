@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:foodandbody/cache.dart';
 import 'package:foodandbody/models/user.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -15,18 +16,23 @@ class LogOutFailure implements Exception {}
 
 class LogInWithGoogleFailure implements Exception {}
 
+class LogInWithFacebookFailure implements Exception {}
+
 class AuthenRepository {
   AuthenRepository({
     CacheClient? cache,
     firebase_auth.FirebaseAuth? firebaseAuth,
     GoogleSignIn? googleSignIn,
+    FacebookAuth? facebookAuth
   })  : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
         _cache = cache ?? CacheClient(),
-        _googleSignIn = googleSignIn ?? GoogleSignIn.standard();
+        _googleSignIn = googleSignIn ?? GoogleSignIn.standard(),
+        _facebookAuth = facebookAuth ?? FacebookAuth.instance;
 
   final firebase_auth.FirebaseAuth _firebaseAuth;
   final CacheClient _cache;
   final GoogleSignIn _googleSignIn;
+  final FacebookAuth _facebookAuth;
 
   @visibleForTesting
   static const userCacheKey = '__user_cache_key__';
@@ -76,6 +82,19 @@ class AuthenRepository {
       await _firebaseAuth.signInWithCredential(credential);
     } catch (_) {
       throw LogInWithGoogleFailure();
+    }
+  }
+
+  Future<void> logInWithFacebook() async {
+    try {
+      final LoginResult loginResult = await _facebookAuth.login();
+      final firebase_auth.OAuthCredential facebookAuthCredential =
+          firebase_auth.FacebookAuthProvider.credential(
+              loginResult.accessToken!.token);
+
+      await _firebaseAuth.signInWithCredential(facebookAuthCredential);
+    } catch (_) {
+      throw LogInWithFacebookFailure();
     }
   }
 
