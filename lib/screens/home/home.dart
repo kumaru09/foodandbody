@@ -23,7 +23,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   List page = [Home(), Plan(), Body(), History()];
-  var _water;
+  var _water = 0;
   int bottomAppBarIndex = 0;
 
   @override
@@ -41,9 +41,8 @@ class _HomeState extends State<Home> {
                   .merge(TextStyle(color: Theme.of(context).primaryColor))),
           actions: [
             IconButton(
+                key: const Key('setting_button'),
                 onPressed: () {
-                  // change page to setting page
-                  print("setting");
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => Setting()));
                 },
@@ -155,6 +154,7 @@ class _HomeState extends State<Home> {
                 height: 74,
                 margin: EdgeInsets.only(left: 16, right: 16, bottom: 30),
                 child: Card(
+                  key: const Key('daily_water_card'),
                   color: Colors.white,
                   elevation: 2,
                   shape: RoundedRectangleBorder(
@@ -176,6 +176,7 @@ class _HomeState extends State<Home> {
                                 width: 35,
                                 height: 38,
                                 child: ElevatedButton(
+                                  key: const Key('remove_water_button'),
                                   onPressed: removeWater,
                                   style: ElevatedButton.styleFrom(
                                       primary: Theme.of(context).cardColor,
@@ -195,6 +196,7 @@ class _HomeState extends State<Home> {
                                 ),
                               ),
                               Container(
+                                // key: const Key('daily_water_display'),
                                 width: 57,
                                 height: 38,
                                 alignment: Alignment.center,
@@ -202,7 +204,8 @@ class _HomeState extends State<Home> {
                                     border: Border.all(
                                         color: Color(0xFFC4C4C4), width: 1)),
                                 child: Text(
-                                    "${_water == null ? 0 : _water.toString()}",
+                                    "${_water.toString()}",
+                                    key: const Key('daily_water_display'),
                                     style: Theme.of(context)
                                         .textTheme
                                         .headline5!
@@ -216,6 +219,7 @@ class _HomeState extends State<Home> {
                                 width: 35,
                                 height: 38,
                                 child: ElevatedButton(
+                                  key: const Key('add_water_button'),
                                   onPressed: addWater,
                                   style: ElevatedButton.styleFrom(
                                       primary: Theme.of(context).cardColor,
@@ -265,10 +269,7 @@ class _HomeState extends State<Home> {
 
   void addWater() {
     setState(() {
-      if (_water == null)
-        _water = 1;
-      else
-        _water++;
+      _water++;
     });
   }
 

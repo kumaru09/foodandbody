@@ -22,16 +22,20 @@ class LinearNutrientIndicator extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        buildLinearIndicator(context, "โปรตีน", totalProtein, goalProtein, percentProtein),
-        buildLinearIndicator(context, "คาร์บ", totalCarb, goalCarb, percentCarb),
-        buildLinearIndicator(context, "ไขมัน", totalFat, goalFat, percentFat),
+        buildLinearIndicator(context, const Key('protein_linear_indicator'),
+            "โปรตีน", totalProtein, goalProtein, percentProtein),
+        buildLinearIndicator(context, const Key('carb_linear_indicator'),
+            "คาร์บ", totalCarb, goalCarb, percentCarb),
+        buildLinearIndicator(context, const Key('fat_linear_indicator'),
+            "ไขมัน", totalFat, goalFat, percentFat),
       ],
     );
   }
 
-  Widget buildLinearIndicator(
-      BuildContext context, String label, int total, int goal, double percent) {
+  Widget buildLinearIndicator(BuildContext context, Key key, String label,
+      int total, int goal, double percent) {
     return Column(
+      key: key,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
