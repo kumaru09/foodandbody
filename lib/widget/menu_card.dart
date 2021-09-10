@@ -12,6 +12,7 @@ class MenuCardWidget extends StatelessWidget {
     return Container(
       height: 200,
       child: ListView.builder(
+          key: const Key('menu_card_listview'),
           itemCount: menu.length,
           scrollDirection: Axis.horizontal,
           shrinkWrap: true,
@@ -35,7 +36,10 @@ class MenuCardWidget extends StatelessWidget {
           child: InkWell(
             onTap: () {
               //change page
-              Navigator.push(context, MaterialPageRoute(builder: (context) => MenuDetail(menuName: menu.name)));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => MenuDetail(menuName: menu.name)));
             },
             // child: SingleChildScrollView(
             child: Column(
