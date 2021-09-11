@@ -3,13 +3,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:foodandbody/screens/body/body.dart';
+import 'package:foodandbody/screens/camera/camera.dart';
+import 'package:foodandbody/screens/history/history.dart';
 import 'package:foodandbody/screens/menu/menu.dart';
+import 'package:foodandbody/screens/plan/plan.dart';
 import 'package:foodandbody/screens/setting/setting.dart';
-import 'package:mocktail/mocktail.dart';
-import 'package:mocktail_image_network/mocktail_image_network.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:foodandbody/models/user.dart';
 import 'package:foodandbody/screens/home/home.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:mocktail_image_network/mocktail_image_network.dart';
 
 class MockAppBloc extends MockBloc<AppEvent, AppState> implements AppBloc {}
 
@@ -26,6 +30,11 @@ void main() {
   const menuAllButtonKey = Key('menu_all_button');
   const removeWaterButtonKey = Key('remove_water_button');
   const addWaterButtonKey = Key('add_water_button');
+  const homeButtonKey = Key('home_button');
+  const planButtonKey = Key('plan_button');
+  const bodyButtonKey = Key('body_button');
+  const historyButtonKey = Key('history_button');
+  const cameraButtonKey = Key('camera_floating_button');
 
   //widget
   const circularIndicatorKey = Key('calories_circular_indicator');
@@ -35,6 +44,7 @@ void main() {
   const menuCardListViewKey = const Key('menu_card_listview');
   const dailyWaterCardKey = Key('daily_water_card');
   const dailyWaterDisplayKey = Key('daily_water_display');
+  const bottomAppBarKey = Key('bottom_app_bar');
 
   group('Home Page', () {
     late AppBloc appBloc;
@@ -143,6 +153,18 @@ void main() {
               home: Home(),
             ),
           ));
+          expect(find.byKey(bottomAppBarKey), findsOneWidget);
+        });
+      }); //group "bottom app bar"
+
+      testWidgets("bottom app bar", (tester) async {
+        await mockNetworkImages(() async {
+          await tester.pumpWidget(BlocProvider.value(
+            value: appBloc,
+            child: const MaterialApp(
+              home: Home(),
+            ),
+          ));
           await tester.dragFrom(Offset(0, 300), Offset(0, -300));
           await tester.pumpAndSettle();
           expect(find.byKey(dailyWaterCardKey), findsOneWidget);
@@ -236,5 +258,158 @@ void main() {
         });
       }); //group "when pressed add and remove button"
     }); //group "action"
+
+    group("bottom app bar", () {
+      testWidgets("when pressed home icon", (tester) async {
+        await mockNetworkImages(() async {
+          await tester.pumpWidget(BlocProvider.value(
+            value: appBloc,
+            child: const MaterialApp(
+              home: Home(),
+            ),
+          ));
+          await tester.tap(find.byKey(homeButtonKey));
+          await tester.pumpAndSettle();
+          expect(find.byType(Home), findsOneWidget);
+          Column button = tester.firstWidget(find.byKey(homeButtonKey));
+          Widget icon = button.children[0];
+          Widget text = button.children[1];
+          expect(icon.toString(), contains("Color(0xffffffff)"));
+          expect(text.toString(), contains("Color(0xffffffff)"));
+          button = tester.firstWidget(find.byKey(planButtonKey));
+          icon = button.children[0];
+          text = button.children[1];
+          expect(icon.toString(), contains("Color(0x80ffffff)"));
+          expect(text.toString(), contains("Color(0x80ffffff)"));
+          button = tester.firstWidget(find.byKey(bodyButtonKey));
+          icon = button.children[0];
+          text = button.children[1];
+          expect(icon.toString(), contains("Color(0x80ffffff)"));
+          expect(text.toString(), contains("Color(0x80ffffff)"));
+          button = tester.firstWidget(find.byKey(historyButtonKey));
+          icon = button.children[0];
+          text = button.children[1];
+          expect(icon.toString(), contains("Color(0x80ffffff)"));
+          expect(text.toString(), contains("Color(0x80ffffff)"));
+        });
+      }); //group "when pressed home icon"
+
+      testWidgets("when pressed plan icon", (tester) async {
+        await mockNetworkImages(() async {
+          await tester.pumpWidget(BlocProvider.value(
+            value: appBloc,
+            child: const MaterialApp(
+              home: Home(),
+            ),
+          ));
+          await tester.tap(find.byKey(planButtonKey));
+          await tester.pump();
+          expect(find.byType(Plan), findsOneWidget);
+          Column button = tester.firstWidget(find.byKey(homeButtonKey));
+          Widget icon = button.children[0];
+          Widget text = button.children[1];
+          expect(icon.toString(), contains("Color(0x80ffffff)"));
+          expect(text.toString(), contains("Color(0x80ffffff)"));
+          button = tester.firstWidget(find.byKey(planButtonKey));
+          icon = button.children[0];
+          text = button.children[1];
+          expect(icon.toString(), contains("Color(0xffffffff)"));
+          expect(text.toString(), contains("Color(0xffffffff)"));
+          button = tester.firstWidget(find.byKey(bodyButtonKey));
+          icon = button.children[0];
+          text = button.children[1];
+          expect(icon.toString(), contains("Color(0x80ffffff)"));
+          expect(text.toString(), contains("Color(0x80ffffff)"));
+          button = tester.firstWidget(find.byKey(historyButtonKey));
+          icon = button.children[0];
+          text = button.children[1];
+          expect(icon.toString(), contains("Color(0x80ffffff)"));
+          expect(text.toString(), contains("Color(0x80ffffff)"));
+        });
+      }); //group "when pressed home icon"
+
+      testWidgets("when pressed body icon", (tester) async {
+        await mockNetworkImages(() async {
+          await tester.pumpWidget(BlocProvider.value(
+            value: appBloc,
+            child: const MaterialApp(
+              home: Home(),
+            ),
+          ));
+          await tester.tap(find.byKey(bodyButtonKey));
+          await tester.pump();
+          expect(find.byType(Body), findsOneWidget);
+          Column button = tester.firstWidget(find.byKey(homeButtonKey));
+          Widget icon = button.children[0];
+          Widget text = button.children[1];
+          expect(icon.toString(), contains("Color(0x80ffffff)"));
+          expect(text.toString(), contains("Color(0x80ffffff)"));
+          button = tester.firstWidget(find.byKey(planButtonKey));
+          icon = button.children[0];
+          text = button.children[1];
+          expect(icon.toString(), contains("Color(0x80ffffff)"));
+          expect(text.toString(), contains("Color(0x80ffffff)"));
+          button = tester.firstWidget(find.byKey(bodyButtonKey));
+          icon = button.children[0];
+          text = button.children[1];
+          expect(icon.toString(), contains("Color(0xffffffff)"));
+          expect(text.toString(), contains("Color(0xffffffff)"));
+          button = tester.firstWidget(find.byKey(historyButtonKey));
+          icon = button.children[0];
+          text = button.children[1];
+          expect(icon.toString(), contains("Color(0x80ffffff)"));
+          expect(text.toString(), contains("Color(0x80ffffff)"));
+        });
+      }); //group "when pressed body icon"
+
+      testWidgets("when pressed history icon", (tester) async {
+        await mockNetworkImages(() async {
+          await tester.pumpWidget(BlocProvider.value(
+            value: appBloc,
+            child: const MaterialApp(
+              home: Home(),
+            ),
+          ));
+          await tester.tap(find.byKey(historyButtonKey));
+          await tester.pump();
+          expect(find.byType(History), findsOneWidget);
+          Column button = tester.firstWidget(find.byKey(homeButtonKey));
+          Widget icon = button.children[0];
+          Widget text = button.children[1];
+          expect(icon.toString(), contains("Color(0x80ffffff)"));
+          expect(text.toString(), contains("Color(0x80ffffff)"));
+          button = tester.firstWidget(find.byKey(planButtonKey));
+          icon = button.children[0];
+          text = button.children[1];
+          expect(icon.toString(), contains("Color(0x80ffffff)"));
+          expect(text.toString(), contains("Color(0x80ffffff)"));
+          button = tester.firstWidget(find.byKey(bodyButtonKey));
+          icon = button.children[0];
+          text = button.children[1];
+          expect(icon.toString(), contains("Color(0x80ffffff)"));
+          expect(text.toString(), contains("Color(0x80ffffff)"));
+          button = tester.firstWidget(find.byKey(historyButtonKey));
+          icon = button.children[0];
+          text = button.children[1];
+          expect(icon.toString(), contains("Color(0xffffffff)"));
+          expect(text.toString(), contains("Color(0xffffffff)"));
+        });
+      }); //group "when pressed history icon"
+
+      testWidgets("camera button", (tester) async {
+        await mockNetworkImages(() async {
+          await tester.pumpWidget(BlocProvider.value(
+            value: appBloc,
+            child: const MaterialApp(
+              home: Home(),
+            ),
+          ));
+          await tester.tap(find.byKey(cameraButtonKey));
+          await tester.pumpAndSettle();
+          expect(find.byType(Camera), findsOneWidget);
+          expect(find.byKey(bottomAppBarKey), findsNothing);
+        });
+      }); //group "camera button"
+    }); //group "pressed"
   }); //group "Home Page"
 } //main
