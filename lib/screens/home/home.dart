@@ -254,6 +254,7 @@ class _HomeState extends State<Home> {
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(
+          key: const Key('camera_floating_button'),
           onPressed: () {
             //change to camera mode
             Navigator.push(
