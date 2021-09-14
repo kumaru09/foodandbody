@@ -178,7 +178,7 @@ class _RegisterButton extends StatelessWidget {
                   key: const Key('registerForm_continue_raisedButton'),
                   onPressed: state.status.isValidated
                       ? () =>
-                          context.read<RegisterCubit>().RegisterFormSubmitted()
+                          context.read<RegisterCubit>().registerFormSubmitted()
                       : null,
                   child: Text('ลงทะเบียน'),
                   style: ElevatedButton.styleFrom(

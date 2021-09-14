@@ -49,7 +49,7 @@ class RegisterCubit extends Cubit<RegisterState> {
     ));
   }
 
-  Future<void> RegisterFormSubmitted() async {
+  Future<void> registerFormSubmitted() async {
     if (!state.status.isValidated) return;
     emit(state.copyWith(status: FormzStatus.submissionInProgress));
     try {
