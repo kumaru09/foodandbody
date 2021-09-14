@@ -9,7 +9,6 @@ import 'package:foodandbody/screens/forgot_password/forgot_password.dart';
 import 'package:foodandbody/screens/login/cubit/login_cubit.dart';
 import 'package:foodandbody/screens/login/login_form.dart';
 import 'package:foodandbody/screens/register/register.dart';
-// import 'package:form_inputs/form_inputs.dart';
 import 'package:formz/formz.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -46,7 +45,8 @@ void main() {
     setUp(() {
       loginCubit = MockLoginCubit();
       when(() => loginCubit.state).thenReturn(const LoginState());
-      // when(() => loginCubit.logInWithGoogle()).thenAnswer((_) async {});
+      when(() => loginCubit.logInWithGoogle()).thenAnswer((_) async {});
+      when(() => loginCubit.logInWithFacebook()).thenAnswer((_) async {});
       when(() => loginCubit.logInWithCredentials()).thenAnswer((_) async {});
     });
 
@@ -100,21 +100,37 @@ void main() {
         verify(() => loginCubit.logInWithCredentials()).called(1);
       });
 
-      // testWidgets('logInWithGoogle when sign in with google button is pressed',
-      //     (tester) async {
-      //   await tester.pumpWidget(
-      //     MaterialApp(
-      //       home: Scaffold(
-      //         body: BlocProvider.value(
-      //           value: loginCubit,
-      //           child: const LoginForm(),
-      //         ),
-      //       ),
-      //     ),
-      //   );
-      //   await tester.tap(find.byKey(signInWithGoogleButtonKey));
-      //   verify(() => loginCubit.logInWithGoogle()).called(1);
-      // });
+      testWidgets('logInWithGoogle when sign in with google button is pressed',
+          (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: BlocProvider.value(
+                value: loginCubit,
+                child: const LoginForm(),
+              ),
+            ),
+          ),
+        );
+        await tester.tap(find.byKey(signInWithGoogleButtonKey));
+        verify(() => loginCubit.logInWithGoogle()).called(1);
+      });
+
+        testWidgets('logInWithFacebook when sign in with facebook button is pressed',
+          (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: BlocProvider.value(
+                value: loginCubit,
+                child: const LoginForm(),
+              ),
+            ),
+          ),
+        );
+        await tester.tap(find.byKey(signInWithFacebookButtonKey));
+        verify(() => loginCubit.logInWithFacebook()).called(1);
+      });
     });
 
     group('renders', () {
