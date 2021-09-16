@@ -53,9 +53,9 @@ class AppTheme {
 
       //define the default brightness and color
       colorScheme: _appColorScheme,
-      accentColor: secondaryColor,
+      // accentColor: secondaryColor,
       primaryColor: primaryColor,
-      buttonColor: secondaryColor,
+      // buttonColor: secondaryColor,
       scaffoldBackgroundColor: backgroundColor,
       cardColor: surfaceColor,
       errorColor: errorColor,

@@ -39,7 +39,7 @@ class _PlanState extends State<Plan> {
           },
           elevation: 0.4,
           child: Icon(Icons.photo_camera),
-          backgroundColor: Theme.of(context).accentColor,
+          backgroundColor: Theme.of(context).colorScheme.secondary,
         ),
         bottomNavigationBar: BottomAppBarWidget(
             index: bottomAppBarIndex, onChangedTab: onChangedTab));

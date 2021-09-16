@@ -39,7 +39,7 @@ class _BodyState extends State<Body> {
           },
           elevation: 0.4,
           child: Icon(Icons.photo_camera),
-          backgroundColor: Theme.of(context).accentColor,
+          backgroundColor: Theme.of(context).colorScheme.secondary,
         ),
         bottomNavigationBar: BottomAppBarWidget(
             index: bottomAppBarIndex, onChangedTab: onChangedTab));
