@@ -64,7 +64,7 @@ void main() {
 
     test("has a page", () {
       expect(Home.page(), isA<MaterialPage>());
-    }); //group "has a page"
+    }); //"has a page"
 
     group("calls", () {
       testWidgets("AppLogoutRequested when logout out is pressed",
@@ -79,7 +79,7 @@ void main() {
           await tester.tap(find.byKey(logoutButtonKey));
           verify(() => appBloc.add(AppLogoutRequested())).called(1);
         });
-      }); //test "AppLogoutRequested when logout out is pressed"
+      }); //"AppLogoutRequested when logout out is pressed"
     }); //group "calls"
 
     group("render", () {
@@ -93,7 +93,7 @@ void main() {
           ));
           expect(find.byKey(circularIndicatorKey), findsOneWidget);
         });
-      }); //group "calories circular progress"
+      }); //"calories circular progress"
 
       group("nutrient linear progress", () {
         testWidgets("protein", (tester) async {
@@ -106,7 +106,7 @@ void main() {
             ));
             expect(find.byKey(proteinLinearIndicatorKey), findsOneWidget);
           });
-        }); //group ": protein"
+        }); //"protein"
 
         testWidgets("carb", (tester) async {
           await mockNetworkImages(() async {
@@ -118,7 +118,7 @@ void main() {
             ));
             expect(find.byKey(carbLinearIndicatorKey), findsOneWidget);
           });
-        }); //group ": carb"
+        }); //"carb"
 
         testWidgets("fat", (tester) async {
           await mockNetworkImages(() async {
@@ -130,7 +130,7 @@ void main() {
             ));
             expect(find.byKey(fatLinearIndicatorKey), findsOneWidget);
           });
-        }); //group ": fat"
+        }); //"fat"
       }); //group "nutrient linear progress"
 
       testWidgets("menu card ListView", (tester) async {
@@ -143,7 +143,7 @@ void main() {
           ));
           expect(find.byKey(menuCardListViewKey), findsOneWidget);
         });
-      }); //group "menu card ListView"
+      }); //"menu card ListView"
 
       testWidgets("daily water card", (tester) async {
         await mockNetworkImages(() async {
@@ -155,7 +155,7 @@ void main() {
           ));
           expect(find.byKey(bottomAppBarKey), findsOneWidget);
         });
-      }); //group "bottom app bar"
+      }); //"daily water card"
 
       testWidgets("bottom app bar", (tester) async {
         await mockNetworkImages(() async {
@@ -173,7 +173,7 @@ void main() {
           expect(find.byKey(dailyWaterDisplayKey), findsOneWidget);
           expect(find.byKey(addWaterButtonKey), findsOneWidget);
         });
-      }); //group "daily water card"
+      }); //"bottom app bar"
     }); //group "render"
 
     group("action", () {
@@ -189,7 +189,7 @@ void main() {
           await tester.pumpAndSettle();
           expect(find.byType(Setting), findsOneWidget);
         });
-      }); //group "when pressed setting icon"
+      }); //"when pressed setting icon"
 
       testWidgets("when pressed ดูทั้งหมด button", (tester) async {
         await mockNetworkImages(() async {
@@ -203,7 +203,7 @@ void main() {
           await tester.pumpAndSettle();
           expect(find.byType(Menu), findsOneWidget);
         });
-      }); //group "when pressed ดูทั้งหมด button"
+      }); //"when pressed ดูทั้งหมด button"
 
       testWidgets("when pressed remove button", (tester) async {
         await mockNetworkImages(() async {
@@ -220,7 +220,7 @@ void main() {
           await tester.pumpAndSettle();
           expect(find.text("0"), findsOneWidget);
         });
-      }); //group "when pressed remove button"
+      }); //"when pressed remove button"
 
       testWidgets("when pressed add button", (tester) async {
         await mockNetworkImages(() async {
@@ -237,7 +237,7 @@ void main() {
           await tester.pumpAndSettle();
           expect(find.text("1"), findsOneWidget);
         });
-      }); //group "when pressed add button"
+      }); //"when pressed add button"
 
       testWidgets("when pressed add and remove button", (tester) async {
         await mockNetworkImages(() async {
@@ -248,15 +248,17 @@ void main() {
             ),
           ));
           await tester.dragFrom(Offset(0, 300), Offset(0, -300));
-          await tester.pumpAndSettle();
+          await tester.pump();
           await tester.ensureVisible(find.byKey(addWaterButtonKey));
           await tester.tap(find.byKey(addWaterButtonKey));
+          await tester.pump();
+          expect(find.text("1"), findsOneWidget);
           await tester.ensureVisible(find.byKey(removeWaterButtonKey));
           await tester.tap(find.byKey(removeWaterButtonKey));
-          await tester.pumpAndSettle();
+          await tester.pump();
           expect(find.text("0"), findsOneWidget);
         });
-      }); //group "when pressed add and remove button"
+      }); //"when pressed add and remove button"
     }); //group "action"
 
     group("bottom app bar", () {
@@ -292,7 +294,7 @@ void main() {
           expect(icon.toString(), contains("Color(0x80ffffff)"));
           expect(text.toString(), contains("Color(0x80ffffff)"));
         });
-      }); //group "when pressed home icon"
+      }); //"when pressed home icon"
 
       testWidgets("when pressed plan icon", (tester) async {
         await mockNetworkImages(() async {
@@ -326,7 +328,7 @@ void main() {
           expect(icon.toString(), contains("Color(0x80ffffff)"));
           expect(text.toString(), contains("Color(0x80ffffff)"));
         });
-      }); //group "when pressed home icon"
+      }); //"when pressed home icon"
 
       testWidgets("when pressed body icon", (tester) async {
         await mockNetworkImages(() async {
@@ -360,7 +362,7 @@ void main() {
           expect(icon.toString(), contains("Color(0x80ffffff)"));
           expect(text.toString(), contains("Color(0x80ffffff)"));
         });
-      }); //group "when pressed body icon"
+      }); //"when pressed body icon"
 
       testWidgets("when pressed history icon", (tester) async {
         await mockNetworkImages(() async {
@@ -394,7 +396,7 @@ void main() {
           expect(icon.toString(), contains("Color(0xffffffff)"));
           expect(text.toString(), contains("Color(0xffffffff)"));
         });
-      }); //group "when pressed history icon"
+      }); //"when pressed history icon"
 
       testWidgets("camera button", (tester) async {
         await mockNetworkImages(() async {
@@ -409,7 +411,7 @@ void main() {
           expect(find.byType(Camera), findsOneWidget);
           expect(find.byKey(bottomAppBarKey), findsNothing);
         });
-      }); //group "camera button"
+      }); //"camera button"
     }); //group "pressed"
   }); //group "Home Page"
 } //main
