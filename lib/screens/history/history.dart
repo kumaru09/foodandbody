@@ -3,7 +3,7 @@ import 'package:foodandbody/screens/body/body.dart';
 import 'package:foodandbody/screens/camera/camera.dart';
 import 'package:foodandbody/screens/home/home.dart';
 import 'package:foodandbody/screens/plan/plan.dart';
-import 'package:foodandbody/widget/buttom_appbar.dart';
+import 'package:foodandbody/widget/bottom_appbar.dart';
 
 class History extends StatefulWidget {
   const History({Key? key}) : super(key: key);

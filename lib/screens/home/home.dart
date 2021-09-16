@@ -6,8 +6,8 @@ import 'package:foodandbody/screens/home/circular_cal_indicator.dart';
 import 'package:foodandbody/screens/menu/menu.dart';
 import 'package:foodandbody/screens/plan/plan.dart';
 import 'package:foodandbody/screens/setting/setting.dart';
-import 'package:foodandbody/widget/buttom_appbar.dart';
-import 'package:foodandbody/widget/linear_nutrient_indicator.dart';
+import 'package:foodandbody/widget/bottom_appbar.dart';
+import 'package:foodandbody/screens/home/linear_nutrient_indicator.dart';
 import 'package:foodandbody/widget/menu_card.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,7 +24,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   List page = [Home(), Plan(), Body(), History()];
   var _water = 0;
-  int bottomAppBarIndex = 0;
+  int _bottomAppBarIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -98,7 +98,7 @@ class _HomeState extends State<Home> {
               ),
               Container(
                   child: Padding(
-                      padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+                      padding: EdgeInsets.fromLTRB(16, 16, 8, 0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -265,7 +265,7 @@ class _HomeState extends State<Home> {
           backgroundColor: Theme.of(context).accentColor,
         ),
         bottomNavigationBar: BottomAppBarWidget(
-            index: bottomAppBarIndex, onChangedTab: onChangedTab));
+            index: _bottomAppBarIndex, onChangedTab: onChangedTab));
   }
 
   void addWater() {
@@ -283,7 +283,7 @@ class _HomeState extends State<Home> {
 
   void onChangedTab(int index) {
     setState(() {
-      this.bottomAppBarIndex = index;
+      this._bottomAppBarIndex = index;
       Navigator.pop(context);
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => page[index]));
