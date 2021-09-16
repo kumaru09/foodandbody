@@ -1,14 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:foodandbody/screens/menu_detail/menu_detail.dart';
 
+// ignore: must_be_immutable
 class MenuCardWidget extends StatelessWidget {
-  const MenuCardWidget({Key? key}) : super(key: key);
+  MenuCardWidget({Key? key}) : super(key: key);
+  late List<MenuCardInfo> menu = getMenuInfo();
+
+  List<MenuCardInfo> getMenuInfo() {
+    //query menu image, menu name, calories
+    return [
+      MenuCardInfo(
+          "https://www.haveazeed.com/wp-content/uploads/2019/08/3.%E0%B8%AA%E0%B9%89%E0%B8%A1%E0%B8%95%E0%B8%B3%E0%B9%84%E0%B8%97%E0%B8%A2%E0%B9%84%E0%B8%82%E0%B9%88%E0%B9%80%E0%B8%84%E0%B9%87%E0%B8%A1-1.png",
+          "ตำไทยไข่เค็ม",
+          172),
+      MenuCardInfo("https://dilafashionshop.files.wordpress.com/2019/03/71.jpg",
+          "ข้าวกะเพราไก่ไข่ดาว", 480),
+      MenuCardInfo(
+          "https://img.kapook.com/u/pirawan/Cooking1/thai%20spicy%20mushrooms%20salad.jpg",
+          "ยำเห็ดรวมมิตร",
+          104),
+      MenuCardInfo(
+          "https://snpfood.com/wp-content/uploads/2020/01/Breakfast-00002-scaled-1-1536x1536.jpg",
+          "ข้าวต้มปลา",
+          220),
+      MenuCardInfo(
+          "https://snpfood.com/wp-content/uploads/2020/01/Highlight-Menu-0059-scaled-1-1536x1536.jpg",
+          "ข้าวผัดปู",
+          551),
+    ]; //dummy data
+  }
 
   @override
   Widget build(BuildContext context) {
-    //variable
-    List<MenuCardInfo> menu = getMenuInfo();
-
     return Container(
       height: 200,
       child: ListView.builder(
@@ -26,9 +49,9 @@ class MenuCardWidget extends StatelessWidget {
   Widget buildMenuCard(BuildContext context, MenuCardInfo menu) {
     final item = menu;
     return Container(
-        height: 200,
-        padding: EdgeInsets.only(left: 8),
-        child: Card(
+      height: 200,
+      padding: EdgeInsets.only(left: 8),
+      child: Card(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           elevation: 2,
@@ -64,7 +87,7 @@ class MenuCardWidget extends StatelessWidget {
                   children: [
                     Container(
                       width: 150,
-                      padding: EdgeInsets.only(left: 8, top: 3),
+                      padding: EdgeInsets.only(left: 8, top: 8, bottom: 8),
                       child: Text(
                         item.name,
                         textAlign: TextAlign.left,
@@ -74,7 +97,7 @@ class MenuCardWidget extends StatelessWidget {
                     ),
                     Container(
                       width: 50,
-                      padding: EdgeInsets.only(top: 3, right: 8),
+                      padding: EdgeInsets.only(top: 3, right: 8, bottom: 8),
                       child: Text(
                         "${item.calories}",
                         textAlign: TextAlign.right,
@@ -86,34 +109,9 @@ class MenuCardWidget extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-        )
-        // ),
-        );
-  }
-
-  List<MenuCardInfo> getMenuInfo() {
-    //query menu image, menu name, calories
-    return [
-      MenuCardInfo(
-          "https://www.haveazeed.com/wp-content/uploads/2019/08/3.%E0%B8%AA%E0%B9%89%E0%B8%A1%E0%B8%95%E0%B8%B3%E0%B9%84%E0%B8%97%E0%B8%A2%E0%B9%84%E0%B8%82%E0%B9%88%E0%B9%80%E0%B8%84%E0%B9%87%E0%B8%A1-1.png",
-          "ตำไทยไข่เค็ม",
-          172),
-      MenuCardInfo("https://dilafashionshop.files.wordpress.com/2019/03/71.jpg",
-          "ข้าวกะเพราไก่ไข่ดาว", 480),
-      MenuCardInfo(
-          "https://img.kapook.com/u/pirawan/Cooking1/thai%20spicy%20mushrooms%20salad.jpg",
-          "ยำเห็ดรวมมิตร",
-          104),
-      MenuCardInfo(
-          "https://snpfood.com/wp-content/uploads/2020/01/Breakfast-00002-scaled-1-1536x1536.jpg",
-          "ข้าวต้มปลา",
-          220),
-      MenuCardInfo(
-          "https://snpfood.com/wp-content/uploads/2020/01/Highlight-Menu-0059-scaled-1-1536x1536.jpg",
-          "ข้าวผัดปู",
-          551),
-    ]; //dummy data
+            // ),
+          )),
+    );
   }
 }
 
