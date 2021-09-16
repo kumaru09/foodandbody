@@ -92,7 +92,7 @@ class MenuCardWidget extends StatelessWidget {
                         item.name,
                         textAlign: TextAlign.left,
                         style: Theme.of(context).textTheme.bodyText2!.merge(
-                            TextStyle(color: Theme.of(context).accentColor)),
+                            TextStyle(color: Theme.of(context).colorScheme.secondary)),
                       ),
                     ),
                     Container(
@@ -102,7 +102,7 @@ class MenuCardWidget extends StatelessWidget {
                         "${item.calories}",
                         textAlign: TextAlign.right,
                         style: Theme.of(context).textTheme.headline6!.merge(
-                            TextStyle(color: Theme.of(context).accentColor)),
+                            TextStyle(color: Theme.of(context).colorScheme.secondary)),
                       ),
                     )
                   ],
