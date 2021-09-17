@@ -1,26 +1,35 @@
 import 'dart:async';
 import 'dart:developer';
 import 'package:foodandbody/models/info.dart';
+import 'package:foodandbody/models/info_entity.dart';
 import 'package:foodandbody/models/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' as cloud_firestore;
+import 'package:foodandbody/repositories/i_user_repository.dart';
 
-class UserRepository {
+class UserRepository implements IUserRepository {
+  UserRepository({required User user}) : _user = user;
 
-  Future<void> addUser(String uid,
-      String name, int goal, int height, int weight, String gender) async {
-    final cloud_firestore.CollectionReference usersRef =
-        cloud_firestore.FirebaseFirestore.instance.collection('users');
+  final User _user;
 
-    await usersRef
-        .add({
-          'id': uid,
-          'name': name,
-          'goal': goal,
-          'height': height,
-          'weight': weight,
-          'gender': gender
-        })
-        .then((value) => log("User Added"))
-        .catchError((error) => log("Failed to add user: $error"));
+  final cloud_firestore.CollectionReference users =
+      cloud_firestore.FirebaseFirestore.instance.collection('users');
+
+  @override
+  Future<void> addUserInfo(Info info) {
+    return users.doc(this._user.uid).set(info.toEntity().toDocument());
+  }
+
+  @override
+  Stream<Info> info() {
+    return users.doc(this._user.uid).snapshots().map((snapshot) {
+      return snapshot.exists
+          ? Info.fromEntity(InfoEntity.fromSnapshot(snapshot))
+          : Info.fromEntity(InfoEntity.empty);
+    });
+  }
+
+  @override
+  Future<void> updateInfo(Info info) {
+    return users.doc(this._user.uid).update(info.toEntity().toDocument());
   }
 }
