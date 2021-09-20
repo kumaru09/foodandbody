@@ -18,7 +18,8 @@ class InitialInfoForm extends StatelessWidget {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(
-                const SnackBar(content: Text('กรอกข้อมูลไม่สำเร็จ กรุณาลองอีกครั้ง')),
+                const SnackBar(
+                    content: Text('กรอกข้อมูลไม่สำเร็จ กรุณาลองอีกครั้ง')),
               );
           }
         },
@@ -220,10 +221,14 @@ class _InitialInfoButton extends StatelessWidget {
                   child: ElevatedButton(
                     key: const Key('initialInfoForm_continue_raisedButton'),
                     onPressed: state.status.isValidated
-                        ? () => context
-                            .read<InitialInfoCubit>()
-                            .initialInfoFormSubmitted('tVM15WpkhsUQrvYsIULv0nHWQyC2')
-                            // .initialInfoFormSubmitted(context.select((AppBloc bloc) => bloc.state.user.uid))
+                        ? () {
+                            context
+                                .read<InitialInfoCubit>()
+                                .initialInfoFormSubmitted(
+                                    context.read<AppBloc>().state.user.uid);
+                            context.read<AppBloc>().add(AddInfoRequested(
+                                context.read<AppBloc>().state.user));
+                          }
                         : null,
                     child: Text('บันทึก'),
                     style: ElevatedButton.styleFrom(
