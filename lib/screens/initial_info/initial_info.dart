@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 class InnitialInfo extends StatelessWidget {
   const InnitialInfo({Key? key}) : super(key: key);
 
+  static Page page() => const MaterialPage<void>(child: InnitialInfo());
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(

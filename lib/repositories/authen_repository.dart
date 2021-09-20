@@ -23,7 +23,7 @@ class AuthenRepository {
     CacheClient? cache,
     firebase_auth.FirebaseAuth? firebaseAuth,
     GoogleSignIn? googleSignIn,
-    FacebookAuth? facebookAuth
+    FacebookAuth? facebookAuth,
   })  : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
         _cache = cache ?? CacheClient(),
         _googleSignIn = googleSignIn ?? GoogleSignIn.standard(),
@@ -109,6 +109,6 @@ class AuthenRepository {
 
 extension on firebase_auth.User {
   User get toUser {
-    return User(uid: uid, email: email, name: displayName, photo: photoURL);
+    return User(uid: uid, email: email, name: displayName, photoUrl: photoURL);
   }
 }
