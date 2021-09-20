@@ -7,7 +7,7 @@ class User extends Equatable {
 
   final String? email;
   final String? uid;
-  final String? name;
+  final String? name; 
   final String? photoUrl;
   final Info? info;
 
