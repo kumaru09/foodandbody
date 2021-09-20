@@ -43,6 +43,7 @@ void main() {
   const testHeight = '150';
   const testGender = 'หญิง';
   const testCalory = '1500';
+  const testUid = 'tVM15WpkhsUQrvYsIULv0nHWQyC2';
 
   group('InitialInfoForm', () {
     late InitialInfoCubit initialInfoCubit;
@@ -54,7 +55,7 @@ void main() {
     setUp(() {
       initialInfoCubit = MockInitialInfoCubit();
       when(() => initialInfoCubit.state).thenReturn(const InitialInfoState());
-      when(() => initialInfoCubit.initialInfoFormSubmitted())
+      when(() => initialInfoCubit.initialInfoFormSubmitted(testUid))
           .thenAnswer((_) async {});
     });
 
@@ -162,7 +163,7 @@ void main() {
           ),
         );
         await tester.tap(find.byKey(initialInfoButtonKey));
-        verify(() => initialInfoCubit.initialInfoFormSubmitted()).called(1);
+        verify(() => initialInfoCubit.initialInfoFormSubmitted(testUid)).called(1);
       });
     });
 

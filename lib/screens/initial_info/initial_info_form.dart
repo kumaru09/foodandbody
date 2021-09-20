@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:foodandbody/screens/initial_info/cubit/initial_info_cubit.dart';
 import 'package:formz/formz.dart';
 
@@ -221,7 +222,8 @@ class _InitialInfoButton extends StatelessWidget {
                     onPressed: state.status.isValidated
                         ? () => context
                             .read<InitialInfoCubit>()
-                            .initialInfoFormSubmitted()
+                            .initialInfoFormSubmitted('tVM15WpkhsUQrvYsIULv0nHWQyC2')
+                            // .initialInfoFormSubmitted(context.select((AppBloc bloc) => bloc.state.user.uid))
                         : null,
                     child: Text('บันทึก'),
                     style: ElevatedButton.styleFrom(

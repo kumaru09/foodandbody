@@ -7,10 +7,6 @@ import 'package:foodandbody/screens/initial_info/initial_info_form.dart';
 class InitialInfo extends StatelessWidget {
   const InitialInfo ({ Key? key }) : super(key: key);
 
-  // static Route route() {
-  //   return MaterialPageRoute<void>(builder: (_) => const InitialInfo());
-  // }
-
   static Page page() => const MaterialPage<void>(child: InitialInfo());
 
   @override

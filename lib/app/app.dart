@@ -22,7 +22,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RepositoryProvider.value(
-      value: _authenRepository,
+      value: {_authenRepository, _userRepository},
       child: BlocProvider(
         create: (_) => AppBloc(
             authenRepository: _authenRepository,
