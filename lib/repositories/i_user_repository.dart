@@ -1,11 +1,10 @@
-import 'dart:ffi';
-
 import 'package:foodandbody/models/info.dart';
+import 'package:foodandbody/models/user.dart';
 
 abstract class IUserRepository {
-  Future<void> addUserInfo(Info info);
+  Future<void> addUserInfo(User user);
 
-  Stream<Info> info();
+  Future<User> getInfo(User user);
 
-  Future<void> updateInfo(Info info);
+  Future<void> updateInfo(User user);
 }

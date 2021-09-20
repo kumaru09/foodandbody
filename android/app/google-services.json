@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "581411196555-v972ulrthkuhpcsrl7atv1o4b0tqloe3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bnnproject.foodandbody",
+            "certificate_hash": "7ac68cf0bcb75562bacdf174fa690599e3110d4a"
+          }
+        },
+        {
           "client_id": "581411196555-fsq0nu0d8sr70o98u3mg7sflbo44o93e.apps.googleusercontent.com",
           "client_type": 3
         }

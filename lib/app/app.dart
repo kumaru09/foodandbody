@@ -4,21 +4,29 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:foodandbody/app/routes.dart';
 import 'package:foodandbody/repositories/authen_repository.dart';
+import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/theme.dart';
 
 class App extends StatelessWidget {
-  const App({Key? key, required AuthenRepository authenRepository})
+  const App(
+      {Key? key,
+      required AuthenRepository authenRepository,
+      required UserRepository userRepository})
       : _authenRepository = authenRepository,
+        _userRepository = userRepository,
         super(key: key);
 
   final AuthenRepository _authenRepository;
+  final UserRepository _userRepository;
 
   @override
   Widget build(BuildContext context) {
     return RepositoryProvider.value(
       value: _authenRepository,
       child: BlocProvider(
-        create: (_) => AppBloc(authenRepository: _authenRepository),
+        create: (_) => AppBloc(
+            authenRepository: _authenRepository,
+            userRepository: _userRepository),
         child: const AppView(),
       ),
     );
