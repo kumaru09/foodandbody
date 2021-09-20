@@ -37,6 +37,18 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       yield* _mapUserChangedToState(event, state);
     } else if (event is AppLogoutRequested) {
       unawaited(_authenRepository.logOut());
+    } else if (event is AddInfoRequested) {
+      yield* _mapInfoRequestToState(event, state);
+    }
+  }
+
+  Stream<AppState> _mapInfoRequestToState(
+      AddInfoRequested event, AppState state) async* {
+    final user = await _userRepository.getInfo(event.user);
+    if (user.info != null) {
+      yield AppState.authenticated(user);
+    } else {
+      yield AppState.initialize(event.user);
     }
   }
 
