@@ -22,9 +22,9 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List page = [Home(), Plan(), Body(), History()];
-  var _water = 0;
+  final _page = [Home(), Plan(), Body(), History()];
   int _bottomAppBarIndex = 0;
+  int _water = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -165,7 +165,7 @@ class _HomeState extends State<Home> {
                                 height: 38,
                                 child: ElevatedButton(
                                   key: const Key('remove_water_button'),
-                                  onPressed: removeWater,
+                                  onPressed: _removeWater,
                                   style: ElevatedButton.styleFrom(
                                       primary: Theme.of(context).cardColor,
                                       elevation: 0,
@@ -209,7 +209,7 @@ class _HomeState extends State<Home> {
                                 height: 38,
                                 child: ElevatedButton(
                                   key: const Key('add_water_button'),
-                                  onPressed: addWater,
+                                  onPressed: _addWater,
                                   style: ElevatedButton.styleFrom(
                                       primary: Theme.of(context).cardColor,
                                       elevation: 0,
@@ -257,28 +257,28 @@ class _HomeState extends State<Home> {
           backgroundColor: Theme.of(context).colorScheme.secondary,
         ),
         bottomNavigationBar: BottomAppBarWidget(
-            index: _bottomAppBarIndex, onChangedTab: onChangedTab));
+            index: _bottomAppBarIndex, onChangedTab: _onChangedTab));
   }
 
-  void addWater() {
+  void _onChangedTab(int index) {
+    setState(() {
+      this._bottomAppBarIndex = index;
+      Navigator.pop(context);
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => _page[index]));
+    });
+  }
+
+  void _addWater() {
     setState(() {
       _water++;
     });
   }
 
-  void removeWater() {
+  void _removeWater() {
     setState(() {
       _water--;
       if (_water < 0) _water = 0;
-    });
-  }
-
-  void onChangedTab(int index) {
-    setState(() {
-      this._bottomAppBarIndex = index;
-      Navigator.pop(context);
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => page[index]));
     });
   }
 }
