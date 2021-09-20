@@ -1,9 +1,9 @@
 import 'package:equatable/equatable.dart';
 import 'package:bloc/bloc.dart';
-import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:foodandbody/models/calory.dart';
 import 'package:foodandbody/models/gender.dart';
 import 'package:foodandbody/models/height.dart';
+import 'package:foodandbody/models/info.dart';
 import 'package:foodandbody/models/username.dart';
 import 'package:foodandbody/models/weight.dart';
 import 'package:foodandbody/repositories/user_repository.dart'; 
@@ -61,18 +61,19 @@ class InitialInfoCubit extends Cubit<InitialInfoState> {
     ));
   }
 
-  Future<void> initialInfoFormSubmitted() async {
+  Future<void> initialInfoFormSubmitted(String? uid) async {
     if (!state.status.isValidated) return;
     emit(state.copyWith(status: FormzStatus.submissionInProgress));
     try {
       await _userRepository.addUserInfo(
-        uid: context.read<AppBloc>().select((AppBloc bloc) => bloc.state.status),
+        uid!,
         Info(
           name: state.username.value,
           weight: int.parse(state.weight.value),
           height: int.parse(state.height.value),
           gender: state.gender.value,
           goal: int.parse(state.calory.value),
+          photoUrl: '',
         )
       );
       emit(state.copyWith(status: FormzStatus.submissionSuccess));

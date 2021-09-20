@@ -13,7 +13,7 @@ class UserRepository implements IUserRepository {
       cloud_firestore.FirebaseFirestore.instance.collection('users');
 
   @override
-  Future<void> addUserInfo(uid, Info info) {
+  Future<void> addUserInfo(String uid, Info info) {
     return users.doc(uid).set(info.toEntity().toDocument());
   }
 
