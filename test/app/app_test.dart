@@ -64,6 +64,7 @@ void main() {
 
   group('AppView', () {
     late AuthenRepository authenRepository;
+    late UserRepository userRepository;
     late AppBloc appBloc;
 
     setUpAll(() {
@@ -73,6 +74,7 @@ void main() {
 
     setUp(() {
       authenRepository = MockAuthenRepository();
+      userRepository = MockUserRepository();
       appBloc = MockAppBloc();
     });
 
@@ -90,13 +92,14 @@ void main() {
       expect(find.byType(Login), findsOneWidget);
     });
 
-    testWidgets('navigates to IntialPage when authen but not found userInfo',
+    testWidgets(
+        'navigates to IntialPage when authenticated but not found userInfo',
         (tester) async {
       final user = MockUser();
       when(() => user.info).thenReturn(null);
       when(() => appBloc.state).thenReturn(AppState.initialize(user));
       await tester.pumpWidget(RepositoryProvider.value(
-        value: authenRepository,
+        value: userRepository,
         child: MaterialApp(
           home: BlocProvider.value(
             value: appBloc,
@@ -112,7 +115,7 @@ void main() {
       when(() => appBloc.state).thenReturn(AppState.authenticated(user));
       await tester.pumpWidget(
         RepositoryProvider.value(
-          value: authenRepository,
+          value: userRepository,
           child: MaterialApp(
             home: BlocProvider.value(value: appBloc, child: const AppView()),
           ),
