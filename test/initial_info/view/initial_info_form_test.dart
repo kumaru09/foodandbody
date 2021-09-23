@@ -1,6 +1,8 @@
+import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:foodandbody/models/calory.dart';
 import 'package:foodandbody/models/gender.dart';
 import 'package:foodandbody/models/height.dart';
+import 'package:foodandbody/models/user.dart';
 import 'package:foodandbody/models/username.dart';
 import 'package:foodandbody/models/weight.dart';
 // import 'package:foodandbody/repositories/authen_repository.dart';
@@ -30,6 +32,14 @@ class MockGender extends Mock implements Gender {}
 
 class MockCalory extends Mock implements Calory {}
 
+class MockAppBloc extends MockBloc<AppEvent, AppState> implements AppBloc {}
+
+class FakeAppEvent extends Fake implements AppEvent {}
+
+class FakeAppState extends Fake implements AppState {}
+
+class MockUser extends Mock implements User {}
+
 void main() {
   const initialInfoButtonKey = Key('initialInfoForm_continue_raisedButton');
   const usernameInputKey = Key('initialInfoForm_usernameInput_textField');
@@ -47,15 +57,24 @@ void main() {
 
   group('InitialInfoForm', () {
     late InitialInfoCubit initialInfoCubit;
+    late AppBloc appBloc;
+    late User user;
 
     setUpAll(() {
+      registerFallbackValue<AppEvent>(FakeAppEvent());
+      registerFallbackValue<AppState>(FakeAppState());
       registerFallbackValue<InitialInfoState>(FakeInitialInfoState());
     });
 
     setUp(() {
+      appBloc = MockAppBloc();
+      user = MockUser();
       initialInfoCubit = MockInitialInfoCubit();
       when(() => initialInfoCubit.state).thenReturn(const InitialInfoState());
-      when(() => initialInfoCubit.initialInfoFormSubmitted(testUid)).thenAnswer((_) async {});
+      when(() => initialInfoCubit.initialInfoFormSubmitted(testUid))
+          .thenAnswer((_) async {});
+      when(() => appBloc.state)
+          .thenReturn(const AppState.authenticated(User(uid: testUid)));
     });
 
     group('calls', () {
@@ -128,7 +147,6 @@ void main() {
         var input2 = tester.widget<DropdownButtonFormField<String>>(
             find.byKey(genderInputKey));
         expect(input2.initialValue, 'F');
-
       });
 
       testWidgets('caloryChanged when calory changes', (tester) async {
@@ -146,24 +164,27 @@ void main() {
         verify(() => initialInfoCubit.caloryChanged(testCalory)).called(1);
       });
 
-      // testWidgets('initialInfoFormSubmitted when save button is pressed',
-      //     (tester) async {
-      //   when(() => initialInfoCubit.state).thenReturn(
-      //     const InitialInfoState(status: FormzStatus.valid),
-      //   );
-      //   await tester.pumpWidget(
-      //     MaterialApp(
-      //       home: Scaffold(
-      //         body: BlocProvider.value(
-      //           value: initialInfoCubit,
-      //           child: const InitialInfoForm(),
-      //         ),
-      //       ),
-      //     ),
-      //   );
-      //   await tester.tap(find.byKey(initialInfoButtonKey));
-      //   verify(() => initialInfoCubit.initialInfoFormSubmitted(testUid)).called(1);
-      // });
+      testWidgets('initialInfoFormSubmitted when save button is pressed',
+          (tester) async {
+        when(() => initialInfoCubit.state).thenReturn(
+          const InitialInfoState(status: FormzStatus.valid),
+        );
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+                body: BlocProvider.value(
+              value: appBloc,
+              child: BlocProvider.value(
+                value: initialInfoCubit,
+                child: const InitialInfoForm(),
+              ),
+            )),
+          ),
+        );
+        await tester.tap(find.byKey(initialInfoButtonKey));
+        verify(() => initialInfoCubit.initialInfoFormSubmitted(testUid))
+            .called(1);
+      });
     });
 
     group('renders', () {
