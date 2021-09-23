@@ -232,7 +232,7 @@ class _InitialInfoButton extends StatelessWidget {
                         : null,
                     child: Text('บันทึก'),
                     style: ElevatedButton.styleFrom(
-                      primary: Theme.of(context).accentColor,
+                      primary: Theme.of(context).colorScheme.secondary,
                       padding: const EdgeInsets.symmetric(
                           vertical: 10.0, horizontal: 50.0),
                       shape: const RoundedRectangleBorder(

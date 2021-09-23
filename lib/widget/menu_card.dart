@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:foodandbody/screens/menu_detail/menu_detail.dart';
+import 'package:foodandbody/screens/menu/menu.dart';
 
 // ignore: must_be_immutable
 class MenuCardWidget extends StatelessWidget {
@@ -62,7 +62,7 @@ class MenuCardWidget extends StatelessWidget {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => MenuDetail(menuName: menu.name)));
+                      builder: (context) => Menu(menuName: menu.name)));
             },
             // child: SingleChildScrollView(
             child: Column(
