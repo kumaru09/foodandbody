@@ -3,7 +3,7 @@ import 'package:foodandbody/screens/body/body.dart';
 import 'package:foodandbody/screens/camera/camera.dart';
 import 'package:foodandbody/screens/history/history.dart';
 import 'package:foodandbody/screens/home/circular_cal_indicator.dart';
-import 'package:foodandbody/screens/menu/menu.dart';
+import 'package:foodandbody/screens/search/search.dart';
 import 'package:foodandbody/screens/plan/plan.dart';
 import 'package:foodandbody/screens/setting/setting.dart';
 import 'package:foodandbody/widget/bottom_appbar.dart';
@@ -110,7 +110,7 @@ class _HomeState extends State<Home> {
                         onPressed: () {
                           //chage page
                           Navigator.push(context,
-                              MaterialPageRoute(builder: (context) => Menu()));
+                              MaterialPageRoute(builder: (context) => Search()));
                         },
                         icon: Icon(
                           Icons.add,

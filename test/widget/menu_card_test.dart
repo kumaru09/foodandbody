@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:foodandbody/screens/menu_detail/menu_detail.dart';
+import 'package:foodandbody/screens/menu/menu.dart';
 import 'package:foodandbody/theme.dart';
 import 'package:foodandbody/widget/menu_card.dart';
 import 'package:mocktail/mocktail.dart';
@@ -70,7 +70,7 @@ void main() {
       expect(cardFinder, findsWidgets);
       await tester.tap(cardFinder.first);
       await tester.pumpAndSettle();
-      var menuDetailFinder = find.byType(MenuDetail);
+      var menuDetailFinder = find.byType(Menu);
       expect(menuDetailFinder, findsOneWidget);
       expect(find.text("ข้าวผัดกระเทียม"), findsOneWidget);
     }); //"when pressed menu card"

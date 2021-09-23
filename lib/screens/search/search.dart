@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 
-class MenuDetail extends StatelessWidget {
-  const MenuDetail({Key? key, required this.menuName}) : super(key: key);
-  final String menuName;
+class Search extends StatelessWidget {
+  const Search({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        extendBody: true,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
           backgroundColor: Theme.of(context).primaryColor,
           elevation: 0,
-          title: Text("$menuName",
+          title: Text("เมนู",
               style: Theme.of(context)
                   .textTheme
                   .headline6!
