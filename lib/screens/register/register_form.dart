@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:foodandbody/screens/register/cubit/register_cubit.dart';
 import 'package:formz/formz.dart';
 
@@ -140,7 +139,7 @@ class _ConfirmPasswordInputState extends State<ConfirmPasswordInput> {
             previous.confirmedPassword != current.confirmedPassword,
         builder: (context, state) {
           return TextField(
-            key: const Key('registerForm_confirmpasswordInput_textField'),
+            key: const Key('registerForm_confirmedPasswordInput_textField'),
             onChanged: (confirmPassword) => context
                 .read<RegisterCubit>()
                 .confirmedPasswordChanged(confirmPassword),
@@ -151,7 +150,7 @@ class _ConfirmPasswordInputState extends State<ConfirmPasswordInput> {
                     ? 'passwords do not match'
                     : null,
                 suffixIcon: InkWell(
-                  key: const Key('registerForm_confirmpassword_visibilityIcon'),
+                  key: const Key('registerForm_confirmPassword_visibilityIcon'),
                   onTap: () {
                     setState(() {
                       _isHidden = !_isHidden;
