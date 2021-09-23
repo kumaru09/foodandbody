@@ -1,13 +1,12 @@
-import 'package:foodandbody/repositories/authen_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/screens/initial_info/initial_info.dart';
 import 'package:foodandbody/screens/initial_info/initial_info_form.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockAuthenticationRepository extends Mock
-    implements AuthenRepository {}
+class MockUserRepository extends Mock implements UserRepository {}
 
 void main() {
   group('Initial Info Page', () {
@@ -17,8 +16,8 @@ void main() {
 
     testWidgets('renders a InitialInfoForm', (tester) async {
       await tester.pumpWidget(
-        RepositoryProvider<AuthenRepository>(
-          create: (_) => MockAuthenticationRepository(),
+        RepositoryProvider<UserRepository>(
+          create: (_) => MockUserRepository(),
           child: const MaterialApp(home: InitialInfo()),
         ),
       );
