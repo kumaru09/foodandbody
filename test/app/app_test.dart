@@ -8,6 +8,7 @@ import 'package:foodandbody/app/app.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:foodandbody/models/user.dart';
 import 'package:foodandbody/repositories/authen_repository.dart';
+import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/screens/home/home.dart';
 import 'package:foodandbody/screens/login/login.dart';
 import 'package:mocktail/mocktail.dart';
@@ -15,6 +16,8 @@ import 'package:mocktail/mocktail.dart';
 class MockUser extends Mock implements User {}
 
 class MockAuthenRepository extends Mock implements AuthenRepository {}
+
+class MockUserRepository extends Mock implements UserRepository {}
 
 class MockAppBloc extends MockBloc<AppEvent, AppState> implements AppBloc {}
 
@@ -25,6 +28,7 @@ class FakeAppState extends Fake implements AppState {}
 void main() {
   group('App', () {
     late AuthenRepository authenRepository;
+    late UserRepository userRepository;
     late User user;
 
     setUpAll(() {
@@ -34,6 +38,7 @@ void main() {
     });
 
     setUp(() {
+      userRepository = MockUserRepository();
       authenRepository = MockAuthenRepository();
       user = MockUser();
       when(() => authenRepository.user).thenAnswer(
@@ -47,7 +52,10 @@ void main() {
 
     testWidgets('renders AppView', (tester) async {
       await tester.pumpWidget(
-        App(authenRepository: authenRepository),
+        App(
+          authenRepository: authenRepository,
+          userRepository: userRepository,
+        ),
       );
       await tester.pump();
       expect(find.byType(AppView), findsOneWidget);
@@ -80,6 +88,22 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(find.byType(Login), findsOneWidget);
+    });
+
+    testWidgets('navigates to IntialPage when authen but not found userInfo',
+        (tester) async {
+      final user = MockUser();
+      when(() => user.info).thenReturn(null);
+      when(() => appBloc.state).thenReturn(AppState.initialize(user));
+      await tester.pumpWidget(RepositoryProvider.value(
+        value: authenRepository,
+        child: MaterialApp(
+          home: BlocProvider.value(
+            value: appBloc,
+            child: const AppView(),
+          ),
+        ),
+      ));
     });
 
     testWidgets('navigates to HomePage when authenticated', (tester) async {

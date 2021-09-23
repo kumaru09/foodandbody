@@ -122,7 +122,6 @@ class _EmailInput extends StatelessWidget {
             onChanged: (email) =>
                 context.read<LoginCubit>().emailChanged(email),
             keyboardType: TextInputType.emailAddress,
-            autofocus: true,
             textInputAction: TextInputAction.next,
             decoration: InputDecoration(
               // hintText: 'ชื่อผู้ใช้งาน',
@@ -210,8 +209,7 @@ class _GoogleLoginButton extends StatelessWidget {
         padding: EdgeInsets.fromLTRB(13, 13, 6, 13),
       ),
       icon: const Icon(FontAwesomeIcons.google, color: Colors.white),
-      onPressed: () {},
-      // onPressed: () => context.read<LoginCubit>().logInWithGoogle(),
+      onPressed: () => context.read<LoginCubit>().logInWithGoogle(),
     );
   }
 }
@@ -228,8 +226,7 @@ class _FacebookLoginButton extends StatelessWidget {
         padding: EdgeInsets.fromLTRB(13, 13, 6, 13),
       ),
       icon: const Icon(FontAwesomeIcons.facebookF, color: Colors.white),
-      onPressed: () {},
-      // onPressed: () => context.read<LoginCubit>().logInWithGoogle(),
+      onPressed: () => context.read<LoginCubit>().logInWithFacebook(),
     );
   }
 }
