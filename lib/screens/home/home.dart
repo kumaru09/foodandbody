@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:foodandbody/screens/home/circularCaIndicator.dart';
-import 'package:foodandbody/widget/buttom_appbar.dart';
-import 'package:foodandbody/widget/linear_nutrient_indicator.dart';
+import 'package:foodandbody/screens/body/body.dart';
+import 'package:foodandbody/screens/camera/camera.dart';
+import 'package:foodandbody/screens/history/history.dart';
+import 'package:foodandbody/screens/home/circular_cal_indicator.dart';
+import 'package:foodandbody/screens/menu/menu.dart';
+import 'package:foodandbody/screens/plan/plan.dart';
+import 'package:foodandbody/screens/setting/setting.dart';
+import 'package:foodandbody/widget/bottom_appbar.dart';
+import 'package:foodandbody/screens/home/linear_nutrient_indicator.dart';
 import 'package:foodandbody/widget/menu_card.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,8 +22,9 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  var _water = 0;
-  int bottomAppBarIndex = 0;
+  final _page = [Home(), Plan(), Body(), History()];
+  int _bottomAppBarIndex = 0;
+  int _water = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -34,15 +41,17 @@ class _HomeState extends State<Home> {
                   .merge(TextStyle(color: Theme.of(context).primaryColor))),
           actions: [
             IconButton(
+                key: const Key('setting_button'),
                 onPressed: () {
-                  // change page to setting page
-                  print("setting");
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => Setting()));
                 },
                 icon: Icon(Icons.settings,
                     color: Theme.of(context).primaryColor)),
             ElevatedButton(
                 onPressed: () =>
                     context.read<AppBloc>().add(AppLogoutRequested()),
+                key: const Key('homePage_logout_iconButton'),
                 child: Text('Logout'))
           ],
         ),
@@ -51,96 +60,87 @@ class _HomeState extends State<Home> {
             children: <Widget>[
               //today's calories
               Container(
-                  child: Padding(
-                padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
-                child: Text(
-                  "แคลอรีวันนี้",
-                  style: Theme.of(context).textTheme.bodyText1!.merge(
-                        TextStyle(color: Theme.of(context).primaryColor),
-                      ),
-                ),
-              )),
+                  padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+                  child: Text(
+                    "แคลอรีวันนี้",
+                    style: Theme.of(context).textTheme.bodyText1!.merge(
+                          TextStyle(color: Theme.of(context).primaryColor),
+                        ),
+                  )),
               //calories progress card
               Container(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-                  child: Card(
-                    color: Theme.of(context).primaryColor,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15)),
-                    elevation: 2,
-                    child: Center(
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(102, 18, 95, 0),
-                            child: CircularCalIndicator(), //circular progress
-                          ),
-                          Padding(
-                            padding: EdgeInsets.all(10),
-                            child:
-                                LinearNutrientIndicator(), //show line progress
-                          )
-                        ],
-                      ),
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                child: Card(
+                  color: Theme.of(context).primaryColor,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  elevation: 2,
+                  child: Center(
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(102, 18, 95, 0),
+                          child: CircularCalIndicator(), //circular progress
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(10),
+                          child: LinearNutrientIndicator(), //line progress
+                        )
+                      ],
                     ),
                   ),
                 ),
               ),
               Container(
-                  child: Padding(
-                      padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "เมนูแนะนำ",
-                            style: Theme.of(context).textTheme.bodyText1!.merge(
+                  padding: EdgeInsets.fromLTRB(16, 16, 8, 0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "เมนูแนะนำ",
+                        style: Theme.of(context).textTheme.bodyText1!.merge(
+                              TextStyle(color: Theme.of(context).primaryColor),
+                            ),
+                      ),
+                      ElevatedButton.icon(
+                        key: const Key('menu_all_button'),
+                        style: ElevatedButton.styleFrom(
+                            primary: Theme.of(context).scaffoldBackgroundColor,
+                            elevation: 0),
+                        onPressed: () {
+                          //chage page
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (context) => Menu()));
+                        },
+                        icon: Icon(
+                          Icons.add,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                        label: Text("ดูทั้งหมด",
+                            style: Theme.of(context).textTheme.button!.merge(
                                   TextStyle(
                                       color: Theme.of(context).primaryColor),
-                                ),
-                          ),
-                          ElevatedButton.icon(
-                            style: ElevatedButton.styleFrom(
-                                primary:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                elevation: 0),
-                            onPressed: () {
-                              //chage page
-                              print("menu all");
-                            },
-                            icon: Icon(
-                              Icons.add,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                            label: Text("ดูทั้งหมด",
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .button!
-                                    .merge(
-                                      TextStyle(
-                                          color:
-                                              Theme.of(context).primaryColor),
-                                    )),
-                          )
-                        ],
-                      ))),
+                                )),
+                      )
+                    ],
+                  )),
               MenuCardWidget(), //show menu card
               Container(
+                padding: EdgeInsets.only(left: 16, top: 16),
                 height: 51,
-                child: Padding(
-                  padding: EdgeInsets.only(left: 16, top: 16),
-                  child: Text(
-                    "น้ำวันนี้",
-                    style: Theme.of(context).textTheme.bodyText1!.merge(
-                        TextStyle(color: Theme.of(context).primaryColor)),
-                  ),
+                child: Text(
+                  "น้ำวันนี้",
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyText1!
+                      .merge(TextStyle(color: Theme.of(context).primaryColor)),
                 ),
               ),
               Container(
                 height: 74,
                 margin: EdgeInsets.only(left: 16, right: 16, bottom: 30),
                 child: Card(
+                  key: const Key('daily_water_card'),
                   color: Colors.white,
                   elevation: 2,
                   shape: RoundedRectangleBorder(
@@ -151,7 +151,9 @@ class _HomeState extends State<Home> {
                       Text(
                         "วันนี้คุณดื่มน้ำไปแล้ว",
                         style: Theme.of(context).textTheme.bodyText2!.merge(
-                            TextStyle(color: Theme.of(context).accentColor)),
+                            TextStyle(
+                                color:
+                                    Theme.of(context).colorScheme.secondary)),
                       ),
                       Container(
                           height: 38,
@@ -162,7 +164,8 @@ class _HomeState extends State<Home> {
                                 width: 35,
                                 height: 38,
                                 child: ElevatedButton(
-                                  onPressed: removeWater,
+                                  key: const Key('remove_water_button'),
+                                  onPressed: _removeWater,
                                   style: ElevatedButton.styleFrom(
                                       primary: Theme.of(context).cardColor,
                                       elevation: 0,
@@ -176,7 +179,8 @@ class _HomeState extends State<Home> {
                                                   Radius.circular(10)))),
                                   child: Icon(
                                     Icons.remove,
-                                    color: Theme.of(context).accentColor,
+                                    color:
+                                        Theme.of(context).colorScheme.secondary,
                                   ),
                                 ),
                               ),
@@ -187,21 +191,24 @@ class _HomeState extends State<Home> {
                                 decoration: BoxDecoration(
                                     border: Border.all(
                                         color: Color(0xFFC4C4C4), width: 1)),
-                                child: Text("${_water.toString()}",
+                                child: Text("$_water",
+                                    key: const Key('daily_water_display'),
                                     style: Theme.of(context)
                                         .textTheme
                                         .headline5!
                                         .merge(
                                           TextStyle(
                                               color: Theme.of(context)
-                                                  .accentColor),
+                                                  .colorScheme
+                                                  .secondary),
                                         )),
                               ),
                               Container(
                                 width: 35,
                                 height: 38,
                                 child: ElevatedButton(
-                                  onPressed: addWater,
+                                  key: const Key('add_water_button'),
+                                  onPressed: _addWater,
                                   style: ElevatedButton.styleFrom(
                                       primary: Theme.of(context).cardColor,
                                       elevation: 0,
@@ -215,7 +222,8 @@ class _HomeState extends State<Home> {
                                                   Radius.circular(10)))),
                                   child: Icon(
                                     Icons.add,
-                                    color: Theme.of(context).accentColor,
+                                    color:
+                                        Theme.of(context).colorScheme.secondary,
                                   ),
                                 ),
                               ),
@@ -224,7 +232,9 @@ class _HomeState extends State<Home> {
                       Text(
                         "แก้ว",
                         style: Theme.of(context).textTheme.bodyText2!.merge(
-                            TextStyle(color: Theme.of(context).accentColor)),
+                            TextStyle(
+                                color:
+                                    Theme.of(context).colorScheme.secondary)),
                       )
                     ],
                   ),
@@ -235,36 +245,39 @@ class _HomeState extends State<Home> {
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(
+          key: const Key('camera_floating_button'),
           onPressed: () {
             //change to camera mode
-            print("camera");
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => Camera()));
           },
           elevation: 0.4,
           child: Icon(Icons.photo_camera),
-          backgroundColor: Theme.of(context).accentColor,
+          backgroundColor: Theme.of(context).colorScheme.secondary,
         ),
         bottomNavigationBar: BottomAppBarWidget(
-            index: bottomAppBarIndex, onChangedTab: onChangedTab));
+            index: _bottomAppBarIndex, onChangedTab: _onChangedTab));
   }
 
-  void addWater() {
+  void _onChangedTab(int index) {
     setState(() {
-      print("add water");
+      this._bottomAppBarIndex = index;
+      Navigator.pop(context);
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => _page[index]));
+    });
+  }
+
+  void _addWater() {
+    setState(() {
       _water++;
     });
   }
 
-  void removeWater() {
+  void _removeWater() {
     setState(() {
-      print("remove water");
       _water--;
       if (_water < 0) _water = 0;
-    });
-  }
-
-  void onChangedTab(int index) {
-    setState(() {
-      this.bottomAppBarIndex = index;
     });
   }
 }

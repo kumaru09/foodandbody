@@ -1,87 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:foodandbody/screens/menu_detail/menu_detail.dart';
 
+// ignore: must_be_immutable
 class MenuCardWidget extends StatelessWidget {
-  const MenuCardWidget({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    //variable
-    List<MenuCardInfo> menu = getMenuInfo();
-
-    return Container(
-      height: 200,
-      child: ListView.builder(
-          itemCount: menu.length,
-          scrollDirection: Axis.horizontal,
-          shrinkWrap: true,
-          padding: EdgeInsets.only(left: 8),
-          itemBuilder: (BuildContext context, int index) {
-            return buildMenuCard(context, menu[index]);
-          }),
-    );
-  }
-
-  Widget buildMenuCard(BuildContext context, MenuCardInfo menu) {
-    final item = menu;
-    return Container(
-      height: 200,
-      padding: EdgeInsets.only(left: 8),
-      child: Card(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          elevation: 2,
-          semanticContainer: true,
-          child: InkWell(
-            onTap: () {
-              //change page
-              print("tap menu card");
-            },
-            child: SingleChildScrollView(
-              child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                ClipRRect(
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(15),
-                      topRight: Radius.circular(15)),
-                  child: Image.network(
-                    item.image,
-                    height: 150,
-                    width: 200,
-                    fit: BoxFit.fill,
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 150,
-                      padding: EdgeInsets.only(left: 8, top: 6),
-                      child: Text(
-                        item.name,
-                        textAlign: TextAlign.left,
-                        style: Theme.of(context).textTheme.bodyText2!.merge(
-                            TextStyle(color: Theme.of(context).accentColor)),
-                      ),
-                    ),
-                    Container(
-                      width: 50,
-                      padding: EdgeInsets.only(top: 3, right: 8),
-                      child: Text(
-                        "${item.calories}",
-                        textAlign: TextAlign.right,
-                        style: Theme.of(context).textTheme.headline6!.merge(
-                            TextStyle(color: Theme.of(context).accentColor)),
-                      ),
-                    )
-                  ],
-                ),
-              ],
-            ),
-            ),
-          )),
-    );
-  }
+  MenuCardWidget({Key? key}) : super(key: key);
+  late List<MenuCardInfo> menu = getMenuInfo();
 
   List<MenuCardInfo> getMenuInfo() {
     //query menu image, menu name, calories
@@ -105,6 +28,90 @@ class MenuCardWidget extends StatelessWidget {
           "ข้าวผัดปู",
           551),
     ]; //dummy data
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 200,
+      child: ListView.builder(
+          key: const Key('menu_card_listview'),
+          itemCount: menu.length,
+          scrollDirection: Axis.horizontal,
+          shrinkWrap: true,
+          padding: EdgeInsets.only(left: 8),
+          itemBuilder: (BuildContext context, int index) {
+            return buildMenuCard(context, menu[index]);
+          }),
+    );
+  }
+
+  Widget buildMenuCard(BuildContext context, MenuCardInfo menu) {
+    final item = menu;
+    return Container(
+      height: 200,
+      padding: EdgeInsets.only(left: 8),
+      child: Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          elevation: 2,
+          semanticContainer: true,
+          child: InkWell(
+            onTap: () {
+              //change page
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => MenuDetail(menuName: menu.name)));
+            },
+            // child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Expanded(
+                  flex: 1,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(15),
+                        topRight: Radius.circular(15)),
+                    child: Image.network(
+                      item.image,
+                      height: 150,
+                      width: 200,
+                      fit: BoxFit.fill,
+                    ),
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 150,
+                      padding: EdgeInsets.only(left: 8, top: 8, bottom: 8),
+                      child: Text(
+                        item.name,
+                        textAlign: TextAlign.left,
+                        style: Theme.of(context).textTheme.bodyText2!.merge(
+                            TextStyle(color: Theme.of(context).colorScheme.secondary)),
+                      ),
+                    ),
+                    Container(
+                      width: 50,
+                      padding: EdgeInsets.only(top: 3, right: 8, bottom: 8),
+                      child: Text(
+                        "${item.calories}",
+                        textAlign: TextAlign.right,
+                        style: Theme.of(context).textTheme.headline6!.merge(
+                            TextStyle(color: Theme.of(context).colorScheme.secondary)),
+                      ),
+                    )
+                  ],
+                ),
+              ],
+            ),
+            // ),
+          )),
+    );
   }
 }
 

@@ -58,7 +58,7 @@ class LoginForm extends StatelessWidget {
                                         .button!
                                         .merge(TextStyle(
                                             color: Theme.of(context)
-                                                .accentColor))),
+                                                .colorScheme.secondary))),
                                 onPressed: () {
                                   Navigator.push(
                                     context,
@@ -75,7 +75,7 @@ class LoginForm extends StatelessWidget {
                         Text('หรือ',
                             style: Theme.of(context).textTheme.bodyText2!.merge(
                                 TextStyle(
-                                    color: Theme.of(context).accentColor))),
+                                    color: Theme.of(context).colorScheme.secondary))),
                         Padding(
                             padding: EdgeInsets.fromLTRB(16, 6, 16, 30),
                             child: Row(
@@ -89,7 +89,7 @@ class LoginForm extends StatelessWidget {
                           child: Text('ลงทะเบียน',
                               style: Theme.of(context).textTheme.button!.merge(
                                   TextStyle(
-                                      color: Theme.of(context).accentColor))),
+                                      color: Theme.of(context).colorScheme.secondary))),
                           onPressed: () {
                             Navigator.push(
                               context,
@@ -186,7 +186,7 @@ class _LoginButton extends StatelessWidget {
                       : null,
                   child: Text('เข้าสู่ระบบ'),
                   style: ElevatedButton.styleFrom(
-                    primary: Theme.of(context).accentColor,
+                    primary: Theme.of(context).colorScheme.secondary,
                     padding: const EdgeInsets.symmetric(
                         vertical: 10.0, horizontal: 50.0),
                     shape: const RoundedRectangleBorder(
