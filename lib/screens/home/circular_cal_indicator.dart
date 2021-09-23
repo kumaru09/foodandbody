@@ -48,6 +48,7 @@ class CircularCalIndicator extends StatelessWidget {
       animationDuration: 750,
       progressColor: progressColor,
       backgroundColor: backgroundColor,
+      circularStrokeCap: CircularStrokeCap.round,
       center: Center(
         child: Column(
           key: const Key('calories_circular_indicator_column'),

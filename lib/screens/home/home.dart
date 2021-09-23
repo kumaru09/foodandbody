@@ -185,14 +185,13 @@ class _HomeState extends State<Home> {
                                 ),
                               ),
                               Container(
-                                // key: const Key('daily_water_display'),
                                 width: 57,
                                 height: 38,
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
                                     border: Border.all(
                                         color: Color(0xFFC4C4C4), width: 1)),
-                                child: Text("${_water.toString()}",
+                                child: Text("$_water",
                                     key: const Key('daily_water_display'),
                                     style: Theme.of(context)
                                         .textTheme
