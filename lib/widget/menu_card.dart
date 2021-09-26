@@ -62,7 +62,7 @@ class MenuCardWidget extends StatelessWidget {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => Menu(menuName: menu.name)));
+                      builder: (context) => Menu(menuName: menu.name, menuImg: item.image)));
             },
             // child: SingleChildScrollView(
             child: Column(
