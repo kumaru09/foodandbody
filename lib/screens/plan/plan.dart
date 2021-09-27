@@ -3,7 +3,12 @@ import 'package:foodandbody/screens/body/body.dart';
 import 'package:foodandbody/screens/camera/camera.dart';
 import 'package:foodandbody/screens/history/history.dart';
 import 'package:foodandbody/screens/home/home.dart';
+import 'package:foodandbody/screens/plan/linear_nutrient_two_progress.dart';
+import 'package:foodandbody/screens/plan/plan_menu_card_list.dart';
 import 'package:foodandbody/widget/bottom_appbar.dart';
+
+import 'ate_menu_card_list.dart';
+import 'circular_cal_and_info.dart';
 
 class Plan extends StatefulWidget {
   const Plan({Key? key}) : super(key: key);
@@ -30,6 +35,82 @@ class _PlanState extends State<Plan> {
                   .headline5!
                   .merge(TextStyle(color: Theme.of(context).primaryColor))),
         ),
+        body: SingleChildScrollView( 
+            child: Column(
+          children: [
+            Container(
+              padding: EdgeInsets.only(left: 16, top: 16),
+              width: MediaQuery.of(context).size.width,
+              child: Text("แผนแคลอรี่วันนี้",
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyText1!
+                      .merge(TextStyle(color: Theme.of(context).primaryColor))),
+            ),
+            Container(
+              padding: EdgeInsets.only(left: 16, top: 8, right: 16),
+              width: MediaQuery.of(context).size.width,
+              constraints: BoxConstraints(minHeight: 100),
+              child: Card(
+                elevation: 2,
+                color: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15)),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [CircularCalAndInfo(), LinearNutrientTwoProgress()],
+                ),
+              ),
+            ),
+            Container(
+              width: MediaQuery.of(context).size.width,
+              padding: EdgeInsets.only(left: 16, top: 16),
+              child: Text("เมนูที่จะกิน",
+                  style: Theme.of(context).textTheme.bodyText1!.merge(
+                        TextStyle(color: Theme.of(context).primaryColor),
+                      )),
+            ),
+            Container(
+              margin: EdgeInsets.only(left: 16, top: 8, right: 15),
+              child: PlanMenuCardList(),
+            ),
+            Container(
+              width: MediaQuery.of(context).size.width,
+              alignment: Alignment.center,
+              child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                      primary: Theme.of(context).scaffoldBackgroundColor,
+                      elevation: 0),
+                  onPressed: () {
+                    print("add menu");
+                  },
+                  icon: Icon(
+                    Icons.add,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  label: Text(
+                    "เพิ่มเมนู",
+                    style: Theme.of(context).textTheme.button!.merge(
+                        TextStyle(color: Theme.of(context).primaryColor)),
+                  )),
+            ),
+            Container(
+              width: MediaQuery.of(context).size.width,
+              padding: EdgeInsets.only(left: 16, top: 16),
+              child: Text(
+                "เมนูที่กินแล้ว",
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyText1!
+                    .merge(TextStyle(color: Theme.of(context).primaryColor)),
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.only(left: 16, right: 16, bottom: 100, top: 8),
+              child: AteMenuCardList(),
+            )
+          ],
+        )),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(
           onPressed: () {
@@ -42,10 +123,10 @@ class _PlanState extends State<Plan> {
           backgroundColor: Theme.of(context).colorScheme.secondary,
         ),
         bottomNavigationBar: BottomAppBarWidget(
-            index: bottomAppBarIndex, onChangedTab: onChangedTab));
+            index: bottomAppBarIndex, onChangedTab: _onChangedTab));
   }
 
-  void onChangedTab(int index) {
+  void _onChangedTab(int index) {
     setState(() {
       this.bottomAppBarIndex = index;
       Navigator.pop(context);
