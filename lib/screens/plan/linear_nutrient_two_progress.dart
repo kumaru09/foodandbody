@@ -33,25 +33,25 @@ class LinearNutrientTwoProgress extends StatelessWidget {
 
   List getTotalNutrient() {
     //query from DB
-    var _totalProtein = 45;
-    var _totalCarb = 145;
-    var _totalFat = 14;
+    double _totalProtein = 45;
+    double _totalCarb = 145;
+    double _totalFat = 14;
     return [_totalProtein, _totalCarb, _totalFat];
   }
 
   List getPlanNutrient() {
     //query from DB
-    var _planProtein = 60;
-    var _planCarb = 180;
-    var _planFat = 30;
+    double _planProtein = 60;
+    double _planCarb = 180;
+    double _planFat = 30;
     return [_planProtein, _planCarb, _planFat];
   }
 
   List getGoalNutrient() {
     //query from DB
-    var _goalProtein = 85;
-    var _goalCarb = 200;
-    var _goalFat = 51;
+    double _goalProtein = 85;
+    double _goalCarb = 200;
+    double _goalFat = 51;
     return [_goalProtein, _goalCarb, _goalFat];
   }
 }
@@ -65,9 +65,9 @@ class _LinearIndicator extends StatelessWidget {
       required this.goalNutrient});
 
   String label;
-  int totalNutrient;
-  int planNutrient;
-  int goalNutrient;
+  double totalNutrient;
+  double planNutrient;
+  double goalNutrient;
 
   @override
   Widget build(BuildContext context) {
