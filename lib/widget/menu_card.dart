@@ -11,10 +11,10 @@ class MenuCardWidget extends StatelessWidget {
     return [
       MenuCardInfo(
           "https://www.haveazeed.com/wp-content/uploads/2019/08/3.%E0%B8%AA%E0%B9%89%E0%B8%A1%E0%B8%95%E0%B8%B3%E0%B9%84%E0%B8%97%E0%B8%A2%E0%B9%84%E0%B8%82%E0%B9%88%E0%B9%80%E0%B8%84%E0%B9%87%E0%B8%A1-1.png",
-          "ตำไทยไข่เค็ม",
+          "very long menu name test 1234567890",
           172),
       MenuCardInfo("https://dilafashionshop.files.wordpress.com/2019/03/71.jpg",
-          "ข้าวกะเพราไก่ไข่ดาว", 480),
+          "long cal", 48000),
       MenuCardInfo(
           "https://img.kapook.com/u/pirawan/Cooking1/thai%20spicy%20mushrooms%20salad.jpg",
           "ยำเห็ดรวมมิตร",
@@ -50,6 +50,7 @@ class MenuCardWidget extends StatelessWidget {
     final item = menu;
     return Container(
       height: 200,
+      width: 200,
       padding: EdgeInsets.only(left: 8),
       child: Card(
           shape:
@@ -62,9 +63,9 @@ class MenuCardWidget extends StatelessWidget {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => Menu(menuName: menu.name, menuImg: item.image)));
+                      builder: (context) =>
+                          Menu(menuName: menu.name, menuImg: item.image)));
             },
-            // child: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
@@ -77,39 +78,46 @@ class MenuCardWidget extends StatelessWidget {
                     child: Image.network(
                       item.image,
                       height: 150,
-                      width: 200,
-                      fit: BoxFit.fill,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 150,
-                      padding: EdgeInsets.only(left: 8, top: 8, bottom: 8),
-                      child: Text(
-                        item.name,
-                        textAlign: TextAlign.left,
-                        style: Theme.of(context).textTheme.bodyText2!.merge(
-                            TextStyle(color: Theme.of(context).colorScheme.secondary)),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(8, 3, 8, 8),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.only(top: 2),
+                          child: Text(
+                            item.name,
+                            maxLines: 1,
+                            softWrap: false,
+                            overflow: TextOverflow.fade,
+                            textAlign: TextAlign.left,
+                            style: Theme.of(context).textTheme.bodyText2!.merge(
+                                TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .secondary)),
+                          ),
+                        ),
                       ),
-                    ),
-                    Container(
-                      width: 50,
-                      padding: EdgeInsets.only(top: 3, right: 8, bottom: 8),
-                      child: Text(
-                        "${item.calories}",
+                      Text(
+                        " ${item.calories}",
                         textAlign: TextAlign.right,
                         style: Theme.of(context).textTheme.headline6!.merge(
-                            TextStyle(color: Theme.of(context).colorScheme.secondary)),
+                            TextStyle(
+                                color:
+                                    Theme.of(context).colorScheme.secondary)),
                       ),
-                    )
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
-            // ),
           )),
     );
   }

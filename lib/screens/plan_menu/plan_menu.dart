@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class MenuPlan extends StatelessWidget {
-  const MenuPlan ({Key? key, required this.menuName, required this.menuImg})
+class PlanMenu extends StatelessWidget {
+  const PlanMenu ({Key? key, required this.menuName, required this.menuImg})
       : super(key: key);
   final String menuName;
   final String menuImg;
