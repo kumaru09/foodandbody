@@ -1,7 +1,6 @@
-import 'dart:ui';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:foodandbody/screens/plan/edit_goal_dialog.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
 // ignore: must_be_immutable
@@ -178,14 +177,7 @@ class _PlanInfo extends StatelessWidget {
               padding: const EdgeInsets.all(0),
               width: 35,
               height: 35,
-              child: IconButton(
-                iconSize: 24,
-                onPressed: () {print("edit goal");},
-                icon: Icon(
-                  Icons.edit,
-                  color: Theme.of(context).primaryColor,
-                ),
-              ),
+              child: EditGoalDialog(),
             )
           ],
         ),
