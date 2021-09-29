@@ -1,32 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
+// ignore: must_be_immutable
 class LinearNutrientTwoProgress extends StatelessWidget {
-  const LinearNutrientTwoProgress({Key? key}) : super(key: key);
+  late double proteinTotal = getTotalNutrient()[0];
+  late double proteinPlan = getPlanNutrient()[0];
+  late double proteinGoal = getGoalNutrient()[0];
+
+  late double carbTotal = getTotalNutrient()[1];
+  late double carbPlan = getPlanNutrient()[1];
+  late double carbGoal = getGoalNutrient()[1];
+
+  late double fatTotal = getTotalNutrient()[2];
+  late double fatPlan = getPlanNutrient()[2];
+  late double fatGoal = getGoalNutrient()[2];
 
   @override
   Widget build(BuildContext context) {
     return Container(
+        key: const Key("nutrient_info"),
         height: 86,
         width: MediaQuery.of(context).size.width,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _LinearIndicator(
+                keyString: "plan_protein_linear",
                 label: "โปรตีน",
-                totalNutrient: getTotalNutrient()[0],
-                planNutrient: getPlanNutrient()[0],
-                goalNutrient: getGoalNutrient()[0]),
+                totalNutrient: proteinTotal,
+                planNutrient: proteinPlan,
+                goalNutrient: proteinGoal),
             _LinearIndicator(
+                keyString: "plan_carb_linear",
                 label: "คาร์บ",
-                totalNutrient: getTotalNutrient()[1],
-                planNutrient: getPlanNutrient()[1],
-                goalNutrient: getGoalNutrient()[1]),
+                totalNutrient: carbTotal,
+                planNutrient: carbPlan,
+                goalNutrient: carbGoal),
             _LinearIndicator(
+                keyString: "plan_fat_linear",
                 label: "ไขมัน",
-                totalNutrient: getTotalNutrient()[2],
-                planNutrient: getPlanNutrient()[2],
-                goalNutrient: getGoalNutrient()[2])
+                totalNutrient: fatTotal,
+                planNutrient: fatPlan,
+                goalNutrient: fatGoal)
           ],
         ));
   }
@@ -59,11 +74,13 @@ class LinearNutrientTwoProgress extends StatelessWidget {
 // ignore: must_be_immutable
 class _LinearIndicator extends StatelessWidget {
   _LinearIndicator(
-      {required this.label,
+      {required this.keyString,
+      required this.label,
       required this.totalNutrient,
       required this.planNutrient,
       required this.goalNutrient});
 
+  String keyString;
   String label;
   double totalNutrient;
   double planNutrient;
@@ -96,6 +113,7 @@ class _LinearIndicator extends StatelessWidget {
     }
 
     return Column(
+      key: Key(keyString),
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(

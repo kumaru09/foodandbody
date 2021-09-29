@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 
+// ignore: must_be_immutable
 class AteMenuCardList extends StatelessWidget {
-  const AteMenuCardList({Key? key}) : super(key: key);
+  late List ateMenu = getAteMenuList();
 
   @override
   Widget build(BuildContext context) {
-    List ateMenu = getAteMenuList();
     List<Widget> ateMenuCardList = [];
     for (int index = 0; index < ateMenu.length; index++) {
       ateMenuCardList.add(_buildAteMenuCard(context, ateMenu[index]));
     }
-    return Column(children: ateMenuCardList);
+    return Column(
+        key: const Key("ate_menu_card_list"), children: ateMenuCardList);
   }
 
-  Widget _buildAteMenuCard(BuildContext context, _AteMenuList item) {
+  Widget _buildAteMenuCard(BuildContext context, AteMenuList item) {
     return Card(
       color: Colors.white,
       elevation: 2,
@@ -65,15 +66,15 @@ class AteMenuCardList extends StatelessWidget {
   List getAteMenuList() {
     //query from DB
     return [
-      _AteMenuList(menu: "โอวัลติน", cal: 177, time: "7:00"),
-      _AteMenuList(menu: "ส้มตำไทย", cal: 240, time: "12:00"),
-      _AteMenuList(menu: "ข้าวมันไก่", cal: 765, time: "17:35"),
+      AteMenuList(menu: "โอวัลติน", cal: 177, time: "7:00"),
+      AteMenuList(menu: "ส้มตำไทย", cal: 240, time: "12:00"),
+      AteMenuList(menu: "ข้าวมันไก่", cal: 765, time: "17:35"),
     ];
   }
 }
 
-class _AteMenuList {
-  _AteMenuList({required this.menu, required this.cal, required this.time});
+class AteMenuList {
+  AteMenuList({required this.menu, required this.cal, required this.time});
 
   final String menu;
   final int cal;

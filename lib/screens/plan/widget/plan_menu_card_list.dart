@@ -8,6 +8,7 @@ class PlanMenuCardList extends StatefulWidget {
 }
 
 class _PlanMenuCardListState extends State<PlanMenuCardList> {
+  
   GlobalKey<AnimatedListState> animatedListKey = GlobalKey();
   late List planMenu = getPlanMenu();
 
@@ -23,7 +24,7 @@ class _PlanMenuCardListState extends State<PlanMenuCardList> {
     );
   }
 
-  Widget _buildPlanCard(_PlanMenu item, Animation<double> animation) {
+  Widget _buildPlanCard(PlanMenu item, Animation<double> animation) {
     return SizeTransition(
         sizeFactor: animation,
         child: InkWell(
@@ -63,7 +64,7 @@ class _PlanMenuCardListState extends State<PlanMenuCardList> {
                   ),
                   onPressed: () {
                     int removeIndex = planMenu.indexOf(item);
-                    _PlanMenu removedItem = planMenu.removeAt(removeIndex);
+                    PlanMenu removedItem = planMenu.removeAt(removeIndex);
 
                     AnimatedListRemovedItemBuilder builder =
                         (context, animation) {
@@ -81,15 +82,15 @@ class _PlanMenuCardListState extends State<PlanMenuCardList> {
   List getPlanMenu() {
     //query from DB
     return [
-      _PlanMenu(menu: "ตำไทยไข่เค็ม", calories: 172),
-      _PlanMenu(menu: "ยำเห็ดรวมมิตร", calories: 104),
-      _PlanMenu(menu: "ข้าวต้มปลา", calories: 220)
+      PlanMenu(menu: "ตำไทยไข่เค็ม", calories: 172),
+      PlanMenu(menu: "ยำเห็ดรวมมิตร", calories: 104),
+      PlanMenu(menu: "ข้าวต้มปลา", calories: 220)
     ];
   }
 }
 
-class _PlanMenu {
-  _PlanMenu({required this.menu, required this.calories});
+class PlanMenu {
+  PlanMenu({required this.menu, required this.calories});
 
   final String menu;
   final int calories;
