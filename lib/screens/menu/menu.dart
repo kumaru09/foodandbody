@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:foodandbody/screens/menu/dialog.dart';
+import 'package:foodandbody/widget/nutrient_detial.dart';
 
 class Menu extends StatelessWidget {
   const Menu({Key? key, required this.menuName, required this.menuImg})
@@ -64,11 +66,13 @@ class Menu extends StatelessWidget {
                           ],
                         ),
                         SizedBox(height: 16.0),
-                        _NutrientDetial(label: 'โปรตีน', value: '27.5'),
+                        NutrientDetial(label: 'หน่วยบริโภค', value: '1 จาน'),
                         SizedBox(height: 7.0),
-                        _NutrientDetial(label: 'คาร์โบไฮเดรต', value: '89.1'),
+                        NutrientDetial(label: 'โปรตีน', value: '27.5 กรัม'),
                         SizedBox(height: 7.0),
-                        _NutrientDetial(label: 'ไขมัน', value: '32.3'),
+                        NutrientDetial(label: 'คาร์โบไฮเดรต', value: '89.1 กรัม'),
+                        SizedBox(height: 7.0),
+                        NutrientDetial(label: 'ไขมัน', value: '32.3 กรัม'),
                       ],
                     ),
                   ),
@@ -86,29 +90,6 @@ class Menu extends StatelessWidget {
   }
 }
 
-class _NutrientDetial extends StatelessWidget {
-  const _NutrientDetial({Key? key, required this.label, required this.value})
-      : super(key: key);
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: <Widget>[
-        Expanded(
-          child: Text('$label',
-              style: Theme.of(context).textTheme.bodyText2!.merge(
-                  TextStyle(color: Theme.of(context).colorScheme.secondary))),
-        ),
-        Text('$value แคล',
-            style: Theme.of(context).textTheme.bodyText2!.merge(
-                TextStyle(color: Theme.of(context).colorScheme.secondary))),
-      ],
-    );
-  }
-}
-
 class _AddToPlanButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -116,13 +97,15 @@ class _AddToPlanButton extends StatelessWidget {
       width: double.infinity,
       child: OutlinedButton(
         key: const Key('initialInfoForm_continue_raisedButton'),
-        onPressed: () {},
         child: Text('เพิ่มในแผนการกิน'),
         style: OutlinedButton.styleFrom(
           primary: Theme.of(context).primaryColor,
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(50))),
         ),
+        onPressed: () => showDialog<String>(
+            context: context,
+            builder: (BuildContext context) => ConfirmCalDialog()),
       ),
     );
   }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:foodandbody/screens/plan_menu/dialog.dart';
+import 'package:foodandbody/widget/nutrient_detial.dart';
 
 class PlanMenu extends StatelessWidget {
   const PlanMenu ({Key? key, required this.menuName, required this.menuImg})
@@ -64,11 +66,13 @@ class PlanMenu extends StatelessWidget {
                           ],
                         ),
                         SizedBox(height: 16.0),
-                        _NutrientDetial(label: 'โปรตีน', value: '27.5'),
+                        NutrientDetial(label: 'หน่วยบริโภค', value: '1 จาน'),
                         SizedBox(height: 7.0),
-                        _NutrientDetial(label: 'คาร์โบไฮเดรต', value: '89.1'),
+                        NutrientDetial(label: 'โปรตีน', value: '27.5 กรัม'),
                         SizedBox(height: 7.0),
-                        _NutrientDetial(label: 'ไขมัน', value: '32.3'),
+                        NutrientDetial(label: 'คาร์โบไฮเดรต', value: '89.1 กรัม'),
+                        SizedBox(height: 7.0),
+                        NutrientDetial(label: 'ไขมัน', value: '32.3 กรัม'),
                       ],
                     ),
                   ),
@@ -92,36 +96,15 @@ class PlanMenu extends StatelessWidget {
   }
 }
 
-class _NutrientDetial extends StatelessWidget {
-  const _NutrientDetial({Key? key, required this.label, required this.value})
-      : super(key: key);
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: <Widget>[
-        Expanded(
-          child: Text('$label',
-              style: Theme.of(context).textTheme.bodyText2!.merge(
-                  TextStyle(color: Theme.of(context).colorScheme.secondary))),
-        ),
-        Text('$value แคล',
-            style: Theme.of(context).textTheme.bodyText2!.merge(
-                TextStyle(color: Theme.of(context).colorScheme.secondary))),
-      ],
-    );
-  }
-}
-
 class _EatNowButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: OutlinedButton(
         key: const Key('initialInfoForm_continue_raisedButton'),
-        onPressed: () {},
+        onPressed: () => showDialog<String>(
+            context: context,
+            builder: (BuildContext context) => ConfirmCalDialog()),
         child: Text('กินเลย'),
         style: OutlinedButton.styleFrom(
           primary: Theme.of(context).primaryColor,
