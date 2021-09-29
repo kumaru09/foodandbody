@@ -265,6 +265,7 @@ class _EditGoalDialog extends StatelessWidget {
                 ),
                 actions: <Widget>[
                   TextButton(
+                    key: const Key("edit_button_in_edit_goal_dialog"),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
@@ -273,6 +274,7 @@ class _EditGoalDialog extends StatelessWidget {
                               TextStyle(
                                   color: Theme.of(context).primaryColor)))),
                   TextButton(
+                    key: const Key("cancel_button_in_edit_goal_dialog"),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },

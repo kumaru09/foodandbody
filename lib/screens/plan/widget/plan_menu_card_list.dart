@@ -10,7 +10,7 @@ class PlanMenuCardList extends StatefulWidget {
 class _PlanMenuCardListState extends State<PlanMenuCardList> {
   
   GlobalKey<AnimatedListState> animatedListKey = GlobalKey();
-  late List planMenu = [
+  List planMenu = [
       PlanMenu(menu: "ตำไทยไข่เค็ม", calories: 172.6),
       PlanMenu(menu: "ยำเห็ดรวมมิตร", calories: 104.2),
       PlanMenu(menu: "ข้าวต้มปลา", calories: 220.0)
