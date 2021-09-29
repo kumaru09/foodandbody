@@ -10,7 +10,11 @@ class PlanMenuCardList extends StatefulWidget {
 class _PlanMenuCardListState extends State<PlanMenuCardList> {
   
   GlobalKey<AnimatedListState> animatedListKey = GlobalKey();
-  late List planMenu = getPlanMenu();
+  late List planMenu = [
+      PlanMenu(menu: "ตำไทยไข่เค็ม", calories: 172.6),
+      PlanMenu(menu: "ยำเห็ดรวมมิตร", calories: 104.2),
+      PlanMenu(menu: "ข้าวต้มปลา", calories: 220.0)
+    ];
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +47,7 @@ class _PlanMenuCardListState extends State<PlanMenuCardList> {
                   children: [
                     Expanded(
                         flex: 3,
-                        child: Text("${item.calories}",
+                        child: Text("${item.calories.round()}",
                             style: Theme.of(context)
                                 .textTheme
                                 .headline5!
@@ -78,20 +82,11 @@ class _PlanMenuCardListState extends State<PlanMenuCardList> {
               ),
             )));
   }
-
-  List getPlanMenu() {
-    //query from DB
-    return [
-      PlanMenu(menu: "ตำไทยไข่เค็ม", calories: 172),
-      PlanMenu(menu: "ยำเห็ดรวมมิตร", calories: 104),
-      PlanMenu(menu: "ข้าวต้มปลา", calories: 220)
-    ];
-  }
 }
 
 class PlanMenu {
   PlanMenu({required this.menu, required this.calories});
 
   final String menu;
-  final int calories;
+  final double calories;
 }

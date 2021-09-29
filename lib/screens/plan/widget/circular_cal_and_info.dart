@@ -4,9 +4,10 @@ import 'package:percent_indicator/percent_indicator.dart';
 
 // ignore: must_be_immutable
 class CircularCalAndInfo extends StatelessWidget {
-  late int totalCal = getTotalCal();
-  late int planCal = getPlanCal();
-  late int goalCal = getGoalCal();
+  late double totalCal = 1182.8;
+  late double planCal = 1678.2;
+  late double goalCal = 1800.3;
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -31,21 +32,6 @@ class CircularCalAndInfo extends StatelessWidget {
               )),
         ]);
   }
-
-  int getTotalCal() {
-    //query from DB
-    return 1182;
-  }
-
-  int getPlanCal() {
-    //query from DB
-    return 1678;
-  }
-
-  int getGoalCal() {
-    //query from DB
-    return 1800;
-  }
 }
 
 // ignore: must_be_immutable
@@ -53,9 +39,9 @@ class _CircularCalTwoProgress extends StatelessWidget {
   _CircularCalTwoProgress(
       {required this.totalCal, required this.planCal, required this.goalCal});
 
-  final int totalCal;
-  final int planCal;
-  final int goalCal;
+  final double totalCal;
+  final double planCal;
+  final double goalCal;
   late double percentTotalCal = totalCal / goalCal;
   late double percentPlanCal = planCal / goalCal;
 
@@ -73,7 +59,7 @@ class _CircularCalTwoProgress extends StatelessWidget {
       planProgressColor = Color(0xFFFF4040);
       backgroundColor = Theme.of(context).indicatorColor.withOpacity(0.8);
       label = "กินเกินแล้ว";
-      cal = (totalCal - goalCal).toString();
+      cal = (totalCal - goalCal).round().toString();
       percentTotalCal = 1;
       percentPlanCal = 1;
     } else if (percentTotalCal < 1 && percentPlanCal > 1) {
@@ -88,7 +74,7 @@ class _CircularCalTwoProgress extends StatelessWidget {
       planProgressColor = Color(0xFFFFBB91);
       backgroundColor = Color(0xFFD8D8D8);
       label = "เพิ่มได้อีก";
-      cal = (goalCal - planCal).toString();
+      cal = (goalCal - planCal).round().toString();
     }
 
     return Stack(
@@ -156,9 +142,9 @@ class _PlanInfo extends StatelessWidget {
   const _PlanInfo(
       {required this.totalCal, required this.planCal, required this.goalCal});
 
-  final int totalCal;
-  final int planCal;
-  final int goalCal;
+  final double totalCal;
+  final double planCal;
+  final double goalCal;
 
   @override
   Widget build(BuildContext context) {
@@ -191,7 +177,7 @@ class _PlanInfo extends StatelessWidget {
             alignment: Alignment.topLeft,
             padding: EdgeInsets.only(left: 25, bottom: 15),
             child: Text(
-              "$goalCal",
+              "${goalCal.round()}",
               style: Theme.of(context)
                   .textTheme
                   .headline6!
@@ -213,7 +199,7 @@ class _PlanInfo extends StatelessWidget {
             alignment: Alignment.topLeft,
             padding: EdgeInsets.only(left: 25, bottom: 15),
             child: Text(
-              "$planCal",
+              "${planCal.round()}",
               style: Theme.of(context)
                   .textTheme
                   .headline6!
@@ -235,7 +221,7 @@ class _PlanInfo extends StatelessWidget {
             alignment: Alignment.topLeft,
             padding: EdgeInsets.only(left: 25),
             child: Text(
-              "$totalCal",
+              "${totalCal.round()}",
               style: Theme.of(context)
                   .textTheme
                   .headline6!
@@ -248,7 +234,6 @@ class _PlanInfo extends StatelessWidget {
 
 // ignore: must_be_immutable
 class _EditGoalDialog extends StatelessWidget {
-  TextEditingController _textFieldController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -262,17 +247,19 @@ class _EditGoalDialog extends StatelessWidget {
       onPressed: () => showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            key: const Key("edit_goal_dialog"),
+                key: const Key("edit_goal_dialog"),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15)),
                 elevation: 0,
                 backgroundColor: Colors.white,
                 title: Text(
                   "แก้ไขเป้าหมายแคลอรี่",
-                  style: TextStyle(color: Theme.of(context).primaryColor),
+                  style: Theme.of(context)
+                      .textTheme
+                      .headline6!
+                      .merge(TextStyle(color: Theme.of(context).primaryColor)),
                 ),
                 content: TextField(
-                  controller: _textFieldController,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(hintText: "ตัวอย่าง 1600"),
                 ),
@@ -281,12 +268,18 @@ class _EditGoalDialog extends StatelessWidget {
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      child: Text("ยกเลิก")),
+                      child: Text("แก้ไข",
+                          style: Theme.of(context).textTheme.button!.merge(
+                              TextStyle(
+                                  color: Theme.of(context).primaryColor)))),
                   TextButton(
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      child: Text("ตกลง"))
+                      child: Text("ยกเลิก",
+                          style: Theme.of(context).textTheme.button!.merge(
+                              TextStyle(
+                                  color: Theme.of(context).primaryColor))))
                 ],
               )),
     );

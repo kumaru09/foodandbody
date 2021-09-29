@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class AteMenuCardList extends StatelessWidget {
-  late List ateMenu = getAteMenuList();
+  late List ateMenu = [
+    AteMenuList(menu: "โอวัลติน", cal: 177.2, time: "7:00"),
+    AteMenuList(menu: "ส้มตำไทย", cal: 240.3, time: "12:00"),
+    AteMenuList(menu: "ข้าวมันไก่", cal: 765.0, time: "17:35"),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +50,7 @@ class AteMenuCardList extends StatelessWidget {
               )),
           Container(
               margin: EdgeInsets.only(right: 15),
-              child: Text("${item.cal}",
+              child: Text("${item.cal.round()}",
                   style: Theme.of(context)
                       .textTheme
                       .headline6!
@@ -62,21 +66,12 @@ class AteMenuCardList extends StatelessWidget {
       ),
     );
   }
-
-  List getAteMenuList() {
-    //query from DB
-    return [
-      AteMenuList(menu: "โอวัลติน", cal: 177, time: "7:00"),
-      AteMenuList(menu: "ส้มตำไทย", cal: 240, time: "12:00"),
-      AteMenuList(menu: "ข้าวมันไก่", cal: 765, time: "17:35"),
-    ];
-  }
 }
 
 class AteMenuList {
   AteMenuList({required this.menu, required this.cal, required this.time});
 
   final String menu;
-  final int cal;
+  final double cal;
   final String time;
 }

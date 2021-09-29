@@ -3,12 +3,12 @@ import 'package:foodandbody/screens/body/body.dart';
 import 'package:foodandbody/screens/camera/camera.dart';
 import 'package:foodandbody/screens/history/history.dart';
 import 'package:foodandbody/screens/home/home.dart';
-import 'package:foodandbody/screens/plan/linear_nutrient_two_progress.dart';
-import 'package:foodandbody/screens/plan/plan_menu_card_list.dart';
+import 'package:foodandbody/screens/plan/widget/linear_nutrient_two_progress.dart';
+import 'package:foodandbody/screens/plan/widget/plan_menu_card_list.dart';
 import 'package:foodandbody/widget/bottom_appbar.dart';
 
-import 'ate_menu_card_list.dart';
-import 'circular_cal_and_info.dart';
+import 'widget/ate_menu_card_list.dart';
+import 'widget/circular_cal_and_info.dart';
 
 class Plan extends StatefulWidget {
   const Plan({Key? key}) : super(key: key);
@@ -78,6 +78,7 @@ class _PlanState extends State<Plan> {
               width: MediaQuery.of(context).size.width,
               alignment: Alignment.center,
               child: ElevatedButton.icon(
+                  key: const Key("add_menu_button"),
                   style: ElevatedButton.styleFrom(
                       primary: Theme.of(context).scaffoldBackgroundColor,
                       elevation: 0),

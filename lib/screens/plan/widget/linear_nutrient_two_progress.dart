@@ -3,17 +3,17 @@ import 'package:percent_indicator/linear_percent_indicator.dart';
 
 // ignore: must_be_immutable
 class LinearNutrientTwoProgress extends StatelessWidget {
-  late double proteinTotal = getTotalNutrient()[0];
-  late double proteinPlan = getPlanNutrient()[0];
-  late double proteinGoal = getGoalNutrient()[0];
+  late double proteinTotal = 45.3;
+  late double proteinPlan = 60.9;
+  late double proteinGoal = 80.2;
 
-  late double carbTotal = getTotalNutrient()[1];
-  late double carbPlan = getPlanNutrient()[1];
-  late double carbGoal = getGoalNutrient()[1];
+  late double carbTotal = 145.0;
+  late double carbPlan = 180.2;
+  late double carbGoal = 200.3;
 
-  late double fatTotal = getTotalNutrient()[2];
-  late double fatPlan = getPlanNutrient()[2];
-  late double fatGoal = getGoalNutrient()[2];
+  late double fatTotal = 14.7;
+  late double fatPlan = 30.3;
+  late double fatGoal = 51.4;
 
   @override
   Widget build(BuildContext context) {
@@ -44,30 +44,6 @@ class LinearNutrientTwoProgress extends StatelessWidget {
                 goalNutrient: fatGoal)
           ],
         ));
-  }
-
-  List getTotalNutrient() {
-    //query from DB
-    double _totalProtein = 45;
-    double _totalCarb = 145;
-    double _totalFat = 14;
-    return [_totalProtein, _totalCarb, _totalFat];
-  }
-
-  List getPlanNutrient() {
-    //query from DB
-    double _planProtein = 60;
-    double _planCarb = 180;
-    double _planFat = 30;
-    return [_planProtein, _planCarb, _planFat];
-  }
-
-  List getGoalNutrient() {
-    //query from DB
-    double _goalProtein = 85;
-    double _goalCarb = 200;
-    double _goalFat = 51;
-    return [_goalProtein, _goalCarb, _goalFat];
   }
 }
 
@@ -150,7 +126,7 @@ class _LinearIndicator extends StatelessWidget {
           ],
         ),
         Text(
-          "$totalNutrient/$goalNutrient g",
+          "${totalNutrient.round()}/${goalNutrient.round()} g",
           style: Theme.of(context)
               .textTheme
               .bodyText2!
