@@ -124,7 +124,7 @@ class _HomeState extends State<Home> {
                       )
                     ],
                   )),
-              MenuCard(), //show menu card
+              MenuCard(path: '/api/menu'), //show menu card
               Container(
                 padding: EdgeInsets.only(left: 16, top: 16),
                 height: 51,

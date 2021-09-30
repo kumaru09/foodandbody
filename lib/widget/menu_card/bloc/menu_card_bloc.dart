@@ -11,7 +11,6 @@ import 'package:stream_transform/stream_transform.dart';
 part 'menu_card_event.dart';
 part 'menu_card_state.dart';
 
-const _postLimit = 20;
 const throttleDuration = Duration(milliseconds: 100);
 
 EventTransformer<E> throttleDroppable<E>(Duration duration) {
@@ -21,7 +20,7 @@ EventTransformer<E> throttleDroppable<E>(Duration duration) {
 }
 
 class MenuCardBloc extends Bloc<MenuCardEvent, MenuCardState> {
-  MenuCardBloc({required this.httpClient}) : super(const MenuCardState()) {
+  MenuCardBloc({required this.httpClient, required this.path}) : super(const MenuCardState()) {
     on<MenuCardFetched>(
       _onMenuCardFetched,
       transformer: throttleDroppable(throttleDuration),
@@ -29,6 +28,7 @@ class MenuCardBloc extends Bloc<MenuCardEvent, MenuCardState> {
   }
 
   final http.Client httpClient;
+  final String path;
 
   Future<void> _onMenuCardFetched(
     MenuCardFetched event,
@@ -37,15 +37,14 @@ class MenuCardBloc extends Bloc<MenuCardEvent, MenuCardState> {
     if (state.hasReachedMax) return;
     try {
       if (state.status == MenuCardStatus.initial) {
-        final menu = await _fetchMenuCards();
+        final menu = await _fetchMenuCards(path);
         return emit(state.copyWith(
           status: MenuCardStatus.success,
           menu: menu,
           hasReachedMax: false,
         ));
       }
-      final menu = await _fetchMenuCards(5);
-      // final menu = await _fetchMenuCards(state.menu.length);
+      final menu = await _fetchMenuCards(path);
       menu.isEmpty
           ? emit(state.copyWith(hasReachedMax: true))
           : emit(
@@ -60,13 +59,9 @@ class MenuCardBloc extends Bloc<MenuCardEvent, MenuCardState> {
     }
   }
 
-  Future<List<MenuCard>> _fetchMenuCards([int startIndex = 0]) async {
+  Future<List<MenuCard>> _fetchMenuCards(String path) async {
     final response = await httpClient.get(
-      Uri.https(
-        'foodandbody-api.azurewebsites.net',
-        '/api/menu',
-        <String, String>{'_start': '$startIndex', '_limit': '$_postLimit'},
-      ),
+      Uri.https('foodandbody-api.azurewebsites.net', path),
     );
     if (response.statusCode == 200) {
       final body = json.decode(response.body) as List;

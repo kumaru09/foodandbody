@@ -40,15 +40,11 @@ class _MenuCardListState extends State<MenuCardList> {
                       ? const Center(child: CircularProgressIndicator())
                       : MenuCardItem(menu: state.menu[index]);
                 },
-                itemCount: 5,
-                // itemCount: state.menu.length,
+                // itemCount: 5,
+                itemCount: state.menu.length,
                 scrollDirection: Axis.horizontal,
                 shrinkWrap: true,
                 padding: EdgeInsets.only(left: 8),
-                // itemCount: state.hasReachedMax
-                //     ? state.menu.length
-                //     : state.menu.length + 1,
-                // controller: _scrollController,
               ),
             );
           default:
@@ -57,23 +53,4 @@ class _MenuCardListState extends State<MenuCardList> {
       },
     );
   }
-
-  // @override
-  // void dispose() {
-  //   _scrollController
-  //     ..removeListener(_onScroll)
-  //     ..dispose();
-  //   super.dispose();
-  // }
-
-  // void _onScroll() {
-  //   if (_isBottom) context.read<MenuCardBloc>().add(MenuCardFetched());
-  // }
-
-  // bool get _isBottom {
-  //   if (!_scrollController.hasClients) return false;
-  //   final maxScroll = _scrollController.position.maxScrollExtent;
-  //   final currentScroll = _scrollController.offset;
-  //   return currentScroll >= (maxScroll * 0.9);
-  // }
 }
