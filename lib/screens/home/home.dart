@@ -8,7 +8,7 @@ import 'package:foodandbody/screens/plan/plan.dart';
 import 'package:foodandbody/screens/setting/setting.dart';
 import 'package:foodandbody/widget/bottom_appbar.dart';
 import 'package:foodandbody/screens/home/linear_nutrient_indicator.dart';
-import 'package:foodandbody/widget/menu_card.dart';
+import 'package:foodandbody/widget/menu_card/menu_card.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -124,7 +124,7 @@ class _HomeState extends State<Home> {
                       )
                     ],
                   )),
-              MenuCardWidget(), //show menu card
+              MenuCard(), //show menu card
               Container(
                 padding: EdgeInsets.only(left: 16, top: 16),
                 height: 51,

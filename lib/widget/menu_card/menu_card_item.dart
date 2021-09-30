@@ -1,53 +1,15 @@
+
 import 'package:flutter/material.dart';
+import 'package:foodandbody/models/menu_card.dart';
 import 'package:foodandbody/screens/menu/menu.dart';
 
-// ignore: must_be_immutable
-class MenuCardWidget extends StatelessWidget {
-  MenuCardWidget({Key? key}) : super(key: key);
-  late List<MenuCardInfo> menu = getMenuInfo();
+class MenuCardItem extends StatelessWidget {
+  const MenuCardItem({Key? key, required this.menu}) : super(key: key);
 
-  List<MenuCardInfo> getMenuInfo() {
-    //query menu image, menu name, calories
-    return [
-      MenuCardInfo(
-          "https://www.haveazeed.com/wp-content/uploads/2019/08/3.%E0%B8%AA%E0%B9%89%E0%B8%A1%E0%B8%95%E0%B8%B3%E0%B9%84%E0%B8%97%E0%B8%A2%E0%B9%84%E0%B8%82%E0%B9%88%E0%B9%80%E0%B8%84%E0%B9%87%E0%B8%A1-1.png",
-          "very long menu name test 1234567890",
-          172),
-      MenuCardInfo("https://dilafashionshop.files.wordpress.com/2019/03/71.jpg",
-          "long cal", 48000),
-      MenuCardInfo(
-          "https://img.kapook.com/u/pirawan/Cooking1/thai%20spicy%20mushrooms%20salad.jpg",
-          "ยำเห็ดรวมมิตร",
-          104),
-      MenuCardInfo(
-          "https://snpfood.com/wp-content/uploads/2020/01/Breakfast-00002-scaled-1-1536x1536.jpg",
-          "ข้าวต้มปลา",
-          220),
-      MenuCardInfo(
-          "https://snpfood.com/wp-content/uploads/2020/01/Highlight-Menu-0059-scaled-1-1536x1536.jpg",
-          "ข้าวผัดปู",
-          551),
-    ]; //dummy data
-  }
+  final MenuCard menu;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 200,
-      child: ListView.builder(
-          key: const Key('menu_card_listview'),
-          itemCount: menu.length,
-          scrollDirection: Axis.horizontal,
-          shrinkWrap: true,
-          padding: EdgeInsets.only(left: 8),
-          itemBuilder: (BuildContext context, int index) {
-            return buildMenuCard(context, menu[index]);
-          }),
-    );
-  }
-
-  Widget buildMenuCard(BuildContext context, MenuCardInfo menu) {
-    final item = menu;
     return Container(
       height: 200,
       width: 200,
@@ -64,7 +26,7 @@ class MenuCardWidget extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          Menu(menuName: menu.name, menuImg: item.image)));
+                          Menu(menuName: menu.name, menuImg: menu.imageUrl)));
             },
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -76,7 +38,7 @@ class MenuCardWidget extends StatelessWidget {
                         topLeft: Radius.circular(15),
                         topRight: Radius.circular(15)),
                     child: Image.network(
-                      item.image,
+                      menu.imageUrl,
                       height: 150,
                       width: double.infinity,
                       fit: BoxFit.cover,
@@ -92,7 +54,7 @@ class MenuCardWidget extends StatelessWidget {
                         child: Padding(
                           padding: EdgeInsets.only(top: 2),
                           child: Text(
-                            item.name,
+                            menu.name,
                             maxLines: 1,
                             softWrap: false,
                             overflow: TextOverflow.fade,
@@ -106,7 +68,7 @@ class MenuCardWidget extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        " ${item.calories}",
+                        " ${menu.calory}",
                         textAlign: TextAlign.right,
                         style: Theme.of(context).textTheme.headline6!.merge(
                             TextStyle(
@@ -121,12 +83,4 @@ class MenuCardWidget extends StatelessWidget {
           )),
     );
   }
-}
-
-class MenuCardInfo {
-  String image; //URL
-  String name;
-  int calories;
-
-  MenuCardInfo(this.image, this.name, this.calories);
 }
