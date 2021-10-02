@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:foodandbody/screens/menu/menu.dart';
 
 // ignore: must_be_immutable
-class MenuCardWidget extends StatelessWidget {
-  MenuCardWidget({Key? key}) : super(key: key);
+class MenuCard extends StatelessWidget {
+  MenuCard({Key? key}) : super(key: key);
   late List<MenuCardInfo> menu = getMenuInfo();
 
   List<MenuCardInfo> getMenuInfo() {
@@ -12,21 +12,21 @@ class MenuCardWidget extends StatelessWidget {
       MenuCardInfo(
           "https://www.haveazeed.com/wp-content/uploads/2019/08/3.%E0%B8%AA%E0%B9%89%E0%B8%A1%E0%B8%95%E0%B8%B3%E0%B9%84%E0%B8%97%E0%B8%A2%E0%B9%84%E0%B8%82%E0%B9%88%E0%B9%80%E0%B8%84%E0%B9%87%E0%B8%A1-1.png",
           "ตำไทยไข่เค็ม",
-          172),
+          172.0),
       MenuCardInfo("https://dilafashionshop.files.wordpress.com/2019/03/71.jpg",
-          "ข้าวกะเพราไก่ไข่ดาว", 480),
+          "ข้าวกะเพราไก่ไข่ดาว", 480.3),
       MenuCardInfo(
           "https://img.kapook.com/u/pirawan/Cooking1/thai%20spicy%20mushrooms%20salad.jpg",
           "ยำเห็ดรวมมิตร",
-          104),
+          104.6),
       MenuCardInfo(
           "https://snpfood.com/wp-content/uploads/2020/01/Breakfast-00002-scaled-1-1536x1536.jpg",
           "ข้าวต้มปลา",
-          220),
+          220.1),
       MenuCardInfo(
           "https://snpfood.com/wp-content/uploads/2020/01/Highlight-Menu-0059-scaled-1-1536x1536.jpg",
           "ข้าวผัดปู",
-          551),
+          551.2),
     ]; //dummy data
   }
 
@@ -99,7 +99,7 @@ class MenuCardWidget extends StatelessWidget {
                       width: 50,
                       padding: EdgeInsets.only(top: 3, right: 8, bottom: 8),
                       child: Text(
-                        "${item.calories}",
+                        "${item.calories.round()}",
                         textAlign: TextAlign.right,
                         style: Theme.of(context).textTheme.headline6!.merge(
                             TextStyle(color: Theme.of(context).colorScheme.secondary)),
@@ -118,7 +118,7 @@ class MenuCardWidget extends StatelessWidget {
 class MenuCardInfo {
   String image; //URL
   String name;
-  int calories;
+  double calories;
 
   MenuCardInfo(this.image, this.name, this.calories);
 }
