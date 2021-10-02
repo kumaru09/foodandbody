@@ -39,13 +39,13 @@ class InfoEntity extends Equatable {
     };
   }
 
-  static const empty = InfoEntity(
-      name: '',
-      goal: null,
-      height: null,
-      weight: null,
-      gender: '',
-      photoUrl: '');
+  // static const empty = InfoEntity(
+  //     name: '',
+  //     goal: null,
+  //     height: null,
+  //     weight: null,
+  //     gender: '',
+  //     photoUrl: '');
 
   @override
   List<Object?> get props => [name, goal, height, weight, gender, photoUrl];
