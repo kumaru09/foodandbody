@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:foodandbody/app/bloc/app_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class Setting extends StatelessWidget {
   const Setting({Key? key}) : super(key: key);
@@ -21,8 +23,14 @@ class Setting extends StatelessWidget {
                 // change page to setting page
                 Navigator.pop(context);
               },
-              icon:
-                  Icon(Icons.arrow_back, color: Colors.white)),
-        ));
+              icon: Icon(Icons.arrow_back, color: Colors.white)),
+        ),
+        body: ElevatedButton(
+            onPressed: () {
+              context.read<AppBloc>().add(AppLogoutRequested());
+              Navigator.pop(context);
+            },
+            key: const Key('homePage_logout_iconButton'),
+            child: Text('Logout')));
   }
 }

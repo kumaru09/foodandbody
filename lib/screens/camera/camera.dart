@@ -14,13 +14,13 @@ class _CameraState extends State<Camera> {
       extendBody: true,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: Theme.of(context).primaryColor,
         elevation: 0,
         title: Text("Camera",
             style: Theme.of(context)
                 .textTheme
                 .headline5!
-                .merge(TextStyle(color: Theme.of(context).primaryColor))),
+                .merge(TextStyle(color: Colors.white))),
       ),
     );
   }

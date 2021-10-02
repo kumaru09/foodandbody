@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 
-class BottomAppBarWidget extends StatefulWidget {
+class BottomNavigation extends StatefulWidget {
+  
   final int index;
   final ValueChanged<int> onChangedTab;
 
-  const BottomAppBarWidget({
+  const BottomNavigation({
     required this.index,
     required this.onChangedTab,
   });
 
   @override
-  _BottomAppBarWidgetState createState() => _BottomAppBarWidgetState();
+  _BottomNavigationState createState() => _BottomNavigationState();
 }
 
-class _BottomAppBarWidgetState extends State<BottomAppBarWidget> {
+class _BottomNavigationState extends State<BottomNavigation> {
   @override
   Widget build(BuildContext context) {
     final placeholder = Opacity(

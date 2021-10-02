@@ -3,40 +3,29 @@ import 'package:percent_indicator/percent_indicator.dart';
 
 // ignore: must_be_immutable
 class CircularCalIndicator extends StatelessWidget {
-  CircularCalIndicator({Key? key}) : super(key: key);
-  late int totalCal = getTotalCal();
-  late int goalCal = getGoalCal();
-  late double percentCal = totalCal / goalCal;
-
-  late Color progressColor;
-  late Color backgroundColor;
-  late String label;
-  late String cal;
-
-  int getTotalCal() {
-    //query from DB
-    return 1182;
-  }
-
-  int getGoalCal() {
-    //query from DB
-    return 1800;
-  }
+  late double totalCal = 1182.4;
+  late double goalCal = 1800.2;
 
   @override
   Widget build(BuildContext context) {
-    //check value
+    double percentCal = totalCal / goalCal;
+
+    Color progressColor;
+    Color backgroundColor;
+    String label;
+    String cal;
+    
     if (percentCal > 1) {
       progressColor = Color(0xFFFF4040);
       backgroundColor = Theme.of(context).indicatorColor.withOpacity(0.8);
       label = "กินเกินแล้ว";
-      cal = (totalCal - goalCal).toString();
+      cal = (totalCal - goalCal).round().toString();
       percentCal = 1;
     } else {
       progressColor = Theme.of(context).indicatorColor;
       backgroundColor = Color(0xFFFFBB91);
       label = "กินได้อีก";
-      cal = (goalCal - totalCal).toString();
+      cal = (goalCal - totalCal).round().toString();
     }
 
     return CircularPercentIndicator(

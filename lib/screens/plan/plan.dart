@@ -1,25 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:foodandbody/screens/body/body.dart';
-import 'package:foodandbody/screens/camera/camera.dart';
-import 'package:foodandbody/screens/history/history.dart';
-import 'package:foodandbody/screens/home/home.dart';
 import 'package:foodandbody/screens/plan/widget/linear_nutrient_two_progress.dart';
 import 'package:foodandbody/screens/plan/widget/plan_menu_card_list.dart';
-import 'package:foodandbody/widget/bottom_appbar.dart';
 
 import 'widget/ate_menu_card_list.dart';
 import 'widget/circular_cal_and_info.dart';
 
-class Plan extends StatefulWidget {
+class Plan extends StatelessWidget {
   const Plan({Key? key}) : super(key: key);
-
-  @override
-  _PlanState createState() => _PlanState();
-}
-
-class _PlanState extends State<Plan> {
-  List page = [Home(), Plan(), Body(), History()];
-  int bottomAppBarIndex = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +22,7 @@ class _PlanState extends State<Plan> {
                   .headline5!
                   .merge(TextStyle(color: Theme.of(context).primaryColor))),
         ),
-        body: SingleChildScrollView( 
+        body: SingleChildScrollView(
             child: Column(
           children: [
             Container(
@@ -107,32 +94,11 @@ class _PlanState extends State<Plan> {
               ),
             ),
             Container(
-              padding: EdgeInsets.only(left: 16, right: 16, bottom: 100, top: 8),
+              padding:
+                  EdgeInsets.only(left: 16, right: 16, bottom: 100, top: 8),
               child: AteMenuCardList(),
             )
           ],
-        )),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            //change to camera mode
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => Camera()));
-          },
-          elevation: 0.4,
-          child: Icon(Icons.photo_camera),
-          backgroundColor: Theme.of(context).colorScheme.secondary,
-        ),
-        bottomNavigationBar: BottomAppBarWidget(
-            index: bottomAppBarIndex, onChangedTab: _onChangedTab));
-  }
-
-  void _onChangedTab(int index) {
-    setState(() {
-      this.bottomAppBarIndex = index;
-      Navigator.pop(context);
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => page[index]));
-    });
+        )));
   }
 }

@@ -10,7 +10,7 @@ abstract class MockWithExpandedToString extends Mock {
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.debug});
 }
 
-class MockFunction extends MockWithExpandedToString implements MenuCardWidget {
+class MockFunction extends MockWithExpandedToString implements MenuCard {
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.debug}) {
     return super.toString();
@@ -35,7 +35,7 @@ void main() {
   }); //group "MenuCardInfo Class"
 
   group("Menu Card ListView", () {
-    late MenuCardWidget mockMenu;
+    late MenuCard mockMenu;
     setUp(() {
       mockMenu = MockFunction();
     });
@@ -44,7 +44,7 @@ void main() {
         await tester.pumpWidget(MaterialApp(
           theme: AppTheme.themeData,
           home: Scaffold(
-            body: MenuCardWidget(),
+            body: MenuCard(),
           ),
         ));
       });
@@ -52,7 +52,7 @@ void main() {
     }); //"can render"
 
     testWidgets("when pressed menu card", (tester) async {
-      final menuCardWidgetRender = MenuCardWidget();
+      final menuCardWidgetRender = MenuCard();
       when(() => mockMenu.getMenuInfo()).thenAnswer((invocation) => [
             MenuCardInfo(
                 "https://img.kapook.com/u/surauch/movie2/garlic-fried-rice.jpg",
