@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-class MenuCard extends Equatable {
-  const MenuCard({required this.name, required this.calory, required this.imageUrl});
+class MenuList extends Equatable {
+  const MenuList({required this.name, required this.calory, required this.imageUrl});
 
   final String name;
   final int calory;

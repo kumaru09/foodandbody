@@ -5,17 +5,17 @@ enum MenuCardStatus { initial, success, failure }
 class MenuCardState extends Equatable {
   const MenuCardState({
     this.status = MenuCardStatus.initial,
-    this.menu = const <MenuCard>[],
+    this.menu = const <MenuList>[],
     this.hasReachedMax = false,
   });
 
   final MenuCardStatus status;
-  final List<MenuCard> menu;
+  final List<MenuList> menu;
   final bool hasReachedMax;
 
   MenuCardState copyWith({
     MenuCardStatus? status,
-    List<MenuCard>? menu,
+    List<MenuList>? menu,
     bool? hasReachedMax,
   }) {
     return MenuCardState(

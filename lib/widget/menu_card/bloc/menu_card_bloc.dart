@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
-import 'package:foodandbody/models/menu_card.dart';
+import 'package:foodandbody/models/menu_list.dart';
 import 'package:http/http.dart' as http;
 import 'package:stream_transform/stream_transform.dart';
 
@@ -59,7 +59,7 @@ class MenuCardBloc extends Bloc<MenuCardEvent, MenuCardState> {
     }
   }
 
-  Future<List<MenuCard>> _fetchMenuCards(String path) async {
+  Future<List<MenuList>> _fetchMenuCards(String path) async {
     final response = await httpClient.get(
       Uri.https('foodandbody-api.azurewebsites.net', path),
     );
@@ -67,7 +67,7 @@ class MenuCardBloc extends Bloc<MenuCardEvent, MenuCardState> {
       final body = json.decode(response.body) as List;
       print('ResponseBody: ' + response.body); // Read Data in Array
       return body.map((dynamic json) {
-        return MenuCard(
+        return MenuList(
           name: json['name'] as String,
           calory: json['calories'] as int,
           imageUrl: json['imageUrl'] as String,

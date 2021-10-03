@@ -1,19 +1,18 @@
 
 import 'package:flutter/material.dart';
-import 'package:foodandbody/models/menu_card.dart';
+import 'package:foodandbody/models/menu_list.dart';
 import 'package:foodandbody/screens/menu/menu.dart';
 
 class MenuCardItem extends StatelessWidget {
   const MenuCardItem({Key? key, required this.menu}) : super(key: key);
 
-  final MenuCard menu;
+  final MenuList menu;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 200,
       width: 200,
-      padding: EdgeInsets.only(left: 8),
       child: Card(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),

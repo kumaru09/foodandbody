@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:foodandbody/models/menu_card.dart';
 import 'package:foodandbody/widget/menu_card/bloc/menu_card_bloc.dart';
 import 'package:foodandbody/widget/menu_card/menu_card_item.dart';
 
@@ -10,14 +9,10 @@ class MenuCardList extends StatefulWidget {
 }
 
 class _MenuCardListState extends State<MenuCardList> {
-  final _scrollController = ScrollController();
-  late Future<MenuCard> futureMenuCard;
 
   @override
   void initState() {
     super.initState();
-    // _scrollController.addListener(_onScroll);
-    // futureMenuCard = fetchMenuCard();
     context.read<MenuCardBloc>().add(MenuCardFetched());
   }
 
@@ -40,11 +35,11 @@ class _MenuCardListState extends State<MenuCardList> {
                       ? const Center(child: CircularProgressIndicator())
                       : MenuCardItem(menu: state.menu[index]);
                 },
-                // itemCount: 5,
-                itemCount: state.menu.length,
+                itemCount: 5,
+                // itemCount: state.menu.length,
                 scrollDirection: Axis.horizontal,
                 shrinkWrap: true,
-                padding: EdgeInsets.only(left: 8),
+                padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
               ),
             );
           default:
