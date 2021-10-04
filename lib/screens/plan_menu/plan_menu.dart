@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:foodandbody/screens/plan_menu/dialog.dart';
-import 'package:foodandbody/widget/nutrient_detial.dart';
+import 'package:foodandbody/widget/nutrient_detail.dart';
 
 class PlanMenu extends StatelessWidget {
   const PlanMenu ({Key? key, required this.menuName, required this.menuImg})
@@ -66,13 +66,13 @@ class PlanMenu extends StatelessWidget {
                           ],
                         ),
                         SizedBox(height: 16.0),
-                        NutrientDetial(label: 'หน่วยบริโภค', value: '1 จาน'),
+                        NutrientDetail(label: 'หน่วยบริโภค', value: '1 จาน'),
                         SizedBox(height: 7.0),
-                        NutrientDetial(label: 'โปรตีน', value: '27.5 กรัม'),
+                        NutrientDetail(label: 'โปรตีน', value: '27.5 กรัม'),
                         SizedBox(height: 7.0),
-                        NutrientDetial(label: 'คาร์โบไฮเดรต', value: '89.1 กรัม'),
+                        NutrientDetail(label: 'คาร์โบไฮเดรต', value: '89.1 กรัม'),
                         SizedBox(height: 7.0),
-                        NutrientDetial(label: 'ไขมัน', value: '32.3 กรัม'),
+                        NutrientDetail(label: 'ไขมัน', value: '32.3 กรัม'),
                       ],
                     ),
                   ),

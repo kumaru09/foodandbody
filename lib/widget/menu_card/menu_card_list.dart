@@ -35,8 +35,8 @@ class _MenuCardListState extends State<MenuCardList> {
                       ? const Center(child: CircularProgressIndicator())
                       : MenuCardItem(menu: state.menu[index]);
                 },
-                itemCount: 5,
-                // itemCount: state.menu.length,
+                // itemCount: 5,
+                itemCount: state.menu.length,
                 scrollDirection: Axis.horizontal,
                 shrinkWrap: true,
                 padding: EdgeInsets.fromLTRB(16, 0, 16, 16),

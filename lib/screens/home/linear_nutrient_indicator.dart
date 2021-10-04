@@ -5,50 +5,13 @@ import 'package:percent_indicator/linear_percent_indicator.dart';
 class LinearNutrientIndicator extends StatelessWidget {
   LinearNutrientIndicator({Key? key}) : super(key: key);
 
-  late int totalProtein = getTotalNutrient()[0];
-  late int totalCarb = getTotalNutrient()[1];
-  late int totalFat = getTotalNutrient()[2];
+  late double totalProtein = 44.8;
+  late double totalCarb = 145.2;
+  late double totalFat = 13.9;
 
-  late int goalProtein = getGoalNutrient()[0];
-  late int goalCarb = getGoalNutrient()[1];
-  late int goalFat = getGoalNutrient()[2];
-
-  late double percentProtein = totalProtein / goalProtein;
-  late double percentCarb = totalCarb / goalCarb;
-  late double percentFat = totalFat / goalFat;
-
-  List getTotalNutrient() {
-    //query from DB
-    var _totalProtein = 45;
-    var _totalCarb = 145;
-    var _totalFat = 14;
-    return [_totalProtein, _totalCarb, _totalFat];
-  }
-
-  List getGoalNutrient() {
-    //query from DB
-    var _goalProtein = 85;
-    var _goalCarb = 200;
-    var _goalFat = 51;
-    return [_goalProtein, _goalCarb, _goalFat];
-  }
-
-  double getPercentDecimal(double percent) {
-    if (percent > 1)
-      return 1;
-    else
-      return percent;
-  }
-
-  Color getProgressColor(BuildContext context, double percent) {
-    return percent > 1 ? Color(0xFFFF4040) : Theme.of(context).indicatorColor;
-  }
-
-  Color getbackgroundColor(BuildContext context, double percent) {
-    return percent > 1
-        ? Theme.of(context).indicatorColor.withOpacity(0.8)
-        : Color(0xFFFFBB91);
-  }
+  late double goalProtein = 85.0;
+  late double goalCarb = 200.4;
+  late double goalFat = 50.6;
 
   @override
   Widget build(BuildContext context) {
@@ -56,18 +19,58 @@ class LinearNutrientIndicator extends StatelessWidget {
       key: Key('linear_indicator_row'),
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        buildLinearIndicator(context, const Key('protein_linear_indicator'), const Key('protein_line'),
-            "โปรตีน", totalProtein, goalProtein, percentProtein),
-        buildLinearIndicator(context, const Key('carb_linear_indicator'), const Key('carb_line'),
-            "คาร์บ", totalCarb, goalCarb, percentCarb),
-        buildLinearIndicator(context, const Key('fat_linear_indicator'), const Key('fat_line'),
-            "ไขมัน", totalFat, goalFat, percentFat),
+        _BuildLinearIndicator(
+            keyCol: const Key('protein_linear_indicator'),
+            keyLinear: const Key('protein_line'),
+            label: "โปรตีน",
+            total: totalProtein,
+            goal: goalProtein),
+        _BuildLinearIndicator(
+            keyCol: const Key('carb_linear_indicator'),
+            keyLinear: const Key('carb_line'),
+            label: "คาร์บ",
+            total: totalCarb,
+            goal: goalCarb),
+        _BuildLinearIndicator(
+            keyCol: const Key('fat_linear_indicator'),
+            keyLinear: const Key('fat_line'),
+            label: "ไขมัน",
+            total: totalFat,
+            goal: goalFat),
       ],
     );
   }
+}
 
-  Widget buildLinearIndicator(BuildContext context, Key keyCol, Key keyLinear, String label,
-      int total, int goal, double percent) {
+class _BuildLinearIndicator extends StatelessWidget {
+  const _BuildLinearIndicator(
+      {required this.keyCol,
+      required this.keyLinear,
+      required this.label,
+      required this.total,
+      required this.goal});
+
+  final Key keyCol;
+  final Key keyLinear;
+  final String label;
+  final double total;
+  final double goal;
+
+  @override
+  Widget build(BuildContext context) {
+    double percent = total / goal;
+    Color progressColor;
+    Color backgroundColor;
+
+    if (percent > 1) {
+      progressColor = Color(0xFFFF4040);
+      backgroundColor = Theme.of(context).indicatorColor.withOpacity(0.8);
+      percent = 1;
+    } else {
+      progressColor = Theme.of(context).indicatorColor;
+      backgroundColor = Color(0xFFFFBB91);
+    }
+
     return Column(
       key: keyCol,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -85,18 +88,15 @@ class LinearNutrientIndicator extends StatelessWidget {
           animation: true,
           animationDuration: 750,
           lineHeight: 6,
-          percent: getPercentDecimal(percent),
+          percent: percent,
           linearStrokeCap: LinearStrokeCap.roundAll,
-          progressColor: getProgressColor(context, percent),
-          backgroundColor: getbackgroundColor(context, percent),
+          progressColor: progressColor,
+          backgroundColor: backgroundColor,
         ),
-        Text(
-          "$total/$goal g",
-          style: Theme.of(context)
-              .textTheme
-              .bodyText2!
-              .merge(TextStyle(color: getProgressColor(context, percent))),
-        )
+        Text("${total.round()}/${goal.round()} g",
+            style: Theme.of(context).textTheme.bodyText2!.merge(
+                  TextStyle(color: progressColor),
+                ))
       ],
     );
   }

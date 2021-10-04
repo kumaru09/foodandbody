@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class NutrientDetial extends StatelessWidget {
-  const NutrientDetial({Key? key, required this.label, required this.value})
+class NutrientDetail extends StatelessWidget {
+  const NutrientDetail({Key? key, required this.label, required this.value})
       : super(key: key);
   final String label;
   final String value;
