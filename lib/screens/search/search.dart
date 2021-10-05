@@ -86,7 +86,8 @@ class _SearchAppBarState extends State<SearchAppBar> {
                   color: Theme.of(context).colorScheme.secondary),
             ),
             hintText: 'ค้นหาเมนู',
-            hintStyle: Theme.of(context).textTheme.bodyText1,
+            hintStyle: Theme.of(context).textTheme.bodyText1!.merge(TextStyle(
+                      color: Color(0xFF7E7C9F))),
             border: InputBorder.none),
       ),
     );
@@ -98,22 +99,34 @@ class _SearchBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<SearchBloc, SearchState>(
-      builder: (context, state) {
-        if (state is SearchStateLoading) {
-          return Center(child: const CircularProgressIndicator());
-        }
-        if (state is SearchStateError) {
-          return Center(child: Text(state.error));
-        }
-        if (state is SearchStateSuccess) {
-          return state.items.isEmpty
-              ? const Text('ไม่พบผลลัพธ์')
-              : _SearchResult(items: state.items);
-        }
-        return const Text('ค้นหาเมนูโดยชื่อเมนู');
-      },
-    );
+    return BlocBuilder<SearchBloc, SearchState>(builder: (context, state) {
+      if (state is SearchStateLoading) {
+        return Center(child: const CircularProgressIndicator());
+      }
+      if (state is SearchStateError) {
+        return Center(child: Text(state.error));
+      }
+      if (state is SearchStateSuccess) {
+        return state.items.isEmpty
+            ? Center(
+                child: Text(
+                  'ไม่พบผลลัพธ์ที่ตรงกัน',
+                  style: Theme.of(context).textTheme.subtitle1!.merge(TextStyle(
+                      color: Theme.of(context).colorScheme.secondary)),
+                ),
+              )
+            : _SearchResult(items: state.items);
+      }
+      return Center(
+        child: Text(
+          'กรุณาใส่ชื่อเมนูเพื่อค้นหา',
+          style: Theme.of(context)
+              .textTheme
+              .subtitle1!
+              .merge(TextStyle(color: Theme.of(context).colorScheme.secondary)),
+        ),
+      );
+    });
   }
 }
 

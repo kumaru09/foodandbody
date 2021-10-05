@@ -41,7 +41,7 @@ class SearchPage extends StatelessWidget {
         child: ListView(
           children: <Widget>[
             Container(
-              padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+              padding: EdgeInsets.fromLTRB(16, 16, 16, 5),
               child: Text(
                 "เมนูแนะนำ",
                 style: Theme.of(context).textTheme.bodyText1!.merge(
@@ -51,7 +51,7 @@ class SearchPage extends StatelessWidget {
             ),
             MenuCard(path: '/api/menu'),
             Container(
-              padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
+              padding: EdgeInsets.fromLTRB(16, 0, 16, 5),
               child: Text(
                 "เมนูยอดนิยม",
                 style: Theme.of(context).textTheme.bodyText1!.merge(
@@ -61,7 +61,7 @@ class SearchPage extends StatelessWidget {
             ),
             MenuCard(path: '/api/menu'),
             Container(
-              padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
+              padding: EdgeInsets.fromLTRB(16, 0, 16, 5),
               child: Text(
                 "เมนูที่กินบ่อย",
                 style: Theme.of(context).textTheme.bodyText1!.merge(
