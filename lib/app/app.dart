@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:foodandbody/app/routes.dart';
 import 'package:foodandbody/repositories/authen_repository.dart';
+import 'package:foodandbody/repositories/search_reository.dart';
 import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/theme.dart';
 
@@ -11,13 +12,16 @@ class App extends StatelessWidget {
   const App(
       {Key? key,
       required AuthenRepository authenRepository,
-      required UserRepository userRepository})
+      required UserRepository userRepository,
+      required SearchRepository searchRepository,})
       : _authenRepository = authenRepository,
         _userRepository = userRepository,
+        _searchRepository = searchRepository,
         super(key: key);
 
   final AuthenRepository _authenRepository;
   final UserRepository _userRepository;
+  final SearchRepository _searchRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -26,12 +30,16 @@ class App extends StatelessWidget {
         RepositoryProvider<AuthenRepository>(
             create: (context) => AuthenRepository()),
         RepositoryProvider<UserRepository>(
-            create: (context) => UserRepository())
+            create: (context) => UserRepository()),
+        RepositoryProvider<SearchRepository>(
+            create: (context) => SearchRepository(SearchCache(), SearchClient())),
       ],
       child: BlocProvider(
         create: (_) => AppBloc(
             authenRepository: _authenRepository,
-            userRepository: _userRepository),
+            userRepository: _userRepository,
+            searchRepository: _searchRepository,
+            ),
         child: const AppView(),
       ),
     );

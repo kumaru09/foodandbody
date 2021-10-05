@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:foodandbody/screens/body/body.dart';
 import 'package:foodandbody/screens/camera/camera.dart';
 import 'package:foodandbody/screens/history/history.dart';
-import 'package:foodandbody/screens/search/search.dart';
+import 'package:foodandbody/screens/search/search_page.dart';
 import 'package:foodandbody/screens/plan/plan.dart';
 import 'package:foodandbody/screens/setting/setting.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
@@ -201,7 +201,7 @@ void main() {
           ));
           await tester.tap(find.byKey(menuAllButtonKey));
           await tester.pumpAndSettle();
-          expect(find.byType(Search), findsOneWidget);
+          expect(find.byType(SearchPage), findsOneWidget);
         });
       }); //"when pressed ดูทั้งหมด button"
 
