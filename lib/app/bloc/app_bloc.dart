@@ -5,7 +5,6 @@ import 'package:bloc/bloc.dart';
 import 'package:foodandbody/repositories/authen_repository.dart';
 import 'package:equatable/equatable.dart';
 import 'package:foodandbody/models/user.dart';
-import 'package:foodandbody/repositories/search_reository.dart';
 import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:pedantic/pedantic.dart';
 
@@ -16,11 +15,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   AppBloc(
       {required AuthenRepository authenRepository,
       required UserRepository userRepository,
-      required SearchRepository searchRepository,
       })
       : _authenRepository = authenRepository,
         _userRepository = userRepository,
-        _searchRepository = searchRepository,
         super(
           authenRepository.currentUser.isNotEmpty
               ? AppState.authenticated(authenRepository.currentUser)
@@ -31,7 +28,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
   final AuthenRepository _authenRepository;
   final UserRepository _userRepository;
-  final SearchRepository _searchRepository;
   late final StreamSubscription<User> _userSubscription;
 
   void _onUserChanged(User user) => add(AppUserChanged(user));

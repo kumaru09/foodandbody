@@ -12,16 +12,13 @@ class App extends StatelessWidget {
   const App(
       {Key? key,
       required AuthenRepository authenRepository,
-      required UserRepository userRepository,
-      required SearchRepository searchRepository,})
+      required UserRepository userRepository,})
       : _authenRepository = authenRepository,
         _userRepository = userRepository,
-        _searchRepository = searchRepository,
         super(key: key);
 
   final AuthenRepository _authenRepository;
   final UserRepository _userRepository;
-  final SearchRepository _searchRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +35,6 @@ class App extends StatelessWidget {
         create: (_) => AppBloc(
             authenRepository: _authenRepository,
             userRepository: _userRepository,
-            searchRepository: _searchRepository,
             ),
         child: const AppView(),
       ),
