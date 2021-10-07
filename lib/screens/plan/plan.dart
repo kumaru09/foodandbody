@@ -33,18 +33,14 @@ class _PlanPageState extends State<Plan> {
                   .merge(TextStyle(color: Theme.of(context).primaryColor))),
         ),
         body: SingleChildScrollView(
-            child: BlocProvider(
-                create: (_) =>
-                    PlanBloc(context.read<PlanRepository>())..add(LoadPlan()),
-                child:
-                    BlocBuilder<PlanBloc, PlanState>(builder: (context, state) {
-                  if (state is PlanLoaded) {
-                    return _buildPlan(context, state.plan);
-                  } else if (state is PlanError) {
-                    return Container();
-                  }
-                  return Center(child: CircularProgressIndicator());
-                }))));
+            child: BlocBuilder<PlanBloc, PlanState>(builder: (context, state) {
+          if (state is PlanLoaded) {
+            return _buildPlan(context, state.plan);
+          } else if (state is PlanError) {
+            return Container();
+          }
+          return Center(child: CircularProgressIndicator());
+        })));
   }
 
   Widget _buildPlan(BuildContext context, History plan) {
