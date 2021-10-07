@@ -9,16 +9,16 @@ class LinearNutrientTwoProgress extends StatelessWidget {
   final User _user;
   final History _plan;
   late double proteinTotal = _plan.totalNutrientList.protein;
-  late double proteinPlan = 60.9;
-  late double proteinGoal = 80.2;
+  late double proteinPlan = _plan.planNutrientList.protein;
+  late double proteinGoal = _user.info!.goalNutrient!.protein;
 
   late double carbTotal = _plan.totalNutrientList.carb;
-  late double carbPlan = 180.2;
-  late double carbGoal = 200.3;
+  late double carbPlan = _plan.planNutrientList.carb;
+  late double carbGoal = _user.info!.goalNutrient!.carb;
 
   late double fatTotal = _plan.totalNutrientList.fat;
-  late double fatPlan = 30.3;
-  late double fatGoal = 51.4;
+  late double fatPlan = _plan.planNutrientList.fat;
+  late double fatGoal = _user.info!.goalNutrient!.fat;
 
   @override
   Widget build(BuildContext context) {

@@ -38,7 +38,7 @@ class PlanRepository implements IPlanRepository {
       final res = await http.get(Uri.parse(
           "https://foodandbody-api.azurewebsites.net/api/Menu/${menu.name}"));
       if (res.statusCode == 200) {
-        updatePlan(MenuDetail.fromJson(json.decode(res.body)));
+        updatePlan(MenuDetail.fromJson(json.decode(res.body)), isEat);
       } else {
         throw Exception('error fetching menu');
       }
@@ -47,6 +47,7 @@ class PlanRepository implements IPlanRepository {
 
   @override
   Future<History> getPlanById() async {
+    log('Fetching data');
     final plan = await foodHistories
         .where('date', isGreaterThanOrEqualTo: lastMidnight)
         .get();
@@ -59,20 +60,29 @@ class PlanRepository implements IPlanRepository {
     }
   }
 
-  Future<void> updatePlan(MenuDetail menuDetail) async {
+  Future<void> updatePlan(MenuDetail menuDetail, bool isEat) async {
     final plan = await foodHistories
         .where('date', isGreaterThanOrEqualTo: lastMidnight)
         .get();
     final data =
         History.fromEntity(HistoryEntity.fromSnapshot(plan.docs.first));
     if (plan.docs.isNotEmpty) {
-      await plan.docs.first.reference.update({
-        'totalCal': data.totalCal + menuDetail.calories,
-        'totalNutrient': data.totalNutrientList.copyWith(
-            protein: data.totalNutrientList.protein + menuDetail.protein,
-            fat: data.totalNutrientList.fat + menuDetail.fat,
-            carb: data.totalNutrientList.carb + menuDetail.carb),
-      });
+      if (isEat) {
+        await plan.docs.first.reference.update({
+          'totalCal': data.totalCal + menuDetail.calories,
+          'totalNutrient': data.totalNutrientList.copyWith(
+              protein: data.totalNutrientList.protein + menuDetail.protein,
+              fat: data.totalNutrientList.fat + menuDetail.fat,
+              carb: data.totalNutrientList.carb + menuDetail.carb),
+        });
+      } else {
+        await plan.docs.first.reference.update({
+          'planNutrient': data.planNutrientList.copyWith(
+              protein: data.planNutrientList.protein + menuDetail.protein,
+              fat: data.planNutrientList.fat + menuDetail.fat,
+              carb: data.planNutrientList.carb + menuDetail.carb)
+        });
+      }
     }
   }
 }

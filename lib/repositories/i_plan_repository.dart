@@ -6,5 +6,5 @@ abstract class IPlanRepository {
 
   Future<void> getPlanById();
 
-  Future<void> updatePlan(MenuDetail menuDetail);
+  Future<void> updatePlan(MenuDetail menuDetail, bool isEat);
 }

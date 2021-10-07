@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:foodandbody/models/history_entity.dart';
 import 'package:foodandbody/models/menu.dart';
+import 'package:foodandbody/models/nutrient.dart';
 
 class History {
   final Timestamp date;
@@ -8,10 +9,12 @@ class History {
   final int totalWater;
   final double totalCal;
   final Nutrient totalNutrientList;
+  final Nutrient planNutrientList;
 
   History(this.date,
       {this.totalCal = 0,
       this.totalNutrientList = const Nutrient(),
+      this.planNutrientList = const Nutrient(),
       this.totalWater = 0,
       List<Menu>? menuList})
       : this.menuList = menuList ?? [];
@@ -21,14 +24,14 @@ class History {
       List<Menu>? menuList,
       double? totalCal,
       int? totalWater,
-      Nutrient? totalNutrientList}) {
-    return History(
-      date ?? this.date,
-      menuList: menuList ?? this.menuList,
-      totalCal: totalCal ?? this.totalCal,
-      totalNutrientList: totalNutrientList ?? this.totalNutrientList,
-      totalWater: totalWater ?? this.totalWater,
-    );
+      Nutrient? totalNutrientList,
+      Nutrient? planNutrientList}) {
+    return History(date ?? this.date,
+        menuList: menuList ?? this.menuList,
+        totalCal: totalCal ?? this.totalCal,
+        totalNutrientList: totalNutrientList ?? this.totalNutrientList,
+        totalWater: totalWater ?? this.totalWater,
+        planNutrientList: planNutrientList ?? this.planNutrientList);
   }
 
   @override
@@ -37,7 +40,8 @@ class History {
       menuList.hashCode ^
       totalCal.hashCode ^
       totalNutrientList.hashCode ^
-      totalWater.hashCode;
+      totalWater.hashCode ^
+      planNutrientList.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -47,21 +51,17 @@ class History {
           date == other.date &&
           totalCal == other.totalCal &&
           totalNutrientList == other.totalNutrientList &&
-          totalWater == other.totalWater;
+          totalWater == other.totalWater &&
+          planNutrientList == other.planNutrientList;
 
   @override
   String toString() {
-    return 'History {data: $date, totalCal: $totalCal, totalWater: $totalWater, totalNutrient: $totalNutrientList, menuList: $menuList}';
+    return 'History {data: $date, totalCal: $totalCal, totalWater: $totalWater, totalNutrient: $totalNutrientList, menuList: $menuList, planNutrient: ${planNutrientList.toString()}}';
   }
 
   HistoryEntity toEntity() {
-    return HistoryEntity(
-      date,
-      menuList,
-      totalCal,
-      totalWater,
-      totalNutrientList,
-    );
+    return HistoryEntity(date, menuList, totalCal, totalWater,
+        totalNutrientList, planNutrientList);
   }
 
   static History fromEntity(HistoryEntity entity) {
@@ -69,6 +69,7 @@ class History {
         menuList: entity.menuList,
         totalCal: entity.totalCal,
         totalNutrientList: entity.totalNutrientList,
-        totalWater: entity.totalWater);
+        totalWater: entity.totalWater,
+        planNutrientList: entity.planNutrientList);
   }
 }
