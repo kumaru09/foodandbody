@@ -1,34 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:foodandbody/models/history.dart';
+import 'package:foodandbody/models/menu.dart';
 
 class PlanMenuCardList extends StatefulWidget {
-  const PlanMenuCardList({Key? key}) : super(key: key);
+  const PlanMenuCardList(this._plan);
+
+  final History _plan;
 
   @override
-  _PlanMenuCardListState createState() => _PlanMenuCardListState();
+  _PlanMenuCardListState createState() =>
+      _PlanMenuCardListState(_plan.menuList);
 }
 
 class _PlanMenuCardListState extends State<PlanMenuCardList> {
-  
+  _PlanMenuCardListState(this._planMenu);
   GlobalKey<AnimatedListState> animatedListKey = GlobalKey();
-  List planMenu = [
-      PlanMenu(menu: "ตำไทยไข่เค็ม", calories: 172.6),
-      PlanMenu(menu: "ยำเห็ดรวมมิตร", calories: 104.2),
-      PlanMenu(menu: "ข้าวต้มปลา", calories: 220.0)
-    ];
+  final List<Menu> _planMenu;
+  // [
+  //   PlanMenu(menu: "ตำไทยไข่เค็ม", calories: 172.6),
+  //   PlanMenu(menu: "ยำเห็ดรวมมิตร", calories: 104.2),
+  //   PlanMenu(menu: "ข้าวต้มปลา", calories: 220.0)
+  // ];
 
   @override
   Widget build(BuildContext context) {
     return AnimatedList(
       key: animatedListKey,
-      initialItemCount: planMenu.length,
+      initialItemCount: _planMenu.length,
       shrinkWrap: true,
       itemBuilder: (context, index, animation) {
-        return _buildPlanCard(planMenu[index], animation);
+        return _buildPlanCard(_planMenu[index], animation);
       },
     );
   }
 
-  Widget _buildPlanCard(PlanMenu item, Animation<double> animation) {
+  Widget _buildPlanCard(Menu item, Animation<double> animation) {
     return SizeTransition(
         sizeFactor: animation,
         child: InkWell(
@@ -54,7 +60,7 @@ class _PlanMenuCardListState extends State<PlanMenuCardList> {
                                 .merge(TextStyle(color: Color(0xFF515070))))),
                     Expanded(
                         flex: 7,
-                        child: Text("${item.menu}",
+                        child: Text("${item.name}",
                             style: Theme.of(context)
                                 .textTheme
                                 .subtitle1!
@@ -67,8 +73,8 @@ class _PlanMenuCardListState extends State<PlanMenuCardList> {
                     color: Color(0xFF515070),
                   ),
                   onPressed: () {
-                    int removeIndex = planMenu.indexOf(item);
-                    PlanMenu removedItem = planMenu.removeAt(removeIndex);
+                    int removeIndex = _planMenu.indexOf(item);
+                    Menu removedItem = _planMenu.removeAt(removeIndex);
 
                     AnimatedListRemovedItemBuilder builder =
                         (context, animation) {
@@ -82,11 +88,4 @@ class _PlanMenuCardListState extends State<PlanMenuCardList> {
               ),
             )));
   }
-}
-
-class PlanMenu {
-  PlanMenu({required this.menu, required this.calories});
-
-  final String menu;
-  final double calories;
 }

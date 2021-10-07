@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:foodandbody/models/history.dart';
+import 'package:foodandbody/models/user.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
 // ignore: must_be_immutable
 class LinearNutrientTwoProgress extends StatelessWidget {
-  late double proteinTotal = 45.3;
+  LinearNutrientTwoProgress(this._user, this._plan);
+  final User _user;
+  final History _plan;
+  late double proteinTotal = _plan.totalNutrientList.protein;
   late double proteinPlan = 60.9;
   late double proteinGoal = 80.2;
 
-  late double carbTotal = 145.0;
+  late double carbTotal = _plan.totalNutrientList.carb;
   late double carbPlan = 180.2;
   late double carbGoal = 200.3;
 
-  late double fatTotal = 14.7;
+  late double fatTotal = _plan.totalNutrientList.fat;
   late double fatPlan = 30.3;
   late double fatGoal = 51.4;
 

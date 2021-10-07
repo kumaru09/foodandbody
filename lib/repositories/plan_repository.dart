@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,18 +15,25 @@ class PlanRepository implements IPlanRepository {
       .collection('users')
       .doc(FirebaseAuth.instance.currentUser?.uid)
       .collection('foodhistories');
-  final now = new DateTime.now();
-  late final lastMidnight = DateTime(now.year, now.month, now.year);
+  final DateTime now = DateTime.now();
+  late final DateTime lastMidnight = DateTime(now.year, now.month, now.day);
 
   @override
-  Future<void> addPlanMenu(Menu menu) async {
+  Future<void> addPlanMenu(Menu menu, bool isEat) async {
+    log(Timestamp.fromDate(DateTime(now.year, now.month, now.day)).toString());
     final plan = await foodHistories
         .where('date', isGreaterThanOrEqualTo: lastMidnight)
         .get();
-    List<dynamic> menuList = List.from(plan.docs.first.get('menuList'));
-    menuList.add(Menu(
-        timestamp: Timestamp.now(), name: menu.name, calories: menu.calories));
     if (plan.docs.isNotEmpty) {
+      List<Menu> menuList = List.from(plan.docs.first.get('menuList'));
+      if (isEat) {
+        menuList
+            .where((menuList) => menuList.name == menu.name)
+            .first
+            .timestamp = Timestamp.now();
+      } else {
+        menuList.add(Menu(name: menu.name, calories: menu.calories));
+      }
       await plan.docs.first.reference.update({'menuList': menuList});
       final res = await http.get(Uri.parse(
           "https://foodandbody-api.azurewebsites.net/api/Menu/${menu.name}"));

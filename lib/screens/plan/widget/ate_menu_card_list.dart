@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:foodandbody/models/history.dart';
+import 'package:foodandbody/models/menu.dart';
+import 'package:intl/intl.dart';
 
 // ignore: must_be_immutable
 class AteMenuCardList extends StatelessWidget {
-  late List ateMenu = [
-    AteMenuList(menu: "โอวัลติน", calories: 177.2, time: "7:00"),
-    AteMenuList(menu: "ส้มตำไทย", calories: 240.3, time: "12:00"),
-    AteMenuList(menu: "ข้าวมันไก่", calories: 765.0, time: "17:35"),
-  ];
+  AteMenuCardList(this._plan);
+  final History _plan;
+  late List<Menu> ateMenu =
+      _plan.menuList.where((value) => value.timestamp != null).toList();
+  // [
+  //   AteMenuList(menu: "โอวัลติน", calories: 177.2, time: "7:00"),
+  //   AteMenuList(menu: "ส้มตำไทย", calories: 240.3, time: "12:00"),
+  //   AteMenuList(menu: "ข้าวมันไก่", calories: 765.0, time: "17:35"),
+  // ];
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +25,7 @@ class AteMenuCardList extends StatelessWidget {
         key: const Key("ate_menu_card_list"), children: ateMenuCardList);
   }
 
-  Widget _buildAteMenuCard(BuildContext context, AteMenuList item) {
+  Widget _buildAteMenuCard(BuildContext context, Menu item) {
     return Card(
       color: Colors.white,
       elevation: 2,
@@ -33,7 +40,7 @@ class AteMenuCardList extends StatelessWidget {
                   Container(
                       alignment: Alignment.centerLeft,
                       padding: EdgeInsets.only(left: 16, top: 16),
-                      child: Text("${item.menu}",
+                      child: Text("${item.name}",
                           style: Theme.of(context)
                               .textTheme
                               .subtitle1!
@@ -41,7 +48,8 @@ class AteMenuCardList extends StatelessWidget {
                   Container(
                       alignment: Alignment.centerLeft,
                       padding: EdgeInsets.only(left: 16, bottom: 16),
-                      child: Text("${item.time}",
+                      child: Text(
+                          "${DateFormat.Hm().format(item.timestamp!.toDate())}",
                           style: Theme.of(context)
                               .textTheme
                               .bodyText2!

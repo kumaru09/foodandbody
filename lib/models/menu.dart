@@ -4,10 +4,9 @@ import 'package:equatable/equatable.dart';
 class Menu extends Equatable {
   final String name;
   final double calories;
-  final Timestamp timestamp;
+  Timestamp? timestamp;
 
-  const Menu(
-      {required this.timestamp, required this.name, required this.calories});
+  Menu({this.timestamp, required this.name, required this.calories});
 
   static Menu fromJson(Map<String, Object?> json) {
     return Menu(

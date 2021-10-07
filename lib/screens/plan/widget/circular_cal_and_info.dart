@@ -1,12 +1,20 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:foodandbody/models/history.dart';
+import 'package:foodandbody/models/user.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
 // ignore: must_be_immutable
 class CircularCalAndInfo extends StatelessWidget {
-  late double totalCal = 1182.8;
-  late double planCal = 1678.2;
-  late double goalCal = 1800.3;
+  CircularCalAndInfo(this._user, this._plan);
+
+  final History _plan;
+  final User _user;
+  late double totalCal = _plan.menuList
+      .map((value) => value.calories)
+      .fold(0, (previous, current) => previous + current);
+  late double planCal = _plan.totalCal;
+  late double goalCal = _user.info!.goal!.toDouble();
 
   @override
   Widget build(BuildContext context) {
@@ -234,7 +242,6 @@ class _PlanInfo extends StatelessWidget {
 
 // ignore: must_be_immutable
 class _EditGoalDialog extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return IconButton(
@@ -265,7 +272,7 @@ class _EditGoalDialog extends StatelessWidget {
                 ),
                 actions: <Widget>[
                   TextButton(
-                    key: const Key("edit_button_in_edit_goal_dialog"),
+                      key: const Key("edit_button_in_edit_goal_dialog"),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
@@ -274,7 +281,7 @@ class _EditGoalDialog extends StatelessWidget {
                               TextStyle(
                                   color: Theme.of(context).primaryColor)))),
                   TextButton(
-                    key: const Key("cancel_button_in_edit_goal_dialog"),
+                      key: const Key("cancel_button_in_edit_goal_dialog"),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
