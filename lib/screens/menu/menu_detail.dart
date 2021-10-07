@@ -18,6 +18,11 @@ class _MenuDetailState extends State<MenuDetail> {
     context.read<MenuBloc>().add(MenuFetched());
   }
 
+  String toRound(double value) {
+    if(value-value.round()==0.0) return value.round().toString();
+    else return value.toString();
+  } 
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<MenuBloc, MenuState>(
@@ -67,19 +72,19 @@ class _MenuDetailState extends State<MenuDetail> {
                             NutrientDetail(
                                 label: 'หน่วยบริโภค',
                                 value:
-                                    '${state.menu.serve} ${state.menu.unit}'),
+                                    '${toRound(state.menu.serve)} ${state.menu.unit}'),
                             SizedBox(height: 7.0),
                             NutrientDetail(
                                 label: 'โปรตีน',
-                                value: '${state.menu.protein} กรัม'),
+                                value: '${toRound(state.menu.protein)} กรัม'),
                             SizedBox(height: 7.0),
                             NutrientDetail(
                                 label: 'คาร์โบไฮเดรต',
-                                value: '${state.menu.carb} กรัม'),
+                                value: '${toRound(state.menu.carb)} กรัม'),
                             SizedBox(height: 7.0),
                             NutrientDetail(
                                 label: 'ไขมัน',
-                                value: '${state.menu.fat} กรัม'),
+                                value: '${toRound(state.menu.fat)} กรัม'),
                           ],
                         ),
                       ),
