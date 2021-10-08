@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:foodandbody/screens/menu/dialog.dart';
-import 'package:foodandbody/widget/nutrient_detial.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodandbody/screens/menu/bloc/menu_bloc.dart';
+import 'package:foodandbody/screens/menu/menu_detail.dart';
+import 'package:http/http.dart' as http;
 
 class Menu extends StatelessWidget {
-  const Menu({Key? key, required this.menuName, required this.menuImg})
-      : super(key: key);
+  const Menu({Key? key, required this.menuName}) : super(key: key);
   final String menuName;
-  final String menuImg;
 
   @override
   Widget build(BuildContext context) {
@@ -28,84 +28,12 @@ class Menu extends StatelessWidget {
             icon: Icon(Icons.arrow_back, color: Colors.white)),
       ),
       body: SafeArea(
-        child: Column(
-          children: <Widget>[
-            Expanded(
-              child: ListView(
-                children: <Widget>[
-                  Image.network(
-                    menuImg,
-                    alignment: Alignment.center,
-                    height: 300,
-                    fit: BoxFit.cover,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Column(
-                      children: <Widget>[
-                        Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: Text('แคลอรีรวม',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headline5!
-                                      .merge(TextStyle(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .secondary))),
-                            ),
-                            Text('765 แคล',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headline5!
-                                    .merge(TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .secondary))),
-                          ],
-                        ),
-                        SizedBox(height: 16.0),
-                        NutrientDetial(label: 'หน่วยบริโภค', value: '1 จาน'),
-                        SizedBox(height: 7.0),
-                        NutrientDetial(label: 'โปรตีน', value: '27.5 กรัม'),
-                        SizedBox(height: 7.0),
-                        NutrientDetial(label: 'คาร์โบไฮเดรต', value: '89.1 กรัม'),
-                        SizedBox(height: 7.0),
-                        NutrientDetial(label: 'ไขมัน', value: '32.3 กรัม'),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(16.0),
-              child: _AddToPlanButton(),
-            ),
-          ],
+        child: BlocProvider(
+          create: (_) =>
+              MenuBloc(httpClient: http.Client(), path: this.menuName)
+                ..add(MenuFetched()),
+          child: MenuDetail(),
         ),
-      ),
-    );
-  }
-}
-
-class _AddToPlanButton extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: OutlinedButton(
-        key: const Key('initialInfoForm_continue_raisedButton'),
-        child: Text('เพิ่มในแผนการกิน'),
-        style: OutlinedButton.styleFrom(
-          primary: Theme.of(context).primaryColor,
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(50))),
-        ),
-        onPressed: () => showDialog<String>(
-            context: context,
-            builder: (BuildContext context) => ConfirmCalDialog()),
       ),
     );
   }

@@ -34,26 +34,14 @@ class MenuCardBloc extends Bloc<MenuCardEvent, MenuCardState> {
     MenuCardFetched event,
     Emitter<MenuCardState> emit,
   ) async {
-    if (state.hasReachedMax) return;
     try {
       if (state.status == MenuCardStatus.initial) {
         final menu = await _fetchMenuCards(path);
         return emit(state.copyWith(
           status: MenuCardStatus.success,
           menu: menu,
-          hasReachedMax: false,
         ));
       }
-      final menu = await _fetchMenuCards(path);
-      menu.isEmpty
-          ? emit(state.copyWith(hasReachedMax: true))
-          : emit(
-              state.copyWith(
-                status: MenuCardStatus.success,
-                menu: List.of(state.menu)..addAll(menu),
-                hasReachedMax: false,
-              ),
-            );
     } catch (_) {
       emit(state.copyWith(status: MenuCardStatus.failure));
     }
@@ -65,7 +53,6 @@ class MenuCardBloc extends Bloc<MenuCardEvent, MenuCardState> {
     );
     if (response.statusCode == 200) {
       final body = json.decode(response.body) as List;
-      print('ResponseBody: ' + response.body); // Read Data in Array
       return body.map((dynamic json) {
         return MenuList(
           name: json['name'] as String,

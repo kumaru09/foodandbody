@@ -180,9 +180,7 @@ class _SearchResultItem extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                     builder: (context) => Menu(
-                        menuName: '${item.name}',
-                        menuImg:
-                            'https://bnn.blob.core.windows.net/food/grilled-shrimp.jpg')));
+                        menuName: '${item.name}')));
           },
         ),
         const Divider(

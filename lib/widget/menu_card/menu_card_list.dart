@@ -25,7 +25,7 @@ class _MenuCardListState extends State<MenuCardList> {
             return const Center(child: Text('failed to fetch menu'));
           case MenuCardStatus.success:
             if (state.menu.isEmpty) {
-              return const Center(child: Text('no menu'));
+              return const Center(child: Text('ไม่พบเมนู'));
             }
             return Container(
               height: 200,
