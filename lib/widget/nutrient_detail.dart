@@ -11,11 +11,11 @@ class NutrientDetail extends StatelessWidget {
     return Row(
       children: <Widget>[
         Expanded(
-          child: Text('$label',
+          child: Text(label,
               style: Theme.of(context).textTheme.bodyText2!.merge(
                   TextStyle(color: Theme.of(context).colorScheme.secondary))),
         ),
-        Text('$value',
+        Text(value,
             style: Theme.of(context).textTheme.bodyText2!.merge(
                 TextStyle(color: Theme.of(context).colorScheme.secondary))),
       ],
