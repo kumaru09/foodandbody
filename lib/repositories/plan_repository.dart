@@ -11,16 +11,15 @@ import 'package:foodandbody/repositories/i_plan_repository.dart';
 import 'package:http/http.dart' as http;
 
 class PlanRepository implements IPlanRepository {
-  final foodHistories = FirebaseFirestore.instance
-      .collection('users')
-      .doc(FirebaseAuth.instance.currentUser?.uid)
-      .collection('foodhistories');
   final DateTime now = DateTime.now();
   late final DateTime lastMidnight = DateTime(now.year, now.month, now.day);
 
   @override
   Future<void> addPlanMenu(Menu menu, bool isEat) async {
-    log(Timestamp.fromDate(DateTime(now.year, now.month, now.day)).toString());
+    final CollectionReference foodHistories = FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .collection('foodhistories');
     final plan = await foodHistories
         .where('date', isGreaterThanOrEqualTo: lastMidnight)
         .get();
@@ -48,6 +47,10 @@ class PlanRepository implements IPlanRepository {
   @override
   Future<History> getPlanById() async {
     log('Fetching data');
+    final CollectionReference foodHistories = FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .collection('foodhistories');
     final plan = await foodHistories
         .where('date', isGreaterThanOrEqualTo: lastMidnight)
         .get();
@@ -61,6 +64,10 @@ class PlanRepository implements IPlanRepository {
   }
 
   Future<void> updatePlan(MenuDetail menuDetail, bool isEat) async {
+    final CollectionReference foodHistories = FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .collection('foodhistories');
     final plan = await foodHistories
         .where('date', isGreaterThanOrEqualTo: lastMidnight)
         .get();

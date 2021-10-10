@@ -1,12 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:foodandbody/models/history.dart';
+import 'package:foodandbody/models/menu.dart';
 import 'package:foodandbody/screens/plan/widget/plan_menu_card_list.dart';
 import 'package:foodandbody/theme.dart';
+import 'package:mocktail/mocktail.dart';
+
+class MockPlan extends Mock implements History {}
 
 void main() {
+  late History plan;
+
+  setUp(() {
+    plan = MockPlan();
+    when(() => plan.menuList)
+        .thenReturn(<Menu>[Menu(name: 'test', calories: 100)]);
+  });
   group("Plan Menu Card List", () {
     testWidgets("can render", (tester) async {
-      final planMenuCard = PlanMenuCardList();
+      final planMenuCard = PlanMenuCardList(plan);
       await tester.pumpWidget(MaterialApp(
         theme: AppTheme.themeData,
         home: Scaffold(
@@ -18,7 +30,7 @@ void main() {
     }); //test "can render"
 
     testWidgets("when pressed delete icon", (tester) async {
-      final planMenuCard = PlanMenuCardList();
+      final planMenuCard = PlanMenuCardList(plan);
       await tester.pumpWidget(MaterialApp(
           theme: AppTheme.themeData, home: Scaffold(body: planMenuCard)));
       final countCardList = planMenuCard.createState().planMenu.length;

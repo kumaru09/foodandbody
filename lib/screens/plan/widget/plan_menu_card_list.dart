@@ -13,9 +13,9 @@ class PlanMenuCardList extends StatefulWidget {
 }
 
 class _PlanMenuCardListState extends State<PlanMenuCardList> {
-  _PlanMenuCardListState(this._planMenu);
+  _PlanMenuCardListState(this.planMenu);
   GlobalKey<AnimatedListState> animatedListKey = GlobalKey();
-  final List<Menu> _planMenu;
+  final List<Menu> planMenu;
   // [
   //   PlanMenu(menu: "ตำไทยไข่เค็ม", calories: 172.6),
   //   PlanMenu(menu: "ยำเห็ดรวมมิตร", calories: 104.2),
@@ -26,10 +26,10 @@ class _PlanMenuCardListState extends State<PlanMenuCardList> {
   Widget build(BuildContext context) {
     return AnimatedList(
       key: animatedListKey,
-      initialItemCount: _planMenu.length,
+      initialItemCount: planMenu.length,
       shrinkWrap: true,
       itemBuilder: (context, index, animation) {
-        return _buildPlanCard(_planMenu[index], animation);
+        return _buildPlanCard(planMenu[index], animation);
       },
     );
   }
@@ -73,8 +73,8 @@ class _PlanMenuCardListState extends State<PlanMenuCardList> {
                     color: Color(0xFF515070),
                   ),
                   onPressed: () {
-                    int removeIndex = _planMenu.indexOf(item);
-                    Menu removedItem = _planMenu.removeAt(removeIndex);
+                    int removeIndex = planMenu.indexOf(item);
+                    Menu removedItem = planMenu.removeAt(removeIndex);
 
                     AnimatedListRemovedItemBuilder builder =
                         (context, animation) {

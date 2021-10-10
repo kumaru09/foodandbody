@@ -1,9 +1,19 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:foodandbody/models/history.dart';
+import 'package:foodandbody/models/info.dart';
+import 'package:foodandbody/models/menu.dart';
+import 'package:foodandbody/models/user.dart';
 import 'package:foodandbody/screens/plan/widget/circular_cal_and_info.dart';
 import 'package:foodandbody/theme.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+
+class MockUser extends Mock implements User {}
+
+class MockPlan extends Mock implements History {}
 
 void main() {
   //widget
@@ -17,12 +27,21 @@ void main() {
   const editButtonKey = Key("edit_button_in_edit_goal_dialog");
   const cancelButtonKey = Key("cancel_button_in_edit_goal_dialog");
 
+  late User user;
+  late History plan;
+  setUp(() {
+    user = MockUser();
+    plan = MockPlan();
+    when(() => plan.totalCal).thenReturn(1000);
+    when(() => plan.menuList).thenReturn(<Menu>[]);
+    when(() => user.info).thenReturn(Info(goal: 2200));
+  });
   group("Circular Cal and Info", () {
     testWidgets("has widget", (tester) async {
       await tester.pumpWidget(MaterialApp(
         theme: AppTheme.themeData,
         home: Scaffold(
-          body: CircularCalAndInfo(),
+          body: CircularCalAndInfo(user, plan),
         ),
       ));
       expect(find.byKey(circularCalAndInfoKey), findsOneWidget);
@@ -32,7 +51,7 @@ void main() {
         await tester.pumpWidget(MaterialApp(
           theme: AppTheme.themeData,
           home: Scaffold(
-            body: CircularCalAndInfo(),
+            body: CircularCalAndInfo(user, plan),
           ),
         ));
         expect(find.byKey(circularPlanCalKey), findsOneWidget);
@@ -45,7 +64,7 @@ void main() {
       testWidgets("circular total cal", (tester) async {
         await tester.pumpWidget(MaterialApp(
             theme: AppTheme.themeData,
-            home: Scaffold(body: CircularCalAndInfo())));
+            home: Scaffold(body: CircularCalAndInfo(user, plan))));
         expect(find.byKey(circularTotalCalKey), findsOneWidget);
         expect(find.byKey(circularDataColumnKey), findsOneWidget);
       }); //test "circular total cal"
@@ -53,7 +72,7 @@ void main() {
       testWidgets(":cal info", (tester) async {
         await tester.pumpWidget(MaterialApp(
             theme: AppTheme.themeData,
-            home: Scaffold(body: CircularCalAndInfo())));
+            home: Scaffold(body: CircularCalAndInfo(user, plan))));
         expect(find.byKey(calInfoKey), findsOneWidget);
         expect(find.text("เป้าหมาย"), findsOneWidget);
         expect(find.byKey(editGoalButtonKey), findsOneWidget);
@@ -64,7 +83,7 @@ void main() {
 
     group("when plan and total less than goal", () {
       testWidgets(": circular plan cal", (tester) async {
-        final circularCalAndInfo = CircularCalAndInfo();
+        final circularCalAndInfo = CircularCalAndInfo(user, plan);
         final double planCal = 1500.3;
         final double totalCal = 1250.7;
         final double goalCal = 2000.0;
@@ -93,7 +112,7 @@ void main() {
       }); //test ": circular plan cal"
 
       testWidgets(": circular total cal", (tester) async {
-        final circularCalAndInfo = CircularCalAndInfo();
+        final circularCalAndInfo = CircularCalAndInfo(user, plan);
         final double planCal = 1500.3;
         final double totalCal = 1250.7;
         final double goalCal = 2000.0;
@@ -122,7 +141,7 @@ void main() {
       }); //test ": circular total cal"
 
       testWidgets(": circular data info", (tester) async {
-        final circularCalAndInfo = CircularCalAndInfo();
+        final circularCalAndInfo = CircularCalAndInfo(user, plan);
         final double planCal = 1500.3;
         final double totalCal = 1250.7;
         final double goalCal = 2000.0;
@@ -145,7 +164,7 @@ void main() {
       }); //test ": circular data info"
 
       testWidgets(": cal info", (tester) async {
-        final circularCalAndInfo = CircularCalAndInfo();
+        final circularCalAndInfo = CircularCalAndInfo(user, plan);
         final double planCal = 1500.3;
         final double totalCal = 1250.7;
         final double goalCal = 2000.0;
@@ -167,7 +186,7 @@ void main() {
 
     group("when plan greater than goal but total less than goal", () {
       testWidgets(": circular plan cal", (tester) async {
-        final circularCalAndInfo = CircularCalAndInfo();
+        final circularCalAndInfo = CircularCalAndInfo(user, plan);
         final double planCal = 2100.6;
         final double totalCal = 1250.3;
         final double goalCal = 2000.0;
@@ -196,7 +215,7 @@ void main() {
       }); //test ": circular plan cal"
 
       testWidgets(": circular data info", (tester) async {
-        final circularCalAndInfo = CircularCalAndInfo();
+        final circularCalAndInfo = CircularCalAndInfo(user, plan);
         final double planCal = 2100.6;
         final double totalCal = 1250.3;
         final double goalCal = 2000.0;
@@ -220,7 +239,7 @@ void main() {
 
     group("when total greater than goal", () {
       testWidgets(": circular plan cal", (tester) async {
-        final circularCalAndInfo = CircularCalAndInfo();
+        final circularCalAndInfo = CircularCalAndInfo(user, plan);
         final double planCal = 1500.8;
         final double totalCal = 2100.3;
         final double goalCal = 2000.0;
@@ -249,7 +268,7 @@ void main() {
       }); //test ": circular plan cal"
 
       testWidgets(": circular total cal", (tester) async {
-        final circularCalAndInfo = CircularCalAndInfo();
+        final circularCalAndInfo = CircularCalAndInfo(user, plan);
         final double planCal = 1500.8;
         final double totalCal = 2100.3;
         final double goalCal = 2000.0;
@@ -278,7 +297,7 @@ void main() {
       }); //test ": circular total cal"
 
       testWidgets(": circular data info", (tester) async {
-        final circularCalAndInfo = CircularCalAndInfo();
+        final circularCalAndInfo = CircularCalAndInfo(user, plan);
         final double planCal = 1500.8;
         final double totalCal = 2100.3;
         final double goalCal = 2000.0;
@@ -308,7 +327,7 @@ void main() {
         await tester.pumpWidget(MaterialApp(
           theme: AppTheme.themeData,
           home: Scaffold(
-            body: CircularCalAndInfo(),
+            body: CircularCalAndInfo(user, plan),
           ),
         ));
         await tester.tap(find.byKey(editGoalButtonKey));
@@ -319,7 +338,7 @@ void main() {
       testWidgets("แก้ไข button", (tester) async {
         await tester.pumpWidget(MaterialApp(
             theme: AppTheme.themeData,
-            home: Scaffold(body: CircularCalAndInfo())));
+            home: Scaffold(body: CircularCalAndInfo(user, plan))));
         await tester.tap(find.byKey(editGoalButtonKey));
         await tester.pump();
         await tester.tap(find.byKey(editButtonKey));
@@ -330,7 +349,7 @@ void main() {
       testWidgets("ยกเลิก button", (tester) async {
         await tester.pumpWidget(MaterialApp(
             theme: AppTheme.themeData,
-            home: Scaffold(body: CircularCalAndInfo())));
+            home: Scaffold(body: CircularCalAndInfo(user, plan))));
         await tester.tap(find.byKey(editGoalButtonKey));
         await tester.pump();
         await tester.tap(find.byKey(cancelButtonKey));

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:foodandbody/screens/body/body.dart';
 import 'package:foodandbody/screens/camera/camera.dart';
 import 'package:foodandbody/screens/history/history.dart';
@@ -7,7 +9,10 @@ import 'package:foodandbody/screens/home/home.dart';
 import 'package:foodandbody/screens/main_screen/main_screen.dart';
 import 'package:foodandbody/screens/plan/plan.dart';
 import 'package:foodandbody/theme.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:mocktail_image_network/mocktail_image_network.dart';
+
+class MockPlanRepository extends Mock implements PlanRepository {}
 
 void main() {
   const bottomAppBarKey = Key('bottom_app_bar');
@@ -16,6 +21,11 @@ void main() {
   const cameraButtonKey = Key('camera_floating_button');
   const bodyButtonKey = Key('body_button');
   const historyButtonKey = Key('history_button');
+  late PlanRepository planRepository;
+
+  setUp(() {
+    planRepository = MockPlanRepository();
+  });
 
   group("Main Screen", () {
     test("has a page", () {
@@ -24,10 +34,12 @@ void main() {
 
     testWidgets("has a bottom app bar", (tester) async {
       await mockNetworkImages(() async {
-        await tester.pumpWidget(MaterialApp(
-          theme: AppTheme.themeData,
-          home: Scaffold(body: MainScreen()),
-        ));
+        await tester.pumpWidget(RepositoryProvider.value(
+            value: planRepository,
+            child: MaterialApp(
+              theme: AppTheme.themeData,
+              home: Scaffold(body: MainScreen()),
+            )));
         expect(find.byKey(bottomAppBarKey), findsOneWidget);
         expect(find.byKey(homeButtonKey), findsOneWidget);
         expect(find.byKey(planButtonKey), findsOneWidget);
@@ -40,8 +52,11 @@ void main() {
     group("when pressed", () {
       testWidgets("home button", (tester) async {
         await mockNetworkImages(() async {
-          await tester.pumpWidget(MaterialApp(
-              theme: AppTheme.themeData, home: Scaffold(body: MainScreen())));
+          await tester.pumpWidget(RepositoryProvider.value(
+              value: planRepository,
+              child: MaterialApp(
+                  theme: AppTheme.themeData,
+                  home: Scaffold(body: MainScreen()))));
           await tester.tap(find.byKey(homeButtonKey));
           await tester.pump();
           expect(find.byType(Home), findsOneWidget);
@@ -62,8 +77,11 @@ void main() {
 
       testWidgets("plan button", (tester) async {
         await mockNetworkImages(() async {
-          await tester.pumpWidget(MaterialApp(
-              theme: AppTheme.themeData, home: Scaffold(body: MainScreen())));
+          await tester.pumpWidget(RepositoryProvider.value(
+              value: planRepository,
+              child: MaterialApp(
+                  theme: AppTheme.themeData,
+                  home: Scaffold(body: MainScreen()))));
           await tester.tap(find.byKey(planButtonKey));
           await tester.pump();
           expect(find.byType(Plan), findsOneWidget);
@@ -84,8 +102,11 @@ void main() {
 
       testWidgets("body button", (tester) async {
         await mockNetworkImages(() async {
-          await tester.pumpWidget(MaterialApp(
-              theme: AppTheme.themeData, home: Scaffold(body: MainScreen())));
+          await tester.pumpWidget(RepositoryProvider.value(
+              value: planRepository,
+              child: MaterialApp(
+                  theme: AppTheme.themeData,
+                  home: Scaffold(body: MainScreen()))));
           await tester.tap(find.byKey(bodyButtonKey));
           await tester.pump();
           expect(find.byType(Body), findsOneWidget);
@@ -106,8 +127,11 @@ void main() {
 
       testWidgets("history button", (tester) async {
         await mockNetworkImages(() async {
-          await tester.pumpWidget(MaterialApp(
-              theme: AppTheme.themeData, home: Scaffold(body: MainScreen())));
+          await tester.pumpWidget(RepositoryProvider.value(
+              value: planRepository,
+              child: MaterialApp(
+                  theme: AppTheme.themeData,
+                  home: Scaffold(body: MainScreen()))));
           await tester.tap(find.byKey(historyButtonKey));
           await tester.pump();
           expect(find.byType(History), findsOneWidget);
@@ -128,8 +152,11 @@ void main() {
 
       testWidgets("camera button", (tester) async {
         await mockNetworkImages(() async {
-          await tester.pumpWidget(MaterialApp(
-              theme: AppTheme.themeData, home: Scaffold(body: MainScreen())));
+          await tester.pumpWidget(RepositoryProvider.value(
+              value: planRepository,
+              child: MaterialApp(
+                  theme: AppTheme.themeData,
+                  home: Scaffold(body: MainScreen()))));
           await tester.tap(find.byKey(cameraButtonKey));
           await tester.pumpAndSettle();
           expect(find.byKey(bottomAppBarKey), findsNothing);

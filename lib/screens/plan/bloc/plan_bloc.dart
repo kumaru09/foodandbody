@@ -9,7 +9,9 @@ part 'plan_event.dart';
 part 'plan_state.dart';
 
 class PlanBloc extends Bloc<PlanEvent, PlanState> {
-  PlanBloc(this._planRepository) : super(PlanInitial());
+  PlanBloc({required PlanRepository planRepository})
+      : _planRepository = planRepository,
+        super(PlanInitial());
 
   final PlanRepository _planRepository;
 
