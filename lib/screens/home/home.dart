@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:foodandbody/screens/home/circular_cal_indicator.dart';
-import 'package:foodandbody/screens/search/search.dart';
+import 'package:foodandbody/screens/search/search_page.dart';
 import 'package:foodandbody/screens/setting/setting.dart';
 import 'package:foodandbody/screens/home/linear_nutrient_indicator.dart';
 import 'package:foodandbody/widget/menu_card/menu_card.dart';
@@ -83,7 +83,7 @@ class Home extends StatelessWidget {
                     key: const Key('menu_all_button'),
                     onPressed: () {
                       Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => Search()));
+                          MaterialPageRoute(builder: (context) => SearchPage()));
                     },
                     style: ElevatedButton.styleFrom(
                         elevation: 0,

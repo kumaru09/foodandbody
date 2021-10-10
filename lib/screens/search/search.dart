@@ -8,8 +8,6 @@ import 'package:foodandbody/screens/search/bloc/search_bloc.dart';
 class Search extends StatelessWidget {
   const Search({Key? key}) : super(key: key);
 
-  // final GithubRepository githubRepository;
-
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -28,7 +26,7 @@ class Search extends StatelessWidget {
                 color: Theme.of(context).colorScheme.secondary),
           ),
         ),
-        body: _SearchBody(),
+        body: SearchBody(),
       ),
     );
   }
@@ -70,8 +68,9 @@ class _SearchAppBarState extends State<SearchAppBar> {
         borderRadius: BorderRadius.circular(50),
       ),
       child: TextField(
+        key: const Key('search_appbar_textfield'),
         controller: _textController,
-        autocorrect: false,
+        autocorrect: false, 
         onChanged: (text) {
           _searchBloc.add(TextChanged(text: text));
         },
@@ -94,8 +93,8 @@ class _SearchAppBarState extends State<SearchAppBar> {
   }
 }
 
-class _SearchBody extends StatelessWidget {
-  const _SearchBody({Key? key}) : super(key: key);
+class SearchBody extends StatelessWidget {
+  const SearchBody({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

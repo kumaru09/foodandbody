@@ -16,6 +16,7 @@ class SearchPage extends StatelessWidget {
         backgroundColor: Theme.of(context).primaryColor,
         elevation: 0,
         title: Text("เมนู",
+            key: const Key('searchpage_appbar'),
             style: Theme.of(context)
                 .textTheme
                 .headline6!
