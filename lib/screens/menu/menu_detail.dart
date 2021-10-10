@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/screens/menu/bloc/menu_bloc.dart';
-import 'package:foodandbody/screens/menu/dialog.dart';
+import 'package:foodandbody/screens/menu/menu_dialog.dart';
 import 'package:foodandbody/widget/nutrient_detail.dart';
 
 class MenuDetail extends StatefulWidget {

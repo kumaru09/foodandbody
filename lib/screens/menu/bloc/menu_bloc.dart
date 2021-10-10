@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
-import 'package:foodandbody/models/menu_detail.dart';
+import 'package:foodandbody/models/menu_show.dart';
 import 'package:http/http.dart' as http;
 import 'package:stream_transform/stream_transform.dart';
 
@@ -48,13 +48,13 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
     }
   }
 
-  Future<MenuDetail> _fetchMenus(String path) async {
+  Future<MenuShow> _fetchMenus(String path) async {
     final response = await httpClient.get(
       Uri.https('foodandbody-api.azurewebsites.net', '/api/menu/$path'),
     );
     if (response.statusCode == 200) {
       final body = jsonDecode(response.body);
-      final menu = MenuDetail.fromJson(body);
+      final menu = MenuShow.fromJson(body);
       return menu;
     }
     throw Exception('error fetching menu');

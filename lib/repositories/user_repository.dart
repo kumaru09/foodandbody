@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:foodandbody/models/info.dart';
 import 'package:foodandbody/models/info_entity.dart';
+import 'package:foodandbody/models/nutrient.dart';
 import 'package:foodandbody/models/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' as cloud_firestore;
 import 'package:foodandbody/repositories/i_user_repository.dart';
@@ -14,7 +15,12 @@ class UserRepository implements IUserRepository {
 
   @override
   Future<void> addUserInfo(String uid, Info info) {
-    return users.doc(uid).set(info.toEntity().toDocument());
+    final infoE = info.copyWith(
+        goalNutrient: Nutrient(
+            protein: (info.goal! * 0.30) / 4,
+            carb: (info.goal! * 0.35) / 4,
+            fat: (info.goal! * 0.35) / 9));
+    return users.doc(uid).set(infoE.toEntity().toDocument());
   }
 
   @override

@@ -1,40 +1,38 @@
-// import 'package:equatable/equatable.dart';
+import 'package:equatable/equatable.dart';
 
-class MenuDetail {
-  const MenuDetail(
-      {this.name = '',
-      this.calory = 0,
-      this.protein = 0,
-      this.carb = 0,
-      this.fat = 0,
-      this.serve = 0,
-      this.unit = '',
-      this.imageUrl = ''});
-
+class MenuDetail extends Equatable {
   final String name;
-  final int calory;
-  final double protein;
-  final double carb;
-  final double fat;
-  final double serve;
-  final String unit;
+  final double calories;
   final String imageUrl;
+  final double protein;
+  final double fat;
+  final double carb;
+  final int serve;
+  final String unit;
 
-  factory MenuDetail.fromJson(Map<String, dynamic> json) {
+  const MenuDetail(
+      {required this.protein,
+      required this.fat,
+      required this.carb,
+      required this.serve,
+      required this.unit,
+      required this.name,
+      required this.calories,
+      required this.imageUrl});
+
+  static MenuDetail fromJson(Map<String, Object?> json) {
     return MenuDetail(
-      name: json['name'],
-      calory: json['calories'],
-      protein: json['protein'].toDouble(),
-      carb: json['carb'].toDouble(),
-      fat: json['fat'].toDouble(),
-      serve: json['serve'].toDouble(),
-      unit: json['unit'],
-      imageUrl: json['imageUrl'],
-    );
+        name: json['Name'] as String,
+        calories: json['Calories'] as double,
+        imageUrl: json['imageUrl'] as String,
+        protein: json['protein'] as double,
+        fat: json['fat'] as double,
+        carb: json['carb'] as double,
+        serve: json['serve'] as int,
+        unit: json['unit'] as String);
   }
 
   @override
-   String toString() {
-    return 'MenuDetail { name: $name,\n calory: $calory,\n protein: $protein,\n carb: $carb,\n fat: $fat,\n serve: $serve,\n unit: $unit,\n imageUrl: $imageUrl}';
-  }
+  List<Object?> get props =>
+      [name, calories, imageUrl, protein, fat, carb, serve, unit];
 }

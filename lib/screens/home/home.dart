@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:foodandbody/screens/home/circular_cal_indicator.dart';
+import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
 import 'package:foodandbody/screens/search/search.dart';
 import 'package:foodandbody/screens/setting/setting.dart';
 import 'package:foodandbody/screens/home/linear_nutrient_indicator.dart';
@@ -46,28 +49,36 @@ class Home extends StatelessWidget {
               ),
             ),
             Container(
-              padding: EdgeInsets.only(left: 16, top: 8, right: 15),
-              width: MediaQuery.of(context).size.width,
-              constraints: BoxConstraints(minHeight: 100),
-              child: Card(
-                  color: Theme.of(context).primaryColor,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15)),
-                  elevation: 2,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        padding: EdgeInsets.only(top: 18),
-                        child: CircularCalIndicator(),
-                      ),
-                      Container(
-                        padding: EdgeInsets.only(top: 18, bottom: 18),
-                        child: LinearNutrientIndicator(),
-                      )
-                    ],
-                  )),
-            ),
+                padding: EdgeInsets.only(left: 16, top: 8, right: 15),
+                width: MediaQuery.of(context).size.width,
+                constraints: BoxConstraints(minHeight: 100),
+                child: BlocBuilder<PlanBloc, PlanState>(
+                  builder: (context, state) {
+                    return Card(
+                        color: Theme.of(context).primaryColor,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15)),
+                        elevation: 2,
+                        child: state is PlanLoaded
+                            ? Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.only(top: 18),
+                                    child: CircularCalIndicator(state.plan,
+                                        context.read<AppBloc>().state.user),
+                                  ),
+                                  Container(
+                                    padding:
+                                        EdgeInsets.only(top: 18, bottom: 18),
+                                    child: LinearNutrientIndicator(state.plan,
+                                        context.read<AppBloc>().state.user),
+                                  )
+                                ],
+                              )
+                            : Center(child: CircularProgressIndicator()));
+                  },
+                )),
             Container(
               padding: EdgeInsets.only(left: 16, top: 16, right: 8),
               width: MediaQuery.of(context).size.width,

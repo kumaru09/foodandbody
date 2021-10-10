@@ -1,4 +1,5 @@
 import 'package:foodandbody/models/info_entity.dart';
+import 'package:foodandbody/models/nutrient.dart';
 import 'package:meta/meta.dart';
 
 @immutable
@@ -9,6 +10,7 @@ class Info {
   final int? weight;
   final String? gender;
   final String? photoUrl;
+  final Nutrient? goalNutrient;
 
   Info(
       {this.name,
@@ -16,7 +18,8 @@ class Info {
       this.height,
       this.weight,
       this.gender,
-      this.photoUrl});
+      this.photoUrl,
+      this.goalNutrient});
 
   Info copyWith(
       {String? name,
@@ -24,14 +27,16 @@ class Info {
       int? height,
       int? weight,
       String? gender,
-      String? photoUrl}) {
+      String? photoUrl,
+      Nutrient? goalNutrient}) {
     return Info(
         name: name ?? this.name,
         goal: goal ?? this.goal,
         height: height ?? this.height,
         weight: weight ?? this.weight,
         gender: gender ?? this.gender,
-        photoUrl: photoUrl ?? this.photoUrl);
+        photoUrl: photoUrl ?? this.photoUrl,
+        goalNutrient: goalNutrient ?? this.goalNutrient);
   }
 
   @override
@@ -41,7 +46,8 @@ class Info {
       height.hashCode ^
       weight.hashCode ^
       gender.hashCode ^
-      photoUrl.hashCode;
+      photoUrl.hashCode ^
+      goalNutrient.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -53,11 +59,12 @@ class Info {
           height == other.height &&
           weight == other.weight &&
           gender == other.gender &&
-          photoUrl == other.photoUrl;
+          photoUrl == other.photoUrl &&
+          goalNutrient == other.goalNutrient;
 
   @override
   String toString() {
-    return 'Todo { name: $name, goal: $goal, height: $height, weight: $weight, gender: $gender, photoUrl: $photoUrl}';
+    return 'Todo { name: $name, goal: $goal, height: $height, weight: $weight, gender: $gender, photoUrl: $photoUrl, goalNutrient: $goalNutrient}';
   }
 
   InfoEntity toEntity() {
@@ -67,7 +74,8 @@ class Info {
         height: height,
         weight: weight,
         gender: gender,
-        photoUrl: photoUrl);
+        photoUrl: photoUrl,
+        goalNutrient: goalNutrient);
   }
 
   static Info fromEntity(InfoEntity entity) {
@@ -77,6 +85,7 @@ class Info {
         height: entity.height,
         weight: entity.weight,
         gender: entity.gender,
-        photoUrl: entity.photoUrl);
+        photoUrl: entity.photoUrl,
+        goalNutrient: entity.goalNutrient);
   }
 }
