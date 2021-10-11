@@ -34,7 +34,7 @@ class PlanRepository implements IPlanRepository {
       } else {
         menuList.add(Menu(name: menu.name, calories: menu.calories));
       }
-      await plan.docs.first.reference.update({'menuList': menuList});
+      await plan.docs.first.reference.update({'menuList': FieldValue.arrayUnion(menuList)});
       final res = await http.get(Uri.parse(
           "https://foodandbody-api.azurewebsites.net/api/Menu/${menu.name}"));
       if (res.statusCode == 200) {

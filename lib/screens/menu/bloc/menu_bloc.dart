@@ -4,7 +4,9 @@ import 'dart:convert';
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
+import 'package:foodandbody/models/menu.dart';
 import 'package:foodandbody/models/menu_show.dart';
+import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:http/http.dart' as http;
 import 'package:stream_transform/stream_transform.dart';
 
@@ -20,8 +22,11 @@ EventTransformer<E> throttleDroppable<E>(Duration duration) {
 }
 
 class MenuBloc extends Bloc<MenuEvent, MenuState> {
-  MenuBloc({required this.httpClient, required this.path})
-      : super(const MenuState()) {
+  MenuBloc({
+    required this.httpClient,
+    required this.path,
+    required this.planRepository, 
+  }) : super(const MenuState()) {
     on<MenuFetched>(
       _onMenuFetched,
       transformer: throttleDroppable(throttleDuration),
@@ -30,6 +35,7 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
 
   final http.Client httpClient;
   final String path;
+  final PlanRepository planRepository;
 
   Future<void> _onMenuFetched(
     MenuFetched event,
@@ -58,5 +64,15 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
       return menu;
     }
     throw Exception('error fetching menu');
+  }
+
+  Future<void> addMenuToPlan({required double volumn}) async {
+    if (volumn != 0.0) {
+      final rawMenu = await _fetchMenus(path);
+      final calories = rawMenu.calory.toDouble() * volumn;
+      final menu = Menu(name: rawMenu.name, calories: calories);
+      await planRepository.addPlanMenu(menu, false);
+    }
+    return;
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:foodandbody/screens/menu/bloc/menu_bloc.dart';
 import 'package:foodandbody/screens/menu/menu_detail.dart';
 import 'package:http/http.dart' as http;
@@ -30,9 +31,9 @@ class Menu extends StatelessWidget {
       body: SafeArea(
         child: BlocProvider(
           create: (_) =>
-              MenuBloc(httpClient: http.Client(), path: this.menuName)
+              MenuBloc(httpClient: http.Client(), path: this.menuName, planRepository: context.read<PlanRepository>())
                 ..add(MenuFetched()),
-          child: MenuDetail(),
+          child: const MenuDetail(),
         ),
       ),
     );
