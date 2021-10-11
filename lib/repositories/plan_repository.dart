@@ -1,4 +1,4 @@
-import 'dart:convert'; 
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,7 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:foodandbody/models/history.dart';
 import 'package:foodandbody/models/history_entity.dart';
 import 'package:foodandbody/models/menu.dart';
-import 'package:foodandbody/models/menu_detail.dart';
+import 'package:foodandbody/models/menu_show.dart';
 import 'package:foodandbody/repositories/i_plan_repository.dart';
 import 'package:http/http.dart' as http;
 
@@ -25,7 +25,10 @@ class PlanRepository implements IPlanRepository {
         .where('date', isGreaterThanOrEqualTo: lastMidnight)
         .get();
     if (plan.docs.isNotEmpty) {
-      List<Menu> menuList = List.from(plan.docs.first.get('menuList'));
+      List<Menu> menuList = plan.docs.first
+          .get('menuList')
+          .map<Menu>((menu) => Menu.fromJson(menu))
+          .toList();
       if (isEat) {
         menuList
             .where((menuList) => menuList.name == menu.name)
@@ -34,11 +37,13 @@ class PlanRepository implements IPlanRepository {
       } else {
         menuList.add(Menu(name: menu.name, calories: menu.calories));
       }
-      await plan.docs.first.reference.update({'menuList': FieldValue.arrayUnion(menuList)});
+      List<Map> menuListMap = menuList.map((e) => e.toJson()).toList();
+      await plan.docs.first.reference
+          .update({'menuList': FieldValue.arrayUnion(menuListMap)});
       final res = await http.get(Uri.parse(
           "https://foodandbody-api.azurewebsites.net/api/Menu/${menu.name}"));
       if (res.statusCode == 200) {
-        updatePlan(MenuDetail.fromJson(json.decode(res.body)), isEat);
+        updatePlan(MenuShow.fromJson(json.decode(res.body)), isEat);
       } else {
         throw Exception('error fetching menu');
       }
@@ -60,7 +65,7 @@ class PlanRepository implements IPlanRepository {
     }
   }
 
-  Future<void> updatePlan(MenuDetail menuDetail, bool isEat) async {
+  Future<void> updatePlan(MenuShow menuDetail, bool isEat) async {
     final plan = await foodHistories
         .where('date', isGreaterThanOrEqualTo: lastMidnight)
         .get();
@@ -69,20 +74,25 @@ class PlanRepository implements IPlanRepository {
     if (plan.docs.isNotEmpty) {
       if (isEat) {
         await plan.docs.first.reference.update({
-          'totalCal': data.totalCal + menuDetail.calories,
-          'totalNutrient': data.totalNutrientList.copyWith(
-              protein: data.totalNutrientList.protein + menuDetail.protein,
-              fat: data.totalNutrientList.fat + menuDetail.fat,
-              carb: data.totalNutrientList.carb + menuDetail.carb),
+          'totalCal': data.totalCal + menuDetail.calory,
+          'totalNutrient': data.totalNutrientList
+              .copyWith(
+                  protein: data.totalNutrientList.protein + menuDetail.protein,
+                  fat: data.totalNutrientList.fat + menuDetail.fat,
+                  carb: data.totalNutrientList.carb + menuDetail.carb)
+              .toJson(),
         });
       } else {
         await plan.docs.first.reference.update({
-          'planNutrient': data.planNutrientList.copyWith(
-              protein: data.planNutrientList.protein + menuDetail.protein,
-              fat: data.planNutrientList.fat + menuDetail.fat,
-              carb: data.planNutrientList.carb + menuDetail.carb)
+          'planNutrient': data.planNutrientList
+              .copyWith(
+                  protein: data.planNutrientList.protein + menuDetail.protein,
+                  fat: data.planNutrientList.fat + menuDetail.fat,
+                  carb: data.planNutrientList.carb + menuDetail.carb)
+              .toJson()
         });
       }
+      print('added menu in plan');
     }
   }
 }

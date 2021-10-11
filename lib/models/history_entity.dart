@@ -61,7 +61,7 @@ class HistoryEntity extends Equatable {
   static HistoryEntity fromSnapshot(DocumentSnapshot snap) {
     return HistoryEntity(
         snap['date'],
-        List.from(snap['menuList']),
+        snap['menuList'].map<Menu>((menu) => Menu.fromJson(menu)).toList(),
         snap['totalCal'],
         snap['totalWater'],
         Nutrient.fromJson(snap['totalNutrient']),

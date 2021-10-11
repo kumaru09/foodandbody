@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:equatable/equatable.dart';
 
-class Menu extends Equatable {
+class Menu {
   final String name;
   final double calories;
   Timestamp? timestamp;
@@ -10,15 +9,13 @@ class Menu extends Equatable {
 
   static Menu fromJson(Map<String, Object?> json) {
     return Menu(
-        name: json['Name'] as String,
-        calories: json['Calories'] as double,
-        timestamp: json['timestamp'] as Timestamp);
+        name: json['name'] as String,
+        calories: json['calories'] as double,
+        timestamp:
+            json['timestamp'] == null ? null : json['timestamp'] as Timestamp);
   }
 
-  Map<dynamic, dynamic> toJson() {
+  Map<String, dynamic> toJson() {
     return {"name": name, "calories": calories, "timestamp": timestamp};
   }
-
-  @override
-  List<Object?> get props => [name, calories, timestamp];
 }

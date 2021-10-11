@@ -21,6 +21,7 @@ class PlanBloc extends Bloc<PlanEvent, PlanState> {
         final plan = await _planRepository.getPlanById();
         yield PlanLoaded(plan);
       } catch (e) {
+        print('error: $e');
         yield PlanError();
       }
     }

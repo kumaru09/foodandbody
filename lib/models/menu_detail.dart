@@ -22,8 +22,8 @@ class MenuDetail extends Equatable {
 
   static MenuDetail fromJson(Map<String, Object?> json) {
     return MenuDetail(
-        name: json['Name'] as String,
-        calories: json['Calories'] as double,
+        name: json['name'] as String,
+        calories: json['calories'] as double,
         imageUrl: json['imageUrl'] as String,
         protein: json['protein'] as double,
         fat: json['fat'] as double,
