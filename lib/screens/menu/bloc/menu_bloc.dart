@@ -25,7 +25,7 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
   MenuBloc({
     required this.httpClient,
     required this.path,
-    required this.planRepository, 
+    required this.planRepository,
   }) : super(const MenuState()) {
     on<MenuFetched>(
       _onMenuFetched,
@@ -66,10 +66,14 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
     throw Exception('error fetching menu');
   }
 
-  Future<void> addMenuToPlan({required double volumn}) async {
-      final rawMenu = await _fetchMenus(path);
-      final calories = rawMenu.calory.toDouble() * volumn;
-      final menu = Menu(name: rawMenu.name, calories: calories);
-      await planRepository.addPlanMenu(menu, false);
+  Future<void> addMenu(
+      {required String name,
+      required bool isEatNow,
+      required double volumn}) async {
+    // print('menu name: $name');
+    final rawMenu = await _fetchMenus(path);
+    final calories = rawMenu.calory.toDouble() * volumn;
+    final menu = Menu(name: rawMenu.name, calories: calories);
+    await planRepository.addPlanMenu(menu, isEatNow);
   }
 }

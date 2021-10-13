@@ -152,7 +152,7 @@ class _AddToPlanButton extends StatelessWidget {
                       httpClient: http.Client(),
                       path: name,
                       planRepository: context.read<PlanRepository>()),
-                  child: MenuDialog());
+                  child: MenuDialog(name: name, isEatNow: false));
             }),
       ),
     );
@@ -173,17 +173,16 @@ class _EatNowButton extends StatelessWidget {
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(50))),
         ),
-        onPressed: (){},
-        // onPressed: () => showDialog<String>(
-        //     context: context,
-        //     builder: (BuildContext context) {
-        //       return BlocProvider(
-        //           create: (_) => MenuBloc(
-        //               httpClient: http.Client(),
-        //               path: name,
-        //               planRepository: context.read<PlanRepository>()),
-        //           child: MenuDialog());
-        //     }),
+        onPressed: () => showDialog<String>(
+            context: context,
+            builder: (BuildContext context) {
+              return BlocProvider(
+                  create: (_) => MenuBloc(
+                      httpClient: http.Client(),
+                      path: name,
+                      planRepository: context.read<PlanRepository>()),
+                  child: MenuDialog(name: name, isEatNow: true));
+            }),
       ),
     );
   }

@@ -4,7 +4,10 @@ import 'package:foodandbody/screens/main_screen/main_screen.dart';
 import 'package:foodandbody/screens/menu/bloc/menu_bloc.dart';
 
 class MenuDialog extends StatefulWidget {
-  const MenuDialog({Key? key}) : super(key: key);
+  const MenuDialog({Key? key, required this.name, required this.isEatNow}) : super(key: key);
+
+  final String name;
+  final bool isEatNow;
 
   @override
   _MenuDialogState createState() => _MenuDialogState();
@@ -19,7 +22,7 @@ class _MenuDialogState extends State<MenuDialog> {
         title: Row(
           children: <Widget>[
             Expanded(
-              child: Text('ปริมาณที่จะกิน',
+              child: Text(widget.isEatNow? 'ปริมาณที่กิน':'ปริมาณที่จะกิน',
                   style: Theme.of(context).textTheme.subtitle1!.merge(TextStyle(
                       color: Theme.of(context).colorScheme.secondary))),
             ),
@@ -55,7 +58,7 @@ class _MenuDialogState extends State<MenuDialog> {
                 ? null
                 : () => context
                     .read<MenuBloc>()
-                    .addMenuToPlan(volumn: _currentSliderValue)
+                    .addMenu(name: widget.name, isEatNow: widget.isEatNow, volumn: _currentSliderValue)
                     .then((value) => Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
