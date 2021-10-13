@@ -85,8 +85,8 @@ class Search extends StatelessWidget {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => Menu(
-                                    menuName: menu.name)));
+                                builder: (context) => MenuPage(
+                                    menuName: menu.name, isPlanMenu: false)));
                       },
                       title: Row(
                         crossAxisAlignment: CrossAxisAlignment.end,

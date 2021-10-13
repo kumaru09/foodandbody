@@ -1,24 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/repositories/plan_repository.dart';
+import 'package:foodandbody/screens/camera/camera.dart';
+import 'package:foodandbody/screens/menu/menu_dialog.dart';
 import 'package:foodandbody/screens/menu/bloc/menu_bloc.dart';
 import 'package:foodandbody/widget/nutrient_detail.dart';
 import 'package:http/http.dart' as http;
 
-part 'menu_dialog.dart';
-
 class MenuDetail extends StatefulWidget {
-  const MenuDetail({Key? key}) : super(key: key);
+  const MenuDetail({Key? key, required this.isPlanMenu}) : super(key: key);
+
+  final bool isPlanMenu;
 
   @override
   _MenuDetailState createState() => _MenuDetailState();
 }
 
 class _MenuDetailState extends State<MenuDetail> {
+  String menuName = '';
+
   @override
   void initState() {
     super.initState();
     context.read<MenuBloc>().add(MenuFetched());
+    menuName = context.read<MenuBloc>().path;
   }
 
   String toRound(double value) {
@@ -26,6 +31,20 @@ class _MenuDetailState extends State<MenuDetail> {
       return value.round().toString();
     else
       return value.toString();
+  }
+
+  Widget displayButton(bool isPlanMenu) {
+    if (isPlanMenu) {
+      return Row(
+        children: [
+          _EatNowButton(name: menuName),
+          SizedBox(width: 16.0),
+          _TakePhotoButton(),
+        ],
+      );
+    } else {
+      return _AddToPlanButton(name: menuName);
+    }
   }
 
   @override
@@ -98,7 +117,7 @@ class _MenuDetailState extends State<MenuDetail> {
                 ),
                 Padding(
                   padding: EdgeInsets.all(16.0),
-                  child: _AddToPlanButton(name: state.menu.name),
+                  child: displayButton(widget.isPlanMenu),
                 ),
               ],
             );
@@ -118,7 +137,7 @@ class _AddToPlanButton extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton(
-        key: const Key('initialInfoForm_continue_raisedButton'),
+        key: const Key('menu_addToPlan_button'),
         child: Text('เพิ่มในแผนการกิน'),
         style: OutlinedButton.styleFrom(
           primary: Theme.of(context).primaryColor,
@@ -133,78 +152,58 @@ class _AddToPlanButton extends StatelessWidget {
                       httpClient: http.Client(),
                       path: name,
                       planRepository: context.read<PlanRepository>()),
-                  child: ConfirmCalDialog());
+                  child: MenuDialog());
             }),
       ),
     );
   }
 }
 
-class ConfirmCalDialog extends StatefulWidget {
-  const ConfirmCalDialog({Key? key}) : super(key: key);
-
-  @override
-  _ConfirmCalDialogState createState() => _ConfirmCalDialogState();
-}
-
-class _ConfirmCalDialogState extends State<ConfirmCalDialog> {
-  double _currentSliderValue = 1;
+class _EatNowButton extends StatelessWidget {
+  final String name;
+  const _EatNowButton({Key? key, required this.name}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<MenuBloc, MenuState>(builder: (context, state) {
-      return AlertDialog(
-        title: Row(
-          children: <Widget>[
-            Expanded(
-              child: Text('ปริมาณที่จะกิน',
-                  style: Theme.of(context).textTheme.subtitle1!.merge(TextStyle(
-                      color: Theme.of(context).colorScheme.secondary))),
-            ),
-            Text('$_currentSliderValue จาน',
-                style: Theme.of(context).textTheme.subtitle1!.merge(
-                    TextStyle(color: Theme.of(context).colorScheme.secondary))),
-          ],
+    return Expanded(
+      child: OutlinedButton(
+        key: const Key('menu_eatNow_button'),
+        child: Text('กินเลย'),
+        style: OutlinedButton.styleFrom(
+          primary: Theme.of(context).primaryColor,
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(50))),
         ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
+        onPressed: (){},
+        // onPressed: () => showDialog<String>(
+        //     context: context,
+        //     builder: (BuildContext context) {
+        //       return BlocProvider(
+        //           create: (_) => MenuBloc(
+        //               httpClient: http.Client(),
+        //               path: name,
+        //               planRepository: context.read<PlanRepository>()),
+        //           child: MenuDialog());
+        //     }),
+      ),
+    );
+  }
+}
+
+class _TakePhotoButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: ElevatedButton(
+        key: const Key('menu_takePhoto_button'),
+        onPressed: () =>
+          Navigator.push(context, MaterialPageRoute(builder: (context) => Camera())),
+        child: Text('ถ่ายรูป'),
+        style: ElevatedButton.styleFrom(
+          primary: Theme.of(context).primaryColor,
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(50))),
         ),
-        content: SingleChildScrollView(
-          child: Slider(
-            value: _currentSliderValue,
-            min: 0,
-            max: 1,
-            activeColor: Theme.of(context).primaryColor,
-            inactiveColor: Color(0xFFE0E0E0),
-            divisions: 10,
-            onChanged: (double value) {
-              setState(() {
-                _currentSliderValue = value;
-              });
-            },
-          ),
-        ),
-        contentPadding: EdgeInsets.all(0),
-        actionsPadding: EdgeInsets.only(top: 0),
-        actionsOverflowButtonSpacing: 0,
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              context
-                  .read<MenuBloc>()
-                  .addMenuToPlan(volumn: _currentSliderValue);
-            },
-            child: Text('ตกลง',
-                style: Theme.of(context).textTheme.button!.merge(
-                    TextStyle(color: Theme.of(context).colorScheme.secondary))),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, 'cancle'),
-            child: Text('ยกเลิก',
-                style: Theme.of(context).textTheme.button!.merge(
-                    TextStyle(color: Theme.of(context).colorScheme.secondary))),
-          ),
-        ],
-      );
-    });
+      ),
+    );
   }
 }

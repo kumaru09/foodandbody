@@ -5,9 +5,10 @@ import 'package:foodandbody/screens/menu/bloc/menu_bloc.dart';
 import 'package:foodandbody/screens/menu/menu_detail.dart';
 import 'package:http/http.dart' as http;
 
-class Menu extends StatelessWidget {
-  const Menu({Key? key, required this.menuName}) : super(key: key);
+class MenuPage extends StatelessWidget {
+  const MenuPage({Key? key, required this.menuName, required this.isPlanMenu}) : super(key: key);
   final String menuName;
+  final bool isPlanMenu;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +34,7 @@ class Menu extends StatelessWidget {
           create: (_) =>
               MenuBloc(httpClient: http.Client(), path: this.menuName, planRepository: context.read<PlanRepository>())
                 ..add(MenuFetched()),
-          child: const MenuDetail(),
+          child: MenuDetail(isPlanMenu: this.isPlanMenu),
         ),
       ),
     );

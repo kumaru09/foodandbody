@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:foodandbody/models/history.dart';
 import 'package:foodandbody/models/menu.dart';
+import 'package:foodandbody/screens/menu/menu.dart';
 
 class PlanMenuCardList extends StatefulWidget {
   const PlanMenuCardList(this._plan);
@@ -39,7 +40,11 @@ class _PlanMenuCardListState extends State<PlanMenuCardList> {
         sizeFactor: animation,
         child: InkWell(
             onTap: () {
-              print("tap card");
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          MenuPage(menuName: item.name, isPlanMenu: true)));
             },
             child: Card(
               color: Colors.white,

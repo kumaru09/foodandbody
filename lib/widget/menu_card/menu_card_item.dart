@@ -25,7 +25,7 @@ class MenuCardItem extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          Menu(menuName: menu.name)));
+                          MenuPage(menuName: menu.name, isPlanMenu: false)));
             },
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
