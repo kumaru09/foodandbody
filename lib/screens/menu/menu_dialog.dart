@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodandbody/screens/main_screen/main_screen.dart';
 import 'package:foodandbody/screens/menu/bloc/menu_bloc.dart';
 
 class MenuDialog extends StatefulWidget {
@@ -50,14 +51,22 @@ class _MenuDialogState extends State<MenuDialog> {
         actionsOverflowButtonSpacing: 0,
         actions: <Widget>[
           TextButton(
-            onPressed: () {
-              context
-                  .read<MenuBloc>()
-                  .addMenuToPlan(volumn: _currentSliderValue);
-            },
+            onPressed: _currentSliderValue == 0.0
+                ? null
+                : () => context
+                    .read<MenuBloc>()
+                    .addMenuToPlan(volumn: _currentSliderValue)
+                    .then((value) => Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => MainScreen(index: 1)),
+                          (Route<dynamic> route) => false,
+                        )),
             child: Text('ตกลง',
-                style: Theme.of(context).textTheme.button!.merge(
-                    TextStyle(color: Theme.of(context).colorScheme.secondary))),
+                style: Theme.of(context).textTheme.button!.merge(TextStyle(
+                    color: _currentSliderValue == 0.0
+                        ? Theme.of(context).colorScheme.secondaryVariant
+                        : Theme.of(context).colorScheme.secondary))),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, 'cancle'),
@@ -70,4 +79,3 @@ class _MenuDialogState extends State<MenuDialog> {
     });
   }
 }
-

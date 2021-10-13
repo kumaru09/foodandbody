@@ -10,9 +10,11 @@ import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
 import 'package:foodandbody/screens/plan/plan.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({Key? key}) : super(key: key);
+  const MainScreen({Key? key, required this.index}) : super(key: key);
 
-  static Page page() => const MaterialPage<void>(child: MainScreen());
+  final int index;
+
+  static Page page() => const MaterialPage<void>(child: MainScreen(index: 0));
 
   @override
   _MainScreenState createState() => _MainScreenState();
@@ -20,6 +22,12 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.index;
+  }
 
   _getPage(int index) {
     switch (index) {

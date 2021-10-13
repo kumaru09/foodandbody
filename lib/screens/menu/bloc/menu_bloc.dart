@@ -67,12 +67,9 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
   }
 
   Future<void> addMenuToPlan({required double volumn}) async {
-    if (volumn != 0.0) {
       final rawMenu = await _fetchMenus(path);
       final calories = rawMenu.calory.toDouble() * volumn;
       final menu = Menu(name: rawMenu.name, calories: calories);
       await planRepository.addPlanMenu(menu, false);
-    }
-    return;
   }
 }
