@@ -87,10 +87,10 @@ void main() {
           menu: mockMenuCard,
         ));
         await tester.pumpMenuCardList(menuCardBloc);
-        expect(find.byType(Menu), findsNothing);
+        expect(find.byType(MenuPage), findsNothing);
         await tester.tap(find.text('menuName1'));
         await tester.pumpAndSettle();
-        expect(find.byType(Menu), findsOneWidget);
+        expect(find.byType(MenuPage), findsOneWidget);
       });
     });
   });
