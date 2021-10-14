@@ -70,10 +70,6 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
       {required String name,
       required bool isEatNow,
       required double volumn}) async {
-    // print('menu name: $name');
-    final rawMenu = await _fetchMenus(path);
-    final calories = rawMenu.calory.toDouble() * volumn;
-    final menu = Menu(name: rawMenu.name, calories: calories);
-    await planRepository.addPlanMenu(menu, isEatNow);
+    await planRepository.addPlanMenu(name, volumn, isEatNow);
   }
 }

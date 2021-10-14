@@ -26,4 +26,12 @@ class PlanBloc extends Bloc<PlanEvent, PlanState> {
       }
     }
   }
+
+  Future<void> deleteMenu(String name) async {
+    try {
+      await _planRepository.deletePlan(name);
+    } catch (e) {
+      print('error: $e');
+    }
+  }
 }

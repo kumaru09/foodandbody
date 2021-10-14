@@ -11,6 +11,7 @@ class Menu {
     return Menu(
         name: json['name'] as String,
         calories: json['calories'] as double,
+        // calories: double.parse(json['calories'].toString()),
         timestamp:
             json['timestamp'] == null ? null : json['timestamp'] as Timestamp);
   }

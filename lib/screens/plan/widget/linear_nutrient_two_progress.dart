@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:foodandbody/models/history.dart';
 import 'package:foodandbody/models/user.dart';
@@ -22,6 +24,7 @@ class LinearNutrientTwoProgress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    log('render linear nutrient: ${_plan.planNutrientList.toJson()}');
     return Container(
         key: const Key("nutrient_info"),
         height: 86,

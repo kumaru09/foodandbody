@@ -10,10 +10,10 @@ class CircularCalAndInfo extends StatelessWidget {
 
   final History _plan;
   final User _user;
-  late double totalCal = _plan.menuList
+  late double planCal = _plan.menuList
       .map((value) => value.calories)
       .fold(0, (previous, current) => previous + current);
-  late double planCal = _plan.totalCal;
+  late double totalCal = _plan.totalCal;
   late double goalCal = _user.info!.goal!.toDouble();
 
   @override
