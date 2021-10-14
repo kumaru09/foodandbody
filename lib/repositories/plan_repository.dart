@@ -11,10 +11,6 @@ import 'package:foodandbody/repositories/i_plan_repository.dart';
 import 'package:http/http.dart' as http;
 
 class PlanRepository implements IPlanRepository {
-  final foodHistories = FirebaseFirestore.instance
-      .collection('users')
-      .doc(FirebaseAuth.instance.currentUser?.uid)
-      .collection('foodhistories');
   final DateTime now = DateTime.now();
   late final DateTime lastMidnight = DateTime(now.year, now.month, now.day);
 
@@ -24,6 +20,10 @@ class PlanRepository implements IPlanRepository {
         Uri.parse("https://foodandbody-api.azurewebsites.net/api/Menu/$name"));
     if (res.statusCode == 200) {
       final menu = MenuShow.fromJson(json.decode(res.body));
+      final CollectionReference foodHistories = FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser?.uid)
+          .collection('foodhistories');
       final plan = await foodHistories
           .where('date', isGreaterThanOrEqualTo: lastMidnight)
           .get();
@@ -56,6 +56,10 @@ class PlanRepository implements IPlanRepository {
   @override
   Future<History> getPlanById() async {
     log('Fetching data');
+    final CollectionReference foodHistories = FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .collection('foodhistories');
     final plan = await foodHistories
         .where('date', isGreaterThanOrEqualTo: lastMidnight)
         .get();
@@ -70,6 +74,10 @@ class PlanRepository implements IPlanRepository {
 
   Future<void> updatePlan(
       MenuShow menuDetail, double volumn, bool isEat) async {
+    final CollectionReference foodHistories = FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .collection('foodhistories');
     final plan = await foodHistories
         .where('date', isGreaterThanOrEqualTo: lastMidnight)
         .get();
@@ -114,6 +122,10 @@ class PlanRepository implements IPlanRepository {
   }
 
   Future<void> deletePlan(String name) async {
+    final CollectionReference foodHistories = FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .collection('foodhistories');
     final plan = await foodHistories
         .where('date', isGreaterThanOrEqualTo: lastMidnight)
         .get();

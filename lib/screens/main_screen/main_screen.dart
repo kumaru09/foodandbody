@@ -51,7 +51,8 @@ class _MainScreenState extends State<MainScreen> {
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: BlocProvider(
           create: (_) =>
-              PlanBloc(context.read<PlanRepository>())..add(LoadPlan()),
+              PlanBloc(planRepository: context.read<PlanRepository>())
+                ..add(LoadPlan()),
           child: _getPage(_currentIndex),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,

@@ -18,17 +18,17 @@ class _PlanMenuCardListState extends State<PlanMenuCardList> {
   _PlanMenuCardListState(this._plan);
   GlobalKey<AnimatedListState> animatedListKey = GlobalKey();
   final History _plan;
-  late List<Menu> _planMenu =
+  late List<Menu> planMenu =
       _plan.menuList.where((value) => value.timestamp == null).toList();
 
   @override
   Widget build(BuildContext context) {
     return AnimatedList(
       key: animatedListKey,
-      initialItemCount: _planMenu.length,
+      initialItemCount: planMenu.length,
       shrinkWrap: true,
       itemBuilder: (context, index, animation) {
-        return _buildPlanCard(context, _planMenu[index], animation);
+        return _buildPlanCard(context, planMenu[index], animation);
       },
     );
   }
@@ -45,8 +45,6 @@ class _PlanMenuCardListState extends State<PlanMenuCardList> {
                       builder: (context) =>
                           MenuPage(menuName: item.name, isPlanMenu: true)));
             },
-            // child: BlocBuilder<PlanBloc, PlanState>(builder: (context, state) {
-            //   return
             child: Card(
               color: Colors.white,
               elevation: 2,
@@ -79,8 +77,8 @@ class _PlanMenuCardListState extends State<PlanMenuCardList> {
                     color: Color(0xFF515070),
                   ),
                   onPressed: () {
-                    int removeIndex = _planMenu.indexOf(item);
-                    Menu removedItem = _planMenu.removeAt(removeIndex);
+                    int removeIndex = planMenu.indexOf(item);
+                    Menu removedItem = planMenu.removeAt(removeIndex);
                     context
                         .read<PlanBloc>()
                         .deleteMenu(item.name)
@@ -95,8 +93,6 @@ class _PlanMenuCardListState extends State<PlanMenuCardList> {
                   },
                 ),
               ),
-              // );
-              // }
             )));
   }
 }

@@ -9,7 +9,6 @@ class MenuCardList extends StatefulWidget {
 }
 
 class _MenuCardListState extends State<MenuCardList> {
-
   @override
   void initState() {
     super.initState();
@@ -30,6 +29,7 @@ class _MenuCardListState extends State<MenuCardList> {
             return Container(
               height: 200,
               child: ListView.builder(
+                key: const Key('menu_card_listview'),
                 itemBuilder: (BuildContext context, int index) {
                   return index >= state.menu.length
                       ? const Center(child: CircularProgressIndicator())

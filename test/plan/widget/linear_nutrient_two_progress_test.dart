@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:foodandbody/models/history.dart';
+import 'package:foodandbody/models/info.dart';
+import 'package:foodandbody/models/nutrient.dart';
+import 'package:foodandbody/models/user.dart';
 import 'package:foodandbody/screens/plan/widget/linear_nutrient_two_progress.dart';
 import 'package:foodandbody/theme.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
+
+class MockUser extends Mock implements User {}
+
+class MockPlan extends Mock implements History {}
 
 void main() {
   //widget
@@ -10,13 +19,26 @@ void main() {
   const carbLinearKey = Key("plan_carb_linear");
   const fatLinearKey = Key("plan_fat_linear");
 
+  late User user;
+  late History plan;
+  setUp(() {
+    user = MockUser();
+    plan = MockPlan();
+    when(() => plan.totalNutrientList)
+        .thenReturn(Nutrient().copyWith(protein: 120, carb: 80, fat: 30));
+    when(() => user.info).thenReturn(Info(
+        goalNutrient: Nutrient().copyWith(protein: 180, carb: 145, fat: 75)));
+    when(() => plan.planNutrientList)
+        .thenReturn(Nutrient().copyWith(protein: 130, carb: 95, fat: 40));
+  });
+
   group("Nutrient Progress", () {
     group("can render", () {
       testWidgets("protein linear", (tester) async {
         await tester.pumpWidget(MaterialApp(
           theme: AppTheme.themeData,
           home: Scaffold(
-            body: LinearNutrientTwoProgress(),
+            body: LinearNutrientTwoProgress(user, plan),
           ),
         ));
         expect(find.byKey(proteinLinearKey), findsOneWidget);
@@ -27,7 +49,7 @@ void main() {
         await tester.pumpWidget(MaterialApp(
           theme: AppTheme.themeData,
           home: Scaffold(
-            body: LinearNutrientTwoProgress(),
+            body: LinearNutrientTwoProgress(user, plan),
           ),
         ));
         expect(find.byKey(carbLinearKey), findsOneWidget);
@@ -38,7 +60,7 @@ void main() {
         await tester.pumpWidget(MaterialApp(
           theme: AppTheme.themeData,
           home: Scaffold(
-            body: LinearNutrientTwoProgress(),
+            body: LinearNutrientTwoProgress(user, plan),
           ),
         ));
         expect(find.byKey(fatLinearKey), findsOneWidget);
@@ -48,7 +70,7 @@ void main() {
 
     group("when total less than goal", () {
       testWidgets(": protein linear", (tester) async {
-        final linearProgress = LinearNutrientTwoProgress();
+        final linearProgress = LinearNutrientTwoProgress(user, plan);
         final double proteinPlan = 80.0;
         final double proteinTotal = 50.5;
         final double proteinGoal = 100.2;
@@ -89,7 +111,7 @@ void main() {
       }); //test ": protein linear"
 
       testWidgets(": carb linear", (tester) async {
-        final linearProgress = LinearNutrientTwoProgress();
+        final linearProgress = LinearNutrientTwoProgress(user, plan);
         final double carbPlan = 180.0;
         final double carbTotal = 160.3;
         final double carbGoal = 220.5;
@@ -130,7 +152,7 @@ void main() {
       }); //test ": carb linear"
 
       testWidgets(": fat linear", (tester) async {
-        final linearProgress = LinearNutrientTwoProgress();
+        final linearProgress = LinearNutrientTwoProgress(user, plan);
         final double fatPlan = 50.0;
         final double fatTotal = 25.9;
         final double fatGoal = 60.8;
@@ -173,7 +195,7 @@ void main() {
 
     group("when plan greater than goal but total less than goal", () {
       testWidgets(": protein linear", (tester) async {
-        final linearProgress = LinearNutrientTwoProgress();
+        final linearProgress = LinearNutrientTwoProgress(user, plan);
         final double proteinPlan = 110.0;
         final double proteinTotal = 50.5;
         final double proteinGoal = 100.2;
@@ -214,7 +236,7 @@ void main() {
       }); //test ": protein linear"
 
       testWidgets(": carb linear", (tester) async {
-        final linearProgress = LinearNutrientTwoProgress();
+        final linearProgress = LinearNutrientTwoProgress(user, plan);
         final double carbPlan = 225.3;
         final double carbTotal = 160.3;
         final double carbGoal = 220.5;
@@ -242,8 +264,8 @@ void main() {
         //total
         expect(
             tester.widget(find.byType(LinearPercentIndicator).at(3)),
-            isA<LinearPercentIndicator>().having((t) => t.percent, "percent",
-                carbTotal / carbGoal));
+            isA<LinearPercentIndicator>()
+                .having((t) => t.percent, "percent", carbTotal / carbGoal));
         expect(
             tester.widget(find.byType(LinearPercentIndicator).at(3)),
             isA<LinearPercentIndicator>().having((t) => t.progressColor,
@@ -255,7 +277,7 @@ void main() {
       }); //test ": carb linear"
 
       testWidgets(": fat linear", (tester) async {
-        final linearProgress = LinearNutrientTwoProgress();
+        final linearProgress = LinearNutrientTwoProgress(user, plan);
         final double fatPlan = 70.2;
         final double fatTotal = 25.9;
         final double fatGoal = 60.8;
@@ -282,8 +304,8 @@ void main() {
         //total
         expect(
             tester.widget(find.byType(LinearPercentIndicator).at(5)),
-            isA<LinearPercentIndicator>().having((t) => t.percent, "percent",
-                fatTotal / fatGoal));
+            isA<LinearPercentIndicator>()
+                .having((t) => t.percent, "percent", fatTotal / fatGoal));
         expect(
             tester.widget(find.byType(LinearPercentIndicator).at(5)),
             isA<LinearPercentIndicator>().having((t) => t.progressColor,
@@ -297,7 +319,7 @@ void main() {
 
     group("when total greater than goal", () {
       testWidgets(": protein linear", (tester) async {
-        final linearProgress = LinearNutrientTwoProgress();
+        final linearProgress = LinearNutrientTwoProgress(user, plan);
         final double proteinPlan = 80.2;
         final double proteinTotal = 120.3;
         final double proteinGoal = 100.2;
@@ -310,8 +332,8 @@ void main() {
         //plan
         expect(
             tester.widget(find.byType(LinearPercentIndicator).at(0)),
-            isA<LinearPercentIndicator>().having((t) => t.percent, "percent",
-                proteinPlan / proteinGoal));
+            isA<LinearPercentIndicator>().having(
+                (t) => t.percent, "percent", proteinPlan / proteinGoal));
         expect(
             tester.widget(find.byType(LinearPercentIndicator).at(0)),
             isA<LinearPercentIndicator>().having(
@@ -335,14 +357,14 @@ void main() {
             isA<LinearPercentIndicator>().having((t) => t.backgroundColor,
                 "background color", Colors.white.withOpacity(0)));
         expect(
-            tester.widget(find.text(
-                "${proteinTotal.round()}/${proteinGoal.round()} g")),
+            tester.widget(
+                find.text("${proteinTotal.round()}/${proteinGoal.round()} g")),
             isA<Text>().having(
                 (t) => t.style!.color, "text color", Color(0xffff4040)));
       }); //test ": protein linear"
 
       testWidgets(": carb linear", (tester) async {
-        final linearProgress = LinearNutrientTwoProgress();
+        final linearProgress = LinearNutrientTwoProgress(user, plan);
         final double carbPlan = 180.0;
         final double carbTotal = 225.0;
         final double carbGoal = 220.5;
@@ -355,8 +377,8 @@ void main() {
         //plan
         expect(
             tester.widget(find.byType(LinearPercentIndicator).at(2)),
-            isA<LinearPercentIndicator>().having((t) => t.percent, "percent",
-                carbPlan / carbGoal));
+            isA<LinearPercentIndicator>()
+                .having((t) => t.percent, "percent", carbPlan / carbGoal));
         expect(
             tester.widget(find.byType(LinearPercentIndicator).at(2)),
             isA<LinearPercentIndicator>().having(
@@ -380,14 +402,14 @@ void main() {
             isA<LinearPercentIndicator>().having((t) => t.backgroundColor,
                 "background color", Colors.white.withOpacity(0)));
         expect(
-            tester.widget(find.text(
-                "${carbTotal.round()}/${carbGoal.round()} g")),
+            tester.widget(
+                find.text("${carbTotal.round()}/${carbGoal.round()} g")),
             isA<Text>().having(
                 (t) => t.style!.color, "text color", Color(0xffff4040)));
       }); //test ": carb linear"
 
       testWidgets(": fat linear", (tester) async {
-        final linearProgress = LinearNutrientTwoProgress();
+        final linearProgress = LinearNutrientTwoProgress(user, plan);
         final double fatPlan = 45.3;
         final double fatTotal = 75.0;
         final double fatGoal = 60.8;
@@ -400,8 +422,8 @@ void main() {
         //plan
         expect(
             tester.widget(find.byType(LinearPercentIndicator).at(4)),
-            isA<LinearPercentIndicator>().having((t) => t.percent, "percent",
-                fatPlan / fatGoal));
+            isA<LinearPercentIndicator>()
+                .having((t) => t.percent, "percent", fatPlan / fatGoal));
         expect(
             tester.widget(find.byType(LinearPercentIndicator).at(4)),
             isA<LinearPercentIndicator>().having(
@@ -425,8 +447,8 @@ void main() {
             isA<LinearPercentIndicator>().having((t) => t.backgroundColor,
                 "background color", Colors.white.withOpacity(0)));
         expect(
-            tester.widget(find.text(
-                "${fatTotal.round()}/${fatGoal.round()} g")),
+            tester
+                .widget(find.text("${fatTotal.round()}/${fatGoal.round()} g")),
             isA<Text>().having(
                 (t) => t.style!.color, "text color", Color(0xffff4040)));
       }); //test ": protein linear"
