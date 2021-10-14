@@ -17,7 +17,7 @@ const ColorScheme _appColorScheme = ColorScheme(
   primary: secondaryColor,
   primaryVariant: primaryDark,
   secondary: secondaryColor,
-  secondaryVariant: secondaryDark,
+  secondaryVariant: secondaryLight,
   surface: surfaceColor,
   background: backgroundColor,
   error: errorColor,
