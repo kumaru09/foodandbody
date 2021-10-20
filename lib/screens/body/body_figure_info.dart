@@ -32,16 +32,24 @@ class BodyFigureInfo extends StatelessWidget {
                     ),
                   ),
                   CustomPaint(
-                    painter: _DrawLine(circleOffset: Offset(115, 80), lineOffset: Offset(145, 15)),
+                    painter: _DrawLine(
+                        circleOffset: Offset(115, 80),
+                        lineOffset: Offset(145, 15)),
                   ),
                   CustomPaint(
-                    painter: _DrawLine(circleOffset: Offset(115, 115), lineOffset: Offset(145, 125)),
+                    painter: _DrawLine(
+                        circleOffset: Offset(115, 115),
+                        lineOffset: Offset(145, 125)),
                   ),
                   CustomPaint(
-                    painter: _DrawLine(circleOffset: Offset(115, 145), lineOffset: Offset(145, 230)),
+                    painter: _DrawLine(
+                        circleOffset: Offset(115, 145),
+                        lineOffset: Offset(145, 230)),
                   ),
                   CustomPaint(
-                    painter: _DrawLine(circleOffset: Offset(115, 175), lineOffset: Offset(130, 335)),
+                    painter: _DrawLine(
+                        circleOffset: Offset(115, 175),
+                        lineOffset: Offset(130, 335)),
                   )
                 ],
               ),
@@ -67,7 +75,7 @@ class BodyFigureInfo extends StatelessWidget {
                         textAlign: TextAlign.start,
                         text: TextSpan(children: [
                           TextSpan(
-                            text: "$shoulder",
+                            text: isEmpty(shoulder) ? "-  " : "$shoulder",
                             style: Theme.of(context).textTheme.headline4!.merge(
                                   TextStyle(
                                       color: Theme.of(context)
@@ -83,7 +91,7 @@ class BodyFigureInfo extends StatelessWidget {
                                           .colorScheme
                                           .secondary),
                                 ),
-                          )
+                          ),
                         ])),
                   ),
                   Container(
@@ -114,7 +122,7 @@ class BodyFigureInfo extends StatelessWidget {
                       textAlign: TextAlign.start,
                       text: TextSpan(children: [
                         TextSpan(
-                          text: "$chest",
+                          text: isEmpty(chest) ? "-  " : "$chest",
                           style: Theme.of(context).textTheme.headline4!.merge(
                                 TextStyle(
                                     color: Theme.of(context)
@@ -162,7 +170,7 @@ class BodyFigureInfo extends StatelessWidget {
                       textAlign: TextAlign.start,
                       text: TextSpan(children: [
                         TextSpan(
-                          text: "$waist",
+                          text: isEmpty(waist) ? "-  " : "$waist",
                           style: Theme.of(context).textTheme.headline4!.merge(
                                 TextStyle(
                                     color: Theme.of(context)
@@ -210,7 +218,7 @@ class BodyFigureInfo extends StatelessWidget {
                       textAlign: TextAlign.start,
                       text: TextSpan(children: [
                         TextSpan(
-                          text: "$hip",
+                          text: isEmpty(hip) ? "-  " : "$hip",
                           style: Theme.of(context).textTheme.headline4!.merge(
                               TextStyle(
                                   color:
@@ -248,6 +256,8 @@ class BodyFigureInfo extends StatelessWidget {
       ),
     );
   }
+
+  bool isEmpty(int value) => value == 0;
 }
 
 class _DrawLine extends CustomPainter {
@@ -259,15 +269,15 @@ class _DrawLine extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paintCircle = Paint()
-    ..color = Color(0xFF515070)
-    ..style = PaintingStyle.fill;
+      ..color = Color(0xFF515070)
+      ..style = PaintingStyle.fill;
     canvas.drawCircle(circleOffset, 5, paintCircle);
 
     final paintLine = Paint()
-    ..color = Color(0xFF515070)
-    ..strokeWidth = 2
-    ..style = PaintingStyle.stroke
-    ..strokeCap = StrokeCap.round;
+      ..color = Color(0xFF515070)
+      ..strokeWidth = 2
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
     canvas.drawLine(circleOffset, lineOffset, paintLine);
     canvas.drawLine(lineOffset, Offset(175, lineOffset.dy), paintLine);
   }
