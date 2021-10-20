@@ -1,16 +1,19 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:foodandbody/models/user.dart';
 import 'package:foodandbody/screens/body/weight_graph.dart';
 import 'package:intl/intl.dart';
 
 class WeightAndHeightInfo extends StatelessWidget {
-  WeightAndHeightInfo({Key? key}) : super(key: key);
+  WeightAndHeightInfo(this._user);
 
-  late int weight = 48;
-  late int height = 165;
+  final User _user;
+
+  late int? weight = _user.info!.weight;
+  late int? height = _user.info!.height;
   late double bmi = double.parse(
-      (weight / pow(height / 100, 2)).toStringAsFixed(2));
+      (weight! / pow(height! / 100, 2)).toStringAsFixed(2));
   late String date = DateFormat("dd/MM/yyyy").format(DateTime.now());
 
   @override
