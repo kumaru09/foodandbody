@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:foodandbody/models/history.dart';
+import 'package:foodandbody/models/user.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
 // ignore: must_be_immutable
 class CircularCalIndicator extends StatelessWidget {
-  late double totalCal = 1182.4;
-  late double goalCal = 1800.2;
+  CircularCalIndicator(this._plan, this._user);
+  final History _plan;
+  final User _user;
+  late double totalCal = _plan.totalCal;
+  late double goalCal = _user.info!.goal!.toDouble();
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +19,7 @@ class CircularCalIndicator extends StatelessWidget {
     Color backgroundColor;
     String label;
     String cal;
-    
+
     if (percentCal > 1) {
       progressColor = Color(0xFFFF4040);
       backgroundColor = Theme.of(context).indicatorColor.withOpacity(0.8);

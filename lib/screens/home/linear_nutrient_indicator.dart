@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:foodandbody/models/history.dart';
+import 'package:foodandbody/models/user.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
 // ignore: must_be_immutable
 class LinearNutrientIndicator extends StatelessWidget {
-  LinearNutrientIndicator({Key? key}) : super(key: key);
+  LinearNutrientIndicator(this._plan, this._user);
 
-  late double totalProtein = 44.8;
-  late double totalCarb = 145.2;
-  late double totalFat = 13.9;
+  final History _plan;
+  final User _user;
+  late double totalProtein = _plan.totalNutrientList.protein;
+  late double totalCarb = _plan.totalNutrientList.carb;
+  late double totalFat = _plan.totalNutrientList.fat;
 
-  late double goalProtein = 85.0;
-  late double goalCarb = 200.4;
-  late double goalFat = 50.6;
+  late double goalProtein = _user.info!.goalNutrient!.protein;
+  late double goalCarb = _user.info!.goalNutrient!.carb;
+  late double goalFat = _user.info!.goalNutrient!.fat;
 
   @override
   Widget build(BuildContext context) {

@@ -3,6 +3,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:foodandbody/models/history.dart';
+import 'package:foodandbody/models/info.dart';
+import 'package:foodandbody/models/nutrient.dart';
+import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
 import 'package:foodandbody/screens/search/search.dart';
 import 'package:foodandbody/screens/setting/setting.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
@@ -18,6 +22,14 @@ class FakeAppEvent extends Fake implements AppEvent {}
 class FakeAppState extends Fake implements AppState {}
 
 class MockUser extends Mock implements User {}
+
+class MockPlanBloc extends MockBloc<PlanEvent, PlanState> implements PlanBloc {}
+
+class FakePlanEvent extends Fake implements PlanEvent {}
+
+class FakePlanState extends Fake implements PlanState {}
+
+class MockPlan extends Mock implements History {}
 
 void main() {
   //button
@@ -38,17 +50,30 @@ void main() {
   group('Home Page', () {
     late AppBloc appBloc;
     late User user;
+    late PlanBloc planBloc;
+    late History plan;
 
     setUpAll(() {
       registerFallbackValue<AppEvent>(FakeAppEvent());
       registerFallbackValue<AppState>(FakeAppState());
+      registerFallbackValue<PlanEvent>(FakePlanEvent());
+      registerFallbackValue<PlanState>(FakePlanState());
     });
 
     setUp(() {
+      planBloc = MockPlanBloc();
       appBloc = MockAppBloc();
+      plan = MockPlan();
       user = MockUser();
+      when(() => planBloc.state).thenReturn(PlanLoaded(plan));
       when(() => user.email).thenReturn('test@gmail.com');
       when(() => appBloc.state).thenReturn(AppState.authenticated(user));
+      when(() => plan.totalNutrientList)
+          .thenReturn(Nutrient().copyWith(protein: 120, carb: 80, fat: 30));
+      when(() => user.info).thenReturn(Info(
+          goalNutrient: Nutrient().copyWith(protein: 180, carb: 145, fat: 75),
+          goal: 2200));
+      when(() => plan.totalCal).thenReturn(1000);
     });
 
     // group("calls", () {
@@ -70,12 +95,16 @@ void main() {
     group("render", () {
       testWidgets("calories circular progress", (tester) async {
         await mockNetworkImages(() async {
-          await tester.pumpWidget(BlocProvider.value(
-            value: appBloc,
-            child: const MaterialApp(
-              home: Home(),
+          await tester.pumpWidget(MaterialApp(
+            home: MultiBlocProvider(
+              providers: [
+                BlocProvider.value(value: planBloc),
+                BlocProvider.value(value: appBloc),
+              ],
+              child: Home(),
             ),
           ));
+          await tester.pumpAndSettle(const Duration(seconds: 5));
           expect(find.byKey(circularIndicatorKey), findsOneWidget);
         });
       }); //"calories circular progress"
@@ -83,36 +112,48 @@ void main() {
       group("nutrient linear progress", () {
         testWidgets("protein", (tester) async {
           await mockNetworkImages(() async {
-            await tester.pumpWidget(BlocProvider.value(
-              value: appBloc,
-              child: const MaterialApp(
-                home: Home(),
+            await tester.pumpWidget(MaterialApp(
+              home: MultiBlocProvider(
+                providers: [
+                  BlocProvider.value(value: planBloc),
+                  BlocProvider.value(value: appBloc),
+                ],
+                child: Home(),
               ),
             ));
+            await tester.pumpAndSettle();
             expect(find.byKey(proteinLinearIndicatorKey), findsOneWidget);
           });
         }); //"protein"
 
         testWidgets("carb", (tester) async {
           await mockNetworkImages(() async {
-            await tester.pumpWidget(BlocProvider.value(
-              value: appBloc,
-              child: const MaterialApp(
-                home: Home(),
+            await tester.pumpWidget(MaterialApp(
+              home: MultiBlocProvider(
+                providers: [
+                  BlocProvider.value(value: planBloc),
+                  BlocProvider.value(value: appBloc),
+                ],
+                child: Home(),
               ),
             ));
+            await tester.pumpAndSettle();
             expect(find.byKey(carbLinearIndicatorKey), findsOneWidget);
           });
         }); //"carb"
 
         testWidgets("fat", (tester) async {
           await mockNetworkImages(() async {
-            await tester.pumpWidget(BlocProvider.value(
-              value: appBloc,
-              child: const MaterialApp(
-                home: Home(),
+            await tester.pumpWidget(MaterialApp(
+              home: MultiBlocProvider(
+                providers: [
+                  BlocProvider.value(value: planBloc),
+                  BlocProvider.value(value: appBloc),
+                ],
+                child: Home(),
               ),
             ));
+            await tester.pumpAndSettle();
             expect(find.byKey(fatLinearIndicatorKey), findsOneWidget);
           });
         }); //"fat"
@@ -120,22 +161,29 @@ void main() {
 
       testWidgets("menu card ListView", (tester) async {
         await mockNetworkImages(() async {
-          await tester.pumpWidget(BlocProvider.value(
-            value: appBloc,
-            child: const MaterialApp(
-              home: Home(),
+          await tester.pumpWidget(MaterialApp(
+            home: MultiBlocProvider(
+              providers: [
+                BlocProvider.value(value: planBloc),
+                BlocProvider.value(value: appBloc),
+              ],
+              child: Home(),
             ),
           ));
+          await tester.pumpAndSettle(const Duration(seconds: 5));
           expect(find.byKey(menuCardListViewKey), findsOneWidget);
         });
       }); //"menu card ListView"
 
       testWidgets("daily water card", (tester) async {
         await mockNetworkImages(() async {
-          await tester.pumpWidget(BlocProvider.value(
-            value: appBloc,
-            child: const MaterialApp(
-              home: Home(),
+          await tester.pumpWidget(MaterialApp(
+            home: MultiBlocProvider(
+              providers: [
+                BlocProvider.value(value: planBloc),
+                BlocProvider.value(value: appBloc),
+              ],
+              child: Home(),
             ),
           ));
           await tester.dragFrom(Offset(0, 300), Offset(0, -300));
@@ -152,10 +200,13 @@ void main() {
     group("action", () {
       testWidgets("when pressed setting icon", (tester) async {
         await mockNetworkImages(() async {
-          await tester.pumpWidget(BlocProvider.value(
-            value: appBloc,
-            child: const MaterialApp(
-              home: Home(),
+          await tester.pumpWidget(MaterialApp(
+            home: MultiBlocProvider(
+              providers: [
+                BlocProvider.value(value: planBloc),
+                BlocProvider.value(value: appBloc),
+              ],
+              child: Home(),
             ),
           ));
           await tester.tap(find.byKey(settingButtonKey));
@@ -166,10 +217,13 @@ void main() {
 
       testWidgets("when pressed ดูทั้งหมด button", (tester) async {
         await mockNetworkImages(() async {
-          await tester.pumpWidget(BlocProvider.value(
-            value: appBloc,
-            child: const MaterialApp(
-              home: Home(),
+          await tester.pumpWidget(MaterialApp(
+            home: MultiBlocProvider(
+              providers: [
+                BlocProvider.value(value: planBloc),
+                BlocProvider.value(value: appBloc),
+              ],
+              child: Home(),
             ),
           ));
           await tester.tap(find.byKey(menuAllButtonKey));
@@ -180,10 +234,13 @@ void main() {
 
       testWidgets("when pressed remove button", (tester) async {
         await mockNetworkImages(() async {
-          await tester.pumpWidget(BlocProvider.value(
-            value: appBloc,
-            child: const MaterialApp(
-              home: Home(),
+          await tester.pumpWidget(MaterialApp(
+            home: MultiBlocProvider(
+              providers: [
+                BlocProvider.value(value: planBloc),
+                BlocProvider.value(value: appBloc),
+              ],
+              child: Home(),
             ),
           ));
           await tester.dragFrom(Offset(0, 300), Offset(0, -300));
@@ -197,10 +254,13 @@ void main() {
 
       testWidgets("when pressed add button", (tester) async {
         await mockNetworkImages(() async {
-          await tester.pumpWidget(BlocProvider.value(
-            value: appBloc,
-            child: const MaterialApp(
-              home: Home(),
+          await tester.pumpWidget(MaterialApp(
+            home: MultiBlocProvider(
+              providers: [
+                BlocProvider.value(value: planBloc),
+                BlocProvider.value(value: appBloc),
+              ],
+              child: Home(),
             ),
           ));
           await tester.dragFrom(Offset(0, 300), Offset(0, -300));
@@ -214,21 +274,24 @@ void main() {
 
       testWidgets("when pressed add and remove button", (tester) async {
         await mockNetworkImages(() async {
-          await tester.pumpWidget(BlocProvider.value(
-            value: appBloc,
-            child: const MaterialApp(
-              home: Home(),
+          await tester.pumpWidget(MaterialApp(
+            home: MultiBlocProvider(
+              providers: [
+                BlocProvider.value(value: planBloc),
+                BlocProvider.value(value: appBloc),
+              ],
+              child: Home(),
             ),
           ));
           await tester.dragFrom(Offset(0, 300), Offset(0, -300));
-          await tester.pump();
+          await tester.pumpAndSettle();
           await tester.ensureVisible(find.byKey(addWaterButtonKey));
           await tester.tap(find.byKey(addWaterButtonKey));
-          await tester.pump();
+          await tester.pumpAndSettle();
           expect(find.text("1"), findsOneWidget);
           await tester.ensureVisible(find.byKey(removeWaterButtonKey));
           await tester.tap(find.byKey(removeWaterButtonKey));
-          await tester.pump();
+          await tester.pumpAndSettle();
           expect(find.text("0"), findsOneWidget);
         });
       }); //"when pressed add and remove button"

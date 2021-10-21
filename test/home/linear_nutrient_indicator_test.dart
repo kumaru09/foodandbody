@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:foodandbody/models/history.dart';
+import 'package:foodandbody/models/info.dart';
+import 'package:foodandbody/models/nutrient.dart';
+import 'package:foodandbody/models/user.dart';
 import 'package:foodandbody/theme.dart';
 import 'package:foodandbody/screens/home/linear_nutrient_indicator.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
+
+class MockUser extends Mock implements User {}
+
+class MockPlan extends Mock implements History {}
 
 void main() {
   const linearRowKey = Key('linear_indicator_row');
@@ -14,12 +23,24 @@ void main() {
   const carbLineKey = Key('carb_line');
   const fatLineKey = Key('fat_line');
 
+  late User user;
+  late History plan;
+
+  setUp(() {
+    user = MockUser();
+    plan = MockPlan();
+    when(() => plan.totalNutrientList)
+        .thenReturn(Nutrient().copyWith(protein: 120, carb: 80, fat: 30));
+    when(() => user.info).thenReturn(Info(
+        goalNutrient: Nutrient().copyWith(protein: 180, carb: 145, fat: 75)));
+  });
+
   group("Nutrient Linear Indicator", () {
     testWidgets("can render", (tester) async {
       await tester.pumpWidget(MaterialApp(
         theme: AppTheme.themeData,
         home: Scaffold(
-          body: LinearNutrientIndicator(),
+          body: LinearNutrientIndicator(plan, user),
         ),
       ));
       expect(find.byKey(linearRowKey), findsOneWidget);
@@ -29,7 +50,7 @@ void main() {
     }); //"can render"
 
     testWidgets("when total less than goal", (tester) async {
-      final linearProgressRender = LinearNutrientIndicator();
+      final linearProgressRender = LinearNutrientIndicator(plan, user);
       linearProgressRender.totalProtein = 25.4;
       linearProgressRender.totalCarb = 100.3;
       linearProgressRender.totalFat = 19.8;
@@ -114,7 +135,7 @@ void main() {
     }); //"when total less than goal"
 
     testWidgets("when total greater than goal", (tester) async {
-      final linearProgressRender = LinearNutrientIndicator();
+      final linearProgressRender = LinearNutrientIndicator(plan, user);
 
       linearProgressRender.totalProtein = 130.4;
       linearProgressRender.totalCarb = 300.2;
@@ -192,7 +213,7 @@ void main() {
     }); //"when total greater than goal"
 
     testWidgets("when total equals goal", (tester) async {
-      final linearProgressRender = LinearNutrientIndicator();
+      final linearProgressRender = LinearNutrientIndicator(plan, user);
 
       linearProgressRender.totalProtein = 100.0;
       linearProgressRender.totalCarb = 250.3;
