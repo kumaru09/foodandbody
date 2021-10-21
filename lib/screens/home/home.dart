@@ -240,17 +240,4 @@ class __DailyWaterState extends State<_DailyWater> {
       );
     });
   }
-
-  void _addWater() {
-    setState(() {
-      _water++;
-    });
-  }
-
-  void _removeWater() {
-    setState(() {
-      _water--;
-      if (_water < 0) _water = 0;
-    });
-  }
 }
