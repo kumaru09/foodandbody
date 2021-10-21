@@ -37,6 +37,7 @@ dependencies:
   google_sign_in: ^5.1.0
   flutter_facebook_auth: ^3.5.1
   cloud_firestore: ^2.5.2
+  fl_chart: ^0.40.2
   http: ^0.13.3
   bloc_concurrency: ^0.1.0
   search_page: ^2.0.0+1
