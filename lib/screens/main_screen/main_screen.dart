@@ -46,6 +46,7 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom == 0.0;
     return Scaffold(
         extendBody: true,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -56,7 +57,9 @@ class _MainScreenState extends State<MainScreen> {
           child: _getPage(_currentIndex),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: FloatingActionButton(
+        floatingActionButton: Visibility(
+            visible: isKeyboardOpen,
+            child: FloatingActionButton(
           key: const Key('camera_floating_button'),
           onPressed: () {
             Navigator.push(
@@ -65,7 +68,7 @@ class _MainScreenState extends State<MainScreen> {
           elevation: 0.4,
           child: Icon(Icons.photo_camera),
           backgroundColor: Theme.of(context).colorScheme.secondary,
-        ),
+        )),
         bottomNavigationBar: BottomNavigation(
             index: _currentIndex, onChangedTab: _onChangedTab));
   }
