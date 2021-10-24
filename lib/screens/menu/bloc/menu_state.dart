@@ -23,7 +23,7 @@ class MenuState extends Equatable {
 
   @override
   String toString() {
-    return '''MenuState { status: $status,  menu: ${menu.name} }''';
+    return '''MenuState { status: $status,  menu: $menu }''';
   }
 
   @override
