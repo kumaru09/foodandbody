@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 
 class BodyEntity extends Equatable {
   final Timestamp date;
-  final int weight;
+  final List<int> weight;
   final int shoulder;
   final int chest;
   final int waist;

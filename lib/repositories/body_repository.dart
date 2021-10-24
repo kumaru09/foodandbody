@@ -17,7 +17,7 @@ class BodyRepository {
     if (body.docs.isNotEmpty) {
       return Body.fromEmtity(BodyEntity.fromSnapshot(body.docs.first));
     } else {
-      return Body(Timestamp.now());
+      return Body.empty;
     }
   }
 

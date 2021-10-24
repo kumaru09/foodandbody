@@ -1,35 +1,46 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:equatable/equatable.dart';
 import 'package:foodandbody/models/body_entity.dart';
 
-class Body {
+class Body extends Equatable {
   final Timestamp date;
-  final int weight;
+  final List<int> weight;
   final int shoulder;
   final int chest;
   final int waist;
   final int hip;
 
-  Body(this.date,
-      {this.weight = 0,
-      this.shoulder = 0,
-      this.chest = 0,
-      this.waist = 0,
-      this.hip = 0});
+  const Body(
+      {required this.date,
+      required this.weight,
+      required this.shoulder,
+      required this.chest,
+      required this.waist,
+      required this.hip});
 
   Body copyWith(
       {Timestamp? date,
-      int? weight,
+      List<int>? weight,
       int? shoulder,
       int? chest,
       int? waist,
       int? hip}) {
-    return Body(date ?? this.date,
+    return Body(
+        date: date ?? this.date,
         weight: weight ?? this.weight,
         waist: waist ?? this.waist,
         shoulder: shoulder ?? this.shoulder,
         chest: chest ?? this.chest,
         hip: hip ?? this.hip);
   }
+
+  static final empty = Body(
+      date: Timestamp.now(),
+      weight: List.empty(),
+      waist: 0,
+      shoulder: 0,
+      chest: 0,
+      hip: 0);
 
   @override
   int get hashCode =>
@@ -62,11 +73,15 @@ class Body {
   }
 
   static Body fromEmtity(BodyEntity entity) {
-    return Body(entity.date,
+    return Body(
+        date: entity.date,
         weight: entity.weight,
         waist: entity.waist,
         shoulder: entity.shoulder,
         chest: entity.chest,
         hip: entity.hip);
   }
+
+  @override
+  List<Object?> get props => [date, weight, waist, shoulder, chest, hip];
 }
