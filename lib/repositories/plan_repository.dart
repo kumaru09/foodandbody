@@ -121,7 +121,9 @@ class PlanRepository implements IPlanRepository {
           .get('menuList')
           .map<Menu>((menu) => Menu.fromJson(menu))
           .toList();
-      menuList.remove((menu) => menu.name == name && menu.timestamp == null);
+      menuList.remove(menuList
+          .where((menu) => menu.name == name && menu.timestamp == null)
+          .first);
       List<Map> menuListMap = menuList.map((e) => e.toJson()).toList();
       await plan.docs.first.reference.update({'menuList': menuListMap});
     }
