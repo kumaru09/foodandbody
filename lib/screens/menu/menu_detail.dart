@@ -17,13 +17,11 @@ class MenuDetail extends StatefulWidget {
 }
 
 class _MenuDetailState extends State<MenuDetail> {
-  String menuName = '';
 
   @override
   void initState() {
     super.initState();
     context.read<MenuBloc>().add(MenuFetched());
-    menuName = context.read<MenuBloc>().path;
   }
 
   String toRound(double value) {
@@ -33,17 +31,17 @@ class _MenuDetailState extends State<MenuDetail> {
       return value.toString();
   }
 
-  Widget displayButton(bool isPlanMenu, double serve, String unit) {
+  Widget displayButton(bool isPlanMenu, String name, double serve, String unit) {
     if (isPlanMenu) {
       return Row(
         children: [
-          _EatNowButton(name: menuName, serve: serve, unit: unit),
+          _EatNowButton(name: name, serve: serve, unit: unit),
           SizedBox(width: 16.0),
           _TakePhotoButton(),
         ],
       );
     } else {
-      return _AddToPlanButton(name: menuName, serve: serve, unit: unit);
+      return _AddToPlanButton(name: name, serve: serve, unit: unit);
     }
   }
 
@@ -117,7 +115,7 @@ class _MenuDetailState extends State<MenuDetail> {
                 ),
                 Padding(
                   padding: EdgeInsets.all(16.0),
-                  child: displayButton(widget.isPlanMenu, state.menu.serve, state.menu.unit),
+                  child: displayButton(widget.isPlanMenu, state.menu.name, state.menu.serve, state.menu.unit),
                 ),
               ],
             );
