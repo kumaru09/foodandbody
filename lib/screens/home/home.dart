@@ -59,7 +59,8 @@ class Home extends StatelessWidget {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15)),
                         elevation: 2,
-                        child: state is PlanLoaded
+                        child: state is PlanLoaded &&
+                                context.read<AppBloc>().state.user.info != null
                             ? Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
