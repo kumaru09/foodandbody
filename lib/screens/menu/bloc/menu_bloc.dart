@@ -69,6 +69,7 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
       {required String name,
       required bool isEatNow,
       required double volumn}) async {
+        // print('menu volumn: $volumn');
     await planRepository.addPlanMenu(name, volumn, isEatNow);
   }
 }

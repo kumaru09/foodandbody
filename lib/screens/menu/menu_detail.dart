@@ -27,23 +27,23 @@ class _MenuDetailState extends State<MenuDetail> {
   }
 
   String toRound(double value) {
-    if (value - value.round() == 0.0)
-      return value.round().toString();
+    if (value - value.toInt() == 0.0)
+      return value.toInt().toString();
     else
       return value.toString();
   }
 
-  Widget displayButton(bool isPlanMenu) {
+  Widget displayButton(bool isPlanMenu, double serve, String unit) {
     if (isPlanMenu) {
       return Row(
         children: [
-          _EatNowButton(name: menuName),
+          _EatNowButton(name: menuName, serve: serve, unit: unit),
           SizedBox(width: 16.0),
           _TakePhotoButton(),
         ],
       );
     } else {
-      return _AddToPlanButton(name: menuName);
+      return _AddToPlanButton(name: menuName, serve: serve, unit: unit);
     }
   }
 
@@ -117,7 +117,7 @@ class _MenuDetailState extends State<MenuDetail> {
                 ),
                 Padding(
                   padding: EdgeInsets.all(16.0),
-                  child: displayButton(widget.isPlanMenu),
+                  child: displayButton(widget.isPlanMenu, state.menu.serve, state.menu.unit),
                 ),
               ],
             );
@@ -131,7 +131,9 @@ class _MenuDetailState extends State<MenuDetail> {
 
 class _AddToPlanButton extends StatelessWidget {
   final String name;
-  const _AddToPlanButton({Key? key, required this.name}) : super(key: key);
+  final double serve;
+  final String unit;
+  const _AddToPlanButton({Key? key, required this.name, required this.serve, required this.unit}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -152,7 +154,7 @@ class _AddToPlanButton extends StatelessWidget {
                       httpClient: http.Client(),
                       path: name,
                       planRepository: context.read<PlanRepository>()),
-                  child: MenuDialog(name: name, isEatNow: false));
+                  child: MenuDialog(name: name, serve: serve, unit: unit, isEatNow: false));
             }),
       ),
     );
@@ -161,7 +163,9 @@ class _AddToPlanButton extends StatelessWidget {
 
 class _EatNowButton extends StatelessWidget {
   final String name;
-  const _EatNowButton({Key? key, required this.name}) : super(key: key);
+  final double serve;
+  final String unit;
+  const _EatNowButton({Key? key, required this.name, required this.serve, required this.unit}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -181,7 +185,7 @@ class _EatNowButton extends StatelessWidget {
                       httpClient: http.Client(),
                       path: name,
                       planRepository: context.read<PlanRepository>()),
-                  child: MenuDialog(name: name, isEatNow: true));
+                  child: MenuDialog(name: name, serve: serve, unit: unit, isEatNow: true));
             }),
       ),
     );

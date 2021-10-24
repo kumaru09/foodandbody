@@ -4,9 +4,17 @@ import 'package:foodandbody/screens/main_screen/main_screen.dart';
 import 'package:foodandbody/screens/menu/bloc/menu_bloc.dart';
 
 class MenuDialog extends StatefulWidget {
-  const MenuDialog({Key? key, required this.name, required this.isEatNow}) : super(key: key);
+  const MenuDialog(
+      {Key? key,
+      required this.name,
+      required this.serve,
+      required this.unit,
+      required this.isEatNow})
+      : super(key: key);
 
   final String name;
+  final double serve;
+  final String unit;
   final bool isEatNow;
 
   @override
@@ -14,7 +22,21 @@ class MenuDialog extends StatefulWidget {
 }
 
 class _MenuDialogState extends State<MenuDialog> {
-  double _currentSliderValue = 1;
+  double _currentSliderValue = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentSliderValue = widget.serve;
+  }
+
+  String toRound(double value) {
+    if (value - value.toInt() == 0.0 || value - value.toInt() < 0.01 || value - value.toInt() >= 0.99)
+      return value.toInt().toString();
+    else
+      return value.toStringAsFixed(2);
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<MenuBloc, MenuState>(builder: (context, state) {
@@ -22,11 +44,11 @@ class _MenuDialogState extends State<MenuDialog> {
         title: Row(
           children: <Widget>[
             Expanded(
-              child: Text(widget.isEatNow? 'ปริมาณที่กิน':'ปริมาณที่จะกิน',
+              child: Text(widget.isEatNow ? 'ปริมาณที่กิน' : 'ปริมาณที่จะกิน',
                   style: Theme.of(context).textTheme.subtitle1!.merge(TextStyle(
                       color: Theme.of(context).colorScheme.secondary))),
             ),
-            Text('$_currentSliderValue จาน',
+            Text('${toRound(_currentSliderValue)} ${widget.unit}',
                 style: Theme.of(context).textTheme.subtitle1!.merge(
                     TextStyle(color: Theme.of(context).colorScheme.secondary))),
           ],
@@ -38,10 +60,10 @@ class _MenuDialogState extends State<MenuDialog> {
           child: Slider(
             value: _currentSliderValue,
             min: 0,
-            max: 1,
+            max: widget.serve.toInt() * 5,
             activeColor: Theme.of(context).primaryColor,
             inactiveColor: Color(0xFFE0E0E0),
-            divisions: 10,
+            divisions: widget.unit == 'กรัม' ? widget.serve.toInt() * 5: 20,
             onChanged: (double value) {
               setState(() {
                 _currentSliderValue = value;
@@ -58,7 +80,10 @@ class _MenuDialogState extends State<MenuDialog> {
                 ? null
                 : () => context
                     .read<MenuBloc>()
-                    .addMenu(name: widget.name, isEatNow: widget.isEatNow, volumn: _currentSliderValue)
+                    .addMenu(
+                        name: widget.name,
+                        isEatNow: widget.isEatNow,
+                        volumn: double.parse(toRound(_currentSliderValue)))
                     .then((value) => Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
