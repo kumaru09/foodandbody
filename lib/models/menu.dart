@@ -8,6 +8,7 @@ class Menu {
   final double protein;
   final double carb;
   final double fat;
+  final double volumn;
 
   Menu(
       {this.timestamp,
@@ -16,7 +17,8 @@ class Menu {
       required this.protein,
       required this.carb,
       required this.fat,
-      required this.serve});
+      required this.serve,
+      required this.volumn});
 
   static Menu fromJson(Map<String, Object?> json) {
     return Menu(
@@ -28,7 +30,8 @@ class Menu {
         serve: json['serve'] as double,
         protein: json['protein'] as double,
         carb: json['carb'] as double,
-        fat: json['fat'] as double);
+        fat: json['fat'] as double,
+        volumn: json['volumn'] as double);
   }
 
   Map<String, dynamic> toJson() {
@@ -39,7 +42,8 @@ class Menu {
       "serve": serve,
       "protein": protein,
       "carb": carb,
-      "fat": fat
+      "fat": fat,
+      "volumn": volumn
     };
   }
 }

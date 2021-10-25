@@ -11,22 +11,20 @@ class LinearNutrientTwoProgress extends StatelessWidget {
   LinearNutrientTwoProgress(this._user, this._plan);
   final User _user;
   final History _plan;
-  late List<Menu> _planMenu =
-      _plan.menuList.where((menu) => menu.timestamp == null).toList();
   late double proteinTotal = _plan.totalNutrientList.protein;
-  late double proteinPlan = _planMenu
+  late double proteinPlan = _plan.menuList
       .map((value) => value.protein)
       .fold(0, (previous, current) => previous + current);
   late double proteinGoal = _user.info!.goalNutrient!.protein;
 
   late double carbTotal = _plan.totalNutrientList.carb;
-  late double carbPlan = _planMenu
+  late double carbPlan = _plan.menuList
       .map((value) => value.carb)
       .fold(0, (previous, current) => previous + current);
   late double carbGoal = _user.info!.goalNutrient!.carb;
 
   late double fatTotal = _plan.totalNutrientList.fat;
-  late double fatPlan = _planMenu
+  late double fatPlan = _plan.menuList
       .map((value) => value.fat)
       .fold(0, (previous, current) => previous + current);
   late double fatGoal = _user.info!.goalNutrient!.fat;

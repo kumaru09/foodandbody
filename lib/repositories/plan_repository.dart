@@ -37,21 +37,37 @@ class PlanRepository implements IPlanRepository {
               .where((menuList) =>
                   menuList.name == menu.name && menuList.timestamp == null)
               .first;
-          menuList
-              .where((menuList) =>
-                  menuList.name == menu.name && menuList.timestamp == null)
-              .first
-              .timestamp = Timestamp.now();
-          await updatePlan(menuSelect, volumn, isEat);
+          if (menuSelect.volumn != volumn) {
+            menuList.remove(menuSelect);
+            menuList.add(Menu(
+                name: menu.name,
+                calories: menu.calory
+                    .toDouble()
+                    .toFixStringOneDot(volumn, menu.serve),
+                serve: menu.serve,
+                protein: menu.protein.toFixStringOneDot(volumn, menu.serve),
+                fat: menu.fat.toFixStringOneDot(volumn, menu.serve),
+                carb: menu.carb.toFixStringOneDot(volumn, menu.serve),
+                volumn: volumn,
+                timestamp: Timestamp.now()));
+          } else {
+            menuList
+                .where((menuList) =>
+                    menuList.name == menu.name && menuList.timestamp == null)
+                .first
+                .timestamp = Timestamp.now();
+          }
+          await updatePlan(menu, volumn, isEat);
         } else {
           menuList.add(Menu(
             name: menu.name,
             calories:
                 menu.calory.toDouble().toFixStringOneDot(volumn, menu.serve),
-            serve: volumn,
+            serve: menu.serve,
             protein: menu.protein.toFixStringOneDot(volumn, menu.serve),
             fat: menu.fat.toFixStringOneDot(volumn, menu.serve),
             carb: menu.carb.toFixStringOneDot(volumn, menu.serve),
+            volumn: volumn,
           ));
         }
         List<Map> menuListMap = menuList.map((e) => e.toJson()).toList();
@@ -81,7 +97,8 @@ class PlanRepository implements IPlanRepository {
     }
   }
 
-  Future<void> updatePlan(Menu menuDetail, double volumn, bool isEat) async {
+  Future<void> updatePlan(
+      MenuShow menuDetail, double volumn, bool isEat) async {
     final CollectionReference foodHistories = FirebaseFirestore.instance
         .collection('users')
         .doc(FirebaseAuth.instance.currentUser?.uid)
@@ -94,12 +111,19 @@ class PlanRepository implements IPlanRepository {
     if (plan.docs.isNotEmpty) {
       if (isEat) {
         await plan.docs.first.reference.update({
-          'totalCal': data.totalCal + menuDetail.calories,
+          'totalCal': data.totalCal +
+              menuDetail.calory
+                  .toDouble()
+                  .toFixStringOneDot(volumn, menuDetail.serve),
           'totalNutrient': data.totalNutrientList
               .copyWith(
-                protein: data.totalNutrientList.protein + menuDetail.protein,
-                fat: data.totalNutrientList.fat + menuDetail.fat,
-                carb: data.totalNutrientList.carb + menuDetail.carb,
+                protein: data.totalNutrientList.protein +
+                    menuDetail.protein
+                        .toFixStringOneDot(volumn, menuDetail.serve),
+                fat: data.totalNutrientList.fat +
+                    menuDetail.fat.toFixStringOneDot(volumn, menuDetail.serve),
+                carb: data.totalNutrientList.carb +
+                    menuDetail.carb.toFixStringOneDot(volumn, menuDetail.serve),
               )
               .toJson(),
         });
