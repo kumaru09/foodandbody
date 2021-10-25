@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:foodandbody/models/history.dart';
+import 'package:foodandbody/models/menu.dart';
 import 'package:foodandbody/models/user.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
@@ -10,21 +11,28 @@ class LinearNutrientTwoProgress extends StatelessWidget {
   LinearNutrientTwoProgress(this._user, this._plan);
   final User _user;
   final History _plan;
+  late List<Menu> _planMenu =
+      _plan.menuList.where((menu) => menu.timestamp == null).toList();
   late double proteinTotal = _plan.totalNutrientList.protein;
-  late double proteinPlan = _plan.planNutrientList.protein;
+  late double proteinPlan = _planMenu
+      .map((value) => value.protein)
+      .fold(0, (previous, current) => previous + current);
   late double proteinGoal = _user.info!.goalNutrient!.protein;
 
   late double carbTotal = _plan.totalNutrientList.carb;
-  late double carbPlan = _plan.planNutrientList.carb;
+  late double carbPlan = _planMenu
+      .map((value) => value.carb)
+      .fold(0, (previous, current) => previous + current);
   late double carbGoal = _user.info!.goalNutrient!.carb;
 
   late double fatTotal = _plan.totalNutrientList.fat;
-  late double fatPlan = _plan.planNutrientList.fat;
+  late double fatPlan = _planMenu
+      .map((value) => value.fat)
+      .fold(0, (previous, current) => previous + current);
   late double fatGoal = _user.info!.goalNutrient!.fat;
 
   @override
   Widget build(BuildContext context) {
-    log('render linear nutrient: ${_plan.planNutrientList.toJson()}');
     return Container(
         key: const Key("nutrient_info"),
         height: 86,
