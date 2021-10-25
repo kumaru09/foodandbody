@@ -6,7 +6,7 @@ abstract class IPlanRepository {
 
   Future<void> getPlanById();
 
-  Future<void> updatePlan(Menu menuDetail, double volumn, bool isEat);
+  Future<void> updatePlan(MenuShow menuDetail, double volumn, bool isEat);
 
   Future<void> deletePlan(String name);
 }
