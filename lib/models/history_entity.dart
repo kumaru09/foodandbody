@@ -9,10 +9,9 @@ class HistoryEntity extends Equatable {
   final int totalWater;
   final double totalCal;
   final Nutrient totalNutrientList;
-  final Nutrient planNutrientList;
 
   const HistoryEntity(this.date, this.menuList, this.totalCal, this.totalWater,
-      this.totalNutrientList, this.planNutrientList);
+      this.totalNutrientList);
 
   HistoryEntity fromJson(Map<dynamic, dynamic> json) {
     return HistoryEntity(
@@ -20,8 +19,7 @@ class HistoryEntity extends Equatable {
         List.from(json['menuList']),
         json['totalCal'] as double,
         json['totalWater'] as int,
-        Nutrient.fromJson(json['totalNutrient']),
-        Nutrient.fromJson(json['planNutrient']));
+        Nutrient.fromJson(json['totalNutrient']));
   }
 
   Map<String, Object?> toJson() {
@@ -31,7 +29,6 @@ class HistoryEntity extends Equatable {
       'totalCal': totalCal,
       'totalWater': totalWater,
       'totalNutrient': totalNutrientList.toJson(),
-      'planNutrient': planNutrientList.toJson()
     };
   }
 
@@ -45,7 +42,7 @@ class HistoryEntity extends Equatable {
 
   @override
   String toString() {
-    return 'HistoryEntity {data: $date, totalCal: $totalCal, totalWater: $totalWater, totalNutrient: $totalNutrientList, menuList: $menuList, planNutrient: ${planNutrientList.toString()}}';
+    return 'HistoryEntity {data: $date, totalCal: $totalCal, totalWater: $totalWater, totalNutrient: $totalNutrientList, menuList: $menuList}';
   }
 
   @override
@@ -55,7 +52,6 @@ class HistoryEntity extends Equatable {
         totalCal,
         totalWater,
         totalNutrientList,
-        planNutrientList
       ];
 
   static HistoryEntity fromSnapshot(DocumentSnapshot snap) {
@@ -64,7 +60,6 @@ class HistoryEntity extends Equatable {
         snap['menuList'].map<Menu>((menu) => Menu.fromJson(menu)).toList(),
         snap['totalCal'],
         snap['totalWater'],
-        Nutrient.fromJson(snap['totalNutrient']),
-        Nutrient.fromJson(snap['planNutrient']));
+        Nutrient.fromJson(snap['totalNutrient']));
   }
 }

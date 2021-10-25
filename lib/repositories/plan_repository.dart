@@ -33,20 +33,29 @@ class PlanRepository implements IPlanRepository {
             .map<Menu>((menu) => Menu.fromJson(menu))
             .toList();
         if (isEat) {
+          final menuSelect = menuList
+              .where((menuList) =>
+                  menuList.name == menu.name && menuList.timestamp == null)
+              .first;
           menuList
               .where((menuList) =>
                   menuList.name == menu.name && menuList.timestamp == null)
               .first
               .timestamp = Timestamp.now();
+          await updatePlan(menuSelect, volumn, isEat);
         } else {
           menuList.add(Menu(
-              name: menu.name,
-              calories:
-                  double.parse((menu.calory * volumn).toStringAsFixed(1))));
+            name: menu.name,
+            calories:
+                menu.calory.toDouble().toFixStringOneDot(volumn, menu.serve),
+            serve: volumn,
+            protein: menu.protein.toFixStringOneDot(volumn, menu.serve),
+            fat: menu.fat.toFixStringOneDot(volumn, menu.serve),
+            carb: menu.carb.toFixStringOneDot(volumn, menu.serve),
+          ));
         }
         List<Map> menuListMap = menuList.map((e) => e.toJson()).toList();
         await plan.docs.first.reference.update({'menuList': menuListMap});
-        await updatePlan(menu, volumn, isEat);
       }
     } else {
       throw Exception('error fetching menu');
@@ -72,8 +81,7 @@ class PlanRepository implements IPlanRepository {
     }
   }
 
-  Future<void> updatePlan(
-      MenuShow menuDetail, double volumn, bool isEat) async {
+  Future<void> updatePlan(Menu menuDetail, double volumn, bool isEat) async {
     final CollectionReference foodHistories = FirebaseFirestore.instance
         .collection('users')
         .doc(FirebaseAuth.instance.currentUser?.uid)
@@ -86,35 +94,14 @@ class PlanRepository implements IPlanRepository {
     if (plan.docs.isNotEmpty) {
       if (isEat) {
         await plan.docs.first.reference.update({
-          'totalCal': data.totalCal +
-              double.parse((menuDetail.calory * volumn).toStringAsFixed(1)),
+          'totalCal': data.totalCal + menuDetail.calories,
           'totalNutrient': data.totalNutrientList
               .copyWith(
-                  protein: data.totalNutrientList.protein +
-                      double.parse(
-                          (menuDetail.protein * volumn).toStringAsFixed(1)),
-                  fat: data.totalNutrientList.fat +
-                      double.parse(
-                          (menuDetail.fat * volumn).toStringAsFixed(1)),
-                  carb: data.totalNutrientList.carb +
-                      double.parse(
-                          (menuDetail.carb * volumn).toStringAsFixed(1)))
+                protein: data.totalNutrientList.protein + menuDetail.protein,
+                fat: data.totalNutrientList.fat + menuDetail.fat,
+                carb: data.totalNutrientList.carb + menuDetail.carb,
+              )
               .toJson(),
-        });
-      } else {
-        await plan.docs.first.reference.update({
-          'planNutrient': data.planNutrientList
-              .copyWith(
-                  protein: data.planNutrientList.protein +
-                      double.parse(
-                          (menuDetail.protein * volumn).toStringAsFixed(1)),
-                  fat: data.planNutrientList.fat +
-                      double.parse(
-                          (menuDetail.fat * volumn).toStringAsFixed(1)),
-                  carb: data.planNutrientList.carb +
-                      double.parse(
-                          (menuDetail.carb * volumn).toStringAsFixed(1)))
-              .toJson()
         });
       }
       print('added menu in plan');
@@ -134,27 +121,16 @@ class PlanRepository implements IPlanRepository {
           .get('menuList')
           .map<Menu>((menu) => Menu.fromJson(menu))
           .toList();
-      menuList
-          .removeWhere((menu) => menu.name == name && menu.timestamp == null);
+      menuList.remove(menuList
+          .where((menu) => menu.name == name && menu.timestamp == null)
+          .first);
       List<Map> menuListMap = menuList.map((e) => e.toJson()).toList();
       await plan.docs.first.reference.update({'menuList': menuListMap});
-      final res = await http.get(Uri.parse(
-          "https://foodandbody-api.azurewebsites.net/api/Menu/$name"));
-      if (res.statusCode == 200) {
-        final menuDetail = MenuShow.fromJson(json.decode(res.body));
-        final data =
-            History.fromEntity(HistoryEntity.fromSnapshot(plan.docs.first));
-        await plan.docs.first.reference.update({
-          'planNutrient': data.planNutrientList
-              .copyWith(
-                  protein: data.planNutrientList.protein - menuDetail.protein,
-                  fat: data.planNutrientList.fat - menuDetail.fat,
-                  carb: data.planNutrientList.carb - menuDetail.carb)
-              .toJson()
-        });
-      } else {
-        throw Exception('error deleting menu');
-      }
     }
   }
+}
+
+extension on double {
+  double toFixStringOneDot(double volumn, double serve) =>
+      (double.parse(((this * volumn) / serve).toStringAsFixed(1)));
 }
