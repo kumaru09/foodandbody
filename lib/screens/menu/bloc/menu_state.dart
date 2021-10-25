@@ -5,15 +5,15 @@ enum MenuStatus { initial, success, failure }
 class MenuState extends Equatable {
   const MenuState({
     this.status = MenuStatus.initial,
-    this.menu = const MenuDetail(),
+    this.menu = const MenuShow(),
   });
 
   final MenuStatus status;
-  final MenuDetail menu;
+  final MenuShow menu;
 
   MenuState copyWith({
     MenuStatus? status,
-    MenuDetail? menu,
+    MenuShow? menu,
   }) {
     return MenuState(
       status: status ?? this.status,
