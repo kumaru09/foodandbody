@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodandbody/repositories/favor_repository.dart';
 import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:foodandbody/screens/menu/bloc/menu_bloc.dart';
 import 'package:foodandbody/screens/menu/menu_detail.dart';
 import 'package:http/http.dart' as http;
 
 class MenuPage extends StatelessWidget {
-  const MenuPage({Key? key, required this.menuName, required this.isPlanMenu}) : super(key: key);
+  const MenuPage({Key? key, required this.menuName, required this.isPlanMenu})
+      : super(key: key);
   final String menuName;
   final bool isPlanMenu;
 
@@ -31,9 +33,12 @@ class MenuPage extends StatelessWidget {
       ),
       body: SafeArea(
         child: BlocProvider(
-          create: (_) =>
-              MenuBloc(httpClient: http.Client(), path: this.menuName, planRepository: context.read<PlanRepository>())
-                ..add(MenuFetched()),
+          create: (_) => MenuBloc(
+              httpClient: http.Client(),
+              path: this.menuName,
+              planRepository: context.read<PlanRepository>(),
+              favoriteRepository: context.read<FavoriteRepository>())
+            ..add(MenuFetched()),
           child: MenuDetail(isPlanMenu: this.isPlanMenu),
         ),
       ),

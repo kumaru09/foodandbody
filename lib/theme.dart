@@ -31,17 +31,17 @@ const ColorScheme _appColorScheme = ColorScheme(
 
 //text theme
 const TextTheme textTheme = TextTheme(
-  headline3: TextStyle(fontSize: 53, fontWeight: FontWeight.w300),
-  headline4: TextStyle(fontSize: 38, fontWeight: FontWeight.w300),
-  headline5: TextStyle(fontSize: 27, fontWeight: FontWeight.w300),
-  headline6: TextStyle(fontSize: 22, fontWeight: FontWeight.w400),
-  subtitle1: TextStyle(fontSize: 18, fontWeight: FontWeight.w300),
-  subtitle2: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
-  bodyText1: TextStyle(fontSize: 18, fontWeight: FontWeight.w300),
-  bodyText2: TextStyle(fontSize: 15, fontWeight: FontWeight.w300),
-  button: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
-  caption: TextStyle(fontSize: 13, fontWeight: FontWeight.w300),
-  overline: TextStyle(fontSize: 11, fontWeight: FontWeight.w300),
+  headline3: TextStyle(fontSize: 53, fontWeight: FontWeight.w400),
+  headline4: TextStyle(fontSize: 38, fontWeight: FontWeight.w400, letterSpacing: 0.25),
+  headline5: TextStyle(fontSize: 27, fontWeight: FontWeight.w400),
+  headline6: TextStyle(fontSize: 22, fontWeight: FontWeight.w500, letterSpacing: 0.15),
+  subtitle1: TextStyle(fontSize: 18, fontWeight: FontWeight.w400, letterSpacing: 0.15),
+  subtitle2: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, letterSpacing: 0.1),
+  bodyText1: TextStyle(fontSize: 18, fontWeight: FontWeight.w400, letterSpacing: 0.5),
+  bodyText2: TextStyle(fontSize: 15, fontWeight: FontWeight.w400, letterSpacing: 0.25),
+  button: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, letterSpacing: 1.25),
+  caption: TextStyle(fontSize: 13, fontWeight: FontWeight.w400, letterSpacing: 0.4),
+  overline: TextStyle(fontSize: 11, fontWeight: FontWeight.w400, letterSpacing: 1.5),
 );
 
 class AppTheme {
