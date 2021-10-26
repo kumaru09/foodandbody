@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/models/user.dart';
+import 'package:foodandbody/screens/edit_profile/edit_profile.dart';
 
 class Setting extends StatelessWidget {
   const Setting({Key? key}) : super(key: key);
@@ -121,7 +122,10 @@ class Setting extends StatelessWidget {
                         alignment: Alignment.topLeft,
                         child: TextButton(
                           onPressed: () {
-                            print("edit profile");
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => EditProfile()));
                           },
                           style: TextButton.styleFrom(
                               minimumSize: Size.zero,
