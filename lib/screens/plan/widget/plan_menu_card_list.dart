@@ -43,7 +43,7 @@ class _PlanMenuCardListState extends State<PlanMenuCardList> {
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          MenuPage(menuName: item.name, isPlanMenu: true)));
+                          MenuPage.plan(menu: item)));
             },
             child: Card(
               color: Colors.white,

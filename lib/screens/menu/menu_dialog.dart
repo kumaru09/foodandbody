@@ -9,13 +9,16 @@ class MenuDialog extends StatefulWidget {
       required this.name,
       required this.serve,
       required this.unit,
-      required this.isEatNow})
-      : super(key: key);
+      required this.isEatNow,
+      double? volumn})
+      : this.volumn = volumn ?? 0.0,
+      super(key: key);
 
   final String name;
   final double serve;
   final String unit;
   final bool isEatNow;
+  final double volumn;
 
   @override
   _MenuDialogState createState() => _MenuDialogState();
@@ -27,7 +30,7 @@ class _MenuDialogState extends State<MenuDialog> {
   @override
   void initState() {
     super.initState();
-    _currentSliderValue = widget.serve;
+    _currentSliderValue = widget.isEatNow? widget.volumn : widget.serve;
   }
 
   String toRound(double value) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodandbody/models/menu.dart';
 import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:foodandbody/screens/camera/camera.dart';
 import 'package:foodandbody/screens/menu/menu_dialog.dart';
@@ -8,16 +9,26 @@ import 'package:foodandbody/widget/nutrient_detail.dart';
 import 'package:http/http.dart' as http;
 
 class MenuDetail extends StatefulWidget {
-  const MenuDetail({Key? key, required this.isPlanMenu}) : super(key: key);
+  MenuDetail({Key? key, required this.isPlanMenu, Menu? item})
+      : this.menu = item ??
+            Menu(
+                name: '',
+                calories: 0,
+                carb: 0,
+                fat: 0,
+                protein: 0,
+                serve: 0,
+                volumn: 0),
+        super(key: key);
 
   final bool isPlanMenu;
+  final Menu menu;
 
   @override
   _MenuDetailState createState() => _MenuDetailState();
 }
 
 class _MenuDetailState extends State<MenuDetail> {
-
   @override
   void initState() {
     super.initState();
@@ -31,11 +42,11 @@ class _MenuDetailState extends State<MenuDetail> {
       return value.toString();
   }
 
-  Widget displayButton(bool isPlanMenu, String name, double serve, String unit) {
-    if (isPlanMenu) {
+  Widget displayButton(String name, double serve, String unit) {
+    if (widget.isPlanMenu) {
       return Row(
         children: [
-          _EatNowButton(name: name, serve: serve, unit: unit),
+          _EatNowButton(name: name, volumn: widget.menu.volumn, serve: serve, unit: unit),
           SizedBox(width: 16.0),
           _TakePhotoButton(),
         ],
@@ -80,7 +91,10 @@ class _MenuDetailState extends State<MenuDetail> {
                                                   .colorScheme
                                                   .secondary))),
                                 ),
-                                Text('${state.menu.calory} แคล',
+                                Text(
+                                    widget.isPlanMenu
+                                        ? '${widget.menu.calories.round()} แคล'
+                                        : '${state.menu.calory.round()} แคล',
                                     style: Theme.of(context)
                                         .textTheme
                                         .headline5!
@@ -94,19 +108,22 @@ class _MenuDetailState extends State<MenuDetail> {
                             NutrientDetail(
                                 label: 'หน่วยบริโภค',
                                 value:
-                                    '${toRound(state.menu.serve)} ${state.menu.unit}'),
+                                    '${widget.isPlanMenu ? toRound(widget.menu.volumn) : toRound(state.menu.serve)} ${state.menu.unit}'),
                             SizedBox(height: 7.0),
                             NutrientDetail(
                                 label: 'โปรตีน',
-                                value: '${toRound(state.menu.protein)} กรัม'),
+                                value:
+                                    '${widget.isPlanMenu ? toRound(widget.menu.protein) : toRound(state.menu.protein)} กรัม'),
                             SizedBox(height: 7.0),
                             NutrientDetail(
                                 label: 'คาร์โบไฮเดรต',
-                                value: '${toRound(state.menu.carb)} กรัม'),
+                                value:
+                                    '${widget.isPlanMenu ? toRound(widget.menu.carb) : toRound(state.menu.carb)} กรัม'),
                             SizedBox(height: 7.0),
                             NutrientDetail(
                                 label: 'ไขมัน',
-                                value: '${toRound(state.menu.fat)} กรัม'),
+                                value:
+                                    '${widget.isPlanMenu ? toRound(widget.menu.fat) : toRound(state.menu.fat)} กรัม'),
                           ],
                         ),
                       ),
@@ -115,7 +132,10 @@ class _MenuDetailState extends State<MenuDetail> {
                 ),
                 Padding(
                   padding: EdgeInsets.all(16.0),
-                  child: displayButton(widget.isPlanMenu, state.menu.name, state.menu.serve, state.menu.unit),
+                  child: displayButton(
+                      state.menu.name,
+                      state.menu.serve,
+                      state.menu.unit),
                 ),
               ],
             );
@@ -131,7 +151,9 @@ class _AddToPlanButton extends StatelessWidget {
   final String name;
   final double serve;
   final String unit;
-  const _AddToPlanButton({Key? key, required this.name, required this.serve, required this.unit}) : super(key: key);
+  const _AddToPlanButton(
+      {Key? key, required this.name, required this.serve, required this.unit})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -152,7 +174,8 @@ class _AddToPlanButton extends StatelessWidget {
                       httpClient: http.Client(),
                       path: name,
                       planRepository: context.read<PlanRepository>()),
-                  child: MenuDialog(name: name, serve: serve, unit: unit, isEatNow: false));
+                  child: MenuDialog(
+                      name: name, serve: serve, unit: unit, isEatNow: false));
             }),
       ),
     );
@@ -162,8 +185,11 @@ class _AddToPlanButton extends StatelessWidget {
 class _EatNowButton extends StatelessWidget {
   final String name;
   final double serve;
+  final double volumn;
   final String unit;
-  const _EatNowButton({Key? key, required this.name, required this.serve, required this.unit}) : super(key: key);
+  const _EatNowButton(
+      {Key? key, required this.name, required this.serve, required this.volumn, required this.unit})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -183,7 +209,8 @@ class _EatNowButton extends StatelessWidget {
                       httpClient: http.Client(),
                       path: name,
                       planRepository: context.read<PlanRepository>()),
-                  child: MenuDialog(name: name, serve: serve, unit: unit, isEatNow: true));
+                  child: MenuDialog(
+                      name: name, serve: serve, unit: unit, isEatNow: true, volumn: volumn));
             }),
       ),
     );
@@ -196,8 +223,8 @@ class _TakePhotoButton extends StatelessWidget {
     return Expanded(
       child: ElevatedButton(
         key: const Key('menu_takePhoto_button'),
-        onPressed: () =>
-          Navigator.push(context, MaterialPageRoute(builder: (context) => Camera())),
+        onPressed: () => Navigator.push(
+            context, MaterialPageRoute(builder: (context) => Camera())),
         child: Text('ถ่ายรูป'),
         style: ElevatedButton.styleFrom(
           primary: Theme.of(context).primaryColor,
