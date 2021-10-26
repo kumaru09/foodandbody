@@ -5,6 +5,7 @@ import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:foodandbody/models/menu_show.dart';
+import 'package:foodandbody/repositories/favor_repository.dart';
 import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:http/http.dart' as http;
 import 'package:stream_transform/stream_transform.dart';
@@ -21,11 +22,12 @@ EventTransformer<E> throttleDroppable<E>(Duration duration) {
 }
 
 class MenuBloc extends Bloc<MenuEvent, MenuState> {
-  MenuBloc({
-    required this.httpClient,
-    required this.path,
-    required this.planRepository,
-  }) : super(const MenuState()) {
+  MenuBloc(
+      {required this.httpClient,
+      required this.path,
+      required this.planRepository,
+      required this.favoriteRepository})
+      : super(const MenuState()) {
     on<MenuFetched>(
       _onMenuFetched,
       transformer: throttleDroppable(throttleDuration),
@@ -35,6 +37,7 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
   final http.Client httpClient;
   final String path;
   final PlanRepository planRepository;
+  final FavoriteRepository favoriteRepository;
 
   Future<void> _onMenuFetched(
     MenuFetched event,
@@ -69,6 +72,14 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
       {required String name,
       required bool isEatNow,
       required double volumn}) async {
-    await planRepository.addPlanMenu(name, volumn, isEatNow);
+    try {
+      await planRepository.addPlanMenu(name, volumn, isEatNow);
+      if (isEatNow) {
+        await favoriteRepository.addFavMenuById(name);
+        await favoriteRepository.addFavMenuAll(name);
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
   }
 }
