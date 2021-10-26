@@ -31,6 +31,7 @@ class LinearNutrientTwoProgress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    log('$proteinPlan, $carbPlan, $fatPlan');
     return Container(
         key: const Key("nutrient_info"),
         height: 86,
@@ -121,7 +122,7 @@ class _LinearIndicator extends StatelessWidget {
               animation: true,
               animationDuration: 750,
               lineHeight: 6,
-              percent: planPercent,
+              percent: planPercent >= 1 ? 1.0 : planPercent,
               linearStrokeCap: LinearStrokeCap.roundAll,
               progressColor: planProgressColor,
               backgroundColor: backgroundColor,
