@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/models/menu.dart';
+import 'package:foodandbody/repositories/favor_repository.dart';
 import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:foodandbody/screens/camera/camera.dart';
 import 'package:foodandbody/screens/menu/menu_dialog.dart';
@@ -173,7 +174,8 @@ class _AddToPlanButton extends StatelessWidget {
                   create: (_) => MenuBloc(
                       httpClient: http.Client(),
                       path: name,
-                      planRepository: context.read<PlanRepository>()),
+                      planRepository: context.read<PlanRepository>(),
+                      favoriteRepository: context.read<FavoriteRepository>()),
                   child: MenuDialog(
                       name: name, serve: serve, unit: unit, isEatNow: false));
             }),
@@ -208,7 +210,8 @@ class _EatNowButton extends StatelessWidget {
                   create: (_) => MenuBloc(
                       httpClient: http.Client(),
                       path: name,
-                      planRepository: context.read<PlanRepository>()),
+                      planRepository: context.read<PlanRepository>(),
+                      favoriteRepository: context.read<FavoriteRepository>()),
                   child: MenuDialog(
                       name: name, serve: serve, unit: unit, isEatNow: true, volumn: volumn));
             }),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/models/menu.dart';
+import 'package:foodandbody/repositories/favor_repository.dart';
 import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:foodandbody/screens/menu/bloc/menu_bloc.dart';
 import 'package:foodandbody/screens/menu/menu_detail.dart';
@@ -43,9 +44,12 @@ class MenuPage extends StatelessWidget {
       ),
       body: SafeArea(
         child: BlocProvider(
-          create: (_) =>
-              MenuBloc(httpClient: http.Client(), path: this.menuName, planRepository: context.read<PlanRepository>())
-                ..add(MenuFetched()),
+          create: (_) => MenuBloc(
+              httpClient: http.Client(),
+              path: this.menuName,
+              planRepository: context.read<PlanRepository>(),
+              favoriteRepository: context.read<FavoriteRepository>())
+            ..add(MenuFetched()),
           child: this.isPlanMenu? MenuDetail(isPlanMenu: this.isPlanMenu, item: this.menu) : MenuDetail(isPlanMenu: this.isPlanMenu),
         ),
       ),
