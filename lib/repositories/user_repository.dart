@@ -14,13 +14,17 @@ class UserRepository implements IUserRepository {
       cloud_firestore.FirebaseFirestore.instance.collection('users');
 
   @override
-  Future<void> addUserInfo(String uid, Info info) {
+  Future<void> addUserInfo(String uid, Info info) async {
     final infoE = info.copyWith(
         goalNutrient: Nutrient(
             protein: (info.goal! * 0.30) / 4,
             carb: (info.goal! * 0.35) / 4,
             fat: (info.goal! * 0.35) / 9));
-    return users.doc(uid).set(infoE.toEntity().toDocument());
+    await users
+        .doc(uid)
+        .collection('weight')
+        .add({'weight': info.weight, "date": cloud_firestore.Timestamp.now()});
+    return await users.doc(uid).set(infoE.toEntity().toDocument());
   }
 
   @override

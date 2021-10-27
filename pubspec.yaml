@@ -40,7 +40,6 @@ dependencies:
   fl_chart: ^0.40.2
   http: ^0.13.3
   bloc_concurrency: ^0.1.0
-  search_page: ^2.0.0+1
   network_image_mock: ^2.0.1
   intl: ^0.17.0
 
