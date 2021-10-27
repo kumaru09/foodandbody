@@ -10,16 +10,25 @@ extension BodyStatusX on BodyStatus {
 }
 
 class BodyState extends Equatable {
-  BodyState({this.status = BodyStatus.initial, Body? body})
-      : body = body ?? Body.empty;
+  BodyState(
+      {this.status = BodyStatus.initial,
+      Body? body,
+      List<WeightList>? weightList})
+      : body = body ?? Body.empty,
+        weightList = weightList ?? List.empty();
 
   final BodyStatus status;
   final Body body;
+  final List<WeightList> weightList;
 
-  BodyState copyWith({BodyStatus? status, Body? body}) {
-    return BodyState(body: body ?? this.body, status: status ?? this.status);
+  BodyState copyWith(
+      {BodyStatus? status, Body? body, List<WeightList>? weightList}) {
+    return BodyState(
+        body: body ?? this.body,
+        status: status ?? this.status,
+        weightList: weightList);
   }
 
   @override
-  List<Object> get props => [status, body];
+  List<Object> get props => [status, body, weightList];
 }

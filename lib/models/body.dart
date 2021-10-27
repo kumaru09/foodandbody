@@ -4,7 +4,6 @@ import 'package:foodandbody/models/body_entity.dart';
 
 class Body extends Equatable {
   final Timestamp date;
-  final List<int> weight;
   final int shoulder;
   final int chest;
   final int waist;
@@ -12,40 +11,27 @@ class Body extends Equatable {
 
   const Body(
       {required this.date,
-      required this.weight,
       required this.shoulder,
       required this.chest,
       required this.waist,
       required this.hip});
 
   Body copyWith(
-      {Timestamp? date,
-      List<int>? weight,
-      int? shoulder,
-      int? chest,
-      int? waist,
-      int? hip}) {
+      {Timestamp? date, int? shoulder, int? chest, int? waist, int? hip}) {
     return Body(
         date: date ?? this.date,
-        weight: weight ?? this.weight,
         waist: waist ?? this.waist,
         shoulder: shoulder ?? this.shoulder,
         chest: chest ?? this.chest,
         hip: hip ?? this.hip);
   }
 
-  static final empty = Body(
-      date: Timestamp.now(),
-      weight: List.empty(),
-      waist: 0,
-      shoulder: 0,
-      chest: 0,
-      hip: 0);
+  static final empty =
+      Body(date: Timestamp.now(), waist: 0, shoulder: 0, chest: 0, hip: 0);
 
   @override
   int get hashCode =>
       date.hashCode ^
-      weight.hashCode ^
       shoulder.hashCode ^
       waist.hashCode ^
       chest.hashCode ^
@@ -57,7 +43,6 @@ class Body extends Equatable {
       other is Body &&
           runtimeType == other.runtimeType &&
           date == other.date &&
-          weight == other.weight &&
           waist == other.waist &&
           shoulder == other.shoulder &&
           chest == other.chest &&
@@ -69,13 +54,12 @@ class Body extends Equatable {
   }
 
   BodyEntity toEntity() {
-    return BodyEntity(date, weight, shoulder, chest, waist, hip);
+    return BodyEntity(date, shoulder, chest, waist, hip);
   }
 
   static Body fromEmtity(BodyEntity entity) {
     return Body(
         date: entity.date,
-        weight: entity.weight,
         waist: entity.waist,
         shoulder: entity.shoulder,
         chest: entity.chest,
@@ -83,5 +67,5 @@ class Body extends Equatable {
   }
 
   @override
-  List<Object?> get props => [date, weight, waist, shoulder, chest, hip];
+  List<Object?> get props => [date, waist, shoulder, chest, hip];
 }

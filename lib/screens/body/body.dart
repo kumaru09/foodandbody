@@ -42,7 +42,7 @@ class Body extends StatelessWidget {
                             width: MediaQuery.of(context).size.width,
                             child: WeightAndHeightInfo(
                                 context.read<AppBloc>().state.user,
-                                state.body)),
+                                state.weightList)),
                         Container(
                           padding: EdgeInsets.only(left: 16, top: 16),
                           width: MediaQuery.of(context).size.width,

@@ -3,13 +3,14 @@ import 'package:fl_chart/fl_chart.dart';
 import 'dart:math';
 
 import 'package:foodandbody/models/body.dart';
+import 'package:foodandbody/models/weight_list.dart';
 
 class WeightGraph extends StatelessWidget {
-  WeightGraph(this.body);
+  WeightGraph(this.weightList);
 
-  final Body body;
+  final List<WeightList> weightList;
   static const int NUMBER_OF_DATE = 10;
-  late List<int> weight = body.weight;
+  late List<int> weight = weightList.map((e) => e.weight).toList();
   // [];
   // [50, 51, 52, 49, 50, 49, 48];
   // [50, 51, 52, 49, 50, 52, 51, 50, 50, 48];
