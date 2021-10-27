@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:foodandbody/app/routes.dart';
 import 'package:foodandbody/repositories/authen_repository.dart';
+import 'package:foodandbody/repositories/body_repository.dart';
 import 'package:foodandbody/repositories/favor_repository.dart';
 import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:foodandbody/repositories/user_repository.dart';
@@ -31,6 +32,8 @@ class App extends StatelessWidget {
             create: (context) => UserRepository()),
         RepositoryProvider<PlanRepository>(
             create: (context) => PlanRepository()),
+        RepositoryProvider<BodyRepository>(
+            create: (context) => BodyRepository()),
         RepositoryProvider<FavoriteRepository>(
             create: (context) => FavoriteRepository())
       ],
