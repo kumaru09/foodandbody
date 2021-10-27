@@ -9,12 +9,10 @@ class History {
   final int totalWater;
   final double totalCal;
   final Nutrient totalNutrientList;
-  final Nutrient planNutrientList;
 
   History(this.date,
       {this.totalCal = 0,
       this.totalNutrientList = const Nutrient(),
-      this.planNutrientList = const Nutrient(),
       this.totalWater = 0,
       List<Menu>? menuList})
       : this.menuList = menuList ?? [];
@@ -30,8 +28,7 @@ class History {
         menuList: menuList ?? this.menuList,
         totalCal: totalCal ?? this.totalCal,
         totalNutrientList: totalNutrientList ?? this.totalNutrientList,
-        totalWater: totalWater ?? this.totalWater,
-        planNutrientList: planNutrientList ?? this.planNutrientList);
+        totalWater: totalWater ?? this.totalWater);
   }
 
   @override
@@ -40,8 +37,7 @@ class History {
       menuList.hashCode ^
       totalCal.hashCode ^
       totalNutrientList.hashCode ^
-      totalWater.hashCode ^
-      planNutrientList.hashCode;
+      totalWater.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -51,17 +47,16 @@ class History {
           date == other.date &&
           totalCal == other.totalCal &&
           totalNutrientList == other.totalNutrientList &&
-          totalWater == other.totalWater &&
-          planNutrientList == other.planNutrientList;
+          totalWater == other.totalWater;
 
   @override
   String toString() {
-    return 'History {data: $date, totalCal: $totalCal, totalWater: $totalWater, totalNutrient: $totalNutrientList, menuList: $menuList, planNutrient: ${planNutrientList.toString()}}';
+    return 'History {data: $date, totalCal: $totalCal, totalWater: $totalWater, totalNutrient: $totalNutrientList, menuList: $menuList}';
   }
 
   HistoryEntity toEntity() {
-    return HistoryEntity(date, menuList, totalCal, totalWater,
-        totalNutrientList, planNutrientList);
+    return HistoryEntity(
+        date, menuList, totalCal, totalWater, totalNutrientList);
   }
 
   static History fromEntity(HistoryEntity entity) {
@@ -69,7 +64,6 @@ class History {
         menuList: entity.menuList,
         totalCal: entity.totalCal,
         totalNutrientList: entity.totalNutrientList,
-        totalWater: entity.totalWater,
-        planNutrientList: entity.planNutrientList);
+        totalWater: entity.totalWater);
   }
 }
