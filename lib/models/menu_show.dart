@@ -1,4 +1,6 @@
-class MenuShow {
+import 'package:equatable/equatable.dart';
+
+class MenuShow extends Equatable{
   const MenuShow(
       {this.name = '',
       this.calory = 0,
@@ -35,4 +37,7 @@ class MenuShow {
    String toString() {
     return 'MenuShow { name: $name,\n calory: $calory,\n protein: $protein,\n carb: $carb,\n fat: $fat,\n serve: $serve,\n unit: $unit,\n imageUrl: $imageUrl}';
   }
+
+  @override
+  List<Object?> get props => [name, calory, protein, carb, fat, serve, unit, imageUrl];
 }

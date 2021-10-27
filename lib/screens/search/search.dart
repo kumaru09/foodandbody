@@ -178,8 +178,7 @@ class _SearchResultItem extends StatelessWidget {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => MenuPage(
-                        menuName: '${item.name}', isPlanMenu: false)));
+                    builder: (context) => MenuPage.menu(menuName: item.name)));
           },
         ),
         const Divider(

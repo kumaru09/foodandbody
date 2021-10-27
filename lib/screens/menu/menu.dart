@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodandbody/models/menu.dart';
 import 'package:foodandbody/repositories/favor_repository.dart';
 import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:foodandbody/screens/menu/bloc/menu_bloc.dart';
@@ -7,10 +8,20 @@ import 'package:foodandbody/screens/menu/menu_detail.dart';
 import 'package:http/http.dart' as http;
 
 class MenuPage extends StatelessWidget {
-  const MenuPage({Key? key, required this.menuName, required this.isPlanMenu})
-      : super(key: key);
-  final String menuName;
-  final bool isPlanMenu;
+  late String menuName;
+  late bool isPlanMenu;
+  late Menu menu;
+
+  MenuPage.menu({required String menuName}) {
+    this.menuName = menuName;
+    this.isPlanMenu = false;
+  }
+
+  MenuPage.plan({required Menu menu}) {
+    this.menu = menu;
+    this.menuName = menu.name;
+    this.isPlanMenu = true;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +50,7 @@ class MenuPage extends StatelessWidget {
               planRepository: context.read<PlanRepository>(),
               favoriteRepository: context.read<FavoriteRepository>())
             ..add(MenuFetched()),
-          child: MenuDetail(isPlanMenu: this.isPlanMenu),
+          child: this.isPlanMenu? MenuDetail(isPlanMenu: this.isPlanMenu, item: this.menu) : MenuDetail(isPlanMenu: this.isPlanMenu),
         ),
       ),
     );
