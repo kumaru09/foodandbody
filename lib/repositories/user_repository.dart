@@ -17,9 +17,9 @@ class UserRepository implements IUserRepository {
   Future<void> addUserInfo(String uid, Info info) async {
     final infoE = info.copyWith(
         goalNutrient: Nutrient(
-            protein: (info.goal! * 0.30) / 4,
-            carb: (info.goal! * 0.35) / 4,
-            fat: (info.goal! * 0.35) / 9));
+            protein: double.parse(((info.goal! * 0.30) / 4).toStringAsFixed(1)),
+            carb: double.parse(((info.goal! * 0.35) / 4).toStringAsFixed(1)),
+            fat: double.parse(((info.goal! * 0.35) / 9).toStringAsFixed(1))));
     await users
         .doc(uid)
         .collection('weight')
