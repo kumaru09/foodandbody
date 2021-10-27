@@ -3,11 +3,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:foodandbody/screens/search/search_page.dart';
 import 'package:foodandbody/models/history.dart';
 import 'package:foodandbody/models/info.dart';
 import 'package:foodandbody/models/nutrient.dart';
 import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
-import 'package:foodandbody/screens/search/search.dart';
 import 'package:foodandbody/screens/setting/setting.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:foodandbody/models/user.dart';
@@ -228,7 +228,7 @@ void main() {
           ));
           await tester.tap(find.byKey(menuAllButtonKey));
           await tester.pumpAndSettle();
-          expect(find.byType(Search), findsOneWidget);
+          expect(find.byType(SearchPage), findsOneWidget);
         });
       }); //"when pressed ดูทั้งหมด button"
 

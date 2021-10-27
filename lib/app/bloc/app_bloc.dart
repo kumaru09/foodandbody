@@ -14,7 +14,8 @@ part 'app_event.dart';
 class AppBloc extends Bloc<AppEvent, AppState> {
   AppBloc(
       {required AuthenRepository authenRepository,
-      required UserRepository userRepository})
+      required UserRepository userRepository,
+      })
       : _authenRepository = authenRepository,
         _userRepository = userRepository,
         super(

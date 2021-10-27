@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
-import 'package:foodandbody/models/menu.dart';
 import 'package:foodandbody/models/menu_show.dart';
 import 'package:foodandbody/repositories/favor_repository.dart';
 import 'package:foodandbody/repositories/plan_repository.dart';
