@@ -147,7 +147,6 @@ class _DailyWater extends StatefulWidget {
 }
 
 class __DailyWaterState extends State<_DailyWater> {
-  int _water = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -173,7 +172,6 @@ class __DailyWaterState extends State<_DailyWater> {
                       height: 40,
                       child: ElevatedButton(
                         key: const Key('remove_water_button'),
-                        // onPressed: _removeWater,
                         onPressed: () {
                           homeBloc.add(DecreaseWaterEvent());
                         },
@@ -191,7 +189,7 @@ class __DailyWaterState extends State<_DailyWater> {
                             color: Theme.of(context).colorScheme.secondary),
                       )),
                   Container(
-                    width: 50,
+                    constraints: BoxConstraints(minWidth: 50),
                     height: 40,
                     alignment: Alignment.center,
                     padding: EdgeInsets.all(0),
@@ -210,7 +208,6 @@ class __DailyWaterState extends State<_DailyWater> {
                       height: 40,
                       child: ElevatedButton(
                         key: const Key('add_water_button'),
-                        // onPressed: _addWater,
                         onPressed: () {
                           homeBloc.add(IncreaseWaterEvent());
                         },
