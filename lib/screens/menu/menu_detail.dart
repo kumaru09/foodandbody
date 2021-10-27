@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodandbody/models/menu.dart';
 import 'package:foodandbody/repositories/favor_repository.dart';
 import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:foodandbody/screens/camera/camera.dart';
@@ -9,42 +10,50 @@ import 'package:foodandbody/widget/nutrient_detail.dart';
 import 'package:http/http.dart' as http;
 
 class MenuDetail extends StatefulWidget {
-  const MenuDetail({Key? key, required this.isPlanMenu}) : super(key: key);
+  MenuDetail({Key? key, required this.isPlanMenu, Menu? item})
+      : this.menu = item ??
+            Menu(
+                name: '',
+                calories: 0,
+                carb: 0,
+                fat: 0,
+                protein: 0,
+                serve: 0,
+                volumn: 0),
+        super(key: key);
 
   final bool isPlanMenu;
+  final Menu menu;
 
   @override
   _MenuDetailState createState() => _MenuDetailState();
 }
 
 class _MenuDetailState extends State<MenuDetail> {
-  String menuName = '';
-
   @override
   void initState() {
     super.initState();
     context.read<MenuBloc>().add(MenuFetched());
-    menuName = context.read<MenuBloc>().path;
   }
 
   String toRound(double value) {
-    if (value - value.round() == 0.0)
-      return value.round().toString();
+    if (value - value.toInt() == 0.0)
+      return value.toInt().toString();
     else
       return value.toString();
   }
 
-  Widget displayButton(bool isPlanMenu) {
-    if (isPlanMenu) {
+  Widget displayButton(String name, double serve, String unit) {
+    if (widget.isPlanMenu) {
       return Row(
         children: [
-          _EatNowButton(name: menuName),
+          _EatNowButton(name: name, volumn: widget.menu.volumn, serve: serve, unit: unit),
           SizedBox(width: 16.0),
           _TakePhotoButton(),
         ],
       );
     } else {
-      return _AddToPlanButton(name: menuName);
+      return _AddToPlanButton(name: name, serve: serve, unit: unit);
     }
   }
 
@@ -83,7 +92,10 @@ class _MenuDetailState extends State<MenuDetail> {
                                                   .colorScheme
                                                   .secondary))),
                                 ),
-                                Text('${state.menu.calory} แคล',
+                                Text(
+                                    widget.isPlanMenu
+                                        ? '${widget.menu.calories.round()} แคล'
+                                        : '${state.menu.calory.round()} แคล',
                                     style: Theme.of(context)
                                         .textTheme
                                         .headline5!
@@ -97,19 +109,22 @@ class _MenuDetailState extends State<MenuDetail> {
                             NutrientDetail(
                                 label: 'หน่วยบริโภค',
                                 value:
-                                    '${toRound(state.menu.serve)} ${state.menu.unit}'),
+                                    '${widget.isPlanMenu ? toRound(widget.menu.volumn) : toRound(state.menu.serve)} ${state.menu.unit}'),
                             SizedBox(height: 7.0),
                             NutrientDetail(
                                 label: 'โปรตีน',
-                                value: '${toRound(state.menu.protein)} กรัม'),
+                                value:
+                                    '${widget.isPlanMenu ? toRound(widget.menu.protein) : toRound(state.menu.protein)} กรัม'),
                             SizedBox(height: 7.0),
                             NutrientDetail(
                                 label: 'คาร์โบไฮเดรต',
-                                value: '${toRound(state.menu.carb)} กรัม'),
+                                value:
+                                    '${widget.isPlanMenu ? toRound(widget.menu.carb) : toRound(state.menu.carb)} กรัม'),
                             SizedBox(height: 7.0),
                             NutrientDetail(
                                 label: 'ไขมัน',
-                                value: '${toRound(state.menu.fat)} กรัม'),
+                                value:
+                                    '${widget.isPlanMenu ? toRound(widget.menu.fat) : toRound(state.menu.fat)} กรัม'),
                           ],
                         ),
                       ),
@@ -118,7 +133,10 @@ class _MenuDetailState extends State<MenuDetail> {
                 ),
                 Padding(
                   padding: EdgeInsets.all(16.0),
-                  child: displayButton(widget.isPlanMenu),
+                  child: displayButton(
+                      state.menu.name,
+                      state.menu.serve,
+                      state.menu.unit),
                 ),
               ],
             );
@@ -132,7 +150,11 @@ class _MenuDetailState extends State<MenuDetail> {
 
 class _AddToPlanButton extends StatelessWidget {
   final String name;
-  const _AddToPlanButton({Key? key, required this.name}) : super(key: key);
+  final double serve;
+  final String unit;
+  const _AddToPlanButton(
+      {Key? key, required this.name, required this.serve, required this.unit})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -154,7 +176,8 @@ class _AddToPlanButton extends StatelessWidget {
                       path: name,
                       planRepository: context.read<PlanRepository>(),
                       favoriteRepository: context.read<FavoriteRepository>()),
-                  child: MenuDialog(name: name, isEatNow: false));
+                  child: MenuDialog(
+                      name: name, serve: serve, unit: unit, isEatNow: false));
             }),
       ),
     );
@@ -163,7 +186,12 @@ class _AddToPlanButton extends StatelessWidget {
 
 class _EatNowButton extends StatelessWidget {
   final String name;
-  const _EatNowButton({Key? key, required this.name}) : super(key: key);
+  final double serve;
+  final double volumn;
+  final String unit;
+  const _EatNowButton(
+      {Key? key, required this.name, required this.serve, required this.volumn, required this.unit})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -184,7 +212,8 @@ class _EatNowButton extends StatelessWidget {
                       path: name,
                       planRepository: context.read<PlanRepository>(),
                       favoriteRepository: context.read<FavoriteRepository>()),
-                  child: MenuDialog(name: name, isEatNow: true));
+                  child: MenuDialog(
+                      name: name, serve: serve, unit: unit, isEatNow: true, volumn: volumn));
             }),
       ),
     );
