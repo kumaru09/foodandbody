@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
+import 'package:foodandbody/screens/home/bloc/home_bloc.dart';
 import 'package:foodandbody/screens/home/circular_cal_indicator.dart';
+import 'package:foodandbody/screens/search/search_page.dart';
 import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
-import 'package:foodandbody/screens/search/search.dart';
 import 'package:foodandbody/screens/setting/setting.dart';
 import 'package:foodandbody/screens/home/linear_nutrient_indicator.dart';
 import 'package:foodandbody/widget/menu_card/menu_card.dart';
@@ -95,7 +96,7 @@ class Home extends StatelessWidget {
                     key: const Key('menu_all_button'),
                     onPressed: () {
                       Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => Search()));
+                          MaterialPageRoute(builder: (context) => SearchPage()));
                     },
                     style: ElevatedButton.styleFrom(
                         elevation: 0,
@@ -129,7 +130,8 @@ class Home extends StatelessWidget {
                 padding: EdgeInsets.only(left: 16, right: 16, bottom: 100),
                 width: MediaQuery.of(context).size.width,
                 constraints: BoxConstraints(minHeight: 100),
-                child: _DailyWater())
+                child: BlocProvider<HomeBloc>(
+                    create: (context) => HomeBloc(), child: _DailyWater()))
           ],
         ),
       ),
@@ -145,101 +147,94 @@ class _DailyWater extends StatefulWidget {
 }
 
 class __DailyWaterState extends State<_DailyWater> {
-  int _water = 0;
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      key: const Key('daily_water_card'),
-      color: Colors.white,
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          Text("วันนี้คุณดื่มน้ำไปแล้ว",
-              style: Theme.of(context).textTheme.bodyText2!.merge(
-                  TextStyle(color: Theme.of(context).colorScheme.secondary))),
-          Container(
-            padding: EdgeInsets.only(top: 18, bottom: 18),
-            child: Row(
-              children: [
-                Container(
-                    width: 35,
+    final HomeBloc homeBloc = BlocProvider.of<HomeBloc>(context);
+    return BlocBuilder<HomeBloc, HomeState>(builder: (context, state) {
+      return Card(
+        key: const Key('daily_water_card'),
+        color: Colors.white,
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Text("วันนี้คุณดื่มน้ำไปแล้ว",
+                style: Theme.of(context).textTheme.bodyText2!.merge(
+                    TextStyle(color: Theme.of(context).colorScheme.secondary))),
+            Container(
+              padding: EdgeInsets.only(top: 18, bottom: 18),
+              child: Row(
+                children: [
+                  Container(
+                      width: 35,
+                      height: 40,
+                      child: ElevatedButton(
+                        key: const Key('remove_water_button'),
+                        onPressed: () {
+                          homeBloc.add(DecreaseWaterEvent());
+                        },
+                        style: ElevatedButton.styleFrom(
+                          primary: Theme.of(context).cardColor,
+                          elevation: 0,
+                          padding: EdgeInsets.all(0),
+                          side: BorderSide(width: 1, color: Color(0xFFC4C4C4)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(10),
+                                  bottomLeft: Radius.circular(10))),
+                        ),
+                        child: Icon(Icons.remove,
+                            color: Theme.of(context).colorScheme.secondary),
+                      )),
+                  Container(
+                    constraints: BoxConstraints(minWidth: 50),
                     height: 40,
-                    child: ElevatedButton(
-                      key: const Key('remove_water_button'),
-                      onPressed: _removeWater,
-                      style: ElevatedButton.styleFrom(
-                        primary: Theme.of(context).cardColor,
-                        elevation: 0,
-                        padding: EdgeInsets.all(0),
-                        side: BorderSide(width: 1, color: Color(0xFFC4C4C4)),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(10),
-                                bottomLeft: Radius.circular(10))),
-                      ),
-                      child: Icon(Icons.remove,
-                          color: Theme.of(context).colorScheme.secondary),
-                    )),
-                Container(
-                  width: 50,
-                  height: 40,
-                  alignment: Alignment.center,
-                  padding: EdgeInsets.all(0),
-                  decoration: BoxDecoration(
-                      border: Border.all(width: 1, color: Color(0xFFC4C4C4))),
-                  child: Text(
-                    "$_water",
-                    key: const Key('daily_water_display'),
-                    style: Theme.of(context).textTheme.headline5!.merge(
-                        TextStyle(
-                            color: Theme.of(context).colorScheme.secondary)),
+                    alignment: Alignment.center,
+                    padding: EdgeInsets.all(0),
+                    decoration: BoxDecoration(
+                        border: Border.all(width: 1, color: Color(0xFFC4C4C4))),
+                    child: Text(
+                      "${state.water}",
+                      key: const Key('daily_water_display'),
+                      style: Theme.of(context).textTheme.headline5!.merge(
+                          TextStyle(
+                              color: Theme.of(context).colorScheme.secondary)),
+                    ),
                   ),
-                ),
-                Container(
-                    width: 35,
-                    height: 40,
-                    child: ElevatedButton(
-                      key: const Key('add_water_button'),
-                      onPressed: _addWater,
-                      style: ElevatedButton.styleFrom(
-                        primary: Theme.of(context).cardColor,
-                        elevation: 0,
-                        padding: EdgeInsets.all(0),
-                        side: BorderSide(width: 1, color: Color(0xFFC4C4C4)),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.only(
-                                topRight: Radius.circular(10),
-                                bottomRight: Radius.circular(10))),
-                      ),
-                      child: Icon(Icons.add,
-                          color: Theme.of(context).colorScheme.secondary),
-                    )),
-              ],
+                  Container(
+                      width: 35,
+                      height: 40,
+                      child: ElevatedButton(
+                        key: const Key('add_water_button'),
+                        onPressed: () {
+                          homeBloc.add(IncreaseWaterEvent());
+                        },
+                        style: ElevatedButton.styleFrom(
+                          primary: Theme.of(context).cardColor,
+                          elevation: 0,
+                          padding: EdgeInsets.all(0),
+                          side: BorderSide(width: 1, color: Color(0xFFC4C4C4)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(10),
+                                  bottomRight: Radius.circular(10))),
+                        ),
+                        child: Icon(Icons.add,
+                            color: Theme.of(context).colorScheme.secondary),
+                      )),
+                ],
+              ),
             ),
-          ),
-          Text(
-            "แก้ว",
-            style: Theme.of(context).textTheme.bodyText2!.merge(
-                TextStyle(color: Theme.of(context).colorScheme.secondary)),
-          )
-        ],
-      ),
-    );
-  }
-
-  void _addWater() {
-    setState(() {
-      _water++;
-    });
-  }
-
-  void _removeWater() {
-    setState(() {
-      _water--;
-      if (_water < 0) _water = 0;
+            Text(
+              "แก้ว",
+              style: Theme.of(context).textTheme.bodyText2!.merge(
+                  TextStyle(color: Theme.of(context).colorScheme.secondary)),
+            )
+          ],
+        ),
+      );
     });
   }
 }
