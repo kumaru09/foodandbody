@@ -5,6 +5,7 @@ import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:foodandbody/models/menu_list.dart';
+import 'package:foodandbody/repositories/menu_card_repository.dart';
 import 'package:http/http.dart' as http;
 import 'package:stream_transform/stream_transform.dart';
 
@@ -20,47 +21,47 @@ EventTransformer<E> throttleDroppable<E>(Duration duration) {
 }
 
 class MenuCardBloc extends Bloc<MenuCardEvent, MenuCardState> {
-  MenuCardBloc({required this.httpClient, required this.path}) : super(const MenuCardState()) {
+  MenuCardBloc({required this.isMyFav, required this.menuCardRepository})
+      : super(const MenuCardState()) {
     on<MenuCardFetched>(
       _onMenuCardFetched,
       transformer: throttleDroppable(throttleDuration),
     );
   }
 
-  final http.Client httpClient;
-  final String path;
+  final bool isMyFav;
+  final MenuCardRepository menuCardRepository;
 
   Future<void> _onMenuCardFetched(
     MenuCardFetched event,
     Emitter<MenuCardState> emit,
   ) async {
     try {
+      List<MenuList> menu = [];
+      List<String> menuList = isMyFav
+          ? await menuCardRepository.getNameMenuListById()
+          : await menuCardRepository.getNameMenuListAll();
+      for (var item in menuList) {
+        MenuList temp = await _fetchMenuCards(item);
+        menu.add(temp);
+      }
       if (state.status == MenuCardStatus.initial) {
-        final menu = await _fetchMenuCards(path);
         return emit(state.copyWith(
           status: MenuCardStatus.success,
           menu: menu,
         ));
       }
-    } catch (_) {
+    } catch (e) {
+      print('e: $e');
       emit(state.copyWith(status: MenuCardStatus.failure));
     }
   }
 
-  Future<List<MenuList>> _fetchMenuCards(String path) async {
-    final response = await httpClient.get(
-      Uri.https('foodandbody-api.azurewebsites.net', path),
-    );
-    if (response.statusCode == 200) {
-      final body = json.decode(response.body) as List;
-      return body.map((dynamic json) {
-        return MenuList(
-          name: json['name'] as String,
-          calory: json['calories'] as int,
-          imageUrl: json['imageUrl'] as String,
-        );
-      }).toList();
-    }
+  Future<MenuList> _fetchMenuCards(String path) async {
+    final response = await http.get(
+        Uri.parse("https://foodandbody-api.azurewebsites.net/api/Menu/$path"));
+    if (response.statusCode == 200)
+      return MenuList.fromJson(json.decode(response.body));
     throw Exception('error fetching menu');
   }
 }
