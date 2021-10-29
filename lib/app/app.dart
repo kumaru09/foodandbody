@@ -7,7 +7,7 @@ import 'package:foodandbody/repositories/authen_repository.dart';
 import 'package:foodandbody/repositories/favor_repository.dart';
 import 'package:foodandbody/repositories/menu_card_repository.dart';
 import 'package:foodandbody/repositories/plan_repository.dart';
-import 'package:foodandbody/repositories/search_reository.dart';
+import 'package:foodandbody/repositories/search_repository.dart';
 import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/theme.dart';
 

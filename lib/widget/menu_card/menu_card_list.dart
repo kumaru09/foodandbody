@@ -26,7 +26,13 @@ class _MenuCardListState extends State<MenuCardList> {
             return const Center(child: Text('failed to fetch menu'));
           case MenuCardStatus.success:
             if (state.menu.isEmpty) {
-              return Center(child: Text('${widget.isMyFav ? "ไม่มีเมนูที่กินบ่อยในขณะนี้" : "ไม่มีเมนูยอดนิยมในขณะนี้"}'),);
+              return Center(
+                child: Text(
+                    '${widget.isMyFav ? "ไม่มีเมนูที่กินบ่อยในขณะนี้" : "ไม่มีเมนูยอดนิยมในขณะนี้"}',
+                    style: Theme.of(context).textTheme.subtitle1!.merge(
+                        TextStyle(
+                            color: Theme.of(context).primaryColor))),
+              );
             }
             return Container(
               height: 200,
