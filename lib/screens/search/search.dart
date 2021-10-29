@@ -42,6 +42,7 @@ class SearchAppBar extends StatefulWidget {
 class _SearchAppBarState extends State<SearchAppBar> {
   final _textController = TextEditingController();
   late SearchBloc _searchBloc;
+  String lastText = '';
 
   @override
   void initState() {
@@ -72,7 +73,10 @@ class _SearchAppBarState extends State<SearchAppBar> {
         controller: _textController,
         autocorrect: false,
         onChanged: (text) {
-          _searchBloc.add(TextChanged(text: text));
+          if (lastText != text) {
+            lastText = text;
+            _searchBloc.add(TextChanged(text: text));
+          }
         },
         style: Theme.of(context)
             .textTheme
@@ -159,7 +163,8 @@ class _SearchBodyState extends State<SearchBody> {
                         ? state.result.length
                         : state.result.length + 1,
                     controller: _scrollController,
-                    keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
                     itemBuilder: (BuildContext context, int index) {
                       return index >= state.result.length
                           ? const SizedBox(
