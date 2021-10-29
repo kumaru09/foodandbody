@@ -42,7 +42,7 @@ class SearchAppBar extends StatefulWidget {
 class _SearchAppBarState extends State<SearchAppBar> {
   final _textController = TextEditingController();
   late SearchBloc _searchBloc;
-  String lastText = '';
+  String _lastText = '';
 
   @override
   void initState() {
@@ -58,7 +58,8 @@ class _SearchAppBarState extends State<SearchAppBar> {
 
   void _onClearTapped() {
     _textController.text = '';
-    _searchBloc.add(const TextChanged(text: ''));
+    _lastText = '';
+    _searchBloc.add(TextChanged(text: ''));
   }
 
   @override
@@ -73,8 +74,8 @@ class _SearchAppBarState extends State<SearchAppBar> {
         controller: _textController,
         autocorrect: false,
         onChanged: (text) {
-          if (lastText != text) {
-            lastText = text;
+          if (_lastText != text) {
+            _lastText = text;
             _searchBloc.add(TextChanged(text: text));
           }
         },
