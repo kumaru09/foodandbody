@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:foodandbody/models/body.dart';
 import 'package:intl/intl.dart';
 
 class BodyFigureInfo extends StatelessWidget {
-  BodyFigureInfo({Key? key}) : super(key: key);
+  BodyFigureInfo(this.body);
 
-  late int shoulder = 50;
-  late int chest = 80;
-  late int waist = 65;
-  late int hip = 85;
-  late String date = DateFormat("dd/MM/yyyy HH:mm").format(DateTime.now());
+  final Body body;
+
+  late int shoulder = body.shoulder;
+  late int chest = body.chest;
+  late int waist = body.waist;
+  late int hip = body.hip;
+  late String date = DateFormat.yMd().add_Hm().format(body.date.toDate());
 
   @override
   Widget build(BuildContext context) {

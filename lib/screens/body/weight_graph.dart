@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'dart:math';
 
-class WeightGraph extends StatelessWidget {
-  WeightGraph({Key? key}) : super(key: key);
+import 'package:foodandbody/models/body.dart';
+import 'package:foodandbody/models/weight_list.dart';
 
+class WeightGraph extends StatelessWidget {
+  WeightGraph(this.weightList);
+
+  final List<WeightList> weightList;
   static const int NUMBER_OF_DATE = 10;
-  late List<int> weight =
-      // [];
-      // [50, 51, 52, 49, 50, 49, 48];
-      [50, 51, 52, 49, 50, 52, 51, 50, 50, 48];
+  late List<int> weight = weightList.map((e) => e.weight).toList();
 
   @override
   Widget build(BuildContext context) {
@@ -32,13 +33,13 @@ class _LineChart extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isEmpty = weight.length == 0;
 
-    if (isEmpty) weight = List<int>.generate(10, (int index) => 0);
-    else if(weight.length < 10) {
-      for(int index = 0; index < 10 - weight.length; index++) {
-        weight.insert(index, 0);
+    if (isEmpty)
+      weight = List<int>.generate(10, (int index) => 0);
+    else if (weight.length < 10) {
+      for (int index = weight.length; index < 10; index++) {
+        weight.add(weight[weight.length - 1]);
       }
     }
-
     return LineChart(LineChartData(
         minX: 1,
         maxX: 10,
@@ -54,17 +55,16 @@ class _LineChart extends StatelessWidget {
   List<LineChartBarData> _getDataPoint() {
     final List<FlSpot> weightPoint = [];
 
-    for (int index = 0; index < weight.length; index++) {
-      weightPoint.add(FlSpot((index + 1).toDouble(), weight[index].toDouble()));
+    for (int index = weight.length - 1; index >= 0; index--) {
+      weightPoint.add(FlSpot((weight.length - index).toDouble(), weight[index].toDouble()));
     }
 
     return [
       LineChartBarData(
-        colors: [Color(0xFF515070)],
-        spots: weightPoint,
-        isCurved: false,
-        dotData: FlDotData(show: false)
-      )
+          colors: [Color(0xFF515070)],
+          spots: weightPoint,
+          isCurved: false,
+          dotData: FlDotData(show: false))
     ];
   }
 }
