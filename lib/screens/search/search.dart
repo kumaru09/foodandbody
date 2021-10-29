@@ -159,6 +159,7 @@ class _SearchBodyState extends State<SearchBody> {
                         ? state.result.length
                         : state.result.length + 1,
                     controller: _scrollController,
+                    keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                     itemBuilder: (BuildContext context, int index) {
                       return index >= state.result.length
                           ? const SizedBox(

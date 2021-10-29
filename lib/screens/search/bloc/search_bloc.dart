@@ -26,7 +26,10 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     TextChanged event,
     Emitter<SearchState> emit,
   ) async {
-    if (event.text=='') return emit(state.copyWith(status: SearchStatus.initial));
+    if (event.text=='') {
+      keySearch = '';
+      return emit(state.copyWith(status: SearchStatus.initial));
+    } 
     //ทำเมื่อ search คำใหม่ หรือ คำเดิมที่ยังแสดงไม่หมด
     if (event.text != keySearch || state.hasReachedMax == false) {
       try {
