@@ -6,17 +6,18 @@ import 'package:foodandbody/app/routes.dart';
 import 'package:foodandbody/repositories/authen_repository.dart';
 import 'package:foodandbody/repositories/body_repository.dart';
 import 'package:foodandbody/repositories/favor_repository.dart';
+import 'package:foodandbody/repositories/menu_card_repository.dart';
 import 'package:foodandbody/repositories/plan_repository.dart';
-import 'package:foodandbody/repositories/search_reository.dart';
+import 'package:foodandbody/repositories/search_repository.dart';
 import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/theme.dart';
 
 class App extends StatelessWidget {
-  const App(
-      {Key? key,
-      required AuthenRepository authenRepository,
-      required UserRepository userRepository,})
-      : _authenRepository = authenRepository,
+  const App({
+    Key? key,
+    required AuthenRepository authenRepository,
+    required UserRepository userRepository,
+  })  : _authenRepository = authenRepository,
         _userRepository = userRepository,
         super(key: key);
 
@@ -32,19 +33,22 @@ class App extends StatelessWidget {
         RepositoryProvider<UserRepository>(
             create: (context) => UserRepository()),
         RepositoryProvider<SearchRepository>(
-            create: (context) => SearchRepository(SearchCache(), SearchClient())),
+            create: (context) =>
+                SearchRepository(SearchCache(), SearchClient())),
         RepositoryProvider<PlanRepository>(
             create: (context) => PlanRepository()),
         RepositoryProvider<BodyRepository>(
             create: (context) => BodyRepository()),
         RepositoryProvider<FavoriteRepository>(
-            create: (context) => FavoriteRepository())
+            create: (context) => FavoriteRepository()),
+        RepositoryProvider<MenuCardRepository>(
+            create: (context) => MenuCardRepository())
       ],
       child: BlocProvider(
         create: (_) => AppBloc(
-            authenRepository: _authenRepository,
-            userRepository: _userRepository,
-            ),
+          authenRepository: _authenRepository,
+          userRepository: _userRepository,
+        ),
         child: const AppView(),
       ),
     );

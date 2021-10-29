@@ -44,23 +44,13 @@ class SearchPage extends StatelessWidget {
             Container(
               padding: EdgeInsets.fromLTRB(16, 16, 16, 5),
               child: Text(
-                "เมนูแนะนำ",
-                style: Theme.of(context).textTheme.bodyText1!.merge(
-                      TextStyle(color: Theme.of(context).primaryColor),
-                    ),
-              ),
-            ),
-            MenuCard(path: '/api/menu'),
-            Container(
-              padding: EdgeInsets.fromLTRB(16, 0, 16, 5),
-              child: Text(
                 "เมนูยอดนิยม",
                 style: Theme.of(context).textTheme.bodyText1!.merge(
                       TextStyle(color: Theme.of(context).primaryColor),
                     ),
               ),
             ),
-            MenuCard(path: '/api/menu'),
+            MenuCard(isMyFav: false),
             Container(
               padding: EdgeInsets.fromLTRB(16, 0, 16, 5),
               child: Text(
@@ -70,7 +60,7 @@ class SearchPage extends StatelessWidget {
                     ),
               ),
             ),
-            MenuCard(path: '/api/menu'),
+            MenuCard(isMyFav: true),
           ],
         ),
       ),
