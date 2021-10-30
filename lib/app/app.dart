@@ -1,6 +1,7 @@
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:foodandbody/app/routes.dart';
 import 'package:foodandbody/repositories/authen_repository.dart';
@@ -66,6 +67,13 @@ class AppView extends StatelessWidget {
         state: context.select((AppBloc bloc) => bloc.state.status),
         onGeneratePages: onGenerateAppViewPages,
       ),
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: [
+        const Locale('th'),
+      ],
     );
   }
 }
