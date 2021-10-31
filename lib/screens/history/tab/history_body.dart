@@ -16,11 +16,11 @@ class HistoryBody extends StatelessWidget {
           padding: EdgeInsets.all(16),
           child: Column(
             children: [
-              HistoryCard(name: 'ไหล่',dataList: data, startDate: startDate, stopDate: stopDate, isBody: true),
-              HistoryCard(name: 'รอบอก',dataList: data, startDate: startDate, stopDate: stopDate, isBody: true),
-              HistoryCard(name: 'รอบเอว',dataList: data, startDate: startDate, stopDate: stopDate, isBody: true),
-              HistoryCard(name: 'รอบสะโพก',dataList: data, startDate: startDate, stopDate: stopDate, isBody: true),
-              HistoryCard(name: 'น้ำหนัก',dataList: data, startDate: startDate, stopDate: stopDate, isBody: true),
+              if(data.isNotEmpty) HistoryCard(name: 'ไหล่',dataList: data, startDate: startDate, stopDate: stopDate, isBody: true),
+              if(data.isNotEmpty) HistoryCard(name: 'รอบอก',dataList: data, startDate: startDate, stopDate: stopDate, isBody: true),
+              if(data.isNotEmpty) HistoryCard(name: 'รอบเอว',dataList: data, startDate: startDate, stopDate: stopDate, isBody: true),
+              if(data.isNotEmpty) HistoryCard(name: 'รอบสะโพก',dataList: data, startDate: startDate, stopDate: stopDate, isBody: true),
+              if(data.isNotEmpty) HistoryCard(name: 'น้ำหนัก',dataList: data, startDate: startDate, stopDate: stopDate, isBody: true),
             ],
           ),
         ),

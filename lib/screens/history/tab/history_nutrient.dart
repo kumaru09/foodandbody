@@ -16,11 +16,11 @@ class HistoryNutrient extends StatelessWidget {
           padding: EdgeInsets.all(16),
           child: Column(
             children: [
-              HistoryCard(name: 'แคลอรี',dataList: data, startDate: startDate, stopDate: stopDate, isBody: false),
-              HistoryCard(name: 'โปรตีน',dataList: data, startDate: startDate, stopDate: stopDate, isBody: false),
-              HistoryCard(name: 'คาร์โบไฮเดรต',dataList: data, startDate: startDate, stopDate: stopDate, isBody: false),
-              HistoryCard(name: 'ไขมัน',dataList: data, startDate: startDate, stopDate: stopDate, isBody: false),
-              HistoryCard(name: 'น้ำ',dataList: data, startDate: startDate, stopDate: stopDate, isBody: false),
+              if(data.isNotEmpty) HistoryCard(name: 'แคลอรี',dataList: data, startDate: startDate, stopDate: stopDate, isBody: false),
+              if(data.isNotEmpty) HistoryCard(name: 'โปรตีน',dataList: data, startDate: startDate, stopDate: stopDate, isBody: false),
+              if(data.isNotEmpty) HistoryCard(name: 'คาร์โบไฮเดรต',dataList: data, startDate: startDate, stopDate: stopDate, isBody: false),
+              if(data.isNotEmpty) HistoryCard(name: 'ไขมัน',dataList: data, startDate: startDate, stopDate: stopDate, isBody: false),
+              if(data.isNotEmpty) HistoryCard(name: 'น้ำ',dataList: data, startDate: startDate, stopDate: stopDate, isBody: false),
             ],
           ),
         ),
