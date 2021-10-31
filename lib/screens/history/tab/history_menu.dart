@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:foodandbody/models/history_menu.dart';
 
@@ -17,34 +18,33 @@ const ColorScheme _calendarColorScheme = ColorScheme(
   brightness: Brightness.light,
 );
 
+DateTime dateToday = DateTime.now();
+
 class HistoryMenu extends StatelessWidget {
-  HistoryMenu({Key? key}) : super(key: key);
+  HistoryMenu({Key? key, required this.startDate}) : super(key: key);
 
-  DateTime dateToday =
-      DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+  final DateTime startDate;
 
-  List<HistoryMenuItem> getMenuHistory() {
-    return [
-      HistoryMenuItem(name: 'กุ้งทอด', calory: 156),
-      HistoryMenuItem(name: 'ปลาทอด', calory: 107),
-      HistoryMenuItem(name: 'ปลาหมึกทอด', calory: 176),
-      HistoryMenuItem(name: 'ไก่ทอด', calory: 234),
-      HistoryMenuItem(name: 'หอยทอด', calory: 426),
-      HistoryMenuItem(name: 'หอยทอด', calory: 426),
-      HistoryMenuItem(name: 'หอยทอด', calory: 426),
-      HistoryMenuItem(name: 'หอยทอด', calory: 426),
-      HistoryMenuItem(name: 'หอยทอด', calory: 426),
-      HistoryMenuItem(name: 'หอยทอด', calory: 426),
-      HistoryMenuItem(name: 'หอยทอด', calory: 426),
-      HistoryMenuItem(name: 'หอยทอดสุดท้าย', calory: 426),
-    ];
-  }
+  List<HistoryMenuItem> items = [
+    HistoryMenuItem(name: 'กุ้งทอด', calory: 156, date: Timestamp.fromDate(dateToday)),
+    HistoryMenuItem(name: 'ปลาทอด', calory: 107, date: Timestamp.fromDate(dateToday)),
+    HistoryMenuItem(name: 'ปลาหมึกทอด', calory: 176, date: Timestamp.fromDate(dateToday)),
+    HistoryMenuItem(name: 'ไก่ทอด', calory: 234, date: Timestamp.fromDate(dateToday)),
+    HistoryMenuItem(name: 'หอยทอด', calory: 426, date: Timestamp.fromDate(dateToday)),
+    HistoryMenuItem(name: 'หอยทอด', calory: 426, date: Timestamp.fromDate(dateToday)),
+    HistoryMenuItem(name: 'หอยทอด', calory: 426, date: Timestamp.fromDate(dateToday)),
+    HistoryMenuItem(name: 'หอยทอด', calory: 426, date: Timestamp.fromDate(dateToday)),
+    HistoryMenuItem(name: 'หอยทอด', calory: 426, date: Timestamp.fromDate(dateToday)),
+    HistoryMenuItem(name: 'หอยทอด', calory: 426, date: Timestamp.fromDate(dateToday)),
+    HistoryMenuItem(name: 'หอยทอด', calory: 426, date: Timestamp.fromDate(dateToday)),
+    HistoryMenuItem(name: 'หอยทอดสุดท้าย', calory: 426, date: Timestamp.fromDate(dateToday)),
+  ];
 
   _selectDate(BuildContext context) async {
     final selected = await showDatePicker(
       context: context,
-      initialDate: dateToday,
-      firstDate: DateTime(2020),
+      initialDate: dateToday, //get from bloc
+      firstDate: startDate,
       lastDate: dateToday,
       helpText: 'เลือกวัน',
       cancelText: 'ยกเลิก',
@@ -64,23 +64,23 @@ class HistoryMenu extends StatelessWidget {
         );
       },
     );
-    if (selected != null) print(selected);
+    if (selected != null) print(selected); //call bloc
   }
 
   @override
   Widget build(BuildContext context) {
-    List<HistoryMenuItem> items = getMenuHistory();
     return SafeArea(
       child: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.all(16),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Row(
                 children: [
                   Expanded(
                     child: Text(
-                      '22/02/2021',
+                      '${items[0].date.toDate().day}/${items[0].date.toDate().month}/${items[0].date.toDate().year}',
                       style: Theme.of(context).textTheme.headline5!.merge(
                           TextStyle(
                               color: Theme.of(context).colorScheme.secondary)),
@@ -98,7 +98,7 @@ class HistoryMenu extends StatelessWidget {
                 ],
               ),
               Padding(
-                padding: EdgeInsets.only(top: 10, bottom: 20),
+                padding: EdgeInsets.only(top: 10, bottom: 16),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -130,15 +130,25 @@ class HistoryMenu extends StatelessWidget {
                 height: 2,
                 thickness: 1,
               ),
-              ListView.builder(
-                itemCount: items.length,
-                scrollDirection: Axis.vertical,
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemBuilder: (BuildContext context, int index) {
-                  return HistoryMenuDaily(item: items[index]);
-                },
-              ),
+              items.isEmpty
+                  ? Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      child: Text(
+                        'ไม่มีประวัติเมนู',
+                        style: Theme.of(context).textTheme.subtitle1!.merge(
+                            TextStyle(
+                                color:
+                                    Theme.of(context).colorScheme.secondary)),
+                      ))
+                  : ListView.builder(
+                      itemCount: items.length,
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemBuilder: (BuildContext context, int index) {
+                        return HistoryMenuDaily(item: items[index]);
+                      },
+                    ),
             ],
           ),
         ),
@@ -171,7 +181,7 @@ class HistoryMenuDaily extends StatelessWidget {
                             TextStyle(
                                 color:
                                     Theme.of(context).colorScheme.secondary))),
-                    Text('${item.name}',
+                    Text('${item.date.toDate().hour}:${item.date.toDate().minute}',
                         style: Theme.of(context).textTheme.bodyText2!.merge(
                             TextStyle(
                                 color: Theme.of(context)

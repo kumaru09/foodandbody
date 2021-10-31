@@ -9,7 +9,7 @@ class History extends StatelessWidget {
   DateTime startDate = DateTime(2020, 11, 11);
   DateTime stopDate = DateTime(2021, 12, 22);
 
-  List<int> data = [
+  List<int> graphData = [
     1500,
     2000,
     1600,
@@ -55,8 +55,8 @@ class History extends StatelessWidget {
         body: TabBarView(
           children: [
             //isEmpty?
-            HistoryMenu(),
-            data.isEmpty
+            HistoryMenu(startDate: startDate),
+            graphData.isEmpty
                 ? Center(
                     child: Text(
                     'ไม่มีประวัติสารอาหารในขณะนี้',
@@ -65,7 +65,7 @@ class History extends StatelessWidget {
                             color: Theme.of(context).colorScheme.secondary)),
                   ))
                 : HistoryNutrient(
-                    data: data, startDate: startDate, stopDate: stopDate),
+                    data: graphData, startDate: startDate, stopDate: stopDate),
             Center(child: Text('BIRDS')),
           ],
         ),
