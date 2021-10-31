@@ -27,12 +27,6 @@ class HistoryCard extends StatelessWidget {
         : '${date.day}/${date.month}/${date.year}';
   }
 
-  Widget signIcon() {
-    return dataList[dataList.length - 1] - dataList[dataList.length - 2] > 0
-        ? Icon(Icons.arrow_drop_up, color: Color(0xFFFF0000), size: 40)
-        : Icon(Icons.arrow_drop_down, color: Color(0xFF0EBA29), size: 40);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -53,10 +47,14 @@ class HistoryCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  if (dataList[dataList.length - 1] -
-                          dataList[dataList.length - 2] !=
-                      0)
-                    signIcon(),
+                  Icon(
+                      dataList[dataList.length - 1] -
+                                  dataList[dataList.length - 2] >
+                              0
+                          ? Icons.arrow_drop_up
+                          : Icons.arrow_drop_down,
+                      color: Theme.of(context).colorScheme.secondary,
+                      size: 40),
                   Text(
                     '${(dataList[dataList.length - 1] - dataList[dataList.length - 2]).abs()} ',
                     style: Theme.of(context).textTheme.headline5!.merge(

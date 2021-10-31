@@ -8,7 +8,7 @@ class History extends StatelessWidget {
   History({Key? key}) : super(key: key);
 
   DateTime startDate = DateTime(2020, 11, 11);
-  DateTime stopDate = DateTime(2021, 12, 22);
+  DateTime stopDate = DateTime.now();
 
   List<int> graphData = [
     1500,
