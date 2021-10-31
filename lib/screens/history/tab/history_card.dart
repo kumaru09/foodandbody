@@ -3,19 +3,21 @@ import 'dart:math';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-class NutrientCard extends StatelessWidget {
-  NutrientCard(
+class HistoryCard extends StatelessWidget {
+  HistoryCard(
       {Key? key,
       required this.name,
       required this.dataList,
       required this.startDate,
-      required this.stopDate})
+      required this.stopDate,
+      required this.isBody})
       : super(key: key);
 
   final String name;
   final List<int> dataList;
   final DateTime startDate;
   final DateTime stopDate;
+  final bool isBody;
 
   String dateToString(DateTime date) {
     return date.day == DateTime.now().day &&
@@ -23,6 +25,12 @@ class NutrientCard extends StatelessWidget {
             date.year == DateTime.now().year
         ? 'วันนี้'
         : '${date.day}/${date.month}/${date.year}';
+  }
+
+  Widget signIcon() {
+    return dataList[dataList.length - 1] - dataList[dataList.length - 2] > 0
+        ? Icon(Icons.arrow_drop_up, color: Color(0xFFFF0000), size: 40)
+        : Icon(Icons.arrow_drop_down, color: Color(0xFF0EBA29), size: 40);
   }
 
   @override
@@ -40,6 +48,37 @@ class NutrientCard extends StatelessWidget {
               style: Theme.of(context).textTheme.headline6!.merge(
                   TextStyle(color: Theme.of(context).colorScheme.secondary)),
             ),
+            if (isBody && dataList.length >= 2)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  if (dataList[dataList.length - 1] -
+                          dataList[dataList.length - 2] !=
+                      0)
+                    signIcon(),
+                  Text(
+                    '${(dataList[dataList.length - 1] - dataList[dataList.length - 2]).abs()} ',
+                    style: Theme.of(context).textTheme.headline5!.merge(
+                        TextStyle(
+                            color: Theme.of(context).colorScheme.secondary)),
+                  ),
+                  Text(
+                    '${name == 'น้ำหนัก' ? 'กิโลกรัม' : 'เซนติเมตร'}',
+                    style: Theme.of(context).textTheme.bodyText2!.merge(
+                        TextStyle(
+                            color: Theme.of(context).colorScheme.secondary)),
+                  ),
+                ],
+              ),
+            if (isBody && dataList.length >= 2)
+              Center(
+                child: Text(
+                  'เทียบกับครั้งก่อนหน้า',
+                  style: Theme.of(context).textTheme.bodyText1!.merge(TextStyle(
+                      color: Theme.of(context).colorScheme.secondary)),
+                ),
+              ),
             Container(
               width: double.infinity,
               height: 100,
@@ -80,15 +119,10 @@ class _LineChart extends StatelessWidget {
   _LineChart(this.data);
 
   List<int> data;
-  late int lenght = data.length;
 
   @override
   Widget build(BuildContext context) {
-    bool isEmpty = data.length == 0;
-
-    if (isEmpty)
-      data = List<int>.generate(10, (int index) => 0);
-    else if (data.length < 10) {
+    if (data.length < 10) {
       for (int index = data.length; index < 10; index++) {
         data.add(data[data.length - 1]);
       }
@@ -96,8 +130,8 @@ class _LineChart extends StatelessWidget {
     return LineChart(LineChartData(
         minX: 1,
         maxX: data.length.toDouble(),
-        minY: isEmpty ? 0 : (data.reduce(min) - 1).toDouble(),
-        maxY: isEmpty ? 10 : (data.reduce(max) + 1).toDouble(),
+        minY: (data.reduce(min) - 1).toDouble(),
+        maxY: (data.reduce(max) + 1).toDouble(),
         axisTitleData: FlAxisTitleData(show: false),
         titlesData: FlTitlesData(show: false),
         borderData: FlBorderData(show: false),
@@ -109,9 +143,8 @@ class _LineChart extends StatelessWidget {
   List<LineChartBarData> _getDataPoint() {
     final List<FlSpot> dataPoint = [];
 
-    for (int index = data.length - 1; index >= 0; index--) {
-      dataPoint.add(
-          FlSpot((data.length - index).toDouble(), data[index].toDouble()));
+    for (int index = 1; index <= data.length; index++) {
+      dataPoint.add(FlSpot(index.toDouble(), data[index - 1].toDouble()));
     }
 
     return [

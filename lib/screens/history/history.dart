@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:foodandbody/screens/history/tab/history_body.dart';
 import 'package:foodandbody/screens/history/tab/history_menu.dart';
 import 'package:foodandbody/screens/history/tab/history_nutrient.dart';
 
@@ -54,7 +55,6 @@ class History extends StatelessWidget {
         ),
         body: TabBarView(
           children: [
-            //isEmpty?
             HistoryMenu(startDate: startDate),
             graphData.isEmpty
                 ? Center(
@@ -66,7 +66,16 @@ class History extends StatelessWidget {
                   ))
                 : HistoryNutrient(
                     data: graphData, startDate: startDate, stopDate: stopDate),
-            Center(child: Text('BIRDS')),
+            graphData.isEmpty
+                ? Center(
+                    child: Text(
+                    'ไม่มีประวัติร่างกายในขณะนี้',
+                    style: Theme.of(context).textTheme.subtitle1!.merge(
+                        TextStyle(
+                            color: Theme.of(context).colorScheme.secondary)),
+                  ))
+                : HistoryBody(
+                    data: graphData, startDate: startDate, stopDate: stopDate),
           ],
         ),
       ),

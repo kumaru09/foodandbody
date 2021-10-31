@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:foodandbody/screens/history/tab/nutrient_card.dart';
+import 'package:foodandbody/screens/history/tab/history_card.dart';
 
 class HistoryNutrient extends StatelessWidget {
   const HistoryNutrient({Key? key, required this.data, required this.startDate, required this.stopDate}) : super(key: key);
@@ -16,11 +16,11 @@ class HistoryNutrient extends StatelessWidget {
           padding: EdgeInsets.all(16),
           child: Column(
             children: [
-              NutrientCard(name: 'แคลอรี',dataList: data, startDate: startDate, stopDate: stopDate),
-              NutrientCard(name: 'โปรตีน',dataList: data, startDate: startDate, stopDate: stopDate),
-              NutrientCard(name: 'คาร์โบไฮเดรต',dataList: data, startDate: startDate, stopDate: stopDate),
-              NutrientCard(name: 'ไขมัน',dataList: data, startDate: startDate, stopDate: stopDate),
-              NutrientCard(name: 'น้ำ',dataList: data, startDate: startDate, stopDate: stopDate),
+              HistoryCard(name: 'แคลอรี',dataList: data, startDate: startDate, stopDate: stopDate, isBody: false),
+              HistoryCard(name: 'โปรตีน',dataList: data, startDate: startDate, stopDate: stopDate, isBody: false),
+              HistoryCard(name: 'คาร์โบไฮเดรต',dataList: data, startDate: startDate, stopDate: stopDate, isBody: false),
+              HistoryCard(name: 'ไขมัน',dataList: data, startDate: startDate, stopDate: stopDate, isBody: false),
+              HistoryCard(name: 'น้ำ',dataList: data, startDate: startDate, stopDate: stopDate, isBody: false),
             ],
           ),
         ),
