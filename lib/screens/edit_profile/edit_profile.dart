@@ -7,7 +7,7 @@ import 'package:foodandbody/models/user.dart';
 import 'package:image_picker/image_picker.dart';
 
 class EditProfile extends StatelessWidget {
-  const EditProfile({Key? key}) : super(key: key);
+  File? _image;
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +26,7 @@ class EditProfile extends StatelessWidget {
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
+            _image = null;
             Navigator.pop(context);
           },
         ),
@@ -50,7 +51,7 @@ class EditProfile extends StatelessWidget {
               constraints: BoxConstraints(minHeight: 50),
               color: Theme.of(context).primaryColor,
               alignment: Alignment.topCenter,
-              child: _EditProfileImage(),
+              child: _EditProfileImage(image: _image),
             ),
             Container(
               padding: EdgeInsets.only(left: 16, top: 26, right: 15),
@@ -84,30 +85,30 @@ class EditProfile extends StatelessWidget {
 }
 
 class _EditProfileImage extends StatefulWidget {
-  const _EditProfileImage({Key? key}) : super(key: key);
+  _EditProfileImage({required this.image});
+  File? image;
 
   @override
   __EditProfileImageState createState() => __EditProfileImageState();
 }
 
 class __EditProfileImageState extends State<_EditProfileImage> {
-  late Future<XFile?> _image;
-  ImagePicker _imagePicker = ImagePicker();
+  Future _pickImage({required source}) async {
+    try {
+      final ImagePicker _picker = ImagePicker();
+      final _pickedImage = await _picker.pickImage(source: source);
 
-  _imagFromGallery() async {
-    Future<XFile?> image =
-        _imagePicker.pickImage(source: ImageSource.gallery, imageQuality: 50);
-    setState(() {
-      _image = image;
-    });
-  }
-
-  _imageFromCamera() async {
-    Future<XFile?> image =
-        _imagePicker.pickImage(source: ImageSource.camera, imageQuality: 50);
-    setState(() {
-      _image = image;
-    });
+      if (_pickedImage == null) return;
+      setState(() {
+        widget.image = File(_pickedImage.path);
+        print("image: ${widget.image}");
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(const SnackBar(
+            content: Text("อัพโหลดรูปภาพไม่สำเร็จ กรุณาลองอีกครั้ง")));
+    }
   }
 
   String getInitialImage(BuildContext context) {
@@ -127,15 +128,20 @@ class __EditProfileImageState extends State<_EditProfileImage> {
           child: CircleAvatar(
         radius: 77,
         backgroundColor: Colors.white,
-        child: CircleAvatar(
-          foregroundImage: getInitialImage(context) != ""
-              ? NetworkImage(
-                  context.read<AppBloc>().state.user.photoUrl.toString())
-              : Image.asset("assets/default_profile_image.png")
-                  .image,
-          backgroundColor: Colors.white,
-          radius: 74,
-        ),
+        child: widget.image == null
+            ? CircleAvatar(
+                foregroundImage: getInitialImage(context) != ""
+                    ? NetworkImage(
+                        context.read<AppBloc>().state.user.photoUrl.toString())
+                    : Image.asset("assets/default_profile_image.png").image,
+                backgroundColor: Colors.white,
+                radius: 74,
+              )
+            : CircleAvatar(
+                foregroundImage: Image.file(widget.image!).image,
+                backgroundColor: Colors.white,
+                radius: 74,
+              ),
       )),
       Positioned(
           top: MediaQuery.of(context).size.height * 0.01,
@@ -160,18 +166,24 @@ class __EditProfileImageState extends State<_EditProfileImage> {
           return Wrap(
             children: [
               ListTile(
-                leading: Icon(Icons.photo_camera),
-                title: Text("กล้องถ่ายรูป"),
+                leading: Icon(Icons.photo_camera,
+                    color: Theme.of(context).colorScheme.secondary),
+                title: Text("กล้องถ่ายรูป",
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.secondary)),
                 onTap: () {
-                  _imageFromCamera();
+                  _pickImage(source: ImageSource.camera);
                   Navigator.pop(context);
                 },
               ),
               ListTile(
-                leading: Icon(Icons.collections),
-                title: Text("แกลลอรี"),
+                leading: Icon(Icons.collections,
+                    color: Theme.of(context).colorScheme.secondary),
+                title: Text("แกลลอรี",
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.secondary)),
                 onTap: () {
-                  _imagFromGallery();
+                  _pickImage(source: ImageSource.gallery);
                   Navigator.pop(context);
                 },
               )
