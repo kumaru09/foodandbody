@@ -1,8 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:foodandbody/screens/history/tab/history_menu.dart';
+import 'package:foodandbody/screens/history/tab/history_nutrient.dart';
 
 class History extends StatelessWidget {
-  const History({Key? key}) : super(key: key);
+  // const History({Key? key}) : super(key: key);
+  History({Key? key}) : super(key: key);
+
+  DateTime startDate = DateTime(2020, 11, 11);
+  DateTime stopDate = DateTime(2021, 12, 22);
+
+  List<int> data = [
+    1500,
+    2000,
+    1600,
+    1800,
+    1900,
+    1500,
+    1800,
+    1500,
+    2100,
+    1600,
+    1700,
+    1900,
+    1500,
+    1800
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -32,8 +54,18 @@ class History extends StatelessWidget {
         ),
         body: TabBarView(
           children: [
+            //isEmpty?
             HistoryMenu(),
-            Center(child: Text('CATS')),
+            data.isEmpty
+                ? Center(
+                    child: Text(
+                    'ไม่มีประวัติสารอาหารในขณะนี้',
+                    style: Theme.of(context).textTheme.subtitle1!.merge(
+                        TextStyle(
+                            color: Theme.of(context).colorScheme.secondary)),
+                  ))
+                : HistoryNutrient(
+                    data: data, startDate: startDate, stopDate: stopDate),
             Center(child: Text('BIRDS')),
           ],
         ),
