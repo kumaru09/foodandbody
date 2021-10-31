@@ -90,15 +90,17 @@ class HistoryCard extends StatelessWidget {
             ),
             SizedBox(height: 3),
             Row(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Expanded(
-                  child: Text(
-                    '${dateToString(startDate)}',
-                    style: Theme.of(context).textTheme.bodyText2!.merge(
-                        TextStyle(
-                            color: Theme.of(context).colorScheme.secondary)),
+                if (dataList.length >= 2)
+                  Expanded(
+                    child: Text(
+                      '${dateToString(startDate)}',
+                      style: Theme.of(context).textTheme.bodyText2!.merge(
+                          TextStyle(
+                              color: Theme.of(context).colorScheme.secondary)),
+                    ),
                   ),
-                ),
                 Text(
                   '${dateToString(stopDate)}',
                   style: Theme.of(context).textTheme.bodyText2!.merge(TextStyle(
@@ -120,14 +122,9 @@ class _LineChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (data.length < 10) {
-      for (int index = data.length; index < 10; index++) {
-        data.add(data[data.length - 1]);
-      }
-    }
     return LineChart(LineChartData(
         minX: 1,
-        maxX: data.length.toDouble(),
+        maxX: data.length == 1 ? 10 : data.length.toDouble(),
         minY: (data.reduce(min) - 1).toDouble(),
         maxY: (data.reduce(max) + 1).toDouble(),
         axisTitleData: FlAxisTitleData(show: false),
@@ -141,8 +138,14 @@ class _LineChart extends StatelessWidget {
   List<LineChartBarData> _getDataPoint() {
     final List<FlSpot> dataPoint = [];
 
-    for (int index = 1; index <= data.length; index++) {
-      dataPoint.add(FlSpot(index.toDouble(), data[index - 1].toDouble()));
+    if (data.length == 1) {
+      for (int index = 1; index <= 10; index++) {
+        dataPoint.add(FlSpot(index.toDouble(), data[0].toDouble()));
+      }
+    } else {
+      for (int index = 1; index <= data.length; index++) {
+        dataPoint.add(FlSpot(index.toDouble(), data[index - 1].toDouble()));
+      }
     }
 
     return [
