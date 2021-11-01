@@ -113,7 +113,7 @@ class Home extends StatelessWidget {
             Container(
               width: MediaQuery.of(context).size.width,
               constraints: BoxConstraints(minHeight: 100),
-              child: MenuCard(path: '/api/menu'),
+              child: MenuCard(isMyFav: false),
             ),
             Container(
               padding: EdgeInsets.only(left: 16, top: 16),

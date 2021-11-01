@@ -6,6 +6,7 @@ import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
 import 'package:foodandbody/screens/plan/widget/linear_nutrient_two_progress.dart';
 import 'package:foodandbody/screens/plan/widget/plan_menu_card_list.dart';
+import 'package:foodandbody/screens/search/search_page.dart';
 
 import 'widget/ate_menu_card_list.dart';
 import 'widget/circular_cal_and_info.dart';
@@ -95,7 +96,8 @@ class _PlanPageState extends State<Plan> {
                   primary: Theme.of(context).scaffoldBackgroundColor,
                   elevation: 0),
               onPressed: () {
-                print("add menu");
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => SearchPage()));
               },
               icon: Icon(
                 Icons.add,

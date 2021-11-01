@@ -4,6 +4,8 @@ import 'package:foodandbody/widget/menu_card/bloc/menu_card_bloc.dart';
 import 'package:foodandbody/widget/menu_card/menu_card_item.dart';
 
 class MenuCardList extends StatefulWidget {
+  const MenuCardList({Key? key, required this.isMyFav}) : super(key: key);
+  final bool isMyFav;
   @override
   _MenuCardListState createState() => _MenuCardListState();
 }
@@ -24,19 +26,22 @@ class _MenuCardListState extends State<MenuCardList> {
             return const Center(child: Text('failed to fetch menu'));
           case MenuCardStatus.success:
             if (state.menu.isEmpty) {
-              return const Center(child: Text('ไม่พบเมนู'));
+              return Center(
+                child: Text(
+                    '${widget.isMyFav ? "ไม่มีเมนูที่กินบ่อยในขณะนี้" : "ไม่มีเมนูยอดนิยมในขณะนี้"}',
+                    style: Theme.of(context).textTheme.subtitle1!.merge(
+                        TextStyle(
+                            color: Theme.of(context).primaryColor))),
+              );
             }
             return Container(
               height: 200,
               child: ListView.builder(
                 key: const Key('menu_card_listview'),
                 itemBuilder: (BuildContext context, int index) {
-                  return index >= state.menu.length
-                      ? const Center(child: CircularProgressIndicator())
-                      : MenuCardItem(menu: state.menu[index]);
+                  return MenuCardItem(menu: state.menu[index]);
                 },
-                itemCount: 5,
-                // itemCount: state.menu.length,
+                itemCount: state.menu.length,
                 scrollDirection: Axis.horizontal,
                 shrinkWrap: true,
                 padding: EdgeInsets.fromLTRB(16, 0, 16, 16),

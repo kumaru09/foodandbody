@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/models/search_result.dart';
-import 'package:foodandbody/repositories/search_reository.dart';
+import 'package:foodandbody/repositories/search_repository.dart';
 import 'package:foodandbody/screens/menu/menu.dart';
 import 'package:foodandbody/screens/search/bloc/search_bloc.dart';
 
@@ -42,6 +42,7 @@ class SearchAppBar extends StatefulWidget {
 class _SearchAppBarState extends State<SearchAppBar> {
   final _textController = TextEditingController();
   late SearchBloc _searchBloc;
+  String _lastText = '';
 
   @override
   void initState() {
@@ -57,7 +58,8 @@ class _SearchAppBarState extends State<SearchAppBar> {
 
   void _onClearTapped() {
     _textController.text = '';
-    _searchBloc.add(const TextChanged(text: ''));
+    _lastText = '';
+    _searchBloc.add(TextChanged(text: ''));
   }
 
   @override
@@ -70,9 +72,12 @@ class _SearchAppBarState extends State<SearchAppBar> {
       child: TextField(
         key: const Key('search_appbar_textfield'),
         controller: _textController,
-        autocorrect: false, 
+        autocorrect: false,
         onChanged: (text) {
-          _searchBloc.add(TextChanged(text: text));
+          if (_lastText != text) {
+            _lastText = text;
+            _searchBloc.add(TextChanged(text: text));
+          }
         },
         style: Theme.of(context)
             .textTheme
@@ -85,65 +90,105 @@ class _SearchAppBarState extends State<SearchAppBar> {
                   color: Theme.of(context).colorScheme.secondary),
             ),
             hintText: 'ค้นหาเมนู',
-            hintStyle: Theme.of(context).textTheme.bodyText1!.merge(TextStyle(
-                      color: Color(0xFF7E7C9F))),
+            hintStyle: Theme.of(context)
+                .textTheme
+                .bodyText1!
+                .merge(TextStyle(color: Color(0xFF7E7C9F))),
             border: InputBorder.none),
       ),
     );
   }
 }
 
-class SearchBody extends StatelessWidget {
+class SearchBody extends StatefulWidget {
   const SearchBody({Key? key}) : super(key: key);
+
+  @override
+  _SearchBodyState createState() => _SearchBodyState();
+}
+
+class _SearchBodyState extends State<SearchBody> {
+  final _scrollController = ScrollController();
+  late SearchBloc _searchBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchBloc = context.read<SearchBloc>();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController
+      ..removeListener(_onScroll)
+      ..dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_isBottom) _searchBloc.add(TextChanged(text: _searchBloc.keySearch));
+  }
+
+  bool get _isBottom {
+    if (!_scrollController.hasClients) return false;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.offset;
+    return currentScroll >= (maxScroll * 0.9);
+  }
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<SearchBloc, SearchState>(builder: (context, state) {
-      if (state is SearchStateLoading) {
-        return Center(child: const CircularProgressIndicator());
-      }
-      if (state is SearchStateError) {
-        return Center(child: Text(state.error));
-      }
-      if (state is SearchStateSuccess) {
-        return state.items.isEmpty
-            ? Center(
-                child: Text(
-                  'ไม่พบผลลัพธ์ที่ตรงกัน',
+      switch (state.status) {
+        case SearchStatus.loading:
+          return Center(child: const CircularProgressIndicator());
+        case SearchStatus.failure:
+          return Center(
+              child: Text('failed to fetch menu',
                   style: Theme.of(context).textTheme.subtitle1!.merge(TextStyle(
-                      color: Theme.of(context).colorScheme.secondary)),
-                ),
-              )
-            : _SearchResult(items: state.items);
+                      color: Theme.of(context).colorScheme.secondary))));
+        case SearchStatus.success:
+          return state.result.isEmpty
+              ? Center(
+                  child: Text(
+                    'ไม่พบผลลัพธ์ที่ตรงกัน',
+                    style: Theme.of(context).textTheme.subtitle1!.merge(
+                        TextStyle(
+                            color: Theme.of(context).colorScheme.secondary)),
+                  ),
+                )
+              : SafeArea(
+                  child: ListView.builder(
+                    itemCount: state.hasReachedMax
+                        ? state.result.length
+                        : state.result.length + 1,
+                    controller: _scrollController,
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
+                    itemBuilder: (BuildContext context, int index) {
+                      return index >= state.result.length
+                          ? const SizedBox(
+                              height: 56,
+                              width: double.infinity,
+                              child: Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            )
+                          : _SearchResultItem(item: state.result[index]);
+                    },
+                  ),
+                );
+        default:
+          return Center(
+            child: Text(
+              'กรุณาใส่ชื่อเมนูเพื่อค้นหา',
+              style: Theme.of(context).textTheme.subtitle1!.merge(
+                  TextStyle(color: Theme.of(context).colorScheme.secondary)),
+            ),
+          );
       }
-      return Center(
-        child: Text(
-          'กรุณาใส่ชื่อเมนูเพื่อค้นหา',
-          style: Theme.of(context)
-              .textTheme
-              .subtitle1!
-              .merge(TextStyle(color: Theme.of(context).colorScheme.secondary)),
-        ),
-      );
     });
-  }
-}
-
-class _SearchResult extends StatelessWidget {
-  const _SearchResult({Key? key, required this.items}) : super(key: key);
-
-  final List<SearchResultItem> items;
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: ListView.builder(
-        itemCount: items.length,
-        itemBuilder: (BuildContext context, int index) {
-          return _SearchResultItem(item: items[index]);
-        },
-      ),
-    );
   }
 }
 
@@ -157,6 +202,7 @@ class _SearchResultItem extends StatelessWidget {
     return Column(
       children: [
         ListTile(
+          minVerticalPadding: 16,
           title: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
