@@ -7,8 +7,6 @@ import 'package:foodandbody/models/user.dart';
 import 'package:image_picker/image_picker.dart';
 
 class EditProfile extends StatelessWidget {
-  File? _image;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,7 +24,6 @@ class EditProfile extends StatelessWidget {
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            _image = null;
             Navigator.pop(context);
           },
         ),
@@ -51,7 +48,7 @@ class EditProfile extends StatelessWidget {
               constraints: BoxConstraints(minHeight: 50),
               color: Theme.of(context).primaryColor,
               alignment: Alignment.topCenter,
-              child: _EditProfileImage(image: _image),
+              child: _EditProfileImage(),
             ),
             Container(
               padding: EdgeInsets.only(left: 16, top: 26, right: 15),
@@ -85,7 +82,6 @@ class EditProfile extends StatelessWidget {
 }
 
 class _EditProfileImage extends StatefulWidget {
-  _EditProfileImage({required this.image});
   File? image;
 
   @override
