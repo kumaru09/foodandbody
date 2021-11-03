@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/models/menu.dart';
-import 'package:foodandbody/repositories/favor_repository.dart';
-import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:foodandbody/screens/camera/camera.dart';
+import 'package:foodandbody/screens/main_screen/main_screen.dart';
 import 'package:foodandbody/screens/menu/menu_dialog.dart';
 import 'package:foodandbody/screens/menu/bloc/menu_bloc.dart';
 import 'package:foodandbody/widget/nutrient_detail.dart';
-import 'package:http/http.dart' as http;
 
 class MenuDetail extends StatefulWidget {
   MenuDetail({Key? key, required this.isPlanMenu, Menu? item})
@@ -47,7 +45,8 @@ class _MenuDetailState extends State<MenuDetail> {
     if (widget.isPlanMenu) {
       return Row(
         children: [
-          _EatNowButton(name: name, volumn: widget.menu.volumn, serve: serve, unit: unit),
+          _EatNowButton(
+              name: name, volumn: widget.menu.volumn, unit: unit),
           SizedBox(width: 16.0),
           _TakePhotoButton(),
         ],
@@ -134,9 +133,7 @@ class _MenuDetailState extends State<MenuDetail> {
                 Padding(
                   padding: EdgeInsets.all(16.0),
                   child: displayButton(
-                      state.menu.name,
-                      state.menu.serve,
-                      state.menu.unit),
+                      state.menu.name, state.menu.serve, state.menu.unit),
                 ),
               ],
             );
@@ -167,18 +164,23 @@ class _AddToPlanButton extends StatelessWidget {
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(50))),
         ),
-        onPressed: () => showDialog<String>(
+        onPressed: () async {
+          final value = await showDialog<String>(
             context: context,
-            builder: (BuildContext context) {
-              return BlocProvider(
-                  create: (_) => MenuBloc(
-                      httpClient: http.Client(),
-                      path: name,
-                      planRepository: context.read<PlanRepository>(),
-                      favoriteRepository: context.read<FavoriteRepository>()),
-                  child: MenuDialog(
-                      name: name, serve: serve, unit: unit, isEatNow: false));
-            }),
+            builder: (BuildContext context) => MenuDialog(
+                serve: serve, unit: unit, isEatNow: false),
+          );
+          if (value != 'cancel') {
+            await context.read<MenuBloc>().addMenu(
+                name: name, isEatNow: false, volumn: double.parse(value as String));
+            Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+              MaterialPageRoute(
+                builder: (context) => MainScreen(index: 1),
+              ),
+              (Route<dynamic> route) => false,
+            );
+          }
+        },
       ),
     );
   }
@@ -186,11 +188,13 @@ class _AddToPlanButton extends StatelessWidget {
 
 class _EatNowButton extends StatelessWidget {
   final String name;
-  final double serve;
   final double volumn;
   final String unit;
   const _EatNowButton(
-      {Key? key, required this.name, required this.serve, required this.volumn, required this.unit})
+      {Key? key,
+      required this.name,
+      required this.volumn,
+      required this.unit})
       : super(key: key);
   @override
   Widget build(BuildContext context) {
@@ -203,18 +207,23 @@ class _EatNowButton extends StatelessWidget {
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(50))),
         ),
-        onPressed: () => showDialog<String>(
+        onPressed: () async {
+          final value = await showDialog<String>(
             context: context,
-            builder: (BuildContext context) {
-              return BlocProvider(
-                  create: (_) => MenuBloc(
-                      httpClient: http.Client(),
-                      path: name,
-                      planRepository: context.read<PlanRepository>(),
-                      favoriteRepository: context.read<FavoriteRepository>()),
-                  child: MenuDialog(
-                      name: name, serve: serve, unit: unit, isEatNow: true, volumn: volumn));
-            }),
+            builder: (BuildContext context) => MenuDialog(
+                serve: volumn, unit: unit, isEatNow: true),
+          );
+          if (value != 'cancel') {
+            await context.read<MenuBloc>().addMenu(
+                name: name, isEatNow: true, volumn: double.parse(value as String));
+            Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+              MaterialPageRoute(
+                builder: (context) => MainScreen(index: 1),
+              ),
+              (Route<dynamic> route) => false,
+            );
+          }
+        }
       ),
     );
   }
