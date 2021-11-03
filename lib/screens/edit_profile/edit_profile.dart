@@ -60,13 +60,13 @@ class EditProfile extends StatelessWidget {
               padding: EdgeInsets.only(left: 16, top: 26, right: 15),
               width: MediaQuery.of(context).size.width,
               alignment: Alignment.topLeft,
-              child: _EditEmail(),
+              child: _EditPassword(),
             ),
             Container(
               padding: EdgeInsets.only(left: 16, top: 26, right: 15),
               width: MediaQuery.of(context).size.width,
               alignment: Alignment.topLeft,
-              child: _EditPassword(),
+              child: _ConfirmEditPassword(),
             ),
             Container(
               padding: EdgeInsets.only(left: 16, top: 26, right: 15),
@@ -202,20 +202,6 @@ class _EditUsername extends StatelessWidget {
   }
 }
 
-class _EditEmail extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      initialValue: context.read<AppBloc>().state.user.email,
-      textInputAction: TextInputAction.next,
-      keyboardType: TextInputType.emailAddress,
-      decoration: InputDecoration(
-          labelText: "อีเมล",
-          border: OutlineInputBorder(borderSide: BorderSide())),
-    );
-  }
-}
-
 class _EditPassword extends StatefulWidget {
   @override
   __EditPasswordState createState() => __EditPasswordState();
@@ -229,6 +215,36 @@ class __EditPasswordState extends State<_EditPassword> {
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(
         labelText: "รหัสผ่าน",
+        border: OutlineInputBorder(
+          borderSide: BorderSide(),
+        ),
+        suffixIcon: InkWell(
+          child: Icon(_isHidden ? Icons.visibility : Icons.visibility_off),
+          onTap: () {
+            setState(() {
+              _isHidden = !_isHidden;
+            });
+          },
+        ),
+      ),
+      obscureText: _isHidden,
+    );
+  }
+}
+
+class _ConfirmEditPassword extends StatefulWidget {
+  @override
+  __ConfirmEditPasswordState createState() => __ConfirmEditPasswordState();
+}
+
+class __ConfirmEditPasswordState extends State<_ConfirmEditPassword> {
+  bool _isHidden = true;
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      textInputAction: TextInputAction.next,
+      decoration: InputDecoration(
+        labelText: "ยืนยันรหัสผ่าน",
         border: OutlineInputBorder(
           borderSide: BorderSide(),
         ),
