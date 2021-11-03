@@ -10,3 +10,18 @@ abstract class HomeEvent extends Equatable {
 class IncreaseWaterEvent extends HomeEvent {}
 
 class DecreaseWaterEvent extends HomeEvent {}
+
+class WaterChanged extends HomeEvent {
+  const WaterChanged({required this.water});
+  final int water;
+
+  @override
+  List<Object> get props => [water];
+
+  @override
+  String toString() {
+    return 'WaterChanged { water: $water }';
+  }
+}
+
+class LoadWater extends HomeEvent {}

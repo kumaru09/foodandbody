@@ -152,6 +152,36 @@ class PlanRepository implements IPlanRepository {
       await plan.docs.first.reference.update({'menuList': menuListMap});
     }
   }
+
+  Future<void> addWaterPlan(int water) async {
+    final CollectionReference foodHistories = FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .collection('foodhistories');
+    final plan = await foodHistories
+        .where('date', isGreaterThanOrEqualTo: lastMidnight)
+        .get();
+    if (plan.docs.isNotEmpty) {
+      return plan.docs.first.reference.update({'totalWater': water});
+    } else {
+      throw Exception('error fetching data');
+    }
+  }
+
+  Future<int> getWaterPlan() async {
+    final CollectionReference foodHistories = FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .collection('foodhistories');
+    final plan = await foodHistories
+        .where('date', isGreaterThanOrEqualTo: lastMidnight)
+        .get();
+    if (plan.docs.isNotEmpty) {
+      return plan.docs.first.get('totalWater');
+    } else {
+      throw Exception('error fetching water');
+    }
+  }
 }
 
 extension on double {
