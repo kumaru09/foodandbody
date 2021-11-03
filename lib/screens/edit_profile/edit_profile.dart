@@ -82,13 +82,14 @@ class EditProfile extends StatelessWidget {
 }
 
 class _EditProfileImage extends StatefulWidget {
-  File? image;
 
   @override
   __EditProfileImageState createState() => __EditProfileImageState();
 }
 
 class __EditProfileImageState extends State<_EditProfileImage> {
+  File? _image;
+
   Future _pickImage({required source}) async {
     try {
       final ImagePicker _picker = ImagePicker();
@@ -96,8 +97,8 @@ class __EditProfileImageState extends State<_EditProfileImage> {
 
       if (_pickedImage == null) return;
       setState(() {
-        widget.image = File(_pickedImage.path);
-        print("image: ${widget.image}");
+        _image = File(_pickedImage.path);
+        print("image: $_image");
       });
     } catch (e) {
       ScaffoldMessenger.of(context)
@@ -107,38 +108,38 @@ class __EditProfileImageState extends State<_EditProfileImage> {
     }
   }
 
-  String getInitialImage(BuildContext context) {
-    User _user = context.read<AppBloc>().state.user;
-    if (_user.info!.photoUrl != "")
-      return _user.info!.photoUrl.toString();
-    else if (_user.photoUrl != null)
-      return _user.photoUrl.toString();
+  String _getInitialImage(BuildContext context, User user) {
+    if (user.info!.photoUrl != "")
+      return user.info!.photoUrl.toString();
+    else if (user.photoUrl != null)
+      return user.photoUrl.toString();
     else
       return "";
   }
 
   @override
   Widget build(BuildContext context) {
+    User _user = context.read<AppBloc>().state.user;
+    bool _hasProfileImage = (_user.photoUrl != null) || (_user.info!.photoUrl != "");
     return Stack(children: <Widget>[
       Container(
           child: CircleAvatar(
-        radius: 77,
-        backgroundColor: Colors.white,
-        child: widget.image == null
-            ? CircleAvatar(
-                foregroundImage: getInitialImage(context) != ""
-                    ? NetworkImage(
-                        context.read<AppBloc>().state.user.photoUrl.toString())
-                    : Image.asset("assets/default_profile_image.png").image,
-                backgroundColor: Colors.white,
-                radius: 74,
-              )
-            : CircleAvatar(
-                foregroundImage: Image.file(widget.image!).image,
-                backgroundColor: Colors.white,
-                radius: 74,
-              ),
-      )),
+              radius: 77,
+              backgroundColor: Colors.white,
+              child: _image != null
+                  ? CircleAvatar(
+                      foregroundImage: Image.file(_image!).image,
+                      backgroundColor: Colors.white,
+                      radius: 74,
+                    )
+                  : CircleAvatar(
+                      foregroundImage: _hasProfileImage
+                          ? NetworkImage(_getInitialImage(context, _user))
+                          : Image.asset("assets/default_profile_image.png")
+                              .image,
+                      backgroundColor: Colors.white,
+                      radius: 74,
+                    ))),
       Positioned(
           top: MediaQuery.of(context).size.height * 0.01,
           left: MediaQuery.of(context).size.width * 0.255,
@@ -214,7 +215,7 @@ class __EditPasswordState extends State<_EditPassword> {
     return TextFormField(
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(
-        labelText: "รหัสผ่าน",
+        labelText: "รหัสผ่านใหม่",
         border: OutlineInputBorder(
           borderSide: BorderSide(),
         ),
