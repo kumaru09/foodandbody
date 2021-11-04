@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodandbody/app/app.dart';
+import 'package:foodandbody/screens/history/bloc/history_bloc.dart';
 import 'package:foodandbody/screens/main_screen/main_screen.dart';
 import 'package:foodandbody/screens/menu/bloc/menu_bloc.dart';
 
@@ -12,7 +14,7 @@ class MenuDialog extends StatefulWidget {
       required this.isEatNow,
       double? volumn})
       : this.volumn = volumn ?? 0.0,
-      super(key: key);
+        super(key: key);
 
   final String name;
   final double serve;
@@ -30,7 +32,7 @@ class _MenuDialogState extends State<MenuDialog> {
   @override
   void initState() {
     super.initState();
-    _currentSliderValue = widget.isEatNow? widget.volumn : widget.serve;
+    _currentSliderValue = widget.isEatNow ? widget.volumn : widget.serve;
   }
 
   String toRound(double value) {
@@ -85,17 +87,21 @@ class _MenuDialogState extends State<MenuDialog> {
           onPressed: _currentSliderValue == 0.0
               ? null
               : () => context
-                  .read<MenuBloc>()
-                  .addMenu(
-                      name: widget.name,
-                      isEatNow: widget.isEatNow,
-                      volumn: double.parse(toRound(_currentSliderValue)))
-                  .then((value) => Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => MainScreen(index: 1)),
-                        (Route<dynamic> route) => false,
-                      )),
+                      .read<MenuBloc>()
+                      .addMenu(
+                          name: widget.name,
+                          isEatNow: widget.isEatNow,
+                          volumn: double.parse(toRound(_currentSliderValue)))
+                      .then((value) {
+                    // context
+                    //     .read<HistoryBloc>()
+                    //     .add(LoadMenuList(dateTime: DateTime.now()));
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => AppView()),
+                      (Route<dynamic> route) => false,
+                    );
+                  }),
           child: Text('ตกลง',
               style: Theme.of(context).textTheme.button!.merge(TextStyle(
                   color: _currentSliderValue == 0.0

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodandbody/repositories/body_repository.dart';
+import 'package:foodandbody/repositories/history_repository.dart';
 import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:foodandbody/screens/body/body.dart';
 import 'package:foodandbody/screens/camera/camera.dart';
+import 'package:foodandbody/screens/history/bloc/history_bloc.dart';
 import 'package:foodandbody/screens/history/history.dart';
 import 'package:foodandbody/screens/home/home.dart';
 import 'package:foodandbody/screens/main_screen/bottom_appbar.dart';
@@ -50,25 +53,34 @@ class _MainScreenState extends State<MainScreen> {
     return Scaffold(
         extendBody: true,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        body: BlocProvider(
-          create: (_) =>
-              PlanBloc(planRepository: context.read<PlanRepository>())
-                ..add(LoadPlan()),
+        body: MultiBlocProvider(
+          providers: [
+            BlocProvider(
+                create: (_) =>
+                    PlanBloc(planRepository: context.read<PlanRepository>())
+                      ..add(LoadPlan())),
+            BlocProvider(
+                create: (_) => HistoryBloc(
+                    historyRepository: context.read<HistoryRepository>(),
+                    bodyRepository: context.read<BodyRepository>())
+                  ..add(LoadHistory())
+                  ..add(LoadMenuList(dateTime: DateTime.now())))
+          ],
           child: _getPage(_currentIndex),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: Visibility(
             visible: isKeyboardOpen,
             child: FloatingActionButton(
-          key: const Key('camera_floating_button'),
-          onPressed: () {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => Camera()));
-          },
-          elevation: 0.4,
-          child: Icon(Icons.photo_camera),
-          backgroundColor: Theme.of(context).colorScheme.secondary,
-        )),
+              key: const Key('camera_floating_button'),
+              onPressed: () {
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (context) => Camera()));
+              },
+              elevation: 0.4,
+              child: Icon(Icons.photo_camera),
+              backgroundColor: Theme.of(context).colorScheme.secondary,
+            )),
         bottomNavigationBar: BottomNavigation(
             index: _currentIndex, onChangedTab: _onChangedTab));
   }
