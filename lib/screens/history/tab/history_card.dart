@@ -143,8 +143,9 @@ class _LineChart extends StatelessWidget {
         dataPoint.add(FlSpot(index.toDouble(), data[0].toDouble()));
       }
     } else {
-      for (int index = 1; index <= data.length; index++) {
-        dataPoint.add(FlSpot(index.toDouble(), data[index - 1].toDouble()));
+      for (int index = data.length; index > 0; index--) {
+        dataPoint.add(
+            FlSpot(index.toDouble(), data[data.length - index].toDouble()));
       }
     }
 

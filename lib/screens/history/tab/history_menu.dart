@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:foodandbody/models/history_menu.dart';
+import 'package:foodandbody/screens/history/bloc/history_bloc.dart';
+import 'package:provider/src/provider.dart';
 
 const ColorScheme _calendarColorScheme = ColorScheme(
   primary: Color(0xFFFF8E6E),
@@ -21,29 +23,54 @@ const ColorScheme _calendarColorScheme = ColorScheme(
 DateTime dateToday = DateTime.now();
 
 class HistoryMenu extends StatelessWidget {
-  HistoryMenu({Key? key, required this.startDate}) : super(key: key);
+  HistoryMenu(
+      {Key? key,
+      required this.startDate,
+      required this.items,
+      required this.dateMenuList})
+      : super(key: key);
 
   final DateTime startDate;
+  DateTime? selected = DateTime.now();
+  final DateTime dateMenuList;
 
-  List<HistoryMenuItem> items = [
-    HistoryMenuItem(name: 'กุ้งทอด', calory: 156, date: Timestamp.fromDate(dateToday)),
-    HistoryMenuItem(name: 'ปลาทอด', calory: 107, date: Timestamp.fromDate(dateToday)),
-    HistoryMenuItem(name: 'ปลาหมึกทอด', calory: 176, date: Timestamp.fromDate(dateToday)),
-    HistoryMenuItem(name: 'ไก่ทอด', calory: 234, date: Timestamp.fromDate(dateToday)),
-    HistoryMenuItem(name: 'หอยทอด', calory: 426, date: Timestamp.fromDate(dateToday)),
-    HistoryMenuItem(name: 'หอยทอด', calory: 426, date: Timestamp.fromDate(dateToday)),
-    HistoryMenuItem(name: 'หอยทอด', calory: 426, date: Timestamp.fromDate(dateToday)),
-    HistoryMenuItem(name: 'หอยทอด', calory: 426, date: Timestamp.fromDate(dateToday)),
-    HistoryMenuItem(name: 'หอยทอด', calory: 426, date: Timestamp.fromDate(dateToday)),
-    HistoryMenuItem(name: 'หอยทอด', calory: 426, date: Timestamp.fromDate(dateToday)),
-    HistoryMenuItem(name: 'หอยทอด', calory: 426, date: Timestamp.fromDate(dateToday)),
-    HistoryMenuItem(name: 'หอยทอดสุดท้าย', calory: 426, date: Timestamp.fromDate(dateToday)),
-  ];
+  final List<HistoryMenuItem> items;
+  late int totalCal = items
+      .map((element) => element.calory)
+      .fold(0, (previousValue, element) => previousValue + element);
+  // [
+  //   HistoryMenuItem(
+  //       name: 'กุ้งทอด', calory: 156, date: Timestamp.fromDate(dateToday)),
+  //   HistoryMenuItem(
+  //       name: 'ปลาทอด', calory: 107, date: Timestamp.fromDate(dateToday)),
+  //   HistoryMenuItem(
+  //       name: 'ปลาหมึกทอด', calory: 176, date: Timestamp.fromDate(dateToday)),
+  //   HistoryMenuItem(
+  //       name: 'ไก่ทอด', calory: 234, date: Timestamp.fromDate(dateToday)),
+  //   HistoryMenuItem(
+  //       name: 'หอยทอด', calory: 426, date: Timestamp.fromDate(dateToday)),
+  //   HistoryMenuItem(
+  //       name: 'หอยทอด', calory: 426, date: Timestamp.fromDate(dateToday)),
+  //   HistoryMenuItem(
+  //       name: 'หอยทอด', calory: 426, date: Timestamp.fromDate(dateToday)),
+  //   HistoryMenuItem(
+  //       name: 'หอยทอด', calory: 426, date: Timestamp.fromDate(dateToday)),
+  //   HistoryMenuItem(
+  //       name: 'หอยทอด', calory: 426, date: Timestamp.fromDate(dateToday)),
+  //   HistoryMenuItem(
+  //       name: 'หอยทอด', calory: 426, date: Timestamp.fromDate(dateToday)),
+  //   HistoryMenuItem(
+  //       name: 'หอยทอด', calory: 426, date: Timestamp.fromDate(dateToday)),
+  //   HistoryMenuItem(
+  //       name: 'หอยทอดสุดท้าย',
+  //       calory: 426,
+  //       date: Timestamp.fromDate(dateToday)),
+  // ];
 
   _selectDate(BuildContext context) async {
-    final selected = await showDatePicker(
+    selected = await showDatePicker(
       context: context,
-      initialDate: dateToday, //get from bloc
+      initialDate: dateMenuList, //get from bloc
       firstDate: startDate,
       lastDate: dateToday,
       helpText: 'เลือกวัน',
@@ -64,7 +91,10 @@ class HistoryMenu extends StatelessWidget {
         );
       },
     );
-    if (selected != null) print(selected); //call bloc
+    if (selected != null)
+      context
+          .read<HistoryBloc>()
+          .add(LoadMenuList(dateTime: selected)); //call bloc
   }
 
   @override
@@ -80,7 +110,7 @@ class HistoryMenu extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      '${items[0].date.toDate().day}/${items[0].date.toDate().month}/${items[0].date.toDate().year}',
+                      '${dateMenuList.day}/${dateMenuList.month}/${dateMenuList.year}',
                       style: Theme.of(context).textTheme.headline5!.merge(
                           TextStyle(
                               color: Theme.of(context).colorScheme.secondary)),
@@ -112,7 +142,7 @@ class HistoryMenu extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '700 ',
+                      '$totalCal ',
                       style: Theme.of(context).textTheme.headline6!.merge(
                           TextStyle(
                               color: Theme.of(context).colorScheme.secondary)),
@@ -181,7 +211,8 @@ class HistoryMenuDaily extends StatelessWidget {
                             TextStyle(
                                 color:
                                     Theme.of(context).colorScheme.secondary))),
-                    Text('${item.date.toDate().hour}:${item.date.toDate().minute}',
+                    Text(
+                        '${item.date?.toDate().hour}:${item.date?.toDate().minute}',
                         style: Theme.of(context).textTheme.bodyText2!.merge(
                             TextStyle(
                                 color: Theme.of(context)

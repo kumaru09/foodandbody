@@ -7,6 +7,6 @@ class HistoryMenuItem {
     required this.calory,
   });
   final String name;
-  final Timestamp date;
+  final Timestamp? date;
   final int calory;
-} 
+}

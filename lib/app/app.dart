@@ -7,6 +7,7 @@ import 'package:foodandbody/app/routes.dart';
 import 'package:foodandbody/repositories/authen_repository.dart';
 import 'package:foodandbody/repositories/body_repository.dart';
 import 'package:foodandbody/repositories/favor_repository.dart';
+import 'package:foodandbody/repositories/history_repository.dart';
 import 'package:foodandbody/repositories/menu_card_repository.dart';
 import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:foodandbody/repositories/search_repository.dart';
@@ -43,7 +44,9 @@ class App extends StatelessWidget {
         RepositoryProvider<FavoriteRepository>(
             create: (context) => FavoriteRepository()),
         RepositoryProvider<MenuCardRepository>(
-            create: (context) => MenuCardRepository())
+            create: (context) => MenuCardRepository()),
+        RepositoryProvider<HistoryRepository>(
+            create: (context) => HistoryRepository())
       ],
       child: BlocProvider(
         create: (_) => AppBloc(
@@ -58,7 +61,6 @@ class App extends StatelessWidget {
 
 class AppView extends StatelessWidget {
   const AppView({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
