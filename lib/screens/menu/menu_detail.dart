@@ -46,13 +46,26 @@ class _MenuDetailState extends State<MenuDetail> {
       return Row(
         children: [
           _EatNowButton(
-              name: name, volumn: widget.menu.volumn, unit: unit),
+              name: name,
+              volumn: widget.menu.volumn,
+              unit: unit,
+              isPlanMenu: widget.isPlanMenu),
           SizedBox(width: 16.0),
           _TakePhotoButton(),
         ],
       );
     } else {
-      return _AddToPlanButton(name: name, serve: serve, unit: unit);
+      return Row(
+        children: [
+          _AddToPlanButton(name: name, serve: serve, unit: unit),
+          SizedBox(width: 16.0),
+          _EatNowButton(
+              name: name,
+              volumn: serve,
+              unit: unit,
+              isPlanMenu: widget.isPlanMenu),
+        ],
+      );
     }
   }
 
@@ -154,8 +167,7 @@ class _AddToPlanButton extends StatelessWidget {
       : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
+    return Expanded(
       child: OutlinedButton(
         key: const Key('menu_addToPlan_button'),
         child: Text('เพิ่มในแผนการกิน'),
@@ -167,18 +179,17 @@ class _AddToPlanButton extends StatelessWidget {
         onPressed: () async {
           final value = await showDialog<String>(
             context: context,
-            builder: (BuildContext context) => MenuDialog(
-                serve: serve, unit: unit, isEatNow: false),
+            builder: (BuildContext context) =>
+                MenuDialog(serve: serve, unit: unit, isEatNow: false),
           );
           if (value != 'cancel') {
             await context.read<MenuBloc>().addMenu(
-                name: name, isEatNow: false, volumn: double.parse(value as String));
-            Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-              MaterialPageRoute(
-                builder: (context) => MainScreen(index: 1),
-              ),
-              (Route<dynamic> route) => false,
-            );
+                name: name,
+                isEatNow: false,
+                volumn: double.parse(value as String));
+            Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (context) => MainScreen(index: 1),
+            ));
           }
         },
       ),
@@ -190,41 +201,54 @@ class _EatNowButton extends StatelessWidget {
   final String name;
   final double volumn;
   final String unit;
+  final bool isPlanMenu;
   const _EatNowButton(
       {Key? key,
       required this.name,
       required this.volumn,
-      required this.unit})
+      required this.unit,
+      required this.isPlanMenu})
       : super(key: key);
+
+  _eatNowOnPressed(BuildContext context) async {
+    final value = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) =>
+          MenuDialog(serve: volumn, unit: unit, isEatNow: true),
+    );
+    if (value != 'cancel') {
+      await context.read<MenuBloc>().addMenu(
+          name: name, isEatNow: true, volumn: double.parse(value as String));
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (context) => MainScreen(index: 1),
+            ));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: OutlinedButton(
-        key: const Key('menu_eatNow_button'),
-        child: Text('กินเลย'),
-        style: OutlinedButton.styleFrom(
-          primary: Theme.of(context).primaryColor,
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(50))),
-        ),
-        onPressed: () async {
-          final value = await showDialog<String>(
-            context: context,
-            builder: (BuildContext context) => MenuDialog(
-                serve: volumn, unit: unit, isEatNow: true),
-          );
-          if (value != 'cancel') {
-            await context.read<MenuBloc>().addMenu(
-                name: name, isEatNow: true, volumn: double.parse(value as String));
-            Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-              MaterialPageRoute(
-                builder: (context) => MainScreen(index: 1),
+      child: isPlanMenu
+          ? OutlinedButton(
+              key: const Key('menu_eatNow_outlinedButton'),
+              child: Text('กินเลย'),
+              style: OutlinedButton.styleFrom(
+                primary: Theme.of(context).primaryColor,
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(50))),
               ),
-              (Route<dynamic> route) => false,
-            );
-          }
-        }
-      ),
+              onPressed: () => _eatNowOnPressed(context),
+            )
+          : ElevatedButton(
+              key: const Key('menu_eatNow_elevatedButton'),
+              child: Text('กินเลย'),
+              style: ElevatedButton.styleFrom(
+                primary: Theme.of(context).primaryColor,
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(50))),
+              ),
+              onPressed: () => _eatNowOnPressed(context),
+            ),
     );
   }
 }
