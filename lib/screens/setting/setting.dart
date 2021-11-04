@@ -14,12 +14,12 @@ class Setting extends StatelessWidget {
     final String photoUrl;
 
     if (_user.info != null) {
-      if (_user.photoUrl != null) {
-        hasPhotoUrl = true;
-        photoUrl = _user.photoUrl.toString();
-      } else if (_user.info!.photoUrl != "") {
+      if (_user.info!.photoUrl != "") {
         hasPhotoUrl = true;
         photoUrl = _user.info!.photoUrl.toString();
+      } else if (_user.photoUrl != null) {
+        hasPhotoUrl = true;
+        photoUrl = _user.photoUrl.toString();
       } else {
         hasPhotoUrl = false;
         photoUrl = "";
