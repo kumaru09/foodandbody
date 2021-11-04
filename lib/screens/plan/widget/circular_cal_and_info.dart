@@ -276,7 +276,7 @@ class _EditGoalDialog extends StatelessWidget {
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      child: Text("แก้ไข",
+                      child: Text("ตกลง",
                           style: Theme.of(context).textTheme.button!.merge(
                               TextStyle(
                                   color: Theme.of(context).primaryColor)))),
