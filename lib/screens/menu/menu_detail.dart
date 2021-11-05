@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:foodandbody/models/menu.dart';
-import 'package:foodandbody/repositories/favor_repository.dart';
-import 'package:foodandbody/repositories/plan_repository.dart';
+import 'package:foodandbody/models/near_restaurant.dart';
 import 'package:foodandbody/screens/camera/camera.dart';
+import 'package:foodandbody/screens/main_screen/main_screen.dart';
 import 'package:foodandbody/screens/menu/menu_dialog.dart';
 import 'package:foodandbody/screens/menu/bloc/menu_bloc.dart';
 import 'package:foodandbody/widget/nutrient_detail.dart';
-import 'package:http/http.dart' as http;
 
 class MenuDetail extends StatefulWidget {
   MenuDetail({Key? key, required this.isPlanMenu, Menu? item})
@@ -47,15 +47,48 @@ class _MenuDetailState extends State<MenuDetail> {
     if (widget.isPlanMenu) {
       return Row(
         children: [
-          _EatNowButton(name: name, volumn: widget.menu.volumn, serve: serve, unit: unit),
+          _EatNowButton(
+              name: name,
+              volumn: widget.menu.volumn,
+              unit: unit,
+              isPlanMenu: widget.isPlanMenu),
           SizedBox(width: 16.0),
           _TakePhotoButton(),
         ],
       );
     } else {
-      return _AddToPlanButton(name: name, serve: serve, unit: unit);
+      return Row(
+        children: [
+          _AddToPlanButton(name: name, serve: serve, unit: unit),
+          SizedBox(width: 16.0),
+          _EatNowButton(
+              name: name,
+              volumn: serve,
+              unit: unit,
+              isPlanMenu: widget.isPlanMenu),
+        ],
+      );
     }
   }
+
+  List<NearRestaurant> items = [
+    NearRestaurant(
+      name: 'ร้านกุ้งยุดยา',
+      imageUrl: 'https://bnn.blob.core.windows.net/food/shrimp-fried-rice.jpg',
+      distance: 2.0,
+      rating: 3.2,
+      open: TimeOfDay(hour: 8, minute: 0),
+      close: TimeOfDay(hour: 20, minute: 0),
+    ),
+    NearRestaurant(
+      name: 'สมปองการกุ้ง',
+      imageUrl: 'https://bnn.blob.core.windows.net/food/shrimp-fried-rice.jpg',
+      distance: 4.5,
+      rating: 4.5,
+      open: TimeOfDay(hour: 12, minute: 0),
+      close: TimeOfDay(hour: 22, minute: 0),
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -107,24 +140,29 @@ class _MenuDetailState extends State<MenuDetail> {
                             ),
                             SizedBox(height: 16.0),
                             NutrientDetail(
-                                label: 'หน่วยบริโภค',
-                                value:
-                                    '${widget.isPlanMenu ? toRound(widget.menu.volumn) : toRound(state.menu.serve)} ${state.menu.unit}'),
+                              label: 'หน่วยบริโภค',
+                              value:
+                                  '${widget.isPlanMenu ? toRound(widget.menu.volumn) : toRound(state.menu.serve)} ${state.menu.unit}',
+                            ),
                             SizedBox(height: 7.0),
                             NutrientDetail(
-                                label: 'โปรตีน',
-                                value:
-                                    '${widget.isPlanMenu ? toRound(widget.menu.protein) : toRound(state.menu.protein)} กรัม'),
+                              label: 'โปรตีน',
+                              value:
+                                  '${widget.isPlanMenu ? toRound(widget.menu.protein) : toRound(state.menu.protein)} กรัม',
+                            ),
                             SizedBox(height: 7.0),
                             NutrientDetail(
-                                label: 'คาร์โบไฮเดรต',
-                                value:
-                                    '${widget.isPlanMenu ? toRound(widget.menu.carb) : toRound(state.menu.carb)} กรัม'),
+                              label: 'คาร์โบไฮเดรต',
+                              value:
+                                  '${widget.isPlanMenu ? toRound(widget.menu.carb) : toRound(state.menu.carb)} กรัม',
+                            ),
                             SizedBox(height: 7.0),
                             NutrientDetail(
-                                label: 'ไขมัน',
-                                value:
-                                    '${widget.isPlanMenu ? toRound(widget.menu.fat) : toRound(state.menu.fat)} กรัม'),
+                              label: 'ไขมัน',
+                              value:
+                                  '${widget.isPlanMenu ? toRound(widget.menu.fat) : toRound(state.menu.fat)} กรัม',
+                            ),
+                            if(items.isNotEmpty) _NearRestaurant(items: items),
                           ],
                         ),
                       ),
@@ -134,9 +172,7 @@ class _MenuDetailState extends State<MenuDetail> {
                 Padding(
                   padding: EdgeInsets.all(16.0),
                   child: displayButton(
-                      state.menu.name,
-                      state.menu.serve,
-                      state.menu.unit),
+                      state.menu.name, state.menu.serve, state.menu.unit),
                 ),
               ],
             );
@@ -144,6 +180,98 @@ class _MenuDetailState extends State<MenuDetail> {
             return const Center(child: CircularProgressIndicator());
         }
       },
+    );
+  }
+}
+
+class _NearRestaurant extends StatelessWidget {
+  final List<NearRestaurant> items;
+  const _NearRestaurant({Key? key, required this.items}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('สถานที่ใกล้คุณ',
+            style: Theme.of(context).textTheme.subtitle1!.merge(
+                TextStyle(color: Theme.of(context).colorScheme.secondary))),
+        ListView.builder(
+          itemBuilder: (BuildContext context, int index) {
+            return _NearRestaurantItem(item: items[index]);
+          },
+          itemCount: items.length,
+          scrollDirection: Axis.vertical,
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          padding: EdgeInsets.symmetric(vertical: 10),
+        ),
+      ],
+    );
+  }
+}
+
+class _NearRestaurantItem extends StatelessWidget {
+  final NearRestaurant item;
+  const _NearRestaurantItem({Key? key, required this.item}) : super(key: key);
+
+  String showTime(TimeOfDay time) {
+    return '${time.hour}:${time.minute==0?'00':time.minute}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 7),
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.all(Radius.circular(15)),
+            child: Image.network(
+              item.imageUrl,
+              width: 100,
+              height: 100,
+              alignment: Alignment.center,
+              fit: BoxFit.cover,
+            ),
+          ),
+          SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('${item.name}',
+                    style: Theme.of(context).textTheme.bodyText2!.merge(
+                        TextStyle(
+                            color: Theme.of(context).colorScheme.secondary))),
+                Text('${item.distance} กิโลเมตร',
+                    style: Theme.of(context).textTheme.caption!.merge(TextStyle(
+                        color: Theme.of(context).colorScheme.secondary))),
+                RatingBarIndicator(
+                  rating: item.rating,
+                  itemBuilder: (context, index) => Icon(
+                    Icons.star,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  itemCount: 5,
+                  itemSize: 24.0,
+                  direction: Axis.horizontal,
+                  unratedColor: Theme.of(context).colorScheme.secondaryVariant.withAlpha(60),
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(Icons.access_time, color: Theme.of(context).colorScheme.secondary),
+                    Text(' ${showTime(item.open)} - ${showTime(item.close)}',
+                    style: Theme.of(context).textTheme.caption!.merge(TextStyle(
+                        color: Theme.of(context).colorScheme.secondary))),],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -157,8 +285,7 @@ class _AddToPlanButton extends StatelessWidget {
       : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
+    return Expanded(
       child: OutlinedButton(
         key: const Key('menu_addToPlan_button'),
         child: Text('เพิ่มในแผนการกิน'),
@@ -167,18 +294,22 @@ class _AddToPlanButton extends StatelessWidget {
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(50))),
         ),
-        onPressed: () => showDialog<String>(
+        onPressed: () async {
+          final value = await showDialog<String>(
             context: context,
-            builder: (BuildContext context) {
-              return BlocProvider(
-                  create: (_) => MenuBloc(
-                      httpClient: http.Client(),
-                      path: name,
-                      planRepository: context.read<PlanRepository>(),
-                      favoriteRepository: context.read<FavoriteRepository>()),
-                  child: MenuDialog(
-                      name: name, serve: serve, unit: unit, isEatNow: false));
-            }),
+            builder: (BuildContext context) =>
+                MenuDialog(serve: serve, unit: unit, isEatNow: false),
+          );
+          if (value != 'cancel' && value != null) {
+            await context.read<MenuBloc>().addMenu(
+                name: name,
+                isEatNow: false,
+                volumn: double.parse(value.toString()));
+            Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (context) => MainScreen(index: 1),
+            ));
+          }
+        },
       ),
     );
   }
@@ -186,36 +317,56 @@ class _AddToPlanButton extends StatelessWidget {
 
 class _EatNowButton extends StatelessWidget {
   final String name;
-  final double serve;
   final double volumn;
   final String unit;
+  final bool isPlanMenu;
   const _EatNowButton(
-      {Key? key, required this.name, required this.serve, required this.volumn, required this.unit})
+      {Key? key,
+      required this.name,
+      required this.volumn,
+      required this.unit,
+      required this.isPlanMenu})
       : super(key: key);
+
+  _eatNowOnPressed(BuildContext context) async {
+    final value = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) =>
+          MenuDialog(serve: volumn, unit: unit, isEatNow: true),
+    );
+    if (value != 'cancel' && value != null) {
+      await context.read<MenuBloc>().addMenu(
+          name: name, isEatNow: true, volumn: double.parse(value.toString()));
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+        builder: (context) => MainScreen(index: 1),
+      ));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: OutlinedButton(
-        key: const Key('menu_eatNow_button'),
-        child: Text('กินเลย'),
-        style: OutlinedButton.styleFrom(
-          primary: Theme.of(context).primaryColor,
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(50))),
-        ),
-        onPressed: () => showDialog<String>(
-            context: context,
-            builder: (BuildContext context) {
-              return BlocProvider(
-                  create: (_) => MenuBloc(
-                      httpClient: http.Client(),
-                      path: name,
-                      planRepository: context.read<PlanRepository>(),
-                      favoriteRepository: context.read<FavoriteRepository>()),
-                  child: MenuDialog(
-                      name: name, serve: serve, unit: unit, isEatNow: true, volumn: volumn));
-            }),
-      ),
+      child: isPlanMenu
+          ? OutlinedButton(
+              key: const Key('menu_eatNow_outlinedButton'),
+              child: Text('กินเลย'),
+              style: OutlinedButton.styleFrom(
+                primary: Theme.of(context).primaryColor,
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(50))),
+              ),
+              onPressed: () => _eatNowOnPressed(context),
+            )
+          : ElevatedButton(
+              key: const Key('menu_eatNow_elevatedButton'),
+              child: Text('กินเลย'),
+              style: ElevatedButton.styleFrom(
+                primary: Theme.of(context).primaryColor,
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(50))),
+              ),
+              onPressed: () => _eatNowOnPressed(context),
+            ),
     );
   }
 }
