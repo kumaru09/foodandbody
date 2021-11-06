@@ -1,22 +1,23 @@
+import 'dart:typed_data';
+
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
 
 class NearRestaurant extends Equatable {
   const NearRestaurant(
-      {required this.name,
-      required this.imageUrl,
-      required this.distance,
-      required this.rating,
-      required this.open,
-      required this.close});
+      {this.name,
+      this.imageUrl,
+      this.distance,
+      this.rating,
+      this.open,
+      this.close});
 
-  final String name;
-  final String imageUrl;
-  final double distance;
-  final double rating;
-  final TimeOfDay open;
-  final TimeOfDay close;
+  final String? name;
+  final String? imageUrl;
+  final String? distance;
+  final double? rating;
+  final String? open;
+  final String? close;
 
   @override
-  List<Object> get props => [name, distance, rating, open, close];
+  List<Object?> get props => [name, distance, imageUrl, rating, open, close];
 }

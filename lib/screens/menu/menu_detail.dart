@@ -71,24 +71,24 @@ class _MenuDetailState extends State<MenuDetail> {
     }
   }
 
-  List<NearRestaurant> items = [
-    NearRestaurant(
-      name: 'ร้านกุ้งยุดยา',
-      imageUrl: 'https://bnn.blob.core.windows.net/food/shrimp-fried-rice.jpg',
-      distance: 2.0,
-      rating: 3.2,
-      open: TimeOfDay(hour: 8, minute: 0),
-      close: TimeOfDay(hour: 20, minute: 0),
-    ),
-    NearRestaurant(
-      name: 'สมปองการกุ้ง',
-      imageUrl: 'https://bnn.blob.core.windows.net/food/shrimp-fried-rice.jpg',
-      distance: 4.5,
-      rating: 4.5,
-      open: TimeOfDay(hour: 12, minute: 0),
-      close: TimeOfDay(hour: 22, minute: 0),
-    ),
-  ];
+  // List<NearRestaurant> items = [
+  //   NearRestaurant(
+  //     name: 'ร้านกุ้งยุดยา',
+  //     imageUrl: 'https://bnn.blob.core.windows.net/food/shrimp-fried-rice.jpg',
+  //     distance: 2.0,
+  //     rating: 3.2,
+  //     open: TimeOfDay(hour: 8, minute: 0),
+  //     close: TimeOfDay(hour: 20, minute: 0),
+  //   ),
+  //   NearRestaurant(
+  //     name: 'สมปองการกุ้ง',
+  //     imageUrl: 'https://bnn.blob.core.windows.net/food/shrimp-fried-rice.jpg',
+  //     distance: 4.5,
+  //     rating: 4.5,
+  //     open: TimeOfDay(hour: 12, minute: 0),
+  //     close: TimeOfDay(hour: 22, minute: 0),
+  //   ),
+  // ];
 
   @override
   Widget build(BuildContext context) {
@@ -162,7 +162,11 @@ class _MenuDetailState extends State<MenuDetail> {
                               value:
                                   '${widget.isPlanMenu ? toRound(widget.menu.fat) : toRound(state.menu.fat)} กรัม',
                             ),
-                            if(items.isNotEmpty) _NearRestaurant(items: items),
+                            if (state.nearRestaurant.isNotEmpty)
+                              _NearRestaurant(
+                                items: state.nearRestaurant,
+                                defaultUrl: state.menu.imageUrl,
+                              ),
                           ],
                         ),
                       ),
@@ -186,7 +190,10 @@ class _MenuDetailState extends State<MenuDetail> {
 
 class _NearRestaurant extends StatelessWidget {
   final List<NearRestaurant> items;
-  const _NearRestaurant({Key? key, required this.items}) : super(key: key);
+  final String defaultUrl;
+  const _NearRestaurant(
+      {Key? key, required this.items, required this.defaultUrl})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -198,7 +205,10 @@ class _NearRestaurant extends StatelessWidget {
                 TextStyle(color: Theme.of(context).colorScheme.secondary))),
         ListView.builder(
           itemBuilder: (BuildContext context, int index) {
-            return _NearRestaurantItem(item: items[index]);
+            return _NearRestaurantItem(
+              item: items[index],
+              defaultUrl: defaultUrl,
+            );
           },
           itemCount: items.length,
           scrollDirection: Axis.vertical,
@@ -213,10 +223,13 @@ class _NearRestaurant extends StatelessWidget {
 
 class _NearRestaurantItem extends StatelessWidget {
   final NearRestaurant item;
-  const _NearRestaurantItem({Key? key, required this.item}) : super(key: key);
+  final String defaultUrl;
+  const _NearRestaurantItem(
+      {Key? key, required this.item, required this.defaultUrl})
+      : super(key: key);
 
   String showTime(TimeOfDay time) {
-    return '${time.hour}:${time.minute==0?'00':time.minute}';
+    return '${time.hour}:${time.minute == 0 ? '00' : time.minute}';
   }
 
   @override
@@ -228,7 +241,7 @@ class _NearRestaurantItem extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.all(Radius.circular(15)),
             child: Image.network(
-              item.imageUrl,
+              item.imageUrl == null ? defaultUrl : item.imageUrl!,
               width: 100,
               height: 100,
               alignment: Alignment.center,
@@ -249,7 +262,7 @@ class _NearRestaurantItem extends StatelessWidget {
                     style: Theme.of(context).textTheme.caption!.merge(TextStyle(
                         color: Theme.of(context).colorScheme.secondary))),
                 RatingBarIndicator(
-                  rating: item.rating,
+                  rating: item.rating!,
                   itemBuilder: (context, index) => Icon(
                     Icons.star,
                     color: Theme.of(context).primaryColor,
@@ -257,15 +270,31 @@ class _NearRestaurantItem extends StatelessWidget {
                   itemCount: 5,
                   itemSize: 24.0,
                   direction: Axis.horizontal,
-                  unratedColor: Theme.of(context).colorScheme.secondaryVariant.withAlpha(60),
+                  unratedColor: Theme.of(context)
+                      .colorScheme
+                      .secondaryVariant
+                      .withAlpha(60),
                 ),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Icon(Icons.access_time, color: Theme.of(context).colorScheme.secondary),
-                    Text(' ${showTime(item.open)} - ${showTime(item.close)}',
-                    style: Theme.of(context).textTheme.caption!.merge(TextStyle(
-                        color: Theme.of(context).colorScheme.secondary))),],
+                    Icon(Icons.access_time,
+                        color: Theme.of(context).colorScheme.secondary),
+                    item.open != null && item.close != null
+                        ? Text(
+                            ' ${item.open!.substring(0, 2)}.${item.open!.substring(2, 4)} - ${item.close!.substring(0, 2)}.${item.close!.substring(2, 4)}',
+                            style: Theme.of(context).textTheme.caption!.merge(
+                                TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .secondary)))
+                        : Text(" 00.00 - 00.00",
+                            style: Theme.of(context).textTheme.caption!.merge(
+                                TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .secondary))),
+                  ],
                 ),
               ],
             ),
