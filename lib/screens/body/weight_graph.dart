@@ -11,9 +11,6 @@ class WeightGraph extends StatelessWidget {
   final List<WeightList> weightList;
   static const int NUMBER_OF_DATE = 10;
   late List<int> weight = weightList.map((e) => e.weight).toList();
-  // [];
-  // [50, 51, 52, 49, 50, 49, 48];
-  // [50, 51, 52, 49, 50, 52, 51, 50, 50, 48];
 
   @override
   Widget build(BuildContext context) {
@@ -39,11 +36,10 @@ class _LineChart extends StatelessWidget {
     if (isEmpty)
       weight = List<int>.generate(10, (int index) => 0);
     else if (weight.length < 10) {
-      for (int index = 0; index < 10 - weight.length; index++) {
-        weight.insert(index, 0);
+      for (int index = weight.length; index < 10; index++) {
+        weight.add(weight[weight.length - 1]);
       }
     }
-
     return LineChart(LineChartData(
         minX: 1,
         maxX: 10,
@@ -59,15 +55,15 @@ class _LineChart extends StatelessWidget {
   List<LineChartBarData> _getDataPoint() {
     final List<FlSpot> weightPoint = [];
 
-    for (int index = 0; index < weight.length; index++) {
-      weightPoint.add(FlSpot((index + 1).toDouble(), weight[index].toDouble()));
+    for (int index = weight.length - 1; index >= 0; index--) {
+      weightPoint.add(FlSpot((weight.length - index).toDouble(), weight[index].toDouble()));
     }
 
     return [
       LineChartBarData(
           colors: [Color(0xFF515070)],
           spots: weightPoint,
-          isCurved: false,
+          isCurved: true,
           dotData: FlDotData(show: false))
     ];
   }

@@ -1,30 +1,59 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:async';
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
+import 'package:foodandbody/models/search_result.dart';
 
 class SearchRepository {
-  Future<List<dynamic>> getNameMenuListById() async {
-    final CollectionReference favorite = FirebaseFirestore.instance
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser?.uid)
-        .collection('favorites');
-    final data =
-        await favorite.orderBy('count', descending: true).limit(5).get();
-    if (data.docs.isNotEmpty) {
-      return data.docs.map((doc) => doc.get('name')).toList();
-    } else {
-      return List.empty();
-    }
-  }
+  const SearchRepository(this.cache, this.client);
 
-  Future<List<dynamic>> getNameMenuListAll() async {
-    final CollectionReference favorite =
-        FirebaseFirestore.instance.collection('favorites');
-    final data =
-        await favorite.orderBy('count', descending: true).limit(5).get();
-    if (data.docs.isNotEmpty) {
-      return data.docs.map((doc) => doc.get('name')).toList();
+  final SearchCache cache;
+  final SearchClient client;
+
+  Future<List<SearchResultItem>> search(String term) async {
+    final cachedResult = cache.get(term);
+    if (cachedResult != null) {
+      return cachedResult;
+    }
+    final result = await client.search(term);
+    cache.set(term, result);
+    return result;
+  }
+}
+
+class SearchCache {
+  final _cache = <String, List<SearchResultItem>>{};
+
+  List<SearchResultItem>? get(String term) => _cache[term];
+
+  void set(String term, List<SearchResultItem> result) => _cache[term] = result;
+
+  bool contains(String term) => _cache.containsKey(term);
+
+  void remove(String term) => _cache.remove(term);
+}
+
+class SearchClient {
+  SearchClient({
+    http.Client? httpClient,
+    this.baseUrl = "https://foodandbody-api.azurewebsites.net/api/menu/name/",
+  }) : this.httpClient = httpClient ?? http.Client();
+
+  final String baseUrl;
+  final http.Client httpClient;
+
+  Future<List<SearchResultItem>> search(String term) async {
+    final response = await httpClient.get(Uri.parse("$baseUrl$term"));
+    final results = json.decode(response.body) as List;
+    if (response.statusCode == 200) {
+      return  results.map((dynamic json) {
+        return SearchResultItem(
+          name: json['name'] as String,
+          calory: json['calories'] as int,
+        );
+      }).toList();
     } else {
-      return List.empty();
+      throw SearchResultError.fromJson(results);
     }
   }
 }
