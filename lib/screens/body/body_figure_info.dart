@@ -36,23 +36,43 @@ class BodyFigureInfo extends StatelessWidget {
                   ),
                   CustomPaint(
                     painter: _DrawLine(
-                        circleOffset: Offset(115, 80),
-                        lineOffset: Offset(145, 15)),
+                        context: context,
+                        circleOffset: Offset(
+                            MediaQuery.of(context).size.width * 0.3,
+                            MediaQuery.of(context).size.height * 0.1),
+                        lineOffset: Offset(
+                            MediaQuery.of(context).size.width * 0.38,
+                            MediaQuery.of(context).size.height * 0.02)),
                   ),
                   CustomPaint(
                     painter: _DrawLine(
-                        circleOffset: Offset(115, 115),
-                        lineOffset: Offset(145, 125)),
+                        context: context,
+                        circleOffset: Offset(
+                            MediaQuery.of(context).size.width * 0.3,
+                            MediaQuery.of(context).size.height * 0.148),
+                        lineOffset: Offset(
+                            MediaQuery.of(context).size.width * 0.38,
+                            MediaQuery.of(context).size.height * 0.16)),
                   ),
                   CustomPaint(
                     painter: _DrawLine(
-                        circleOffset: Offset(115, 145),
-                        lineOffset: Offset(145, 230)),
+                        context: context,
+                        circleOffset: Offset(
+                            MediaQuery.of(context).size.width * 0.3,
+                            MediaQuery.of(context).size.height * 0.19),
+                        lineOffset: Offset(
+                            MediaQuery.of(context).size.width * 0.38,
+                            MediaQuery.of(context).size.height * 0.295)),
                   ),
                   CustomPaint(
                     painter: _DrawLine(
-                        circleOffset: Offset(115, 175),
-                        lineOffset: Offset(130, 335)),
+                        context: context,
+                        circleOffset: Offset(
+                            MediaQuery.of(context).size.width * 0.3,
+                            MediaQuery.of(context).size.height * 0.225),
+                        lineOffset: Offset(
+                            MediaQuery.of(context).size.width * 0.38,
+                            MediaQuery.of(context).size.height * 0.43)),
                   )
                 ],
               ),
@@ -264,8 +284,12 @@ class BodyFigureInfo extends StatelessWidget {
 }
 
 class _DrawLine extends CustomPainter {
-  _DrawLine({required this.circleOffset, required this.lineOffset});
+  _DrawLine(
+      {required this.context,
+      required this.circleOffset,
+      required this.lineOffset});
 
+  final BuildContext context;
   final Offset circleOffset;
   final Offset lineOffset;
 
@@ -282,7 +306,7 @@ class _DrawLine extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
     canvas.drawLine(circleOffset, lineOffset, paintLine);
-    canvas.drawLine(lineOffset, Offset(175, lineOffset.dy), paintLine);
+    canvas.drawLine(lineOffset, Offset(MediaQuery.of(context).size.width * 0.45, lineOffset.dy), paintLine);
   }
 
   @override
