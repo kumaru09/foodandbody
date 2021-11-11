@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:camera/camera.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:foodandbody/screens/help/help.dart';
 
 part 'show_body_result.dart';
@@ -12,11 +12,10 @@ class Camera extends StatefulWidget {
   _CameraState createState() => _CameraState();
 }
 
-class _CameraState extends State<Camera> {
-  var _cameras;
-  late CameraController _controller;
+class _CameraState extends State<Camera> with WidgetsBindingObserver {
+  List<CameraDescription> _cameras = [];
+  CameraController? _controller;
   int _selected = 0;
-  Future<void>? _initialCameraController;
 
   bool _isFoodCamera = true;
   // FlashMode? _currentFlashMode;
@@ -25,21 +24,23 @@ class _CameraState extends State<Camera> {
   void initState() {
     super.initState();
     setupCamera();
+    WidgetsBinding.instance?.addObserver(this);
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    WidgetsBinding.instance?.removeObserver(this);
+    _controller?.dispose();
     super.dispose();
   }
 
   void didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (!_controller.value.isInitialized) {
+    if (_controller == null || !_controller!.value.isInitialized) {
       return;
     }
 
     if (state == AppLifecycleState.inactive) {
-      _controller.dispose();
+      _controller?.dispose();
     } else if (state == AppLifecycleState.resumed) {
       setupCamera();
     }
@@ -49,6 +50,7 @@ class _CameraState extends State<Camera> {
   Widget build(BuildContext context) {
     final deviceRatio =
         MediaQuery.of(context).size.width / MediaQuery.of(context).size.height;
+    final CameraController? cameraController = _controller;
 
     return Scaffold(
       extendBody: true,
@@ -60,7 +62,6 @@ class _CameraState extends State<Camera> {
           icon: Icon(Icons.close, color: Colors.white),
           onPressed: () {
             Navigator.pop(context);
-            _controller.dispose();
           },
         ),
         actions: [
@@ -94,33 +95,26 @@ class _CameraState extends State<Camera> {
           ),
         ],
       ),
-      body: FutureBuilder<void>(
-          future: _initialCameraController,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              return Transform.scale(
-                scale: _controller.value.aspectRatio / deviceRatio,
-                child: Center(
-                  child: AspectRatio(
-                    aspectRatio: _controller.value.aspectRatio,
-                    child: CameraPreview(_controller),
-                  ),
+      body: (cameraController == null || !cameraController.value.isInitialized)
+          ? Center(child: CircularProgressIndicator())
+          : Transform.scale(
+              scale: cameraController.value.aspectRatio / deviceRatio,
+              child: Center(
+                child: AspectRatio(
+                  aspectRatio: cameraController.value.aspectRatio,
+                  child: CameraPreview(cameraController),
                 ),
-              );
-            } else {
-              return Center(child: CircularProgressIndicator());
-            }
-          }),
+              ),
+            ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           try {
-            await _initialCameraController;
-            final image = await _controller.takePicture();
+            final image = await cameraController?.takePicture();
             showResult(
                 context: context,
                 isFoodCamera: _isFoodCamera,
-                imagePath: image.path);
+                imagePath: image?.path);
           } catch (e) {
             print("Take a photo failed: $e");
           }
@@ -136,7 +130,7 @@ class _CameraState extends State<Camera> {
   Future<void> setupCamera() async {
     try {
       _cameras = await availableCameras();
-      var controller = await selectCamera();
+      CameraController controller = await selectCamera();
       setState(() {
         _controller = controller;
         // _controller!.setFlashMode(FlashMode.off);
@@ -154,9 +148,6 @@ class _CameraState extends State<Camera> {
       CameraController controller =
           CameraController(_cameras[_selected], ResolutionPreset.high);
       await controller.initialize();
-      setState(() {
-        _initialCameraController = controller.initialize();
-      });
       return controller;
     } on CameraException catch (e) {
       print("Error initializing camera: $e");
@@ -164,10 +155,10 @@ class _CameraState extends State<Camera> {
   }
 
   toggleCamera() async {
-    int newSelected = _selected == 0 ? 1 : 0;
+    int newSelected = (_selected + 1) % _cameras.length;
     _selected = newSelected;
 
-    var controller = await selectCamera();
+    CameraController controller = await selectCamera();
     setState(() {
       _controller = controller;
     });
@@ -198,7 +189,10 @@ class _CameraState extends State<Camera> {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15),
                             side: BorderSide(color: Colors.white, width: 3)),
-                        child: Image.file(File(imagePath!), fit: BoxFit.fill),
+                        child: ClipRRect(
+                            borderRadius: BorderRadius.all(Radius.circular(15)),
+                            child: Image.file(File(imagePath!),
+                                fit: BoxFit.cover)),
                       ),
                     ),
                   )
