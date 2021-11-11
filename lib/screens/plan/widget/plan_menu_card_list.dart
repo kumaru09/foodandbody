@@ -58,18 +58,19 @@ class _PlanMenuCardListState extends State<PlanMenuCardList> {
                       ),
                 ),
               ),
-              Container(
+              Expanded(
+                  child: Padding(
                 padding: EdgeInsets.only(left: 16),
-                alignment: Alignment.centerLeft,
                 child: Text(
                   "${item.name}",
                   maxLines: 1,
                   softWrap: false,
                   overflow: TextOverflow.fade,
+                  textAlign: TextAlign.left,
                   style: Theme.of(context).textTheme.subtitle1!.merge(TextStyle(
                       color: Theme.of(context).colorScheme.secondary)),
                 ),
-              ),
+              )),
             ],
           ),
           trailing: IconButton(
