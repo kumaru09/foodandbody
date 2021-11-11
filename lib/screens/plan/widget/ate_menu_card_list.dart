@@ -9,11 +9,6 @@ class AteMenuCardList extends StatelessWidget {
   final History _plan;
   late List<Menu> ateMenu =
       _plan.menuList.where((value) => value.timestamp != null).toList();
-  // [
-  //   AteMenuList(menu: "โอวัลติน", calories: 177.2, time: "7:00"),
-  //   AteMenuList(menu: "ส้มตำไทย", calories: 240.3, time: "12:00"),
-  //   AteMenuList(menu: "ข้าวมันไก่", calories: 765.0, time: "17:35"),
-  // ];
 
   @override
   Widget build(BuildContext context) {
@@ -74,12 +69,4 @@ class AteMenuCardList extends StatelessWidget {
       ),
     );
   }
-}
-
-class AteMenuList {
-  AteMenuList({required this.menu, required this.calories, required this.time});
-
-  final String menu;
-  final double calories;
-  final String time;
 }
