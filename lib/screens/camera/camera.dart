@@ -4,8 +4,8 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:foodandbody/screens/help/help.dart';
-
-part 'show_body_result.dart';
+import 'package:foodandbody/screens/camera/show_body_result.dart';
+import 'package:foodandbody/screens/camera/show_food_result.dart';
 
 class Camera extends StatefulWidget {
   @override
@@ -111,10 +111,7 @@ class _CameraState extends State<Camera> with WidgetsBindingObserver {
         onPressed: () async {
           try {
             final image = await cameraController?.takePicture();
-            showResult(
-                context: context,
-                isFoodCamera: _isFoodCamera,
-                imagePath: image?.path);
+            _showResult(isFoodCamera: _isFoodCamera, imagePath: image!.path);
           } catch (e) {
             print("Take a photo failed: $e");
           }
@@ -164,39 +161,15 @@ class _CameraState extends State<Camera> with WidgetsBindingObserver {
     });
   }
 
-  showResult(
-      {required BuildContext context,
-      required bool isFoodCamera,
-      String? imagePath}) {
+  _showResult({required bool isFoodCamera, String? imagePath}) {
     return showModalBottomSheet(
         context: context,
         elevation: 6,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(15))),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         builder: (context) {
-          return Stack(clipBehavior: Clip.none, children: [
-            isFoodCamera ? _foodResult(context) : _bodyResult(context),
-            isFoodCamera
-                ? Container()
-                : Positioned(
-                    bottom: MediaQuery.of(context).size.height * 0.41,
-                    child: Container(
-                      padding: EdgeInsets.only(left: 16, bottom: 23),
-                      constraints:
-                          BoxConstraints(maxHeight: 168, maxWidth: 168),
-                      child: Card(
-                        elevation: 6,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                            side: BorderSide(color: Colors.white, width: 3)),
-                        child: ClipRRect(
-                            borderRadius: BorderRadius.all(Radius.circular(15)),
-                            child: Image.file(File(imagePath!),
-                                fit: BoxFit.cover)),
-                      ),
-                    ),
-                  )
-          ]);
+          return isFoodCamera
+              ? ShowFoodResult()
+              : ShowBodyResult(imagePath: imagePath!);
         });
   }
 }
