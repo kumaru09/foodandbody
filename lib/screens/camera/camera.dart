@@ -166,6 +166,7 @@ class _CameraState extends State<Camera> with WidgetsBindingObserver {
         context: context,
         elevation: 6,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        isScrollControlled: _isFoodCamera,
         builder: (context) {
           return isFoodCamera
               ? ShowFoodResult()
