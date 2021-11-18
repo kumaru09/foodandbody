@@ -162,15 +162,16 @@ class _CameraState extends State<Camera> with WidgetsBindingObserver {
   }
 
   _showResult({required bool isFoodCamera, String? imagePath}) {
-    return showModalBottomSheet(
-        context: context,
-        elevation: 6,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        isScrollControlled: _isFoodCamera,
-        builder: (context) {
-          return isFoodCamera
-              ? ShowFoodResult()
-              : ShowBodyResult(imagePath: imagePath!);
-        });
+    return _isFoodCamera
+        ? Navigator.push(
+            context, MaterialPageRoute(builder: (context) => ShowFoodResult()))
+        : showModalBottomSheet(
+            context: context,
+            elevation: 6,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            builder: (context) {
+              return ShowBodyResult(imagePath: imagePath!);
+            });
   }
 }
