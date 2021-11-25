@@ -58,7 +58,8 @@ class LoginForm extends StatelessWidget {
                                         .button!
                                         .merge(TextStyle(
                                             color: Theme.of(context)
-                                                .colorScheme.secondary))),
+                                                .colorScheme
+                                                .secondary))),
                                 onPressed: () {
                                   Navigator.push(
                                     context,
@@ -68,28 +69,24 @@ class LoginForm extends StatelessWidget {
                                 },
                               ),
                             ]),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(16, 16, 16, 10),
-                          child: _LoginButton(),
-                        ),
+                        _LoginButton(),
                         Text('หรือ',
                             style: Theme.of(context).textTheme.bodyText2!.merge(
                                 TextStyle(
-                                    color: Theme.of(context).colorScheme.secondary))),
-                        Padding(
-                            padding: EdgeInsets.fromLTRB(16, 6, 16, 30),
-                            child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  _FacebookLoginButton(),
-                                  _GoogleLoginButton(),
-                                ])),
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .secondary))),
+                        _GoogleLoginButton(),
+                        _FacebookLoginButton(),
+                        SizedBox(height: 10.0),
                         TextButton(
                           key: const Key('loginForm_createAccount'),
                           child: Text('ลงทะเบียน',
                               style: Theme.of(context).textTheme.button!.merge(
                                   TextStyle(
-                                      color: Theme.of(context).colorScheme.secondary))),
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary))),
                           onPressed: () {
                             Navigator.push(
                               context,
@@ -179,18 +176,22 @@ class _LoginButton extends StatelessWidget {
         builder: (context, state) {
           return state.status.isSubmissionInProgress
               ? const CircularProgressIndicator()
-              : ElevatedButton(
-                  key: const Key('loginForm_continue_raisedButton'),
-                  onPressed: state.status.isValidated
-                      ? () => context.read<LoginCubit>().logInWithCredentials()
-                      : null,
-                  child: Text('เข้าสู่ระบบ'),
-                  style: ElevatedButton.styleFrom(
-                    primary: Theme.of(context).colorScheme.secondary,
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10.0, horizontal: 50.0),
-                    shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(50))),
+              : SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    key: const Key('loginForm_continue_raisedButton'),
+                    onPressed: state.status.isValidated
+                        ? () =>
+                            context.read<LoginCubit>().logInWithCredentials()
+                        : null,
+                    child: Text('เข้าสู่ระบบ'),
+                    style: ElevatedButton.styleFrom(
+                      primary: Theme.of(context).colorScheme.secondary,
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 7.0, horizontal: 10.0),
+                      shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(50))),
+                    ),
                   ),
                 );
         });
@@ -200,16 +201,27 @@ class _LoginButton extends StatelessWidget {
 class _GoogleLoginButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton.icon(
-      key: const Key('loginForm_googleLogin'),
-      label: Text(''),
-      style: ElevatedButton.styleFrom(
-        shape: CircleBorder(),
-        primary: Color(0xFFEA4335),
-        padding: EdgeInsets.fromLTRB(13, 13, 6, 13),
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        key: const Key('loginForm_googleLogin'),
+        label: Text(
+          'LOGIN WITH GOOGLE',
+          style: Theme.of(context)
+              .textTheme
+              .button!
+              .merge(TextStyle(color: Colors.white)),
+        ),
+        style: ElevatedButton.styleFrom(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(50))),
+          primary: Color(0xFFEA4335),
+          padding: const EdgeInsets.symmetric(vertical: 7.0, horizontal: 10.0),
+        ),
+        icon: const Icon(FontAwesomeIcons.google,
+            size: 21.0, color: Colors.white),
+        onPressed: () => context.read<LoginCubit>().logInWithGoogle(),
       ),
-      icon: const Icon(FontAwesomeIcons.google, color: Colors.white),
-      onPressed: () => context.read<LoginCubit>().logInWithGoogle(),
     );
   }
 }
@@ -217,16 +229,26 @@ class _GoogleLoginButton extends StatelessWidget {
 class _FacebookLoginButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton.icon(
-      key: const Key('loginForm_facebookLogin'),
-      label: Text(''),
-      style: ElevatedButton.styleFrom(
-        shape: CircleBorder(),
-        primary: Color(0xFF3B5998),
-        padding: EdgeInsets.fromLTRB(13, 13, 6, 13),
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        key: const Key('loginForm_facebookLogin'),
+        label: Text(
+          'LOGIN WITH FACEBOOK',
+          style: Theme.of(context)
+              .textTheme
+              .button!
+              .merge(TextStyle(color: Colors.white)),
+        ),
+        style: ElevatedButton.styleFrom(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(50))),
+          primary: Color(0xFF3B5998),
+          padding: const EdgeInsets.symmetric(vertical: 7.0, horizontal: 10.0),
+        ),
+        icon: const Icon(Icons.facebook, color: Colors.white),
+        onPressed: () => context.read<LoginCubit>().logInWithFacebook(),
       ),
-      icon: const Icon(FontAwesomeIcons.facebookF, color: Colors.white),
-      onPressed: () => context.read<LoginCubit>().logInWithFacebook(),
     );
   }
 }

@@ -16,83 +16,76 @@ class PlanMenuCardList extends StatefulWidget {
 
 class _PlanMenuCardListState extends State<PlanMenuCardList> {
   _PlanMenuCardListState(this._plan);
-  GlobalKey<AnimatedListState> animatedListKey = GlobalKey();
   final History _plan;
   late List<Menu> planMenu =
       _plan.menuList.where((value) => value.timestamp == null).toList();
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedList(
-      key: animatedListKey,
-      initialItemCount: planMenu.length,
-      shrinkWrap: true,
-      itemBuilder: (context, index, animation) {
-        return _buildPlanCard(context, planMenu[index], animation);
-      },
-    );
+    return ListView.builder(
+        padding: EdgeInsets.zero,
+        itemCount: planMenu.length,
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        itemBuilder: (context, index) {
+          return _buildPlanCard(context, planMenu[index]);
+        });
   }
 
-  Widget _buildPlanCard(
-      BuildContext context, Menu item, Animation<double> animation) {
-    return SizeTransition(
-        sizeFactor: animation,
-        child: InkWell(
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          MenuPage.plan(menu: item)));
-            },
-            child: Card(
-              color: Colors.white,
-              elevation: 2,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15)),
-              child: ListTile(
-                contentPadding: EdgeInsets.fromLTRB(17, 10, 10, 10),
-                title: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Expanded(
-                        flex: 3,
-                        child: Text("${item.calories.round()}",
-                            style: Theme.of(context)
-                                .textTheme
-                                .headline5!
-                                .merge(TextStyle(color: Color(0xFF515070))))),
-                    Expanded(
-                        flex: 7,
-                        child: Text("${item.name}",
-                            style: Theme.of(context)
-                                .textTheme
-                                .subtitle1!
-                                .merge(TextStyle(color: Color(0xFF515070)))))
-                  ],
-                ),
-                trailing: IconButton(
-                  icon: Icon(
-                    Icons.close,
-                    color: Color(0xFF515070),
-                  ),
-                  onPressed: () {
-                    int removeIndex = planMenu.indexOf(item);
-                    Menu removedItem = planMenu.removeAt(removeIndex);
-                    context
-                        .read<PlanBloc>()
-                        .deleteMenu(item.name)
-                        .then((_) => context.read<PlanBloc>().add(LoadPlan()));
-                    AnimatedListRemovedItemBuilder builder =
-                        (context, animation) {
-                      return _buildPlanCard(context, removedItem, animation);
-                    };
-
-                    animatedListKey.currentState
-                        ?.removeItem(removeIndex, builder);
-                  },
+  Widget _buildPlanCard(BuildContext context, Menu item) {
+    return InkWell(
+      onTap: () {
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => MenuPage.plan(menu: item)));
+      },
+      child: Card(
+        elevation: 2,
+        color: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        child: ListTile(
+          contentPadding: EdgeInsets.fromLTRB(17, 10, 10, 10),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Container(
+                constraints: BoxConstraints(minWidth: 70),
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "${item.calories.round()}",
+                  style: Theme.of(context).textTheme.headline5!.merge(
+                        TextStyle(
+                            color: Theme.of(context).colorScheme.secondary),
+                      ),
                 ),
               ),
-            )));
+              Container(
+                padding: EdgeInsets.only(left: 16),
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "${item.name}",
+                  maxLines: 1,
+                  softWrap: false,
+                  overflow: TextOverflow.fade,
+                  style: Theme.of(context).textTheme.subtitle1!.merge(TextStyle(
+                      color: Theme.of(context).colorScheme.secondary)),
+                ),
+              ),
+            ],
+          ),
+          trailing: IconButton(
+            icon: Icon(
+              Icons.close,
+              color: Theme.of(context).colorScheme.secondary,
+            ),
+            onPressed: () {
+              context
+                  .read<PlanBloc>()
+                  .deleteMenu(item.name)
+                  .then((value) => context.read<PlanBloc>().add(LoadPlan()));
+            },
+          ),
+        ),
+      ),
+    );
   }
 }
