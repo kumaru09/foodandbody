@@ -48,10 +48,8 @@ class RegisterForm extends StatelessWidget {
                           PasswordInput(),
                           SizedBox(height: 16.0),
                           ConfirmPasswordInput(),
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(16, 20, 16, 10),
-                            child: _RegisterButton(),
-                          ),
+                          SizedBox(height: 16.0),
+                          _RegisterButton(),
                         ],
                       ),
                     ),
@@ -173,19 +171,23 @@ class _RegisterButton extends StatelessWidget {
         builder: (context, state) {
           return state.status.isSubmissionInProgress
               ? const CircularProgressIndicator()
-              : ElevatedButton(
-                  key: const Key('registerForm_continue_raisedButton'),
-                  onPressed: state.status.isValidated
-                      ? () =>
-                          context.read<RegisterCubit>().registerFormSubmitted()
-                      : null,
-                  child: Text('ลงทะเบียน'),
-                  style: ElevatedButton.styleFrom(
-                    primary: Theme.of(context).colorScheme.secondary,
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10.0, horizontal: 50.0),
-                    shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(50))),
+              : SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    key: const Key('registerForm_continue_raisedButton'),
+                    onPressed: state.status.isValidated
+                        ? () => context
+                            .read<RegisterCubit>()
+                            .registerFormSubmitted()
+                        : null,
+                    child: Text('ลงทะเบียน'),
+                    style: ElevatedButton.styleFrom(
+                      primary: Theme.of(context).colorScheme.secondary,
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 7.0, horizontal: 10.0),
+                      shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(50))),
+                    ),
                   ),
                 );
         });

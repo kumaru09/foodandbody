@@ -43,6 +43,15 @@ dependencies:
   network_image_mock: ^2.0.1
   intl: ^0.17.0
   camera: ^0.9.4+3
+  image_picker: ^0.8.4+3
+  flutter_localizations:
+    sdk: flutter
+  flutter_rating_bar: ^4.0.0
+  google_maps_flutter: ^2.1.0
+  google_place: ^0.4.3
+  location: ^4.3.0
+  dio: ^4.0.1
+  
 
 dev_dependencies:
   build_runner: ^2.1.2
