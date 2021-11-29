@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
+import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:foodandbody/screens/home/bloc/home_bloc.dart';
 import 'package:foodandbody/screens/home/circular_cal_indicator.dart';
 import 'package:foodandbody/screens/search/search_page.dart';
@@ -95,8 +96,10 @@ class Home extends StatelessWidget {
                   ElevatedButton.icon(
                     key: const Key('menu_all_button'),
                     onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => SearchPage()));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => SearchPage()));
                     },
                     style: ElevatedButton.styleFrom(
                         elevation: 0,
@@ -131,7 +134,9 @@ class Home extends StatelessWidget {
                 width: MediaQuery.of(context).size.width,
                 constraints: BoxConstraints(minHeight: 100),
                 child: BlocProvider<HomeBloc>(
-                    create: (context) => HomeBloc(), child: _DailyWater()))
+                    create: (context) => HomeBloc(
+                        planRepository: context.read<PlanRepository>()),
+                    child: _DailyWater()))
           ],
         ),
       ),
@@ -147,10 +152,10 @@ class _DailyWater extends StatefulWidget {
 }
 
 class __DailyWaterState extends State<_DailyWater> {
-
   @override
   Widget build(BuildContext context) {
-    final HomeBloc homeBloc = BlocProvider.of<HomeBloc>(context);
+    final HomeBloc homeBloc = BlocProvider.of<HomeBloc>(context)
+      ..add(LoadWater());
     return BlocBuilder<HomeBloc, HomeState>(builder: (context, state) {
       return Card(
         key: const Key('daily_water_card'),
@@ -174,6 +179,8 @@ class __DailyWaterState extends State<_DailyWater> {
                         key: const Key('remove_water_button'),
                         onPressed: () {
                           homeBloc.add(DecreaseWaterEvent());
+                          homeBloc.add(WaterChanged(
+                              water: state.water == 0 ? 0 : state.water - 1));
                         },
                         style: ElevatedButton.styleFrom(
                           primary: Theme.of(context).cardColor,
@@ -210,6 +217,7 @@ class __DailyWaterState extends State<_DailyWater> {
                         key: const Key('add_water_button'),
                         onPressed: () {
                           homeBloc.add(IncreaseWaterEvent());
+                          homeBloc.add(WaterChanged(water: state.water + 1));
                         },
                         style: ElevatedButton.styleFrom(
                           primary: Theme.of(context).cardColor,
