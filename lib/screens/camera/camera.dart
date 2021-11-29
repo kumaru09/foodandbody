@@ -18,7 +18,8 @@ class _CameraState extends State<Camera> with WidgetsBindingObserver {
   int _selected = 0;
 
   bool _isFoodCamera = true;
-  // FlashMode? _currentFlashMode;
+  bool _isFlashModeOff = true;
+  FlashMode? _currentFlashMode;
 
   @override
   void initState() {
@@ -77,9 +78,19 @@ class _CameraState extends State<Camera> with WidgetsBindingObserver {
             ),
           ),
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              setState(() {
+                if (_currentFlashMode == FlashMode.auto) {
+                  _controller!.setFlashMode(FlashMode.off);
+                } else if (_currentFlashMode == FlashMode.off) {
+                  _controller!.setFlashMode(FlashMode.auto);
+                }
+                _currentFlashMode = _controller!.value.flashMode;
+                _isFlashModeOff = !_isFlashModeOff;
+              });
+            },
             icon: Icon(
-              Icons.flash_on,
+              _isFlashModeOff ? Icons.flash_off : Icons.flash_on,
               color: Colors.white,
             ),
           ),
@@ -130,8 +141,9 @@ class _CameraState extends State<Camera> with WidgetsBindingObserver {
       CameraController controller = await selectCamera();
       setState(() {
         _controller = controller;
-        // _controller!.setFlashMode(FlashMode.off);
-        // _currentFlashMode = _controller!.value.flashMode;
+        _controller!.setFlashMode(FlashMode.off);
+        _currentFlashMode = _controller!.value.flashMode;
+        _isFlashModeOff = _currentFlashMode == FlashMode.off;
         // print("controller: ${_controller!.value.flashMode}");
         // print("mode: $_currentFlashMode");
       });
