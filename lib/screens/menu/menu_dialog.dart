@@ -1,26 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:foodandbody/app/app.dart';
-import 'package:foodandbody/screens/history/bloc/history_bloc.dart';
-import 'package:foodandbody/screens/main_screen/main_screen.dart';
-import 'package:foodandbody/screens/menu/bloc/menu_bloc.dart';
 
 class MenuDialog extends StatefulWidget {
-  const MenuDialog(
-      {Key? key,
-      required this.name,
-      required this.serve,
-      required this.unit,
-      required this.isEatNow,
-      double? volumn})
-      : this.volumn = volumn ?? 0.0,
-        super(key: key);
+  const MenuDialog({
+    Key? key,
+    required this.serve,
+    required this.unit,
+    required this.isEatNow,
+  }) : super(key: key);
 
-  final String name;
   final double serve;
   final String unit;
   final bool isEatNow;
-  final double volumn;
 
   @override
   _MenuDialogState createState() => _MenuDialogState();
@@ -32,7 +22,7 @@ class _MenuDialogState extends State<MenuDialog> {
   @override
   void initState() {
     super.initState();
-    _currentSliderValue = widget.isEatNow ? widget.volumn : widget.serve;
+    _currentSliderValue = widget.serve;
   }
 
   String toRound(double value) {
@@ -86,22 +76,7 @@ class _MenuDialogState extends State<MenuDialog> {
           key: const Key('menu_dialog_ok_button'),
           onPressed: _currentSliderValue == 0.0
               ? null
-              : () => context
-                      .read<MenuBloc>()
-                      .addMenu(
-                          name: widget.name,
-                          isEatNow: widget.isEatNow,
-                          volumn: double.parse(toRound(_currentSliderValue)))
-                      .then((value) {
-                    // context
-                    //     .read<HistoryBloc>()
-                    //     .add(LoadMenuList(dateTime: DateTime.now()));
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (context) => AppView()),
-                      (Route<dynamic> route) => false,
-                    );
-                  }),
+              : () => Navigator.pop(context, '${toRound(_currentSliderValue)}'),
           child: Text('ตกลง',
               style: Theme.of(context).textTheme.button!.merge(TextStyle(
                   color: _currentSliderValue == 0.0
@@ -109,7 +84,7 @@ class _MenuDialogState extends State<MenuDialog> {
                       : Theme.of(context).colorScheme.secondary))),
         ),
         TextButton(
-          onPressed: () => Navigator.pop(context, 'cancle'),
+          onPressed: () => Navigator.pop(context, 'cancel'),
           child: Text('ยกเลิก',
               style: Theme.of(context).textTheme.button!.merge(
                   TextStyle(color: Theme.of(context).colorScheme.secondary))),
