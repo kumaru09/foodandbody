@@ -1,20 +1,26 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:foodandbody/models/history.dart';
+import 'package:foodandbody/models/info.dart';
 import 'package:foodandbody/models/user.dart';
+import 'package:foodandbody/screens/plan/plan.dart';
+import 'package:foodandbody/screens/setting/bloc/info_bloc.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:provider/src/provider.dart';
 
 // ignore: must_be_immutable
 class CircularCalAndInfo extends StatelessWidget {
-  CircularCalAndInfo(this._user, this._plan);
+  CircularCalAndInfo(this._info, this._plan);
 
   final History _plan;
-  final User _user;
+  final Info _info;
   late double planCal = _plan.menuList
       .map((value) => value.calories)
       .fold(0, (previous, current) => previous + current);
   late double totalCal = _plan.totalCal;
-  late double goalCal = _user.info!.goal!.toDouble();
+  late double goalCal = _info.goal!.toDouble();
 
   @override
   Widget build(BuildContext context) {
@@ -28,10 +34,7 @@ class CircularCalAndInfo extends StatelessWidget {
                   constraints: BoxConstraints(minHeight: 100),
                   padding: EdgeInsets.only(left: 18, top: 18),
                   child: _CircularCalTwoProgress(
-                    totalCal: totalCal,
-                    planCal: planCal,
-                    goalCal: goalCal,
-                  ))),
+                      totalCal: totalCal, planCal: planCal, goalCal: goalCal))),
           Expanded(
               flex: 4,
               child: Container(
@@ -173,11 +176,27 @@ class _PlanInfo extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.all(0),
-                  width: 35,
-                  height: 35,
-                  child: _EditGoalDialog(),
-                )
+                    padding: const EdgeInsets.all(0),
+                    width: 35,
+                    height: 35,
+                    child: IconButton(
+                        key: const Key("edit_goal_button"),
+                        iconSize: 24,
+                        icon: Icon(
+                          Icons.edit,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                        onPressed: () async {
+                          final value = await showDialog<int?>(
+                              context: context,
+                              builder: (BuildContext context) =>
+                                  EditGoalDialog());
+                          if (value != null) {
+                            context
+                                .read<InfoBloc>()
+                                .add(UpdateGoal(goal: value));
+                          }
+                        }))
               ],
             ),
           ),
@@ -241,56 +260,53 @@ class _PlanInfo extends StatelessWidget {
 }
 
 // ignore: must_be_immutable
-class _EditGoalDialog extends StatelessWidget {
+class EditGoalDialog extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => _EditGoalDialog();
+}
+
+class _EditGoalDialog extends State<EditGoalDialog> {
+  String _currentGoal = '0';
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      key: const Key("edit_goal_button"),
-      iconSize: 24,
-      icon: Icon(
-        Icons.edit,
-        color: Theme.of(context).primaryColor,
+    return AlertDialog(
+      key: const Key("edit_goal_dialog"),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      elevation: 0,
+      backgroundColor: Colors.white,
+      title: Text(
+        "แก้ไขเป้าหมายแคลอรี่",
+        style: Theme.of(context)
+            .textTheme
+            .headline6!
+            .merge(TextStyle(color: Theme.of(context).primaryColor)),
       ),
-      onPressed: () => showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-                key: const Key("edit_goal_dialog"),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15)),
-                elevation: 0,
-                backgroundColor: Colors.white,
-                title: Text(
-                  "แก้ไขเป้าหมายแคลอรี่",
-                  style: Theme.of(context)
-                      .textTheme
-                      .headline6!
-                      .merge(TextStyle(color: Theme.of(context).primaryColor)),
-                ),
-                content: TextField(
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(hintText: "ตัวอย่าง 1600"),
-                ),
-                actions: <Widget>[
-                  TextButton(
-                      key: const Key("edit_button_in_edit_goal_dialog"),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: Text("ตกลง",
-                          style: Theme.of(context).textTheme.button!.merge(
-                              TextStyle(
-                                  color: Theme.of(context).primaryColor)))),
-                  TextButton(
-                      key: const Key("cancel_button_in_edit_goal_dialog"),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: Text("ยกเลิก",
-                          style: Theme.of(context).textTheme.button!.merge(
-                              TextStyle(
-                                  color: Theme.of(context).primaryColor))))
-                ],
-              )),
+      content: TextField(
+          keyboardType: TextInputType.number,
+          decoration: InputDecoration(hintText: "ตัวอย่าง 1600"),
+          onChanged: (goal) => setState(() {
+                _currentGoal = goal;
+              })),
+      actions: <Widget>[
+        TextButton(
+            key: const Key("edit_button_in_edit_goal_dialog"),
+            onPressed: () => Navigator.pop(context, int.parse(_currentGoal)),
+            child: Text("ตกลง",
+                style: Theme.of(context)
+                    .textTheme
+                    .button!
+                    .merge(TextStyle(color: Theme.of(context).primaryColor)))),
+        TextButton(
+            key: const Key("cancel_button_in_edit_goal_dialog"),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text("ยกเลิก",
+                style: Theme.of(context)
+                    .textTheme
+                    .button!
+                    .merge(TextStyle(color: Theme.of(context).primaryColor))))
+      ],
     );
   }
 }

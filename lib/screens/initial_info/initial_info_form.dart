@@ -226,7 +226,7 @@ class _InitialInfoButton extends StatelessWidget {
                                 .read<InitialInfoCubit>()
                                 .initialInfoFormSubmitted(
                                     context.read<AppBloc>().state.user.uid);
-                            context.read<AppBloc>().add(AddInfoRequested(
+                            context.read<AppBloc>().add(AppUserChanged(
                                 context.read<AppBloc>().state.user));
                           }
                         : null,

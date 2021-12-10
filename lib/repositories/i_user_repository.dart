@@ -4,7 +4,7 @@ import 'package:foodandbody/models/user.dart';
 abstract class IUserRepository {
   Future<void> addUserInfo(String uid, Info info);
 
-  Future<User> getInfo(User user);
+  Future<Info> getInfo();
 
   Future<void> updateInfo(User user);
 }

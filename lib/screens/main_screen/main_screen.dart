@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/repositories/body_repository.dart';
+import 'package:foodandbody/repositories/camera_repository.dart';
 import 'package:foodandbody/repositories/history_repository.dart';
 import 'package:foodandbody/repositories/plan_repository.dart';
+import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/screens/body/body.dart';
+import 'package:foodandbody/screens/body/cubit/body_cubit.dart';
+import 'package:foodandbody/screens/camera/bloc/camera_bloc.dart';
 import 'package:foodandbody/screens/camera/camera.dart';
 import 'package:foodandbody/screens/history/bloc/history_bloc.dart';
 import 'package:foodandbody/screens/history/history.dart';
+import 'package:foodandbody/screens/home/bloc/home_bloc.dart';
 import 'package:foodandbody/screens/home/home.dart';
 import 'package:foodandbody/screens/main_screen/bottom_appbar.dart';
 import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
 import 'package:foodandbody/screens/plan/plan.dart';
+import 'package:foodandbody/screens/setting/bloc/info_bloc.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key, required this.index}) : super(key: key);
@@ -64,7 +70,18 @@ class _MainScreenState extends State<MainScreen> {
                     historyRepository: context.read<HistoryRepository>(),
                     bodyRepository: context.read<BodyRepository>())
                   ..add(LoadHistory())
-                  ..add(LoadMenuList(dateTime: DateTime.now())))
+                  ..add(LoadMenuList(dateTime: DateTime.now()))),
+            BlocProvider(
+                create: (_) =>
+                    InfoBloc(userRepository: context.read<UserRepository>())
+                      ..add(LoadInfo())),
+            BlocProvider(
+                create: (_) =>
+                    BodyCubit(context.read<BodyRepository>())..fetchBody()),
+            BlocProvider(
+                create: (_) =>
+                    HomeBloc(planRepository: context.read<PlanRepository>())
+                      ..add(LoadWater()))
           ],
           child: _getPage(_currentIndex),
         ),

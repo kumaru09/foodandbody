@@ -6,12 +6,15 @@ import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:foodandbody/app/routes.dart';
 import 'package:foodandbody/repositories/authen_repository.dart';
 import 'package:foodandbody/repositories/body_repository.dart';
+import 'package:foodandbody/repositories/camera_repository.dart';
 import 'package:foodandbody/repositories/favor_repository.dart';
 import 'package:foodandbody/repositories/history_repository.dart';
 import 'package:foodandbody/repositories/menu_card_repository.dart';
 import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:foodandbody/repositories/search_repository.dart';
 import 'package:foodandbody/repositories/user_repository.dart';
+import 'package:foodandbody/screens/camera/bloc/camera_bloc.dart';
+import 'package:foodandbody/screens/setting/bloc/info_bloc.dart';
 import 'package:foodandbody/theme.dart';
 
 class App extends StatelessWidget {
@@ -46,13 +49,19 @@ class App extends StatelessWidget {
         RepositoryProvider<MenuCardRepository>(
             create: (context) => MenuCardRepository()),
         RepositoryProvider<HistoryRepository>(
-            create: (context) => HistoryRepository())
+            create: (context) => HistoryRepository()),
+        RepositoryProvider<CameraRepository>(
+            create: (context) => CameraRepository())
       ],
-      child: BlocProvider(
-        create: (_) => AppBloc(
-          authenRepository: _authenRepository,
-          userRepository: _userRepository,
-        ),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+              create: (_) => AppBloc(
+                  authenRepository: _authenRepository,
+                  userRepository: _userRepository)),
+          BlocProvider(
+              create: (_) => CameraBloc(cameraRepository: CameraRepository()))
+        ],
         child: const AppView(),
       ),
     );

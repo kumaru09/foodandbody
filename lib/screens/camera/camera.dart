@@ -3,6 +3,9 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodandbody/repositories/camera_repository.dart';
+import 'package:foodandbody/screens/camera/bloc/camera_bloc.dart';
 import 'package:foodandbody/screens/help/help.dart';
 import 'package:foodandbody/screens/camera/show_body_result.dart';
 import 'package:foodandbody/screens/camera/show_food_result.dart';
@@ -122,7 +125,8 @@ class _CameraState extends State<Camera> with WidgetsBindingObserver {
         onPressed: () async {
           try {
             final image = await cameraController?.takePicture();
-            _showResult(isFoodCamera: _isFoodCamera, imagePath: image!.path);
+            context.read<CameraBloc>().add(GetPredicton(file: image!));
+            _showResult(isFoodCamera: _isFoodCamera, imagePath: image.path);
           } catch (e) {
             print("Take a photo failed: $e");
           }
