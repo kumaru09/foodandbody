@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodandbody/models/menu_show.dart';
+import 'package:foodandbody/screens/camera/bloc/camera_bloc.dart';
 import 'package:foodandbody/screens/camera/show_menu_detail.dart';
 // import 'package:foodandbody/models/menu_detail.dart';
 
@@ -45,93 +48,99 @@ class _ShowFoodResultState extends State<ShowFoodResult> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      extendBody: true,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).primaryColor,
-        elevation: 1,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: Colors.white,
+    return BlocBuilder<CameraBloc, CameraState>(builder: (context, state) {
+      return Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        extendBody: true,
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).primaryColor,
+          elevation: 1,
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
           ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          title: Text(
+            state.results.length == 0
+                ? ""
+                : "${state.results.length} ผลลัพธ์ที่ตรงกัน",
+            style: Theme.of(context).textTheme.headline6!.merge(
+                  TextStyle(color: Colors.white),
+                ),
+          ),
         ),
-        title: Text(
-          _resultMatch == 0 ? "" : "$_resultMatch ผลลัพธ์ที่ตรงกัน",
-          style: Theme.of(context).textTheme.headline6!.merge(
-                TextStyle(color: Colors.white),
-              ),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Stack(
-          children: [
-            _resultMatch == 0
-                ? _noResultMatch(context)
-                : _buildResultList(context),
-          ],
-        ),
-      ),
-      bottomSheet: Container(
-        color: Theme.of(context).primaryColor,
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height * 0.06,
-        padding: EdgeInsets.fromLTRB(11, 8, 20, 9),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Container(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "แคลอรี่รวม",
-                style: Theme.of(context).textTheme.headline6!.merge(
-                      TextStyle(color: Colors.white),
-                    ),
-              ),
-            ),
-            Container(
-              alignment: Alignment.center,
-              constraints: BoxConstraints(minWidth: 50),
-              child: Text(
-                "${_totalCal.round()}",
-                style: Theme.of(context).textTheme.headline6!.merge(
-                      TextStyle(color: Colors.white),
-                    ),
-              ),
-            ),
-            Container(
-              alignment: Alignment.center,
-              child: Text(
-                "แคล",
-                style: Theme.of(context).textTheme.bodyText2!.merge(
-                      TextStyle(color: Colors.white),
-                    ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                elevation: 0,
-                primary: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(50),
+        body: state.status == CameraStatus.success
+            ? SingleChildScrollView(
+                child: Stack(
+                  children: [
+                    state.results == []
+                        ? _noResultMatch(context)
+                        : _buildResultList(context, state.results),
+                  ],
+                ),
+              )
+            : Center(child: CircularProgressIndicator()),
+        bottomSheet: Container(
+          color: Theme.of(context).primaryColor,
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height * 0.06,
+          padding: EdgeInsets.fromLTRB(11, 8, 20, 9),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "แคลอรี่รวม",
+                  style: Theme.of(context).textTheme.headline6!.merge(
+                        TextStyle(color: Colors.white),
+                      ),
                 ),
               ),
-              child: Text(
-                "ตกลง",
-                style: Theme.of(context).textTheme.button!.merge(
-                      TextStyle(color: Theme.of(context).primaryColor),
-                    ),
+              Container(
+                alignment: Alignment.center,
+                constraints: BoxConstraints(minWidth: 50),
+                child: Text(
+                  "${_totalCal.round()}",
+                  style: Theme.of(context).textTheme.headline6!.merge(
+                        TextStyle(color: Colors.white),
+                      ),
+                ),
               ),
-            ),
-          ],
+              Container(
+                alignment: Alignment.center,
+                child: Text(
+                  "แคล",
+                  style: Theme.of(context).textTheme.bodyText2!.merge(
+                        TextStyle(color: Colors.white),
+                      ),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  elevation: 0,
+                  primary: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                ),
+                child: Text(
+                  "ตกลง",
+                  style: Theme.of(context).textTheme.button!.merge(
+                        TextStyle(color: Theme.of(context).primaryColor),
+                      ),
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   Widget _noResultMatch(BuildContext context) {
@@ -144,16 +153,16 @@ class _ShowFoodResultState extends State<ShowFoodResult> {
     );
   }
 
-  Widget _buildResultList(BuildContext context) {
+  Widget _buildResultList(BuildContext context, List<MenuShow> results) {
     return ListView.builder(
         shrinkWrap: true,
-        itemCount: _resultMatch,
+        itemCount: results.length,
         itemBuilder: (context, index) {
           return Container(
             decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
-                  color: index == _resultMatch - 1
+                  color: index == results.length - 1
                       ? Theme.of(context).scaffoldBackgroundColor
                       : Color(0x21212114),
                 ),
@@ -161,12 +170,16 @@ class _ShowFoodResultState extends State<ShowFoodResult> {
             ),
             child: InkWell(
               onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => ShowMenuDetail(menu: _menu[index],)));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ShowMenuDetail(
+                              menu: results[index],
+                            )));
               },
               child: ListTile(
                 contentPadding: EdgeInsets.fromLTRB(15, 11, 15, 11),
-                leading: Image.network(_menu[index].imageUrl,
+                leading: Image.network(results[index].imageUrl,
                     height: 80, width: 80, fit: BoxFit.cover),
                 title: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -175,7 +188,7 @@ class _ShowFoodResultState extends State<ShowFoodResult> {
                       child: Padding(
                         padding: EdgeInsets.zero,
                         child: Text(
-                          _menu[index].name,
+                          results[index].name,
                           softWrap: false,
                           maxLines: 1,
                           overflow: TextOverflow.fade,
@@ -195,7 +208,7 @@ class _ShowFoodResultState extends State<ShowFoodResult> {
                           textAlign: TextAlign.right,
                           text: TextSpan(children: [
                             TextSpan(
-                              text: "${_menu[index].calories.round()}",
+                              text: "${results[index].calory.round()}",
                               style:
                                   Theme.of(context).textTheme.headline5!.merge(
                                         TextStyle(
@@ -229,10 +242,10 @@ class _ShowFoodResultState extends State<ShowFoodResult> {
                       _isChecked[index] = value!;
                       print("before: $_totalCal / $value");
                       value
-                          ? _totalCal += _menu[index].calories
-                          : _totalCal -= _menu[index].calories;
+                          ? _totalCal += results[index].calory
+                          : _totalCal -= results[index].calory;
                       print(
-                          "after: $_totalCal ( +- ${_menu[index].calories} )");
+                          "after: $_totalCal ( +- ${results[index].calory} )");
                     });
                   },
                   value: _isChecked[index],

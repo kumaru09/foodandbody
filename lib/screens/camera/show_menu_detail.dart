@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-// import 'package:foodandbody/models/menu_detail.dart';
-import 'package:foodandbody/screens/camera/show_food_result.dart';
+import 'package:foodandbody/models/menu_show.dart';
 
 class ShowMenuDetail extends StatelessWidget {
   const ShowMenuDetail({required this.menu});
-  final TestMenu menu;
+  final MenuShow menu;
   // final MenuDetail munu;
 
   @override
@@ -49,7 +48,7 @@ class ShowMenuDetail extends StatelessWidget {
                         ),
                   ),
                   Text(
-                    "${menu.calories.round()} แคล",
+                    "${menu.calory.round()} แคล",
                     style: Theme.of(context).textTheme.headline5!.merge(
                           TextStyle(
                               color: Theme.of(context).colorScheme.secondary),
@@ -71,7 +70,7 @@ class ShowMenuDetail extends StatelessWidget {
                         ),
                   ),
                   Text(
-                    "${menu.volumn.round()} กรัม",
+                    "${menu.serve.round()} กรัม",
                     style: Theme.of(context).textTheme.bodyText2!.merge(
                           TextStyle(
                               color: Theme.of(context).colorScheme.secondary),

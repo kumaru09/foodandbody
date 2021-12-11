@@ -2,19 +2,22 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:foodandbody/models/body.dart';
-import 'package:foodandbody/models/user.dart';
+import 'package:foodandbody/models/info.dart';
 import 'package:foodandbody/models/weight_list.dart';
+import 'package:foodandbody/screens/body/cubit/body_cubit.dart';
 import 'package:foodandbody/screens/body/weight_graph.dart';
+import 'package:foodandbody/screens/setting/bloc/info_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/src/provider.dart';
 
 class WeightAndHeightInfo extends StatelessWidget {
-  WeightAndHeightInfo(this._user, this.weightList);
+  WeightAndHeightInfo(this._info, this.weightList);
 
-  final User _user;
+  final Info _info;
   final List<WeightList> weightList;
 
   late int? weight = weightList.first.weight;
-  late int? height = _user.info!.height;
+  late int? height = _info.height;
   late double bmi =
       double.parse((weight! / pow(height! / 100, 2)).toStringAsFixed(2));
   late String date = DateFormat("dd/MM/yyyy").format(DateTime.now());
@@ -68,10 +71,33 @@ class WeightAndHeightInfo extends StatelessWidget {
                 ),
                 WeightGraph(weightList),
                 Container(
-                  alignment: Alignment.topRight,
-                  constraints: BoxConstraints.tightFor(height: 30),
-                  child: _EditWeightDialog(),
-                )
+                    alignment: Alignment.topRight,
+                    constraints: BoxConstraints.tightFor(height: 30),
+                    child: TextButton(
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.only(right: 16, bottom: 11),
+                        minimumSize: Size.zero,
+                        alignment: Alignment.topRight,
+                      ),
+                      child: Text("แก้ไข",
+                          style: Theme.of(context).textTheme.button!.merge(
+                              TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .secondary))),
+                      onPressed: () async {
+                        final value = await showDialog<int?>(
+                            context: context,
+                            builder: (BuildContext context) =>
+                                EditWeightDialog());
+                        if (value != null && value != 0) {
+                          context
+                              .read<InfoBloc>()
+                              .add(UpdateWeight(weight: value));
+                          context.read<BodyCubit>().updateWeight(value);
+                        }
+                      },
+                    ))
               ],
             ),
           ),
@@ -115,7 +141,30 @@ class WeightAndHeightInfo extends StatelessWidget {
                     Container(
                       alignment: Alignment.topRight,
                       constraints: BoxConstraints.tightFor(height: 30),
-                      child: _EditHeightDialog(),
+                      child: TextButton(
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.only(right: 16, bottom: 11),
+                          minimumSize: Size.zero,
+                          alignment: Alignment.topRight,
+                        ),
+                        child: Text("แก้ไข",
+                            style: Theme.of(context).textTheme.button!.merge(
+                                TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .secondary))),
+                        onPressed: () async {
+                          final value = await showDialog<int?>(
+                              context: context,
+                              builder: (BuildContext context) =>
+                                  EditHeightDialog());
+                          if (value != null && value != 0) {
+                            context
+                                .read<InfoBloc>()
+                                .add(UpdateHeight(height: value));
+                          }
+                        },
+                      ),
                     )
                   ],
                 ),
@@ -164,102 +213,99 @@ class WeightAndHeightInfo extends StatelessWidget {
   }
 }
 
-class _EditWeightDialog extends StatelessWidget {
-  const _EditWeightDialog({Key? key}) : super(key: key);
+class EditWeightDialog extends StatefulWidget {
+  const EditWeightDialog({Key? key}) : super(key: key);
 
   @override
+  State<StatefulWidget> createState() => _WeightDialog();
+}
+
+class _WeightDialog extends State<EditWeightDialog> {
+  String _currentWeight = '0';
+  @override
   Widget build(BuildContext context) {
-    return TextButton(
-        style: TextButton.styleFrom(
-          padding: EdgeInsets.only(right: 16, bottom: 11),
-          minimumSize: Size.zero,
-          alignment: Alignment.topRight,
-        ),
-        child: Text("แก้ไข",
-            style: Theme.of(context).textTheme.button!.merge(
-                TextStyle(color: Theme.of(context).colorScheme.secondary))),
-        onPressed: () => showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15)),
-                  elevation: 0,
-                  backgroundColor: Colors.white,
-                  title: Text("แก้ไขน้ำหนัก",
-                      style: Theme.of(context).textTheme.headline6!.merge(
-                          TextStyle(color: Theme.of(context).primaryColor))),
-                  content: TextField(
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(hintText: "ตัวอย่าง 50"),
-                  ),
-                  actions: <Widget>[
-                    TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Text("ตกลง",
-                            style: Theme.of(context).textTheme.button!.merge(
-                                TextStyle(
-                                    color: Theme.of(context).primaryColor)))),
-                    TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Text("ยกเลิก",
-                            style: Theme.of(context).textTheme.button!.merge(
-                                TextStyle(
-                                    color: Theme.of(context).primaryColor))))
-                  ],
-                )));
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      elevation: 0,
+      backgroundColor: Colors.white,
+      title: Text("แก้ไขน้ำหนัก",
+          style: Theme.of(context)
+              .textTheme
+              .headline6!
+              .merge(TextStyle(color: Theme.of(context).primaryColor))),
+      content: TextField(
+        keyboardType: TextInputType.number,
+        decoration: InputDecoration(hintText: "ตัวอย่าง 50"),
+        onChanged: (weight) => setState(() {
+          _currentWeight = weight;
+        }),
+      ),
+      actions: <Widget>[
+        TextButton(
+            onPressed: () => Navigator.pop(context, int.parse(_currentWeight)),
+            child: Text("ตกลง",
+                style: Theme.of(context)
+                    .textTheme
+                    .button!
+                    .merge(TextStyle(color: Theme.of(context).primaryColor)))),
+        TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text("ยกเลิก",
+                style: Theme.of(context)
+                    .textTheme
+                    .button!
+                    .merge(TextStyle(color: Theme.of(context).primaryColor))))
+      ],
+    );
   }
 }
 
-class _EditHeightDialog extends StatelessWidget {
-  const _EditHeightDialog({Key? key}) : super(key: key);
+class EditHeightDialog extends StatefulWidget {
+  const EditHeightDialog({Key? key}) : super(key: key);
 
   @override
+  State<StatefulWidget> createState() => _HeightDialog();
+}
+
+class _HeightDialog extends State<EditHeightDialog> {
+  String _currentHeight = '0';
+  @override
   Widget build(BuildContext context) {
-    return TextButton(
-        style: TextButton.styleFrom(
-          padding: EdgeInsets.only(right: 16, bottom: 11),
-          minimumSize: Size.zero,
-          alignment: Alignment.topRight,
-        ),
-        child: Text("แก้ไข",
-            style: Theme.of(context).textTheme.button!.merge(
-                TextStyle(color: Theme.of(context).colorScheme.secondary))),
-        onPressed: () => showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15)),
-                  elevation: 0,
-                  backgroundColor: Colors.white,
-                  title: Text("แก้ไขส่วนสูง",
-                      style: Theme.of(context).textTheme.headline6!.merge(
-                          TextStyle(color: Theme.of(context).primaryColor))),
-                  content: TextField(
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(hintText: "ตัวอย่าง 165"),
-                  ),
-                  actions: <Widget>[
-                    TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Text("ตกลง",
-                            style: Theme.of(context).textTheme.button!.merge(
-                                TextStyle(
-                                    color: Theme.of(context).primaryColor)))),
-                    TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Text("ยกเลิก",
-                            style: Theme.of(context).textTheme.button!.merge(
-                                TextStyle(
-                                    color: Theme.of(context).primaryColor))))
-                  ],
-                )));
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      elevation: 0,
+      backgroundColor: Colors.white,
+      title: Text("แก้ไขส่วนสูง",
+          style: Theme.of(context)
+              .textTheme
+              .headline6!
+              .merge(TextStyle(color: Theme.of(context).primaryColor))),
+      content: TextField(
+          keyboardType: TextInputType.number,
+          decoration: InputDecoration(hintText: "ตัวอย่าง 165"),
+          onChanged: (height) => setState(() {
+                _currentHeight = height;
+              })),
+      actions: <Widget>[
+        TextButton(
+            onPressed: () => Navigator.pop(context, int.parse(_currentHeight)),
+            child: Text("ตกลง",
+                style: Theme.of(context)
+                    .textTheme
+                    .button!
+                    .merge(TextStyle(color: Theme.of(context).primaryColor)))),
+        TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text("ยกเลิก",
+                style: Theme.of(context)
+                    .textTheme
+                    .button!
+                    .merge(TextStyle(color: Theme.of(context).primaryColor))))
+      ],
+    );
   }
 }

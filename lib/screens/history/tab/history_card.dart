@@ -153,7 +153,7 @@ class _LineChart extends StatelessWidget {
       LineChartBarData(
           colors: [Color(0xFF515070)],
           spots: dataPoint,
-          isCurved: false,
+          isCurved: true,
           dotData: FlDotData(show: false))
     ];
   }

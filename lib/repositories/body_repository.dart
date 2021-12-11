@@ -62,4 +62,16 @@ class BodyRepository {
     }
     return List.empty();
   }
+
+  Future<void> addWeight(int weight) async {
+    final CollectionReference bodyHistories = FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .collection('weight');
+    try {
+      await bodyHistories.add({'date': Timestamp.now(), 'weight': weight});
+    } catch (e) {
+      throw Exception('error adding weight');
+    }
+  }
 }

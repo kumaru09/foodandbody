@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
+import 'package:foodandbody/models/history.dart';
 import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:foodandbody/screens/home/bloc/home_bloc.dart';
 import 'package:foodandbody/screens/home/circular_cal_indicator.dart';
 import 'package:foodandbody/screens/search/search_page.dart';
 import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
+import 'package:foodandbody/screens/setting/bloc/info_bloc.dart';
 import 'package:foodandbody/screens/setting/setting.dart';
 import 'package:foodandbody/screens/home/linear_nutrient_indicator.dart';
 import 'package:foodandbody/widget/menu_card/menu_card.dart';
@@ -61,24 +63,8 @@ class Home extends StatelessWidget {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15)),
                         elevation: 2,
-                        child: state is PlanLoaded &&
-                                context.read<AppBloc>().state.user.info != null
-                            ? Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.only(top: 18),
-                                    child: CircularCalIndicator(state.plan,
-                                        context.read<AppBloc>().state.user),
-                                  ),
-                                  Container(
-                                    padding:
-                                        EdgeInsets.only(top: 18, bottom: 18),
-                                    child: LinearNutrientIndicator(state.plan,
-                                        context.read<AppBloc>().state.user),
-                                  )
-                                ],
-                              )
+                        child: state is PlanLoaded
+                            ? _buildCard(context, state.plan)
                             : Center(child: CircularProgressIndicator()));
                   },
                 )),
@@ -133,14 +119,33 @@ class Home extends StatelessWidget {
                 padding: EdgeInsets.only(left: 16, right: 16, bottom: 100),
                 width: MediaQuery.of(context).size.width,
                 constraints: BoxConstraints(minHeight: 100),
-                child: BlocProvider<HomeBloc>(
-                    create: (context) => HomeBloc(
-                        planRepository: context.read<PlanRepository>()),
-                    child: _DailyWater()))
+                child: _DailyWater())
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildCard(BuildContext context, History plan) {
+    return BlocBuilder<InfoBloc, InfoState>(builder: (context, state) {
+      return state.status == InfoStatus.success
+          ? Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: EdgeInsets.only(top: 18),
+                  child: CircularCalIndicator(plan, state.info!),
+                ),
+                Container(
+                  padding: EdgeInsets.only(top: 18, bottom: 18),
+                  child: LinearNutrientIndicator(plan, state.info!),
+                )
+              ],
+            )
+          : Center(
+              child: CircularProgressIndicator(),
+            );
+    });
   }
 }
 
@@ -154,8 +159,6 @@ class _DailyWater extends StatefulWidget {
 class __DailyWaterState extends State<_DailyWater> {
   @override
   Widget build(BuildContext context) {
-    final HomeBloc homeBloc = BlocProvider.of<HomeBloc>(context)
-      ..add(LoadWater());
     return BlocBuilder<HomeBloc, HomeState>(builder: (context, state) {
       return Card(
         key: const Key('daily_water_card'),
@@ -178,8 +181,8 @@ class __DailyWaterState extends State<_DailyWater> {
                       child: ElevatedButton(
                         key: const Key('remove_water_button'),
                         onPressed: () {
-                          homeBloc.add(DecreaseWaterEvent());
-                          homeBloc.add(WaterChanged(
+                          context.read<HomeBloc>().add(DecreaseWaterEvent());
+                          context.read<HomeBloc>().add(WaterChanged(
                               water: state.water == 0 ? 0 : state.water - 1));
                         },
                         style: ElevatedButton.styleFrom(
@@ -216,8 +219,10 @@ class __DailyWaterState extends State<_DailyWater> {
                       child: ElevatedButton(
                         key: const Key('add_water_button'),
                         onPressed: () {
-                          homeBloc.add(IncreaseWaterEvent());
-                          homeBloc.add(WaterChanged(water: state.water + 1));
+                          context.read<HomeBloc>().add(IncreaseWaterEvent());
+                          context
+                              .read<HomeBloc>()
+                              .add(WaterChanged(water: state.water + 1));
                         },
                         style: ElevatedButton.styleFrom(
                           primary: Theme.of(context).cardColor,

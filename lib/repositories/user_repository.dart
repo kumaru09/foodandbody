@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:foodandbody/models/info.dart';
 import 'package:foodandbody/models/info_entity.dart';
@@ -28,19 +29,59 @@ class UserRepository implements IUserRepository {
   }
 
   @override
-  Future<User> getInfo(User user) async {
-    final data = await users.doc(user.uid).get();
+  Future<Info> getInfo() async {
+    final data = await users
+        .doc(firebase_auth.FirebaseAuth.instance.currentUser?.uid)
+        .get();
     if (data.exists) {
       final info = Info.fromEntity(InfoEntity.fromSnapshot(data));
-      return user.copyWith(info: info);
+      return info;
     } else {
-      log("Cached get failed");
-      return user.copyWith(info: null);
+      throw Exception('No Info data');
     }
   }
 
   @override
   Future<void> updateInfo(User user) {
     return users.doc(user.uid).update(user.info!.toEntity().toDocument());
+  }
+
+  Future<void> updateGoalInfo(int goal) async {
+    try {
+      final info = cloud_firestore.FirebaseFirestore.instance
+          .collection('users')
+          .doc(firebase_auth.FirebaseAuth.instance.currentUser?.uid);
+      return await info.update({'goal': goal});
+    } catch (e) {
+      throw Exception('error updating info');
+    }
+  }
+
+  Future<void> updateHeightInfo(int height) async {
+    try {
+      final info = cloud_firestore.FirebaseFirestore.instance
+          .collection('users')
+          .doc(firebase_auth.FirebaseAuth.instance.currentUser?.uid);
+      return await info.update({'height': height});
+    } catch (e) {
+      throw Exception('error updating info');
+    }
+  }
+
+  Future<void> updateWeightInfo(int weight) async {
+    try {
+      final info = cloud_firestore.FirebaseFirestore.instance
+          .collection('users')
+          .doc(firebase_auth.FirebaseAuth.instance.currentUser?.uid);
+      await info.update({'weight': weight});
+      final cloud_firestore.CollectionReference weights = cloud_firestore
+          .FirebaseFirestore.instance
+          .collection('users')
+          .doc(firebase_auth.FirebaseAuth.instance.currentUser?.uid)
+          .collection('weights');
+      await weights.add({"date": Timestamp.now(), "weight": weight});
+    } catch (e) {
+      throw Exception('error updating info');
+    }
   }
 }

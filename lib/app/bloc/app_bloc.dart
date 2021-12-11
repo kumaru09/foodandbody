@@ -14,8 +14,7 @@ part 'app_event.dart';
 class AppBloc extends Bloc<AppEvent, AppState> {
   AppBloc(
       {required AuthenRepository authenRepository,
-      required UserRepository userRepository,
-      })
+      required UserRepository userRepository})
       : _authenRepository = authenRepository,
         _userRepository = userRepository,
         super(
@@ -24,6 +23,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
               : const AppState.unauthenticated(),
         ) {
     _userSubscription = _authenRepository.user.listen(_onUserChanged);
+    on<AppUserChanged>(_userChanged);
+    on<AppLogoutRequested>(_logout);
+    on<AddInfoRequested>(_infoChanged);
   }
 
   final AuthenRepository _authenRepository;
@@ -32,38 +34,25 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
   void _onUserChanged(User user) => add(AppUserChanged(user));
 
-  @override
-  Stream<AppState> mapEventToState(AppEvent event) async* {
-    if (event is AppUserChanged) {
-      yield* _mapUserChangedToState(event, state);
-    } else if (event is AppLogoutRequested) {
-      unawaited(_authenRepository.logOut());
-    } else if (event is AddInfoRequested) {
-      yield* _mapInfoRequestToState(event, state);
-    }
-  }
-
-  Stream<AppState> _mapInfoRequestToState(
-      AddInfoRequested event, AppState state) async* {
-    final user = await _userRepository.getInfo(event.user);
-    if (user.info != null) {
-      yield AppState.authenticated(user);
-    } else {
-      yield AppState.initialize(event.user);
-    }
-  }
-
-  Stream<AppState> _mapUserChangedToState(
-      AppUserChanged event, AppState state) async* {
+  void _userChanged(AppUserChanged event, Emitter<AppState> emit) async {
     if (event.user.isNotEmpty) {
-      final user = await _userRepository.getInfo(event.user);
-      if (user.info != null) {
-        yield AppState.authenticated(user);
-      } else {
-        yield AppState.initialize(event.user);
+      try {
+        final info = await _userRepository.getInfo();
+        emit(AppState.authenticated(event.user.copyWith(info: info)));
+      } catch (e) {
+        add(AddInfoRequested());
       }
-    } else
-      yield const AppState.unauthenticated();
+    } else {
+      emit(AppState.unauthenticated());
+    }
+  }
+
+  void _logout(AppLogoutRequested event, Emitter<AppState> emit) {
+    unawaited(_authenRepository.logOut());
+  }
+
+  void _infoChanged(AddInfoRequested event, Emitter<AppState> emit) {
+    emit(AppState.initialize());
   }
 
   @override

@@ -13,31 +13,41 @@ EventTransformer<Event> debounce<Event>(Duration duration) {
 }
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
-  HomeBloc({required this.planRepository}) : super(HomeState(water: 0)) {
+  HomeBloc({required this.planRepository}) : super(HomeState()) {
     on<WaterChanged>(_onWaterChanged, transformer: debounce(_duration));
     on<IncreaseWaterEvent>(
-        (event, emit) => emit(HomeState(water: state.water + 1)));
+        (event, emit) => emit(state.copyWith(water: state.water + 1)));
     on<DecreaseWaterEvent>((event, emit) =>
-        emit(HomeState(water: state.water <= 0 ? 0 : state.water - 1)));
+        emit(state.copyWith(water: state.water <= 0 ? 0 : state.water - 1)));
     on<LoadWater>(_onFetchWater);
   }
 
   final PlanRepository planRepository;
 
-  void _onWaterChanged(WaterChanged event, Emitter<HomeState> emit) async {
+  Future<void> _onWaterChanged(
+      WaterChanged event, Emitter<HomeState> emit) async {
     final water = event.water;
     try {
+      emit(state.copyWith(status: HomeStatus.loading));
       print('adding water: $water');
       await planRepository.addWaterPlan(water);
+      emit(state.copyWith(
+          status: HomeStatus.success,
+          water: await planRepository.getWaterPlan()));
     } catch (e) {
+      emit(state.copyWith(status: HomeStatus.failure));
       print('error adding water');
     }
   }
 
-  void _onFetchWater(LoadWater event, Emitter<HomeState> emit) async {
+  Future<void> _onFetchWater(LoadWater event, Emitter<HomeState> emit) async {
     try {
-      emit(HomeState(water: await planRepository.getWaterPlan()));
+      emit(state.copyWith(status: HomeStatus.loading));
+      emit(state.copyWith(
+          status: HomeStatus.success,
+          water: await planRepository.getWaterPlan()));
     } catch (e) {
+      emit(state.copyWith(status: HomeStatus.failure));
       print('$e');
     }
   }
