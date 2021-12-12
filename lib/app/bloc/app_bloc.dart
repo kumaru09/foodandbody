@@ -40,7 +40,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         final info = await _userRepository.getInfo();
         emit(AppState.authenticated(event.user.copyWith(info: info)));
       } catch (e) {
-        add(AddInfoRequested());
+        add(AddInfoRequested(_authenRepository.currentUser));
       }
     } else {
       emit(AppState.unauthenticated());
@@ -52,7 +52,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   }
 
   void _infoChanged(AddInfoRequested event, Emitter<AppState> emit) {
-    emit(AppState.initialize());
+    emit(AppState.initialize(event.user));
   }
 
   @override

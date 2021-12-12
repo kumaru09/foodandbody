@@ -77,7 +77,7 @@ class _ShowFoodResultState extends State<ShowFoodResult> {
             ? SingleChildScrollView(
                 child: Stack(
                   children: [
-                    state.results == []
+                    state.results.isEmpty
                         ? _noResultMatch(context)
                         : _buildResultList(context, state.results),
                   ],

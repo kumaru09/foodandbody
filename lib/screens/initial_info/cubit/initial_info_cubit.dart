@@ -6,7 +6,7 @@ import 'package:foodandbody/models/height.dart';
 import 'package:foodandbody/models/info.dart';
 import 'package:foodandbody/models/username.dart';
 import 'package:foodandbody/models/weight.dart';
-import 'package:foodandbody/repositories/user_repository.dart'; 
+import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:formz/formz.dart';
 
 part 'initial_info_state.dart';
@@ -61,23 +61,21 @@ class InitialInfoCubit extends Cubit<InitialInfoState> {
     ));
   }
 
-  Future<void> initialInfoFormSubmitted(String? uid) async {
+  Future<void> initialInfoFormSubmitted() async {
     if (!state.status.isValidated) return;
     emit(state.copyWith(status: FormzStatus.submissionInProgress));
     try {
-      await _userRepository.addUserInfo(
-        uid!,
-        Info(
-          name: state.username.value,
-          weight: int.parse(state.weight.value),
-          height: int.parse(state.height.value),
-          gender: state.gender.value,
-          goal: int.parse(state.calory.value),
-          photoUrl: '',
-        )
-      );
+      await _userRepository.addUserInfo(Info(
+        name: state.username.value,
+        weight: int.parse(state.weight.value),
+        height: int.parse(state.height.value),
+        gender: state.gender.value,
+        goal: int.parse(state.calory.value),
+        photoUrl: '',
+      ));
       emit(state.copyWith(status: FormzStatus.submissionSuccess));
-    } on Exception {
+    } catch (e) {
+      print(e);
       emit(state.copyWith(status: FormzStatus.submissionFailure));
     }
   }
