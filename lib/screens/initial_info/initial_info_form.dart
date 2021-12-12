@@ -221,11 +221,10 @@ class _InitialInfoButton extends StatelessWidget {
                   child: ElevatedButton(
                     key: const Key('initialInfoForm_continue_raisedButton'),
                     onPressed: state.status.isValidated
-                        ? () {
-                            context
+                        ? () async {
+                            await context
                                 .read<InitialInfoCubit>()
-                                .initialInfoFormSubmitted(
-                                    context.read<AppBloc>().state.user.uid);
+                                .initialInfoFormSubmitted();
                             context.read<AppBloc>().add(AppUserChanged(
                                 context.read<AppBloc>().state.user));
                           }
