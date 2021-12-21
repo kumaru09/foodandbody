@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:bloc/bloc.dart';
-import 'package:foodandbody/models/calory.dart';
+import 'package:foodandbody/models/age.dart';
+import 'package:foodandbody/models/exercise.dart';
 import 'package:foodandbody/models/gender.dart';
 import 'package:foodandbody/models/height.dart';
 import 'package:foodandbody/models/info.dart';
@@ -21,7 +22,7 @@ class InitialInfoCubit extends Cubit<InitialInfoState> {
     emit(state.copyWith(
       username: username,
       status: Formz.validate(
-          [username, state.weight, state.height, state.gender, state.calory]),
+          [username, state.weight, state.height, state.age, state.gender, state.exercise]),
     ));
   }
 
@@ -30,7 +31,7 @@ class InitialInfoCubit extends Cubit<InitialInfoState> {
     emit(state.copyWith(
       weight: weight,
       status: Formz.validate(
-          [state.username, weight, state.height, state.gender, state.calory]),
+          [state.username, weight, state.height, state.age, state.gender, state.exercise]),
     ));
   }
 
@@ -39,7 +40,16 @@ class InitialInfoCubit extends Cubit<InitialInfoState> {
     emit(state.copyWith(
       height: height,
       status: Formz.validate(
-          [state.username, state.weight, height, state.gender, state.calory]),
+          [state.username, state.weight, height, state.age, state.gender, state.exercise]),
+    ));
+  }
+
+  void ageChanged(String value) {
+    final age = Age.dirty(value);
+    emit(state.copyWith(
+      age: age,
+      status: Formz.validate(
+          [state.username, state.weight, state.height, age, state.gender, state.exercise]),
     ));
   }
 
@@ -48,16 +58,16 @@ class InitialInfoCubit extends Cubit<InitialInfoState> {
     emit(state.copyWith(
       gender: gender,
       status: Formz.validate(
-          [state.username, state.weight, state.height, gender, state.calory]),
+          [state.username, state.weight, state.height, state.age, gender, state.exercise]),
     ));
   }
 
-  void caloryChanged(String value) {
-    final calory = Calory.dirty(value);
+  void exerciseChanged(String value) {
+    final exercise = Exercise.dirty(value);
     emit(state.copyWith(
-      calory: calory,
+      exercise: exercise,
       status: Formz.validate(
-          [state.username, state.weight, state.height, state.gender, calory]),
+          [state.username, state.weight, state.height, state.age, state.gender, exercise]),
     ));
   }
 
@@ -69,8 +79,9 @@ class InitialInfoCubit extends Cubit<InitialInfoState> {
         name: state.username.value,
         weight: int.parse(state.weight.value),
         height: int.parse(state.height.value),
+        // age: int.parse(state.age.value),
         gender: state.gender.value,
-        goal: int.parse(state.calory.value),
+        // exercise: state.gender.value,
         photoUrl: '',
       ));
       emit(state.copyWith(status: FormzStatus.submissionSuccess));

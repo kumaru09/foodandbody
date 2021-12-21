@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:foodandbody/screens/initial_info/cubit/initial_info_cubit.dart';
@@ -52,10 +51,12 @@ class InitialInfoForm extends StatelessWidget {
                           SizedBox(height: 16.0),
                           _HeightInput(),
                           SizedBox(height: 16.0),
-                          GenderInput(),
+                          _AgeInput(),
                           SizedBox(height: 16.0),
-                          _GoalInput(),
-                          SizedBox(height: 24.0),
+                          _GenderInput(),
+                          SizedBox(height: 16.0),
+                          _ExerciseInput(),
+                          SizedBox(height: 16.0),
                           _InitialInfoButton(),
                         ],
                       ),
@@ -140,19 +141,43 @@ class _HeightInput extends StatelessWidget {
   }
 }
 
-class GenderInput extends StatefulWidget {
-  const GenderInput({Key? key}) : super(key: key);
-
+class _AgeInput extends StatelessWidget {
   @override
-  _GenderInputState createState() => _GenderInputState();
+  Widget build(BuildContext context) {
+    return BlocBuilder<InitialInfoCubit, InitialInfoState>(
+        buildWhen: (previous, current) => previous.age != current.age,
+        builder: (context, state) {
+          return TextFormField(
+            key: const Key('initialInfoForm_ageInput_textField'),
+            onChanged: (age) =>
+                context.read<InitialInfoCubit>().ageChanged(age),
+            keyboardType: TextInputType.number,
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(
+              labelText: 'อายุ (ปี)',
+              hintText: 'ตัวอย่าง 18, 25, 37',
+              border: OutlineInputBorder(borderSide: BorderSide()),
+              errorText:
+                  state.age.invalid ? 'กรุณาระบุอายุให้ถูกต้อง' : null,
+            ),
+          );
+        });
+  }
 }
 
-class _GenderInputState extends State<GenderInput> {
+class _GenderInput extends StatefulWidget {
+  const _GenderInput({Key? key}) : super(key: key);
+
+  @override
+  __GenderInputState createState() => __GenderInputState();
+}
+
+class __GenderInputState extends State<_GenderInput> {
   String? _gender;
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<InitialInfoCubit, InitialInfoState>(
-        buildWhen: (previous, current) => previous.height != current.height,
+        // buildWhen: (previous, current) => previous.height != current.height,
         builder: (context, state) {
           return DropdownButtonFormField<String>(
             key: const Key('initialInfoForm_genderInput_textField'),
@@ -160,7 +185,7 @@ class _GenderInputState extends State<GenderInput> {
             decoration: InputDecoration(
               labelText: 'เพศ',
               border: OutlineInputBorder(borderSide: BorderSide()),
-              errorText: state.gender.invalid ? 'กรุณาระบุเพศ' : null,
+              errorText: state.gender.invalid ? 'กรุณาระบุเพศของคุณ' : null,
             ),
             items: [
               DropdownMenuItem<String>(
@@ -183,26 +208,57 @@ class _GenderInputState extends State<GenderInput> {
   }
 }
 
-class _GoalInput extends StatelessWidget {
+class _ExerciseInput extends StatefulWidget {
+  const _ExerciseInput({Key? key}) : super(key: key);
+
+  @override
+  __ExerciseInputState createState() => __ExerciseInputState();
+}
+
+class __ExerciseInputState extends State<_ExerciseInput> {
+  String? _exercise;
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<InitialInfoCubit, InitialInfoState>(
-        buildWhen: (previous, current) => previous.calory != current.calory,
+        // buildWhen: (previous, current) => previous.height != current.height,
         builder: (context, state) {
-          return TextFormField(
-            key: const Key('initialInfoForm_caloryInput_textField'),
-            onChanged: (calory) =>
-                context.read<InitialInfoCubit>().caloryChanged(calory),
-            keyboardType: TextInputType.number,
-            textInputAction: TextInputAction.next,
+          return DropdownButtonFormField<String>(
+            key: const Key('initialInfoForm_exerciseInput_textField'),
+            value: _exercise,
+            isExpanded: true,
             decoration: InputDecoration(
-              labelText: 'เป้าหมายแคลอรี',
-              hintText: 'ตัวอย่าง 1600',
+              labelText: 'การออกกำลังกาย',
               border: OutlineInputBorder(borderSide: BorderSide()),
-              errorText: state.calory.invalid
-                  ? 'กรุณาระบุเป้าหมายแคลอรีให้ถูกต้อง'
-                  : null,
+              errorText: state.exercise.invalid ? 'กรุณาระบุการออกกำลังกายของคุณ' : null,
             ),
+            items: [
+              DropdownMenuItem<String>(
+                child: Text('ไม่ได้ออกกำลังกาย'),
+                value: '0',
+              ),
+              DropdownMenuItem<String>(
+                child: Text('ออกกำลังกายเบา 1-3 วันต่อสัปดาห์'),
+                value: '1',
+              ),
+              DropdownMenuItem<String>(
+                child: Text('ออกกำลังกายกลาง 3-5 วันต่อสัปดาห์'),
+                value: '2',
+              ),
+              DropdownMenuItem<String>(
+                child: Text('ออกกำลังกายหนัก 6-7 วันต่อสัปดาห์'),
+                value: '3',
+              ),
+              DropdownMenuItem<String>(
+                child: Text('ออกกำลังกายหนักวันละ 2 ครั้ง'),
+                value: '4',
+              ),
+            ],
+            onChanged: (String? exercise) {
+              setState(() {
+                _exercise = exercise;
+              });
+              context.read<InitialInfoCubit>().exerciseChanged(exercise!);
+            },
           );
         });
   }
