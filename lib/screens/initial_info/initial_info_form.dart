@@ -234,23 +234,23 @@ class __ExerciseInputState extends State<_ExerciseInput> {
             items: [
               DropdownMenuItem<String>(
                 child: Text('ไม่ได้ออกกำลังกาย'),
-                value: '0',
+                value: '1.2',
               ),
               DropdownMenuItem<String>(
                 child: Text('ออกกำลังกายเบา 1-3 วันต่อสัปดาห์'),
-                value: '1',
+                value: '1.375',
               ),
               DropdownMenuItem<String>(
                 child: Text('ออกกำลังกายกลาง 3-5 วันต่อสัปดาห์'),
-                value: '2',
+                value: '1.55',
               ),
               DropdownMenuItem<String>(
                 child: Text('ออกกำลังกายหนัก 6-7 วันต่อสัปดาห์'),
-                value: '3',
+                value: '1.725',
               ),
               DropdownMenuItem<String>(
                 child: Text('ออกกำลังกายหนักวันละ 2 ครั้ง'),
-                value: '4',
+                value: '1.9',
               ),
             ],
             onChanged: (String? exercise) {

@@ -75,13 +75,17 @@ class InitialInfoCubit extends Cubit<InitialInfoState> {
     if (!state.status.isValidated) return;
     emit(state.copyWith(status: FormzStatus.submissionInProgress));
     try {
+      double bmr = state.gender.value == 'M' ? 
+      66 + (13.7 * int.parse(state.weight.value)) + (5 * int.parse(state.height.value)) - (6.8 * int.parse(state.age.value))
+      : 665 + (9.6 * int.parse(state.weight.value)) + (1.8 * int.parse(state.height.value)) - (4.7 * int.parse(state.age.value));
+      double  tdee = bmr.round() * double.parse(state.exercise.value); 
       await _userRepository.addUserInfo(Info(
         name: state.username.value,
         weight: int.parse(state.weight.value),
         height: int.parse(state.height.value),
         // age: int.parse(state.age.value),
         gender: state.gender.value,
-        // exercise: state.gender.value,
+        goal : tdee.round(),
         photoUrl: '',
       ));
       emit(state.copyWith(status: FormzStatus.submissionSuccess));
