@@ -1,13 +1,11 @@
 import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:foodandbody/models/age.dart';
-import 'package:foodandbody/models/calory.dart';
 import 'package:foodandbody/models/exercise.dart';
 import 'package:foodandbody/models/gender.dart';
 import 'package:foodandbody/models/height.dart';
 import 'package:foodandbody/models/user.dart';
 import 'package:foodandbody/models/username.dart';
 import 'package:foodandbody/models/weight.dart';
-// import 'package:foodandbody/repositories/authen_repository.dart';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,8 +14,6 @@ import 'package:foodandbody/screens/initial_info/cubit/initial_info_cubit.dart';
 import 'package:foodandbody/screens/initial_info/initial_info_form.dart';
 import 'package:formz/formz.dart';
 import 'package:mocktail/mocktail.dart';
-
-// class MockAuthenticationRepository extends Mock implements AuthenRepository {}
 
 class MockInitialInfoCubit extends MockCubit<InitialInfoState>
     implements InitialInfoCubit {}
@@ -42,8 +38,6 @@ class FakeAppEvent extends Fake implements AppEvent {}
 
 class FakeAppState extends Fake implements AppState {}
 
-class MockUser extends Mock implements User {}
-
 void main() {
   const initialInfoButtonKey = Key('initialInfoForm_continue_raisedButton');
   const usernameInputKey = Key('initialInfoForm_usernameInput_textField');
@@ -64,7 +58,6 @@ void main() {
   group('InitialInfoForm', () {
     late InitialInfoCubit initialInfoCubit;
     late AppBloc appBloc;
-    late User user;
 
     setUpAll(() {
       registerFallbackValue<AppEvent>(FakeAppEvent());
@@ -74,7 +67,6 @@ void main() {
 
     setUp(() {
       appBloc = MockAppBloc();
-      user = MockUser();
       initialInfoCubit = MockInitialInfoCubit();
       when(() => initialInfoCubit.state).thenReturn(const InitialInfoState());
       when(() => initialInfoCubit.initialInfoFormSubmitted())
@@ -192,7 +184,6 @@ void main() {
 
         var input2 = tester.widget<DropdownButtonFormField<String>>(
             find.byKey(exerciseInputKey));
-        print(input2.initialValue);
         expect(input2.initialValue, '1.55');
       });
 
