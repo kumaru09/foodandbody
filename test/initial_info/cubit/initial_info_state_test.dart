@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:foodandbody/models/age.dart';
+import 'package:foodandbody/models/birth_date.dart';
 import 'package:foodandbody/models/exercise.dart';
 import 'package:foodandbody/models/gender.dart';
 import 'package:foodandbody/models/height.dart';
@@ -12,7 +12,7 @@ void main() {
   const username = Username.dirty('username');
   const weight = Weight.dirty('weight');
   const height = Height.dirty('height');
-  const age = Age.dirty('age');
+  const bDate = BDate.dirty('bDate');
   const gender = Gender.dirty('gender');
   const exercise = Exercise.dirty('exercise');
 
@@ -54,10 +54,10 @@ void main() {
       );
     });
 
-    test('returns object with updated age when age is passed', () {
+    test('returns object with updated bDate when bDate is passed', () {
       expect(
-        InitialInfoState().copyWith(age: age),
-        InitialInfoState(age: age),
+        InitialInfoState().copyWith(bDate: bDate),
+        InitialInfoState(bDate: bDate),
       );
     });
 

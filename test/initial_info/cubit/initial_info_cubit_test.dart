@@ -1,4 +1,4 @@
-import 'package:foodandbody/models/age.dart';
+import 'package:foodandbody/models/birth_date.dart';
 import 'package:foodandbody/models/exercise.dart';
 import 'package:foodandbody/models/gender.dart';
 import 'package:foodandbody/models/height.dart';
@@ -33,11 +33,11 @@ void main() {
   const validHeightString = '150';
   const validHeight = Height.dirty(validHeightString);
 
-  const invalidAgeString = 'invalid';
-  const invalidAge = Age.dirty(invalidAgeString);
+  const invalidBDateString = 'invalid';
+  const invalidBDate = BDate.dirty(invalidBDateString);
 
-  const validAgeString = '25';
-  const validAge = Age.dirty(validAgeString);
+  const validBDateString = '2000-08-15 00:00:00.000';
+  const validBDate = BDate.dirty(validBDateString);
 
   const invalidGenderString = '';
   const invalidGender = Gender.dirty(invalidGenderString);
@@ -51,7 +51,18 @@ void main() {
   const validExerciseString = '1.55';
   const validExercise = Exercise.dirty(validExerciseString);
 
-  double bmr = 665 + (9.6 * 50) + (1.8 * 150) - (4.7 * 25);
+  int _mockCalculateAge(DateTime birthDate) {
+    DateTime currentDate = DateTime.now();
+    int age = currentDate.year - birthDate.year;
+    int cMonth = currentDate.month;
+    int bMonth = birthDate.month;
+    if (bMonth > cMonth ||
+        (cMonth == bMonth && birthDate.day > currentDate.day)) age--;
+    return age;
+  }
+
+  int age = _mockCalculateAge(DateTime.parse(validBDateString));
+  double bmr = 665 + (9.6 * 50) + (1.8 * 150) - (4.7 * age);
   double tdee = bmr.round() * 1.55;
   int validGoal = tdee.round();
 
@@ -85,7 +96,7 @@ void main() {
         seed: () => InitialInfoState(
           weight: validWeight,
           height: validHeight,
-          age: validAge,
+          bDate: validBDate,
           gender: validGender,
           exercise: validExercise,
         ),
@@ -95,7 +106,7 @@ void main() {
             username: validUsername,
             weight: validWeight,
             height: validHeight,
-            age: validAge,
+            bDate: validBDate,
             gender: validGender,
             exercise: validExercise,
             status: FormzStatus.valid,
@@ -123,7 +134,7 @@ void main() {
         seed: () => InitialInfoState(
           username: validUsername,
           height: validHeight,
-          age: validAge,
+          bDate: validBDate,
           gender: validGender,
           exercise: validExercise,
         ),
@@ -133,7 +144,7 @@ void main() {
             username: validUsername,
             weight: validWeight,
             height: validHeight,
-            age: validAge,
+            bDate: validBDate,
             gender: validGender,
             exercise: validExercise,
             status: FormzStatus.valid,
@@ -161,7 +172,7 @@ void main() {
         seed: () => InitialInfoState(
           username: validUsername,
           weight: validWeight,
-          age: validAge,
+          bDate: validBDate,
           gender: validGender,
           exercise: validExercise,
         ),
@@ -171,7 +182,7 @@ void main() {
             username: validUsername,
             weight: validWeight,
             height: validHeight,
-            age: validAge,
+            bDate: validBDate,
             gender: validGender,
             exercise: validExercise,
             status: FormzStatus.valid,
@@ -180,21 +191,21 @@ void main() {
       );
     });
 
-    group('ageChanged', () {
+    group('bDateChanged', () {
       blocTest<InitialInfoCubit, InitialInfoState>(
-        'emits [invalid] when age are invalid',
+        'emits [invalid] when bDate are invalid',
         build: () => InitialInfoCubit(userRepository),
-        act: (cubit) => cubit.ageChanged(invalidAgeString),
+        act: (cubit) => cubit.bDateChanged(invalidBDateString),
         expect: () => const <InitialInfoState>[
           InitialInfoState(
-            age: invalidAge,
+            bDate: invalidBDate,
             status: FormzStatus.invalid,
           ),
         ],
       );
 
       blocTest<InitialInfoCubit, InitialInfoState>(
-        'emits [valid] when age are valid',
+        'emits [valid] when bDate are valid',
         build: () => InitialInfoCubit(userRepository),
         seed: () => InitialInfoState(
           username: validUsername,
@@ -203,13 +214,13 @@ void main() {
           gender: validGender,
           exercise: validExercise,
         ),
-        act: (cubit) => cubit.ageChanged(validAgeString),
+        act: (cubit) => cubit.bDateChanged(validBDateString),
         expect: () => const <InitialInfoState>[
           InitialInfoState(
             username: validUsername,
             weight: validWeight,
             height: validHeight,
-            age: validAge,
+            bDate: validBDate,
             gender: validGender,
             exercise: validExercise,
             status: FormzStatus.valid,
@@ -238,7 +249,7 @@ void main() {
           username: validUsername,
           weight: validWeight,
           height: validHeight,
-          age: validAge,
+          bDate: validBDate,
           exercise: validExercise,
         ),
         act: (cubit) => cubit.genderChanged(validGenderString),
@@ -247,7 +258,7 @@ void main() {
             username: validUsername,
             weight: validWeight,
             height: validHeight,
-            age: validAge,
+            bDate: validBDate,
             gender: validGender,
             exercise: validExercise,
             status: FormzStatus.valid,
@@ -276,7 +287,7 @@ void main() {
           username: validUsername,
           weight: validWeight,
           height: validHeight,
-          age: validAge,
+          bDate: validBDate,
           gender: validGender,
         ),
         act: (cubit) => cubit.exerciseChanged(validExerciseString),
@@ -285,7 +296,7 @@ void main() {
             username: validUsername,
             weight: validWeight,
             height: validHeight,
-            age: validAge,
+            bDate: validBDate,
             gender: validGender,
             exercise: validExercise,
             status: FormzStatus.valid,
@@ -310,7 +321,7 @@ void main() {
           username: validUsername,
           weight: validWeight,
           height: validHeight,
-          age: validAge,
+          bDate: validBDate,
           gender: validGender,
           exercise: validExercise,
         ),
@@ -321,7 +332,7 @@ void main() {
               name: validUsernameString,
               weight: int.parse(validWeightString),
               height: int.parse(validHeightString),
-              // age: int.parse(validAgeString),
+              // bDate: int.parse(validBDateString),
               gender: validGenderString,
               goal: validGoal,
               photoUrl: '',
@@ -339,7 +350,7 @@ void main() {
               name: validUsernameString,
               weight: int.parse(validWeightString),
               height: int.parse(validHeightString),
-              // age: int.parse(validAgeString),
+              // bDate: int.parse(validBDateString),
               gender: validGenderString,
               goal: validGoal,
               photoUrl: '',
@@ -352,7 +363,7 @@ void main() {
           username: validUsername,
           weight: validWeight,
           height: validHeight,
-          age: validAge,
+          bDate: validBDate,
           gender: validGender,
           exercise: validExercise,
         ),
@@ -363,7 +374,7 @@ void main() {
             username: validUsername,
             weight: validWeight,
             height: validHeight,
-            age: validAge,
+            bDate: validBDate,
             gender: validGender,
             exercise: validExercise,
           ),
@@ -372,7 +383,7 @@ void main() {
             username: validUsername,
             weight: validWeight,
             height: validHeight,
-            age: validAge,
+            bDate: validBDate,
             gender: validGender,
             exercise: validExercise,
           )
@@ -388,7 +399,7 @@ void main() {
               name: validUsernameString,
               weight: int.parse(validWeightString),
               height: int.parse(validHeightString),
-              // age: int.parse(validAgeString),
+              // bDate: int.parse(validBDateString),
               gender: validGenderString,
               goal: validGoal,
               photoUrl: '',
@@ -401,7 +412,7 @@ void main() {
           username: validUsername,
           weight: validWeight,
           height: validHeight,
-          age: validAge,
+          bDate: validBDate,
           gender: validGender,
           exercise: validExercise,
         ),
@@ -412,7 +423,7 @@ void main() {
             username: validUsername,
             weight: validWeight,
             height: validHeight,
-            age: validAge,
+            bDate: validBDate,
             gender: validGender,
             exercise: validExercise,
           ),
@@ -421,7 +432,7 @@ void main() {
             username: validUsername,
             weight: validWeight,
             height: validHeight,
-            age: validAge,
+            bDate: validBDate,
             gender: validGender,
             exercise: validExercise,
           )

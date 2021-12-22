@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:bloc/bloc.dart';
-import 'package:foodandbody/models/age.dart';
+import 'package:foodandbody/models/birth_date.dart';
 import 'package:foodandbody/models/exercise.dart';
 import 'package:foodandbody/models/gender.dart';
 import 'package:foodandbody/models/height.dart';
@@ -21,8 +21,14 @@ class InitialInfoCubit extends Cubit<InitialInfoState> {
     final username = Username.dirty(value);
     emit(state.copyWith(
       username: username,
-      status: Formz.validate(
-          [username, state.weight, state.height, state.age, state.gender, state.exercise]),
+      status: Formz.validate([
+        username,
+        state.weight,
+        state.height,
+        state.bDate,
+        state.gender,
+        state.exercise
+      ]),
     ));
   }
 
@@ -30,8 +36,14 @@ class InitialInfoCubit extends Cubit<InitialInfoState> {
     final weight = Weight.dirty(value);
     emit(state.copyWith(
       weight: weight,
-      status: Formz.validate(
-          [state.username, weight, state.height, state.age, state.gender, state.exercise]),
+      status: Formz.validate([
+        state.username,
+        weight,
+        state.height,
+        state.bDate,
+        state.gender,
+        state.exercise
+      ]),
     ));
   }
 
@@ -39,17 +51,29 @@ class InitialInfoCubit extends Cubit<InitialInfoState> {
     final height = Height.dirty(value);
     emit(state.copyWith(
       height: height,
-      status: Formz.validate(
-          [state.username, state.weight, height, state.age, state.gender, state.exercise]),
+      status: Formz.validate([
+        state.username,
+        state.weight,
+        height,
+        state.bDate,
+        state.gender,
+        state.exercise
+      ]),
     ));
   }
 
-  void ageChanged(String value) {
-    final age = Age.dirty(value);
+  void bDateChanged(String value) {
+    final bDate = BDate.dirty(value);
     emit(state.copyWith(
-      age: age,
-      status: Formz.validate(
-          [state.username, state.weight, state.height, age, state.gender, state.exercise]),
+      bDate: bDate,
+      status: Formz.validate([
+        state.username,
+        state.weight,
+        state.height,
+        bDate,
+        state.gender,
+        state.exercise
+      ]),
     ));
   }
 
@@ -57,8 +81,14 @@ class InitialInfoCubit extends Cubit<InitialInfoState> {
     final gender = Gender.dirty(value);
     emit(state.copyWith(
       gender: gender,
-      status: Formz.validate(
-          [state.username, state.weight, state.height, state.age, gender, state.exercise]),
+      status: Formz.validate([
+        state.username,
+        state.weight,
+        state.height,
+        state.bDate,
+        gender,
+        state.exercise
+      ]),
     ));
   }
 
@@ -66,26 +96,49 @@ class InitialInfoCubit extends Cubit<InitialInfoState> {
     final exercise = Exercise.dirty(value);
     emit(state.copyWith(
       exercise: exercise,
-      status: Formz.validate(
-          [state.username, state.weight, state.height, state.age, state.gender, exercise]),
+      status: Formz.validate([
+        state.username,
+        state.weight,
+        state.height,
+        state.bDate,
+        state.gender,
+        exercise
+      ]),
     ));
+  }
+
+  int _calculateAge(DateTime birthDate) {
+    DateTime currentDate = DateTime.now();
+    int age = currentDate.year - birthDate.year;
+    int cMonth = currentDate.month;
+    int bMonth = birthDate.month;
+    if (bMonth > cMonth ||
+        (cMonth == bMonth && birthDate.day > currentDate.day)) age--;
+    return age;
   }
 
   Future<void> initialInfoFormSubmitted() async {
     if (!state.status.isValidated) return;
     emit(state.copyWith(status: FormzStatus.submissionInProgress));
     try {
-      double bmr = state.gender.value == 'M' ? 
-      66 + (13.7 * int.parse(state.weight.value)) + (5 * int.parse(state.height.value)) - (6.8 * int.parse(state.age.value))
-      : 665 + (9.6 * int.parse(state.weight.value)) + (1.8 * int.parse(state.height.value)) - (4.7 * int.parse(state.age.value));
-      double  tdee = bmr.round() * double.parse(state.exercise.value); 
+      int age = _calculateAge(DateTime.parse(state.bDate.value));
+      double bmr = state.gender.value == 'M'
+          ? 66 +
+              (13.7 * int.parse(state.weight.value)) +
+              (5 * int.parse(state.height.value)) -
+              (6.8 * age)
+          : 665 +
+              (9.6 * int.parse(state.weight.value)) +
+              (1.8 * int.parse(state.height.value)) -
+              (4.7 * age);
+      double tdee = bmr.round() * double.parse(state.exercise.value);
       await _userRepository.addUserInfo(Info(
         name: state.username.value,
         weight: int.parse(state.weight.value),
         height: int.parse(state.height.value),
-        // age: int.parse(state.age.value),
+        // bDate: state.bDate.value, //type String
         gender: state.gender.value,
-        goal : tdee.round(),
+        goal: tdee.round(),
         photoUrl: '',
       ));
       emit(state.copyWith(status: FormzStatus.submissionSuccess));

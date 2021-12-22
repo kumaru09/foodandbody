@@ -1,5 +1,5 @@
 import 'package:foodandbody/app/bloc/app_bloc.dart';
-import 'package:foodandbody/models/age.dart';
+import 'package:foodandbody/models/birth_date.dart';
 import 'package:foodandbody/models/exercise.dart';
 import 'package:foodandbody/models/gender.dart';
 import 'package:foodandbody/models/height.dart';
@@ -26,7 +26,7 @@ class MockWeight extends Mock implements Weight {}
 
 class MockHeight extends Mock implements Height {}
 
-class MockAge extends Mock implements Age {}
+class MockBDate extends Mock implements BDate {}
 
 class MockGender extends Mock implements Gender {}
 
@@ -43,14 +43,14 @@ void main() {
   const usernameInputKey = Key('initialInfoForm_usernameInput_textField');
   const weightInputKey = Key('initialInfoForm_weightInput_textField');
   const heightInputKey = Key('initialInfoForm_heightInput_textField');
-  const ageInputKey = Key('initialInfoForm_ageInput_textField');
+  const bDateInputKey = Key('initialInfoForm_bDateInput_textField');
   const genderInputKey = Key('initialInfoForm_genderInput_textField');
   const exerciseInputKey = Key('initialInfoForm_exerciseInput_textField');
 
   const testUsername = 'test_name123';
   const testWeight = '50';
   const testHeight = '150';
-  const testAge = '25';
+  const testBDate = '2021-03-10 00:00:00.000';
   const testGender = 'หญิง';
   const testExercise = 'ออกกำลังกายกลาง 3-5 วันต่อสัปดาห์';
   const testUid = 's1uskWSx4NeSECk8gs2R9bofrG23';
@@ -121,20 +121,24 @@ void main() {
         verify(() => initialInfoCubit.heightChanged(testHeight)).called(1);
       });
 
-      testWidgets('ageChanged when age changes', (tester) async {
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: BlocProvider.value(
-                value: initialInfoCubit,
-                child: const InitialInfoForm(),
-              ),
-            ),
-          ),
-        );
-        await tester.enterText(find.byKey(ageInputKey), testAge);
-        verify(() => initialInfoCubit.ageChanged(testAge)).called(1);
-      });
+      // testWidgets('bDateChanged when bDate changes', (tester) async {
+      //   await tester.pumpWidget(
+      //     MaterialApp(
+      //       home: Scaffold(
+      //         body: BlocProvider.value(
+      //           value: initialInfoCubit,
+      //           child: const InitialInfoForm(),
+      //         ),
+      //       ),
+      //     ),
+      //   );
+      //   await tester.tap(find.byKey(bDateInputKey));
+      //   await tester.pumpAndSettle();
+      //   expect(find.text('ตกลง'), findsOneWidget);
+      //   await tester.tap(find.text('ตกลง'));
+      //   await tester.pump();
+      //   verify(() => initialInfoCubit.bDateChanged(DateTime.now().toString())).called(1);
+      // });
 
       testWidgets('genderChanged when gender changes', (tester) async {
         await tester.pumpWidget(
@@ -293,12 +297,12 @@ void main() {
         expect(find.text('กรุณาระบุส่วนสูงให้ถูกต้อง'), findsOneWidget);
       });
 
-      testWidgets('invalid age error text when age is invalid',
+      testWidgets('invalid bDate error text when bDate is invalid',
           (tester) async {
-        final age = MockAge();
-        when(() => age.invalid).thenReturn(true);
+        final bDate = MockBDate();
+        when(() => bDate.invalid).thenReturn(true);
         when(() => initialInfoCubit.state)
-            .thenReturn(InitialInfoState(age: age));
+            .thenReturn(InitialInfoState(bDate: bDate));
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
@@ -309,7 +313,7 @@ void main() {
             ),
           ),
         );
-        expect(find.text('กรุณาระบุอายุให้ถูกต้อง'), findsOneWidget);
+        expect(find.text('กรุณาระบุวันเกิดของคุณ'), findsOneWidget);
       });
 
       testWidgets('invalid gender error text when gender is invalid',
