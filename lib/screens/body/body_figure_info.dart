@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:foodandbody/models/body.dart';
+import 'package:foodandbody/screens/body/edit_body_figure.dart';
 import 'package:intl/intl.dart';
 
 class BodyFigureInfo extends StatelessWidget {
@@ -263,18 +264,39 @@ class BodyFigureInfo extends StatelessWidget {
               ),
             ],
           ),
-          Container(
-            padding: EdgeInsets.only(left: 14, top: 17, bottom: 10),
-            alignment: Alignment.topLeft,
-            child: Text(
-              "วันที่ $date",
-              style: Theme.of(context).textTheme.bodyText2!.merge(
-                    TextStyle(
-                      color: Color(0xFFA19FB9),
-                    ),
-                  ),
-            ),
-          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: EdgeInsets.only(left: 14, top: 17, bottom: 10),
+                alignment: Alignment.topLeft,
+                child: Text(
+                  "วันที่ $date",
+                  style: Theme.of(context).textTheme.bodyText2!.merge(
+                        TextStyle(
+                          color: Color(0xFFA19FB9),
+                        ),
+                      ),
+                ),
+              ),
+              TextButton(
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.only(right: 16),
+                  minimumSize: Size.zero,
+                  alignment: Alignment.topRight,
+                ),
+                child: Text("แก้ไข",
+                    style: Theme.of(context).textTheme.button!.merge(TextStyle(
+                        color: Theme.of(context).colorScheme.secondary))),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => EditBodyFigure(body: body)));
+                },
+              )
+            ],
+          )
         ],
       ),
     );
@@ -306,7 +328,10 @@ class _DrawLine extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
     canvas.drawLine(circleOffset, lineOffset, paintLine);
-    canvas.drawLine(lineOffset, Offset(MediaQuery.of(context).size.width * 0.45, lineOffset.dy), paintLine);
+    canvas.drawLine(
+        lineOffset,
+        Offset(MediaQuery.of(context).size.width * 0.45, lineOffset.dy),
+        paintLine);
   }
 
   @override
