@@ -79,6 +79,7 @@ class _CircularCalInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CircularPercentIndicator(
+      key: const Key('home_calories_circular'),
       radius: 183,
       lineWidth: 8,
       percent: percentCal,
@@ -89,7 +90,7 @@ class _CircularCalInfo extends StatelessWidget {
       circularStrokeCap: CircularStrokeCap.round,
       center: Center(
         child: Column(
-          key: const Key('calories_circular_indicator_column'),
+          key: const Key('home_calories_data_column'),
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(label,
@@ -128,6 +129,7 @@ class _UserCalInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      key: const Key('home_user_calories_info'),
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
