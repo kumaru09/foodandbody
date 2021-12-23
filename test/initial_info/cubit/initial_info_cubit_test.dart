@@ -1,4 +1,5 @@
-import 'package:foodandbody/models/calory.dart';
+import 'package:foodandbody/models/birth_date.dart';
+import 'package:foodandbody/models/exercise.dart';
 import 'package:foodandbody/models/gender.dart';
 import 'package:foodandbody/models/height.dart';
 import 'package:foodandbody/models/info.dart';
@@ -32,19 +33,40 @@ void main() {
   const validHeightString = '150';
   const validHeight = Height.dirty(validHeightString);
 
+  const invalidBDateString = 'invalid';
+  const invalidBDate = BDate.dirty(invalidBDateString);
+
+  const validBDateString = '2000-08-15 00:00:00.000';
+  const validBDate = BDate.dirty(validBDateString);
+
   const invalidGenderString = '';
   const invalidGender = Gender.dirty(invalidGenderString);
 
-  const validGenderString = 'ชาย';
+  const validGenderString = 'หญิง';
   const validGender = Gender.dirty(validGenderString);
 
-  const invalidCaloryString = 'invalid';
-  const invalidCalory = Calory.dirty(invalidCaloryString);
+  const invalidExerciseString = 'invalid';
+  const invalidExercise = Exercise.dirty(invalidExerciseString);
 
-  const validCaloryString = '1500';
-  const validCalory = Calory.dirty(validCaloryString);
+  const validExerciseString = '1.55';
+  const validExercise = Exercise.dirty(validExerciseString);
 
-  const uid = 's1uskWSx4NeSECk8gs2R9bofrG23';
+  int _mockCalculateAge(DateTime birthDate) {
+    DateTime currentDate = DateTime.now();
+    int age = currentDate.year - birthDate.year;
+    int cMonth = currentDate.month;
+    int bMonth = birthDate.month;
+    if (bMonth > cMonth ||
+        (cMonth == bMonth && birthDate.day > currentDate.day)) age--;
+    return age;
+  }
+
+  int age = _mockCalculateAge(DateTime.parse(validBDateString));
+  double bmr = 665 + (9.6 * 50) + (1.8 * 150) - (4.7 * age);
+  double tdee = bmr.round() * 1.55;
+  int validGoal = tdee.round();
+
+  // const uid = 's1uskWSx4NeSECk8gs2R9bofrG23';
 
   group('InitialInfoCubit', () {
     late UserRepository userRepository;
@@ -74,8 +96,9 @@ void main() {
         seed: () => InitialInfoState(
           weight: validWeight,
           height: validHeight,
+          bDate: validBDate,
           gender: validGender,
-          calory: validCalory,
+          exercise: validExercise,
         ),
         act: (cubit) => cubit.usernameChanged(validUsernameString),
         expect: () => const <InitialInfoState>[
@@ -83,8 +106,9 @@ void main() {
             username: validUsername,
             weight: validWeight,
             height: validHeight,
+            bDate: validBDate,
             gender: validGender,
-            calory: validCalory,
+            exercise: validExercise,
             status: FormzStatus.valid,
           ),
         ],
@@ -110,8 +134,9 @@ void main() {
         seed: () => InitialInfoState(
           username: validUsername,
           height: validHeight,
+          bDate: validBDate,
           gender: validGender,
-          calory: validCalory,
+          exercise: validExercise,
         ),
         act: (cubit) => cubit.weightChanged(validWeightString),
         expect: () => const <InitialInfoState>[
@@ -119,8 +144,9 @@ void main() {
             username: validUsername,
             weight: validWeight,
             height: validHeight,
+            bDate: validBDate,
             gender: validGender,
-            calory: validCalory,
+            exercise: validExercise,
             status: FormzStatus.valid,
           ),
         ],
@@ -146,8 +172,9 @@ void main() {
         seed: () => InitialInfoState(
           username: validUsername,
           weight: validWeight,
+          bDate: validBDate,
           gender: validGender,
-          calory: validCalory,
+          exercise: validExercise,
         ),
         act: (cubit) => cubit.heightChanged(validHeightString),
         expect: () => const <InitialInfoState>[
@@ -155,8 +182,47 @@ void main() {
             username: validUsername,
             weight: validWeight,
             height: validHeight,
+            bDate: validBDate,
             gender: validGender,
-            calory: validCalory,
+            exercise: validExercise,
+            status: FormzStatus.valid,
+          ),
+        ],
+      );
+    });
+
+    group('bDateChanged', () {
+      blocTest<InitialInfoCubit, InitialInfoState>(
+        'emits [invalid] when bDate are invalid',
+        build: () => InitialInfoCubit(userRepository),
+        act: (cubit) => cubit.bDateChanged(invalidBDateString),
+        expect: () => const <InitialInfoState>[
+          InitialInfoState(
+            bDate: invalidBDate,
+            status: FormzStatus.invalid,
+          ),
+        ],
+      );
+
+      blocTest<InitialInfoCubit, InitialInfoState>(
+        'emits [valid] when bDate are valid',
+        build: () => InitialInfoCubit(userRepository),
+        seed: () => InitialInfoState(
+          username: validUsername,
+          weight: validWeight,
+          height: validHeight,
+          gender: validGender,
+          exercise: validExercise,
+        ),
+        act: (cubit) => cubit.bDateChanged(validBDateString),
+        expect: () => const <InitialInfoState>[
+          InitialInfoState(
+            username: validUsername,
+            weight: validWeight,
+            height: validHeight,
+            bDate: validBDate,
+            gender: validGender,
+            exercise: validExercise,
             status: FormzStatus.valid,
           ),
         ],
@@ -183,7 +249,8 @@ void main() {
           username: validUsername,
           weight: validWeight,
           height: validHeight,
-          calory: validCalory,
+          bDate: validBDate,
+          exercise: validExercise,
         ),
         act: (cubit) => cubit.genderChanged(validGenderString),
         expect: () => const <InitialInfoState>[
@@ -191,44 +258,47 @@ void main() {
             username: validUsername,
             weight: validWeight,
             height: validHeight,
+            bDate: validBDate,
             gender: validGender,
-            calory: validCalory,
+            exercise: validExercise,
             status: FormzStatus.valid,
           ),
         ],
       );
     });
 
-    group('caloryChanged', () {
+    group('ExerciseChanged', () {
       blocTest<InitialInfoCubit, InitialInfoState>(
-        'emits [invalid] when calory are invalid',
+        'emits [invalid] when exercise are invalid',
         build: () => InitialInfoCubit(userRepository),
-        act: (cubit) => cubit.caloryChanged(invalidCaloryString),
+        act: (cubit) => cubit.exerciseChanged(invalidExerciseString),
         expect: () => const <InitialInfoState>[
           InitialInfoState(
-            calory: invalidCalory,
+            exercise: invalidExercise,
             status: FormzStatus.invalid,
           ),
         ],
       );
 
       blocTest<InitialInfoCubit, InitialInfoState>(
-        'emits [valid] calory are valid',
+        'emits [valid] when exercise are valid',
         build: () => InitialInfoCubit(userRepository),
         seed: () => InitialInfoState(
           username: validUsername,
           weight: validWeight,
           height: validHeight,
+          bDate: validBDate,
           gender: validGender,
         ),
-        act: (cubit) => cubit.caloryChanged(validCaloryString),
+        act: (cubit) => cubit.exerciseChanged(validExerciseString),
         expect: () => const <InitialInfoState>[
           InitialInfoState(
             username: validUsername,
             weight: validWeight,
             height: validHeight,
+            bDate: validBDate,
             gender: validGender,
-            calory: validCalory,
+            exercise: validExercise,
             status: FormzStatus.valid,
           ),
         ],
@@ -239,7 +309,7 @@ void main() {
       blocTest<InitialInfoCubit, InitialInfoState>(
         'does nothing when status is not validated',
         build: () => InitialInfoCubit(userRepository),
-        act: (cubit) => cubit.initialInfoFormSubmitted(uid),
+        act: (cubit) => cubit.initialInfoFormSubmitted(),
         expect: () => const <InitialInfoState>[],
       );
 
@@ -251,22 +321,22 @@ void main() {
           username: validUsername,
           weight: validWeight,
           height: validHeight,
+          bDate: validBDate,
           gender: validGender,
-          calory: validCalory,
+          exercise: validExercise,
         ),
-        act: (cubit) => cubit.initialInfoFormSubmitted(uid),
+        act: (cubit) => cubit.initialInfoFormSubmitted(),
         verify: (_) {
           verify(
-            () => userRepository.addUserInfo(
-                uid,
-                Info(
-                  name: validUsernameString,
-                  weight: int.parse(validWeightString),
-                  height: int.parse(validHeightString),
-                  gender: validGenderString,
-                  goal: int.parse(validCaloryString),
-                  photoUrl: '',
-                )),
+            () => userRepository.addUserInfo(Info(
+              name: validUsernameString,
+              weight: int.parse(validWeightString),
+              height: int.parse(validHeightString),
+              // bDate: int.parse(validBDateString),
+              gender: validGenderString,
+              goal: validGoal,
+              photoUrl: '',
+            )),
           ).called(1);
         },
       );
@@ -276,16 +346,15 @@ void main() {
         'when initialInfo succeeds',
         build: () {
           when(
-            () => userRepository.addUserInfo(
-                uid,
-                Info(
-                  name: validUsernameString,
-                  weight: int.parse(validWeightString),
-                  height: int.parse(validHeightString),
-                  gender: validGenderString,
-                  goal: int.parse(validCaloryString),
-                  photoUrl: '',
-                )),
+            () => userRepository.addUserInfo(Info(
+              name: validUsernameString,
+              weight: int.parse(validWeightString),
+              height: int.parse(validHeightString),
+              // bDate: int.parse(validBDateString),
+              gender: validGenderString,
+              goal: validGoal,
+              photoUrl: '',
+            )),
           ).thenAnswer((_) async {});
           return InitialInfoCubit(userRepository);
         },
@@ -294,26 +363,29 @@ void main() {
           username: validUsername,
           weight: validWeight,
           height: validHeight,
+          bDate: validBDate,
           gender: validGender,
-          calory: validCalory,
+          exercise: validExercise,
         ),
-        act: (cubit) => cubit.initialInfoFormSubmitted(uid),
+        act: (cubit) => cubit.initialInfoFormSubmitted(),
         expect: () => const <InitialInfoState>[
           InitialInfoState(
             status: FormzStatus.submissionInProgress,
             username: validUsername,
             weight: validWeight,
             height: validHeight,
+            bDate: validBDate,
             gender: validGender,
-            calory: validCalory,
+            exercise: validExercise,
           ),
           InitialInfoState(
             status: FormzStatus.submissionSuccess,
             username: validUsername,
             weight: validWeight,
             height: validHeight,
+            bDate: validBDate,
             gender: validGender,
-            calory: validCalory,
+            exercise: validExercise,
           )
         ],
       );
@@ -323,16 +395,15 @@ void main() {
         'when initialInfo fails',
         build: () {
           when(
-            () => userRepository.addUserInfo(
-                uid,
-                Info(
-                  name: validUsernameString,
-                  weight: int.parse(validWeightString),
-                  height: int.parse(validHeightString),
-                  gender: validGenderString,
-                  goal: int.parse(validCaloryString),
-                  photoUrl: '',
-                )),
+            () => userRepository.addUserInfo(Info(
+              name: validUsernameString,
+              weight: int.parse(validWeightString),
+              height: int.parse(validHeightString),
+              // bDate: int.parse(validBDateString),
+              gender: validGenderString,
+              goal: validGoal,
+              photoUrl: '',
+            )),
           ).thenThrow(Exception('oops'));
           return InitialInfoCubit(userRepository);
         },
@@ -341,26 +412,29 @@ void main() {
           username: validUsername,
           weight: validWeight,
           height: validHeight,
+          bDate: validBDate,
           gender: validGender,
-          calory: validCalory,
+          exercise: validExercise,
         ),
-        act: (cubit) => cubit.initialInfoFormSubmitted(uid),
+        act: (cubit) => cubit.initialInfoFormSubmitted(),
         expect: () => const <InitialInfoState>[
           InitialInfoState(
             status: FormzStatus.submissionInProgress,
             username: validUsername,
             weight: validWeight,
             height: validHeight,
+            bDate: validBDate,
             gender: validGender,
-            calory: validCalory,
+            exercise: validExercise,
           ),
           InitialInfoState(
             status: FormzStatus.submissionFailure,
             username: validUsername,
             weight: validWeight,
             height: validHeight,
+            bDate: validBDate,
             gender: validGender,
-            calory: validCalory,
+            exercise: validExercise,
           )
         ],
       );
