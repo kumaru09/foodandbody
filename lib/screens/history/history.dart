@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodandbody/models/graph_list.dart';
 import 'package:foodandbody/repositories/body_repository.dart';
 import 'package:foodandbody/repositories/history_repository.dart';
 import 'package:foodandbody/screens/history/bloc/history_bloc.dart';
@@ -13,6 +14,22 @@ class History extends StatelessWidget {
 
   late DateTime startDate = stopDate.subtract(new Duration(days: 10));
   final DateTime stopDate = DateTime.now();
+
+  bool _isNoDataInNutrient(GraphList? list){
+    return _isNotZeroList(list!.caloriesList) 
+    || _isNotZeroList(list.carbList)
+    || _isNotZeroList(list.proteinList)
+    || _isNotZeroList(list.proteinList)
+    || _isNotZeroList(list.waterList)
+    // || _isNotZeroList(list.exerciseList)
+    ? false : true;
+  }
+
+  bool _isNotZeroList(List<int> list){
+    return list.length >= 10 
+    ? list.sublist(0, 10).any((x) => x > 0)
+    : list.any((x) => x > 0) ; 
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,35 +64,25 @@ class History extends StatelessWidget {
               return TabBarView(
                 children: [
                   HistoryMenu(
-                      startDate: startDate,
+                      startDate: state.graphList!.foodEndDate,
                       items: state.menuList,
                       dateMenuList: state.dateMenuList),
-                  // Center(
-                  //     child: Text(
-                  //     'ไม่มีประวัติสารอาหารในขณะนี้',
-                  //     style: Theme.of(context)
-                  //         .textTheme
-                  //         .subtitle1!
-                  //         .merge(TextStyle(
-                  //             color: Theme.of(context)
-                  //                 .colorScheme
-                  //                 .secondary)),
-                  //   ))
+                  _isNoDataInNutrient(state.graphList)?
+                  Center(
+                      child: Text(
+                      'ไม่มีประวัติสารอาหารในขณะนี้',
+                      style: Theme.of(context)
+                          .textTheme
+                          .subtitle1!
+                          .merge(TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .secondary)),
+                    )):
                   HistoryNutrient(
                       data: state.graphList,
                       startDate: state.graphList!.foodEndDate,
                       stopDate: state.graphList!.foodStartDate),
-                  // Center(
-                  //   child: Text(
-                  //   'ไม่มีประวัติร่างกายในขณะนี้',
-                  //   style: Theme.of(context)
-                  //       .textTheme
-                  //       .subtitle1!
-                  //       .merge(TextStyle(
-                  //           color: Theme.of(context)
-                  //               .colorScheme
-                  //               .secondary)),
-                  // ))
                   HistoryBody(
                     data: state.graphList,
                     startDate: state.graphList!.bodyEndDate,

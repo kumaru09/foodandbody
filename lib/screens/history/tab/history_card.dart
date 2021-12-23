@@ -19,13 +19,17 @@ class HistoryCard extends StatelessWidget {
   final DateTime stopDate;
   final bool isBody;
 
-  String dateToString(DateTime date) {
+  String _dateToString(DateTime date) {
     return date.day == DateTime.now().day &&
             date.month == DateTime.now().month &&
             date.year == DateTime.now().year
         ? 'วันนี้'
         : '${date.day}/${date.month}/${date.year}';
   }
+
+  double _graphMaxY(String name){
+    return name == 'น้ำ' ? 10 : 100;
+  } 
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +85,7 @@ class HistoryCard extends StatelessWidget {
               width: double.infinity,
               height: 100,
               padding: EdgeInsets.symmetric(vertical: 5),
-              child: _LineChart(dataList),
+              child: _LineChart(dataList, _graphMaxY(name)),
             ),
             const Divider(
               color: Color(0xFF515070),
@@ -95,14 +99,14 @@ class HistoryCard extends StatelessWidget {
                 if (dataList.length >= 2)
                   Expanded(
                     child: Text(
-                      '${dateToString(startDate)}',
+                      '${_dateToString(startDate)}',
                       style: Theme.of(context).textTheme.bodyText2!.merge(
                           TextStyle(
                               color: Theme.of(context).colorScheme.secondary)),
                     ),
                   ),
                 Text(
-                  '${dateToString(stopDate)}',
+                  '${_dateToString(stopDate)}',
                   style: Theme.of(context).textTheme.bodyText2!.merge(TextStyle(
                       color: Theme.of(context).colorScheme.secondary)),
                 ),
@@ -116,17 +120,18 @@ class HistoryCard extends StatelessWidget {
 }
 
 class _LineChart extends StatelessWidget {
-  _LineChart(this.data);
+  _LineChart(this.data, this.maxY);
 
   List<int> data;
+  double maxY;
 
   @override
   Widget build(BuildContext context) {
     return LineChart(LineChartData(
         minX: 1,
         maxX: data.length == 1 ? 10 : data.length.toDouble(),
-        minY: (data.reduce(min) - 1).toDouble(),
-        maxY: (data.reduce(max) + 1).toDouble(),
+        minY: 0, //(data.reduce(min) - 1).toDouble()
+        maxY: data.reduce(max) + 1 < maxY ? maxY : (data.reduce(max) + 1).toDouble(),
         axisTitleData: FlAxisTitleData(show: false),
         titlesData: FlTitlesData(show: false),
         borderData: FlBorderData(show: false),
@@ -153,7 +158,7 @@ class _LineChart extends StatelessWidget {
       LineChartBarData(
           colors: [Color(0xFF515070)],
           spots: dataPoint,
-          isCurved: true,
+          isCurved: false,
           dotData: FlDotData(show: false))
     ];
   }

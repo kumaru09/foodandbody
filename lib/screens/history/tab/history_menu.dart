@@ -38,34 +38,6 @@ class HistoryMenu extends StatelessWidget {
   late int totalCal = items
       .map((element) => element.calory)
       .fold(0, (previousValue, element) => previousValue + element);
-  // [
-  //   HistoryMenuItem(
-  //       name: 'กุ้งทอด', calory: 156, date: Timestamp.fromDate(dateToday)),
-  //   HistoryMenuItem(
-  //       name: 'ปลาทอด', calory: 107, date: Timestamp.fromDate(dateToday)),
-  //   HistoryMenuItem(
-  //       name: 'ปลาหมึกทอด', calory: 176, date: Timestamp.fromDate(dateToday)),
-  //   HistoryMenuItem(
-  //       name: 'ไก่ทอด', calory: 234, date: Timestamp.fromDate(dateToday)),
-  //   HistoryMenuItem(
-  //       name: 'หอยทอด', calory: 426, date: Timestamp.fromDate(dateToday)),
-  //   HistoryMenuItem(
-  //       name: 'หอยทอด', calory: 426, date: Timestamp.fromDate(dateToday)),
-  //   HistoryMenuItem(
-  //       name: 'หอยทอด', calory: 426, date: Timestamp.fromDate(dateToday)),
-  //   HistoryMenuItem(
-  //       name: 'หอยทอด', calory: 426, date: Timestamp.fromDate(dateToday)),
-  //   HistoryMenuItem(
-  //       name: 'หอยทอด', calory: 426, date: Timestamp.fromDate(dateToday)),
-  //   HistoryMenuItem(
-  //       name: 'หอยทอด', calory: 426, date: Timestamp.fromDate(dateToday)),
-  //   HistoryMenuItem(
-  //       name: 'หอยทอด', calory: 426, date: Timestamp.fromDate(dateToday)),
-  //   HistoryMenuItem(
-  //       name: 'หอยทอดสุดท้าย',
-  //       calory: 426,
-  //       date: Timestamp.fromDate(dateToday)),
-  // ];
 
   _selectDate(BuildContext context) async {
     selected = await showDatePicker(
