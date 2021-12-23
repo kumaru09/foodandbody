@@ -79,10 +79,7 @@ class History extends StatelessWidget {
                                   .colorScheme
                                   .secondary)),
                     )):
-                  HistoryNutrient(
-                      data: state.graphList,
-                      startDate: state.graphList!.foodEndDate,
-                      stopDate: state.graphList!.foodStartDate),
+                  HistoryNutrient(data: state.graphList),
                   HistoryBody(
                     data: state.graphList,
                     startDate: state.graphList!.bodyEndDate,

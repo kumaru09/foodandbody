@@ -4,15 +4,10 @@ import 'package:foodandbody/screens/history/tab/history_card.dart';
 
 class HistoryNutrient extends StatelessWidget {
   const HistoryNutrient(
-      {Key? key,
-      required this.data,
-      required this.startDate,
-      required this.stopDate})
+      {Key? key, required this.data})
       : super(key: key);
 
   final GraphList? data;
-  final DateTime startDate;
-  final DateTime stopDate;
 
   bool _isNotZeroList(List<int> list){
     return list.length >= 10 
@@ -33,43 +28,43 @@ class HistoryNutrient extends StatelessWidget {
                 HistoryCard(
                     name: 'แคลอรี',
                     dataList: data!.caloriesList,
-                    startDate: startDate,
-                    stopDate: stopDate,
+                    startDate: data!.foodEndDate,
+                    stopDate: data!.foodStartDate,
                     isBody: false),
               if (_isNotZeroList(data!.proteinList))
                 HistoryCard(
                     name: 'โปรตีน',
                     dataList: data!.proteinList,
-                    startDate: startDate,
-                    stopDate: stopDate,
+                    startDate: data!.foodEndDate,
+                    stopDate: data!.foodStartDate,
                     isBody: false),
               if (_isNotZeroList(data!.carbList))
                 HistoryCard(
                     name: 'คาร์โบไฮเดรต',
                     dataList: data!.carbList,
-                    startDate: startDate,
-                    stopDate: stopDate,
+                    startDate: data!.foodEndDate,
+                    stopDate: data!.foodStartDate,
                     isBody: false),
               if (_isNotZeroList(data!.fatList))
                 HistoryCard(
                     name: 'ไขมัน',
                     dataList: data!.fatList,
-                    startDate: startDate,
-                    stopDate: stopDate,
+                    startDate: data!.foodEndDate,
+                    stopDate: data!.foodStartDate,
                     isBody: false),
               if (_isNotZeroList(data!.waterList))
                 HistoryCard(
                     name: 'น้ำ',
                     dataList: data!.waterList,
-                    startDate: startDate,
-                    stopDate: stopDate,
+                    startDate: data!.foodEndDate,
+                    stopDate: data!.foodStartDate,
                     isBody: false),
               if (_isNotZeroList(exerciseList))
                 HistoryCard(
                     name: 'เผาผลาญพลังงาน',
                     dataList: exerciseList,
-                    startDate: startDate,
-                    stopDate: stopDate,
+                    startDate: data!.foodEndDate,
+                    stopDate: data!.foodStartDate,
                     isBody: false),
             ],
           ),
