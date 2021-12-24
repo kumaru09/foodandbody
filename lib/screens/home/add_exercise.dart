@@ -6,6 +6,7 @@ class AddExerciseButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton.icon(
+      key: const Key('home_add_exercise_button'),
       onPressed: () async {
         await showDialog(
             context: context,
@@ -56,6 +57,7 @@ class __AddExerciseDialogState extends State<_AddExerciseDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      key: const Key("home_add_exercise_dialog"),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       elevation: 16,
       backgroundColor: Colors.white,
@@ -70,6 +72,7 @@ class __AddExerciseDialogState extends State<_AddExerciseDialog> {
         mainAxisSize: MainAxisSize.min,
         children: [
           DropdownButtonFormField<String>(
+            key: const Key("activity_select_dropdown"),
             items: _dropdownItem,
             value: _activity,
             decoration: InputDecoration(
@@ -84,6 +87,7 @@ class __AddExerciseDialogState extends State<_AddExerciseDialog> {
           ),
           SizedBox(height: 20),
           TextFormField(
+              key: const Key("time_text_field"),
               keyboardType: TextInputType.number,
               textInputAction: TextInputAction.done,
               decoration: InputDecoration(
@@ -98,6 +102,7 @@ class __AddExerciseDialogState extends State<_AddExerciseDialog> {
       ),
       actions: <Widget>[
         TextButton(
+          key: const Key("add_exercise_dialog_ok_button"),
           onPressed: () => Navigator.pop(context),
           child: Text(
             "ตกลง",
@@ -107,6 +112,7 @@ class __AddExerciseDialogState extends State<_AddExerciseDialog> {
           ),
         ),
         TextButton(
+          key: const Key("add_exercise_dialog_cancel_button"),
           onPressed: () => Navigator.pop(context),
           child: Text(
             "ยกเลิก",
