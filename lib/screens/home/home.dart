@@ -6,7 +6,7 @@ import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:foodandbody/screens/home/add_exercise.dart';
 import 'package:foodandbody/screens/home/bloc/home_bloc.dart';
 import 'package:foodandbody/screens/home/circular_cal_indicator.dart';
-import 'package:foodandbody/screens/home/exercise_card_list.dart';
+import 'package:foodandbody/screens/home/exercise_list.dart';
 import 'package:foodandbody/screens/search/search_page.dart';
 import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
 import 'package:foodandbody/screens/setting/bloc/info_bloc.dart';
@@ -134,7 +134,7 @@ class Home extends StatelessWidget {
             ),
             Container(
               padding: EdgeInsets.only(left: 16, top: 8, right: 15),
-              child: ExerciseCardList(),
+              child: ExerciseList(),
             ),
             Container(
               width: MediaQuery.of(context).size.width,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class ExerciseCardList extends StatelessWidget {
-  ExerciseCardList({Key? key}) : super(key: key);
+class ExerciseList extends StatelessWidget {
+  ExerciseList({Key? key}) : super(key: key);
 
   late List<Exercise> _exercise = [
     Exercise(exercise: "แอโรบิค", time: "30", calories: 165),
@@ -17,6 +17,7 @@ class ExerciseCardList extends StatelessWidget {
     }
 
     return Column(
+      key: const Key('home_exercise_list'),
       children: _exerciseList,
     );
   }
