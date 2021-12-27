@@ -36,13 +36,10 @@ void main() {
     }); //"can render"
 
     testWidgets("when total calories less than goal calories", (tester) async {
-      final circularProgressRender = CircularCalIndicator(plan, user.info!);
-      circularProgressRender.totalCal = 1500.3;
+      when(() => plan.totalCal).thenReturn(1500.3);
       await tester.pumpWidget(MaterialApp(
         theme: AppTheme.themeData,
-        home: Scaffold(
-          body: circularProgressRender,
-        ),
+        home: Scaffold(body: CircularCalIndicator(plan, user.info!)),
       ));
       var circularProgressFinder = find.byKey(homeCaloriesCircularKey);
       Column circularDataColumnFinder =
@@ -58,10 +55,7 @@ void main() {
       expect(
           tester.widget(circularProgressFinder),
           isA<CircularPercentIndicator>().having(
-              (t) => t.percent,
-              "percent",
-              circularProgressRender.totalCal /
-                  circularProgressRender.goalCal));
+              (t) => t.percent, "percent", plan.totalCal / user.info!.goal!));
       expect(
           circularDataColumnFinder.children[0].toString(), contains("เหลือ"));
       expect(circularDataColumnFinder.children[1].toString(),
@@ -69,13 +63,10 @@ void main() {
     }); //"when total calories less than goal calories"
 
     testWidgets("when total calories equals goal calories", (tester) async {
-      final circularProgressRender = CircularCalIndicator(plan, user.info!);
-      circularProgressRender.totalCal = 2200;
+      when(() => plan.totalCal).thenReturn(2200);
       await tester.pumpWidget(MaterialApp(
         theme: AppTheme.themeData,
-        home: Scaffold(
-          body: circularProgressRender,
-        ),
+        home: Scaffold(body: CircularCalIndicator(plan, user.info!)),
       ));
       var circularProgressFinder = find.byKey(homeCaloriesCircularKey);
       Column circularDataColumnFinder =
@@ -91,10 +82,7 @@ void main() {
       expect(
           tester.widget(circularProgressFinder),
           isA<CircularPercentIndicator>().having(
-              (t) => t.percent,
-              "percent",
-              circularProgressRender.totalCal /
-                  circularProgressRender.goalCal));
+              (t) => t.percent, "percent", plan.totalCal / user.info!.goal!));
       expect(
           circularDataColumnFinder.children[0].toString(), contains("เหลือ"));
       expect(circularDataColumnFinder.children[1].toString(),
@@ -103,12 +91,11 @@ void main() {
 
     testWidgets("when total calories greater than goal calories",
         (tester) async {
-      final circularProgressRender = CircularCalIndicator(plan, user.info!);
-      circularProgressRender.totalCal = 2250.7;
+      when(() => plan.totalCal).thenReturn(2250.7);
       await tester.pumpWidget(MaterialApp(
         theme: AppTheme.themeData,
         home: Scaffold(
-          body: circularProgressRender,
+          body: CircularCalIndicator(plan, user.info!)
         ),
       ));
       var circularProgressFinder = find.byKey(homeCaloriesCircularKey);

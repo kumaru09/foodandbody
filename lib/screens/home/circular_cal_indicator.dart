@@ -3,17 +3,18 @@ import 'package:foodandbody/models/history.dart';
 import 'package:foodandbody/models/info.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
+// ignore: must_be_immutable
 class CircularCalIndicator extends StatelessWidget {
   CircularCalIndicator(this._plan, this._info);
   final History _plan;
   final Info _info;
-  late double totalCal = _plan.totalCal;
-  late double goalCal = _info.goal!.toDouble();
-  late double exercise = 0;
+  late double _totalCal = _plan.totalCal;
+  late double _goalCal = _info.goal!.toDouble();
+  late double _exercise = 0;
 
   @override
   Widget build(BuildContext context) {
-    double percentCal = totalCal / (goalCal + exercise);
+    double percentCal = _totalCal / (_goalCal + _exercise);
 
     Color progressColor;
     Color backgroundColor;
@@ -24,13 +25,13 @@ class CircularCalIndicator extends StatelessWidget {
       progressColor = Color(0xFFFF4040);
       backgroundColor = Theme.of(context).indicatorColor.withOpacity(0.8);
       label = "กินเกินแล้ว";
-      cal = (totalCal - (goalCal + exercise)).round().toString();
+      cal = (_totalCal - (_goalCal + _exercise)).round().toString();
       percentCal = 1;
     } else {
       progressColor = Theme.of(context).indicatorColor;
       backgroundColor = Color(0xFFFFBB91);
       label = "เหลือ";
-      cal = ((goalCal + exercise) - totalCal).round().toString();
+      cal = ((_goalCal + _exercise) - _totalCal).round().toString();
     }
 
     return Row(
@@ -52,9 +53,9 @@ class CircularCalIndicator extends StatelessWidget {
         Expanded(
           flex: 4,
           child: _UserCalInfo(
-            goalCal: goalCal,
-            totalCal: totalCal,
-            exercise: exercise,
+            goalCal: _goalCal,
+            totalCal: _totalCal,
+            exercise: _exercise,
           ),
         )
       ],
