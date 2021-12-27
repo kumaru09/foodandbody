@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:bloc/bloc.dart';
 import 'package:foodandbody/models/birth_date.dart';
@@ -136,7 +137,8 @@ class InitialInfoCubit extends Cubit<InitialInfoState> {
         name: state.username.value,
         weight: int.parse(state.weight.value),
         height: int.parse(state.height.value),
-        // bDate: state.bDate.value, //type String
+        birthDate:
+            Timestamp.fromDate(DateTime.parse(state.bDate.value)), //type String
         gender: state.gender.value,
         goal: tdee.round(),
         photoUrl: '',
