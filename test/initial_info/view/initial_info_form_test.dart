@@ -1,11 +1,11 @@
 import 'package:foodandbody/app/bloc/app_bloc.dart';
-import 'package:foodandbody/models/calory.dart';
+import 'package:foodandbody/models/birth_date.dart';
+import 'package:foodandbody/models/exercise.dart';
 import 'package:foodandbody/models/gender.dart';
 import 'package:foodandbody/models/height.dart';
 import 'package:foodandbody/models/user.dart';
 import 'package:foodandbody/models/username.dart';
 import 'package:foodandbody/models/weight.dart';
-// import 'package:foodandbody/repositories/authen_repository.dart';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,8 +14,6 @@ import 'package:foodandbody/screens/initial_info/cubit/initial_info_cubit.dart';
 import 'package:foodandbody/screens/initial_info/initial_info_form.dart';
 import 'package:formz/formz.dart';
 import 'package:mocktail/mocktail.dart';
-
-// class MockAuthenticationRepository extends Mock implements AuthenRepository {}
 
 class MockInitialInfoCubit extends MockCubit<InitialInfoState>
     implements InitialInfoCubit {}
@@ -28,9 +26,11 @@ class MockWeight extends Mock implements Weight {}
 
 class MockHeight extends Mock implements Height {}
 
+class MockBDate extends Mock implements BDate {}
+
 class MockGender extends Mock implements Gender {}
 
-class MockCalory extends Mock implements Calory {}
+class MockExercise extends Mock implements Exercise {}
 
 class MockAppBloc extends MockBloc<AppEvent, AppState> implements AppBloc {}
 
@@ -38,27 +38,26 @@ class FakeAppEvent extends Fake implements AppEvent {}
 
 class FakeAppState extends Fake implements AppState {}
 
-class MockUser extends Mock implements User {}
-
 void main() {
   const initialInfoButtonKey = Key('initialInfoForm_continue_raisedButton');
   const usernameInputKey = Key('initialInfoForm_usernameInput_textField');
   const weightInputKey = Key('initialInfoForm_weightInput_textField');
   const heightInputKey = Key('initialInfoForm_heightInput_textField');
+  const bDateInputKey = Key('initialInfoForm_bDateInput_textField');
   const genderInputKey = Key('initialInfoForm_genderInput_textField');
-  const caloryInputKey = Key('initialInfoForm_caloryInput_textField');
+  const exerciseInputKey = Key('initialInfoForm_exerciseInput_textField');
 
   const testUsername = 'test_name123';
   const testWeight = '50';
   const testHeight = '150';
+  const testBDate = '2021-03-10 00:00:00.000';
   const testGender = 'หญิง';
-  const testCalory = '1500';
+  const testExercise = 'ออกกำลังกายกลาง 3-5 วันต่อสัปดาห์';
   const testUid = 's1uskWSx4NeSECk8gs2R9bofrG23';
 
   group('InitialInfoForm', () {
     late InitialInfoCubit initialInfoCubit;
     late AppBloc appBloc;
-    late User user;
 
     setUpAll(() {
       registerFallbackValue<AppEvent>(FakeAppEvent());
@@ -68,10 +67,9 @@ void main() {
 
     setUp(() {
       appBloc = MockAppBloc();
-      user = MockUser();
       initialInfoCubit = MockInitialInfoCubit();
       when(() => initialInfoCubit.state).thenReturn(const InitialInfoState());
-      when(() => initialInfoCubit.initialInfoFormSubmitted(testUid))
+      when(() => initialInfoCubit.initialInfoFormSubmitted())
           .thenAnswer((_) async {});
       when(() => appBloc.state)
           .thenReturn(const AppState.authenticated(User(uid: testUid)));
@@ -123,6 +121,25 @@ void main() {
         verify(() => initialInfoCubit.heightChanged(testHeight)).called(1);
       });
 
+      // testWidgets('bDateChanged when bDate changes', (tester) async {
+      //   await tester.pumpWidget(
+      //     MaterialApp(
+      //       home: Scaffold(
+      //         body: BlocProvider.value(
+      //           value: initialInfoCubit,
+      //           child: const InitialInfoForm(),
+      //         ),
+      //       ),
+      //     ),
+      //   );
+      //   await tester.tap(find.byKey(bDateInputKey));
+      //   await tester.pumpAndSettle();
+      //   expect(find.text('ตกลง'), findsOneWidget);
+      //   await tester.tap(find.text('ตกลง'));
+      //   await tester.pump();
+      //   verify(() => initialInfoCubit.bDateChanged(DateTime.now().toString())).called(1);
+      // });
+
       testWidgets('genderChanged when gender changes', (tester) async {
         await tester.pumpWidget(
           MaterialApp(
@@ -138,7 +155,6 @@ void main() {
             find.byKey(genderInputKey));
         expect(input1.initialValue, null);
 
-        // await tester.tap(find.byKey(genderInputKey));
         await tester.tap(find.byKey(genderInputKey));
         await tester.pumpAndSettle();
         await tester.tap(find.text(testGender).last);
@@ -149,7 +165,7 @@ void main() {
         expect(input2.initialValue, 'F');
       });
 
-      testWidgets('caloryChanged when calory changes', (tester) async {
+      testWidgets('exerciseChanged when exercise changes', (tester) async {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
@@ -160,8 +176,19 @@ void main() {
             ),
           ),
         );
-        await tester.enterText(find.byKey(caloryInputKey), testCalory);
-        verify(() => initialInfoCubit.caloryChanged(testCalory)).called(1);
+        await tester.dragFrom(Offset(0, 300), Offset(0, -300));
+        var input1 = tester.widget<DropdownButtonFormField<String>>(
+            find.byKey(exerciseInputKey));
+        expect(input1.initialValue, null);
+
+        await tester.tap(find.byKey(exerciseInputKey));
+        await tester.pump();
+        await tester.tap(find.text(testExercise).last);
+        await tester.pump();
+
+        var input2 = tester.widget<DropdownButtonFormField<String>>(
+            find.byKey(exerciseInputKey));
+        expect(input2.initialValue, '1.55');
       });
 
       testWidgets('initialInfoFormSubmitted when save button is pressed',
@@ -181,8 +208,9 @@ void main() {
             )),
           ),
         );
+        await tester.dragFrom(Offset(0, 300), Offset(0, -300));
         await tester.tap(find.byKey(initialInfoButtonKey));
-        verify(() => initialInfoCubit.initialInfoFormSubmitted(testUid))
+        verify(() => initialInfoCubit.initialInfoFormSubmitted())
             .called(1);
       });
     });
@@ -269,6 +297,25 @@ void main() {
         expect(find.text('กรุณาระบุส่วนสูงให้ถูกต้อง'), findsOneWidget);
       });
 
+      testWidgets('invalid bDate error text when bDate is invalid',
+          (tester) async {
+        final bDate = MockBDate();
+        when(() => bDate.invalid).thenReturn(true);
+        when(() => initialInfoCubit.state)
+            .thenReturn(InitialInfoState(bDate: bDate));
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: BlocProvider.value(
+                value: initialInfoCubit,
+                child: const InitialInfoForm(),
+              ),
+            ),
+          ),
+        );
+        expect(find.text('กรุณาระบุวันเกิดของคุณ'), findsOneWidget);
+      });
+
       testWidgets('invalid gender error text when gender is invalid',
           (tester) async {
         final gender = MockGender();
@@ -285,15 +332,15 @@ void main() {
             ),
           ),
         );
-        expect(find.text('กรุณาระบุเพศ'), findsOneWidget);
+        expect(find.text('กรุณาระบุเพศของคุณ'), findsOneWidget);
       });
 
-      testWidgets('invalid calory error text when calory is invalid',
+      testWidgets('invalid exercise error text when exercise is invalid',
           (tester) async {
-        final calory = MockCalory();
-        when(() => calory.invalid).thenReturn(true);
+        final exercise = MockExercise();
+        when(() => exercise.invalid).thenReturn(true);
         when(() => initialInfoCubit.state)
-            .thenReturn(InitialInfoState(calory: calory));
+            .thenReturn(InitialInfoState(exercise: exercise));
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
@@ -304,7 +351,7 @@ void main() {
             ),
           ),
         );
-        expect(find.text('กรุณาระบุเป้าหมายแคลอรีให้ถูกต้อง'), findsOneWidget);
+        expect(find.text('กรุณาระบุการออกกำลังกายของคุณ'), findsOneWidget);
       });
 
       testWidgets('disabled save button when status is not validated',
