@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:foodandbody/models/calory.dart';
+import 'package:foodandbody/models/birth_date.dart';
+import 'package:foodandbody/models/exercise.dart';
 import 'package:foodandbody/models/gender.dart';
 import 'package:foodandbody/models/height.dart';
 import 'package:foodandbody/models/username.dart';
@@ -11,8 +12,9 @@ void main() {
   const username = Username.dirty('username');
   const weight = Weight.dirty('weight');
   const height = Height.dirty('height');
+  const bDate = BDate.dirty('bDate');
   const gender = Gender.dirty('gender');
-  const calory = Calory.dirty('calory');
+  const exercise = Exercise.dirty('exercise');
 
   group('InitialInfoState', () {
     
@@ -52,6 +54,13 @@ void main() {
       );
     });
 
+    test('returns object with updated bDate when bDate is passed', () {
+      expect(
+        InitialInfoState().copyWith(bDate: bDate),
+        InitialInfoState(bDate: bDate),
+      );
+    });
+
     test('returns object with updated gender when gender is passed', () {
       expect(
         InitialInfoState().copyWith(gender: gender),
@@ -59,10 +68,10 @@ void main() {
       );
     });
 
-    test('returns object with updated calory when calory is passed', () {
+    test('returns object with updated exercise when exercise is passed', () {
       expect(
-        InitialInfoState().copyWith(calory: calory),
-        InitialInfoState(calory: calory),
+        InitialInfoState().copyWith(exercise: exercise),
+        InitialInfoState(exercise: exercise),
       );
     });
 

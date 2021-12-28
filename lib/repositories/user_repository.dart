@@ -52,9 +52,14 @@ class UserRepository implements IUserRepository {
       final info = cloud_firestore.FirebaseFirestore.instance
           .collection('users')
           .doc(firebase_auth.FirebaseAuth.instance.currentUser?.uid);
-      return await info.update({'goal': goal});
+      final goalNutrient = Nutrient(
+          protein: double.parse(((goal * 0.30) / 4).toStringAsFixed(1)),
+          carb: double.parse(((goal * 0.35) / 4).toStringAsFixed(1)),
+          fat: double.parse(((goal * 0.35) / 9).toStringAsFixed(1)));
+      return await info
+          .update({'goal': goal, 'goalNutrient': goalNutrient.toJson()});
     } catch (e) {
-      throw Exception('error updating info');
+      throw Exception('error updating info: $e');
     }
   }
 
