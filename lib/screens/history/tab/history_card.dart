@@ -27,9 +27,9 @@ class HistoryCard extends StatelessWidget {
         : '${date.day}/${date.month}/${date.year}';
   }
 
-  double _graphMaxY(String name){
+  double _graphMaxY(String name) {
     return name == 'น้ำ' ? 10 : 100;
-  } 
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +48,7 @@ class HistoryCard extends StatelessWidget {
             ),
             if (isBody && dataList.length >= 2)
               Row(
+                key: Key('historyCard_compare_body'),
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -100,6 +101,7 @@ class HistoryCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       '${_dateToString(startDate)}',
+                      key: Key('historyCard_startDate'),
                       style: Theme.of(context).textTheme.bodyText2!.merge(
                           TextStyle(
                               color: Theme.of(context).colorScheme.secondary)),
@@ -107,6 +109,7 @@ class HistoryCard extends StatelessWidget {
                   ),
                 Text(
                   '${_dateToString(stopDate)}',
+                  key: Key('historyCard_stopDate'),
                   style: Theme.of(context).textTheme.bodyText2!.merge(TextStyle(
                       color: Theme.of(context).colorScheme.secondary)),
                 ),
@@ -129,7 +132,7 @@ class _LineChart extends StatelessWidget {
   Widget build(BuildContext context) {
     return LineChart(LineChartData(
         minX: 1,
-        maxX: data.length == 1 ? 10 : data.length.toDouble(),
+        maxX: data.length <= 1 || data.length > 10 ? 10 : data.length.toDouble(),
         minY: 0, //(data.reduce(min) - 1).toDouble()
         maxY: data.reduce(max) + 1 < maxY ? maxY : (data.reduce(max) + 1).toDouble(),
         axisTitleData: FlAxisTitleData(show: false),
@@ -143,14 +146,15 @@ class _LineChart extends StatelessWidget {
   List<LineChartBarData> _getDataPoint() {
     final List<FlSpot> dataPoint = [];
 
-    if (data.length == 1) {
+    if (data.length <= 1) {
       for (int index = 1; index <= 10; index++) {
         dataPoint.add(FlSpot(index.toDouble(), data[0].toDouble()));
       }
     } else {
-      for (int index = data.length; index > 0; index--) {
+      List<int> yData = data.length > 10 ? data.sublist(0, 10): data;
+      for (int index = yData.length; index > 0; index--) {
         dataPoint.add(
-            FlSpot(index.toDouble(), data[data.length - index].toDouble()));
+            FlSpot(index.toDouble(), yData[yData.length - index].toDouble()));
       }
     }
 
