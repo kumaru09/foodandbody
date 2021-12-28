@@ -3,6 +3,7 @@ import 'package:foodandbody/models/body.dart';
 import 'package:foodandbody/screens/body/edit_body_figure.dart';
 import 'package:intl/intl.dart';
 
+// ignore: must_be_immutable
 class BodyFigureInfo extends StatelessWidget {
   BodyFigureInfo(this.body);
 
@@ -29,6 +30,7 @@ class BodyFigureInfo extends StatelessWidget {
               Stack(
                 children: [
                   Container(
+                    key: const Key('body_figure_image'),
                     width: MediaQuery.of(context).size.width * 0.45,
                     padding: EdgeInsets.only(left: 14, top: 17),
                     child: Image(
@@ -36,6 +38,7 @@ class BodyFigureInfo extends StatelessWidget {
                     ),
                   ),
                   CustomPaint(
+                    key: const Key('body_shoulder_pointer'),
                     painter: _DrawLine(
                         context: context,
                         circleOffset: Offset(
@@ -46,6 +49,7 @@ class BodyFigureInfo extends StatelessWidget {
                             MediaQuery.of(context).size.height * 0.02)),
                   ),
                   CustomPaint(
+                    key: const Key('body_chest_pointer'),
                     painter: _DrawLine(
                         context: context,
                         circleOffset: Offset(
@@ -56,6 +60,7 @@ class BodyFigureInfo extends StatelessWidget {
                             MediaQuery.of(context).size.height * 0.16)),
                   ),
                   CustomPaint(
+                    key: const Key('body_waist_pointer'),
                     painter: _DrawLine(
                         context: context,
                         circleOffset: Offset(
@@ -66,6 +71,7 @@ class BodyFigureInfo extends StatelessWidget {
                             MediaQuery.of(context).size.height * 0.295)),
                   ),
                   CustomPaint(
+                    key: const Key('body_hip_pointer'),
                     painter: _DrawLine(
                         context: context,
                         circleOffset: Offset(
@@ -94,12 +100,15 @@ class BodyFigureInfo extends StatelessWidget {
                   Container(
                     padding: EdgeInsets.only(left: 8),
                     width: MediaQuery.of(context).size.width * 0.45,
-                    alignment: Alignment.topLeft,
-                    child: RichText(
-                        textAlign: TextAlign.start,
-                        text: TextSpan(children: [
-                          TextSpan(
-                            text: isEmpty(shoulder) ? "-  " : "$shoulder",
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(right: 10),
+                          padding: EdgeInsets.zero,
+                          alignment: Alignment.bottomLeft,
+                          child: Text(
+                            isEmpty(shoulder) ? "-" : "$shoulder",
                             style: Theme.of(context).textTheme.headline4!.merge(
                                   TextStyle(
                                       color: Theme.of(context)
@@ -107,16 +116,22 @@ class BodyFigureInfo extends StatelessWidget {
                                           .secondary),
                                 ),
                           ),
-                          TextSpan(
-                            text: "  เซนติเมตร",
+                        ),
+                        Container(
+                          alignment: Alignment.bottomLeft,
+                          padding: EdgeInsets.only(bottom: 10),
+                          child: Text(
+                            "เซนติเมตร",
                             style: Theme.of(context).textTheme.bodyText2!.merge(
                                   TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .secondary),
+                                    color:
+                                        Theme.of(context).colorScheme.secondary,
+                                  ),
                                 ),
                           ),
-                        ])),
+                        ),
+                      ],
+                    ),
                   ),
                   Container(
                     width: MediaQuery.of(context).size.width * 0.45,
@@ -139,31 +154,39 @@ class BodyFigureInfo extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    width: MediaQuery.of(context).size.width * 0.45,
                     padding: EdgeInsets.only(left: 8),
-                    alignment: Alignment.topLeft,
-                    child: RichText(
-                      textAlign: TextAlign.start,
-                      text: TextSpan(children: [
-                        TextSpan(
-                          text: isEmpty(chest) ? "-  " : "$chest",
-                          style: Theme.of(context).textTheme.headline4!.merge(
-                                TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .secondary),
-                              ),
+                    width: MediaQuery.of(context).size.width * 0.45,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(right: 10),
+                          padding: EdgeInsets.zero,
+                          alignment: Alignment.bottomLeft,
+                          child: Text(
+                            isEmpty(chest) ? "-" : "$chest",
+                            style: Theme.of(context).textTheme.headline4!.merge(
+                                  TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary),
+                                ),
+                          ),
                         ),
-                        TextSpan(
-                          text: "  เซนติเมตร",
-                          style: Theme.of(context).textTheme.bodyText2!.merge(
-                                TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .secondary),
-                              ),
-                        )
-                      ]),
+                        Container(
+                          alignment: Alignment.bottomLeft,
+                          padding: EdgeInsets.only(bottom: 10),
+                          child: Text(
+                            "เซนติเมตร",
+                            style: Theme.of(context).textTheme.bodyText2!.merge(
+                                  TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.secondary,
+                                  ),
+                                ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   Container(
@@ -187,31 +210,39 @@ class BodyFigureInfo extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    width: MediaQuery.of(context).size.width * 0.45,
                     padding: EdgeInsets.only(left: 8),
-                    alignment: Alignment.topLeft,
-                    child: RichText(
-                      textAlign: TextAlign.start,
-                      text: TextSpan(children: [
-                        TextSpan(
-                          text: isEmpty(waist) ? "-  " : "$waist",
-                          style: Theme.of(context).textTheme.headline4!.merge(
-                                TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .secondary),
-                              ),
+                    width: MediaQuery.of(context).size.width * 0.45,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(right: 10),
+                          padding: EdgeInsets.zero,
+                          alignment: Alignment.bottomLeft,
+                          child: Text(
+                            isEmpty(waist) ? "-" : "$waist",
+                            style: Theme.of(context).textTheme.headline4!.merge(
+                                  TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary),
+                                ),
+                          ),
                         ),
-                        TextSpan(
-                          text: "  เซนติเมตร",
-                          style: Theme.of(context).textTheme.bodyText2!.merge(
-                                TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .secondary),
-                              ),
-                        )
-                      ]),
+                        Container(
+                          alignment: Alignment.bottomLeft,
+                          padding: EdgeInsets.only(bottom: 10),
+                          child: Text(
+                            "เซนติเมตร",
+                            style: Theme.of(context).textTheme.bodyText2!.merge(
+                                  TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.secondary,
+                                  ),
+                                ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   Container(
@@ -235,31 +266,41 @@ class BodyFigureInfo extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    width: MediaQuery.of(context).size.width * 0.45,
                     padding: EdgeInsets.only(left: 8),
-                    alignment: Alignment.topLeft,
-                    child: RichText(
-                      textAlign: TextAlign.start,
-                      text: TextSpan(children: [
-                        TextSpan(
-                          text: isEmpty(hip) ? "-  " : "$hip",
-                          style: Theme.of(context).textTheme.headline4!.merge(
-                              TextStyle(
-                                  color:
-                                      Theme.of(context).colorScheme.secondary)),
+                    width: MediaQuery.of(context).size.width * 0.45,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(right: 10),
+                          padding: EdgeInsets.zero,
+                          alignment: Alignment.bottomLeft,
+                          child: Text(
+                            isEmpty(hip) ? "-" : "$hip",
+                            style: Theme.of(context).textTheme.headline4!.merge(
+                                  TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary),
+                                ),
+                          ),
                         ),
-                        TextSpan(
-                          text: "  เซนติเมตร",
-                          style: Theme.of(context).textTheme.bodyText2!.merge(
-                                TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .secondary),
-                              ),
-                        )
-                      ]),
+                        Container(
+                          alignment: Alignment.bottomLeft,
+                          padding: EdgeInsets.only(bottom: 10),
+                          child: Text(
+                            "เซนติเมตร",
+                            style: Theme.of(context).textTheme.bodyText2!.merge(
+                                  TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.secondary,
+                                  ),
+                                ),
+                          ),
+                        ),
+                      ],
                     ),
-                  )
+                  ),
                 ],
               ),
             ],
