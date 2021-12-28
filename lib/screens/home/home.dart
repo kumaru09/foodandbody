@@ -3,13 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:foodandbody/models/history.dart';
 import 'package:foodandbody/repositories/plan_repository.dart';
+import 'package:foodandbody/screens/home/add_exercise.dart';
 import 'package:foodandbody/screens/home/bloc/home_bloc.dart';
 import 'package:foodandbody/screens/home/circular_cal_indicator.dart';
+import 'package:foodandbody/screens/home/exercise_list.dart';
 import 'package:foodandbody/screens/search/search_page.dart';
 import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
 import 'package:foodandbody/screens/setting/bloc/info_bloc.dart';
 import 'package:foodandbody/screens/setting/setting.dart';
-import 'package:foodandbody/screens/home/linear_nutrient_indicator.dart';
 import 'package:foodandbody/widget/menu_card/menu_card.dart';
 
 class Home extends StatelessWidget {
@@ -116,10 +117,31 @@ class Home extends StatelessWidget {
               ),
             ),
             Container(
-                padding: EdgeInsets.only(left: 16, right: 16, bottom: 100),
-                width: MediaQuery.of(context).size.width,
-                constraints: BoxConstraints(minHeight: 100),
-                child: _DailyWater())
+              padding: EdgeInsets.only(left: 16, right: 16),
+              width: MediaQuery.of(context).size.width,
+              constraints: BoxConstraints(minHeight: 80),
+              child: _DailyWater(),
+            ),
+            Container(
+              padding: EdgeInsets.only(left: 16, top: 16),
+              width: MediaQuery.of(context).size.width,
+              child: Text(
+                "ออกกำลังกาย",
+                style: Theme.of(context).textTheme.bodyText1!.merge(
+                      TextStyle(color: Theme.of(context).primaryColor),
+                    ),
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.only(left: 16, top: 8, right: 15),
+              child: ExerciseList(),
+            ),
+            Container(
+              width: MediaQuery.of(context).size.width,
+              padding: EdgeInsets.only(bottom: 100),
+              alignment: Alignment.center,
+              child: AddExerciseButton(),
+            )
           ],
         ),
       ),
@@ -129,19 +151,7 @@ class Home extends StatelessWidget {
   Widget _buildCard(BuildContext context, History plan) {
     return BlocBuilder<InfoBloc, InfoState>(builder: (context, state) {
       return state.status == InfoStatus.success
-          ? Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: EdgeInsets.only(top: 18),
-                  child: CircularCalIndicator(plan, state.info!),
-                ),
-                Container(
-                  padding: EdgeInsets.only(top: 18, bottom: 18),
-                  child: LinearNutrientIndicator(plan, state.info!),
-                )
-              ],
-            )
+          ? CircularCalIndicator(plan, state.info!)
           : Center(
               child: CircularProgressIndicator(),
             );
