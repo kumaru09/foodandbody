@@ -10,6 +10,7 @@ class InfoEntity extends Equatable {
   final String? gender;
   final String? photoUrl;
   final Nutrient? goalNutrient;
+  final Timestamp? birthDate;
 
   const InfoEntity(
       {this.name,
@@ -18,11 +19,13 @@ class InfoEntity extends Equatable {
       this.weight,
       this.gender,
       this.photoUrl,
-      this.goalNutrient});
+      this.goalNutrient,
+      this.birthDate});
 
   static InfoEntity fromJson(Map<dynamic, dynamic> json) {
     return InfoEntity(
         name: json['name'] as String,
+        birthDate: json['birthDate'] as Timestamp,
         goal: json['goal'] as int,
         height: json['height'] as int,
         weight: json['weight'] as int,
@@ -34,6 +37,7 @@ class InfoEntity extends Equatable {
   Map<String, Object?> toJson() {
     return {
       'name': name,
+      'birthDate': birthDate,
       'goal': goal,
       'height': height,
       'weight': weight,
@@ -53,16 +57,17 @@ class InfoEntity extends Equatable {
 
   @override
   List<Object?> get props =>
-      [name, goal, height, weight, gender, photoUrl, goalNutrient];
+      [name, birthDate, goal, height, weight, gender, photoUrl, goalNutrient];
 
   @override
   String toString() {
-    return 'InfoEntity {name: $name, goal: $goal, height: $height, weight: $weight, gender: $gender, photoUrl: $photoUrl, goalNutrient: $goalNutrient}';
+    return 'InfoEntity {name: $name, bitrhDate: $birthDate, goal: $goal, height: $height, weight: $weight, gender: $gender, photoUrl: $photoUrl, goalNutrient: $goalNutrient}';
   }
 
   static InfoEntity fromSnapshot(DocumentSnapshot snap) {
     return InfoEntity(
         name: snap['name'],
+        birthDate: snap['birthDate'],
         goal: snap['goal'],
         height: snap['height'],
         weight: snap['weight'],
@@ -74,6 +79,7 @@ class InfoEntity extends Equatable {
   Map<String, Object?> toDocument() {
     return {
       'name': name,
+      'birthDate': birthDate,
       'goal': goal,
       'height': height,
       'weight': weight,

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:foodandbody/screens/initial_info/cubit/initial_info_cubit.dart';
 import 'package:formz/formz.dart';
+import 'package:intl/intl.dart';
 
 class InitialInfoForm extends StatelessWidget {
   const InitialInfoForm({Key? key}) : super(key: key);
@@ -52,10 +52,12 @@ class InitialInfoForm extends StatelessWidget {
                           SizedBox(height: 16.0),
                           _HeightInput(),
                           SizedBox(height: 16.0),
-                          GenderInput(),
+                          _BDateInput(),
                           SizedBox(height: 16.0),
-                          _GoalInput(),
-                          SizedBox(height: 24.0),
+                          _GenderInput(),
+                          SizedBox(height: 16.0),
+                          _ExerciseInput(),
+                          SizedBox(height: 16.0),
                           _InitialInfoButton(),
                         ],
                       ),
@@ -140,71 +142,191 @@ class _HeightInput extends StatelessWidget {
   }
 }
 
-class GenderInput extends StatefulWidget {
-  const GenderInput({Key? key}) : super(key: key);
+const ColorScheme _calendarColorScheme = ColorScheme(
+  primary: Color(0xFFFF8E6E),
+  primaryVariant: Color(0xFFc85f42),
+  secondary: Color(0xFF515070),
+  secondaryVariant: Color(0xFF272845),
+  surface: Colors.white,
+  background: Color(0xFFF6F6F6),
+  error: Color(0xFFFF0000),
+  onPrimary: Colors.white,
+  onSecondary: Colors.white,
+  onSurface: Color(0xFF515070),
+  onBackground: Color(0xFF515070),
+  onError: Colors.white,
+  brightness: Brightness.light,
+);
+
+class _BDateInput extends StatefulWidget {
+  const _BDateInput({Key? key}) : super(key: key);
 
   @override
-  _GenderInputState createState() => _GenderInputState();
+  __BDateInputState createState() => __BDateInputState();
 }
 
-class _GenderInputState extends State<GenderInput> {
-  String? _gender;
+class __BDateInputState extends State<_BDateInput> {
+  TextEditingController dateinput = TextEditingController();
+
+  @override
+  void initState() {
+    dateinput.text = "";
+    super.initState();
+  }
+
+  _selectDate(BuildContext context) async {
+    FocusScope.of(context).requestFocus(new FocusNode());
+    DateTime? selected = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+      helpText: 'เลือกวัน',
+      cancelText: 'ยกเลิก',
+      confirmText: 'ตกลง',
+      errorFormatText: 'กรุณาระบุรูปแบบวันที่ที่ถูกต้อง',
+      errorInvalidText: 'กรุณาเลือกวันที่อยู่ในช่วงที่กำหนด',
+      fieldHintText: 'วัน/เดือน/ปี',
+      fieldLabelText: 'วันที่',
+      locale: const Locale("th", "TH"),
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData(
+            colorScheme: _calendarColorScheme,
+            textTheme: Theme.of(context).textTheme,
+          ),
+          child: child as Widget,
+        );
+      },
+    );
+    if (selected != null) {
+      String formattedDate = DateFormat('dd/MM/yyyy').format(selected);
+      dateinput.text = formattedDate;
+      context.read<InitialInfoCubit>().bDateChanged(selected.toString());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<InitialInfoCubit, InitialInfoState>(
-        buildWhen: (previous, current) => previous.height != current.height,
+        buildWhen: (previous, current) => previous.bDate != current.bDate,
         builder: (context, state) {
-          return DropdownButtonFormField<String>(
-            key: const Key('initialInfoForm_genderInput_textField'),
-            value: _gender,
+          return TextFormField(
+            key: const Key('initialInfoForm_bDateInput_textField'),
+            controller: dateinput,
+            onTap: () => _selectDate(context),
+            keyboardType: TextInputType.number,
+            textInputAction: TextInputAction.next,
+            readOnly: true,
             decoration: InputDecoration(
-              labelText: 'เพศ',
+              labelText: 'วันเกิด',
+              hintText: 'วัน/เดือน/ปี',
+              suffixIcon: Icon(Icons.calendar_today),
               border: OutlineInputBorder(borderSide: BorderSide()),
-              errorText: state.gender.invalid ? 'กรุณาระบุเพศ' : null,
+              errorText: state.bDate.invalid ? 'กรุณาระบุวันเกิดของคุณ' : null,
             ),
-            items: [
-              DropdownMenuItem<String>(
-                child: Text('ชาย'),
-                value: 'M',
-              ),
-              DropdownMenuItem<String>(
-                child: Text('หญิง'),
-                value: 'F',
-              )
-            ],
-            onChanged: (String? gender) {
-              setState(() {
-                _gender = gender;
-              });
-              context.read<InitialInfoCubit>().genderChanged(gender!);
-            },
           );
         });
   }
 }
 
-class _GoalInput extends StatelessWidget {
+class _GenderInput extends StatefulWidget {
+  const _GenderInput({Key? key}) : super(key: key);
+
+  @override
+  __GenderInputState createState() => __GenderInputState();
+}
+
+class __GenderInputState extends State<_GenderInput> {
+  String? _gender;
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<InitialInfoCubit, InitialInfoState>(
-        buildWhen: (previous, current) => previous.calory != current.calory,
+        buildWhen: (previous, current) => previous.gender != current.gender,
         builder: (context, state) {
-          return TextFormField(
-            key: const Key('initialInfoForm_caloryInput_textField'),
-            onChanged: (calory) =>
-                context.read<InitialInfoCubit>().caloryChanged(calory),
-            keyboardType: TextInputType.number,
-            textInputAction: TextInputAction.next,
-            decoration: InputDecoration(
-              labelText: 'เป้าหมายแคลอรี',
-              hintText: 'ตัวอย่าง 1600',
-              border: OutlineInputBorder(borderSide: BorderSide()),
-              errorText: state.calory.invalid
-                  ? 'กรุณาระบุเป้าหมายแคลอรีให้ถูกต้อง'
-                  : null,
-            ),
-          );
-        });
+      return DropdownButtonFormField<String>(
+        key: const Key('initialInfoForm_genderInput_textField'),
+        value: _gender,
+        decoration: InputDecoration(
+          labelText: 'เพศ',
+          border: OutlineInputBorder(borderSide: BorderSide()),
+          errorText: state.gender.invalid ? 'กรุณาระบุเพศของคุณ' : null,
+        ),
+        items: [
+          DropdownMenuItem<String>(
+            child: Text('ชาย'),
+            value: 'M',
+          ),
+          DropdownMenuItem<String>(
+            child: Text('หญิง'),
+            value: 'F',
+          )
+        ],
+        onChanged: (String? gender) {
+          setState(() {
+            _gender = gender;
+          });
+          context.read<InitialInfoCubit>().genderChanged(gender!);
+        },
+      );
+    });
+  }
+}
+
+class _ExerciseInput extends StatefulWidget {
+  const _ExerciseInput({Key? key}) : super(key: key);
+
+  @override
+  __ExerciseInputState createState() => __ExerciseInputState();
+}
+
+class __ExerciseInputState extends State<_ExerciseInput> {
+  String? _exercise;
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<InitialInfoCubit, InitialInfoState>(
+        buildWhen: (previous, current) => previous.exercise != current.exercise,
+        builder: (context, state) {
+      return DropdownButtonFormField<String>(
+        key: const Key('initialInfoForm_exerciseInput_textField'),
+        value: _exercise,
+        isExpanded: true,
+        decoration: InputDecoration(
+          labelText: 'การออกกำลังกาย',
+          border: OutlineInputBorder(borderSide: BorderSide()),
+          errorText:
+              state.exercise.invalid ? 'กรุณาระบุการออกกำลังกายของคุณ' : null,
+        ),
+        items: [
+          DropdownMenuItem<String>(
+            child: Text('ไม่ได้ออกกำลังกาย'),
+            value: '1.2',
+          ),
+          DropdownMenuItem<String>(
+            child: Text('ออกกำลังกายเบา 1-3 วันต่อสัปดาห์'),
+            value: '1.375',
+          ),
+          DropdownMenuItem<String>(
+            child: Text('ออกกำลังกายกลาง 3-5 วันต่อสัปดาห์'),
+            value: '1.55',
+          ),
+          DropdownMenuItem<String>(
+            child: Text('ออกกำลังกายหนัก 6-7 วันต่อสัปดาห์'),
+            value: '1.725',
+          ),
+          DropdownMenuItem<String>(
+            child: Text('ออกกำลังกายหนักวันละ 2 ครั้ง'),
+            value: '1.9',
+          ),
+        ],
+        onChanged: (String? exercise) {
+          setState(() {
+            _exercise = exercise;
+          });
+          context.read<InitialInfoCubit>().exerciseChanged(exercise!);
+        },
+      );
+    });
   }
 }
 
