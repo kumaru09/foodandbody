@@ -19,12 +19,16 @@ class HistoryCard extends StatelessWidget {
   final DateTime stopDate;
   final bool isBody;
 
-  String dateToString(DateTime date) {
+  String _dateToString(DateTime date) {
     return date.day == DateTime.now().day &&
             date.month == DateTime.now().month &&
             date.year == DateTime.now().year
         ? 'วันนี้'
         : '${date.day}/${date.month}/${date.year}';
+  }
+
+  double _graphMaxY(String name) {
+    return name == 'น้ำ' ? 10 : 100;
   }
 
   @override
@@ -44,6 +48,7 @@ class HistoryCard extends StatelessWidget {
             ),
             if (isBody && dataList.length >= 2)
               Row(
+                key: Key('historyCard_compare_body'),
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -81,7 +86,7 @@ class HistoryCard extends StatelessWidget {
               width: double.infinity,
               height: 100,
               padding: EdgeInsets.symmetric(vertical: 5),
-              child: _LineChart(dataList),
+              child: _LineChart(dataList, _graphMaxY(name)),
             ),
             const Divider(
               color: Color(0xFF515070),
@@ -95,14 +100,16 @@ class HistoryCard extends StatelessWidget {
                 if (dataList.length >= 2)
                   Expanded(
                     child: Text(
-                      '${dateToString(startDate)}',
+                      '${_dateToString(startDate)}',
+                      key: Key('historyCard_startDate'),
                       style: Theme.of(context).textTheme.bodyText2!.merge(
                           TextStyle(
                               color: Theme.of(context).colorScheme.secondary)),
                     ),
                   ),
                 Text(
-                  '${dateToString(stopDate)}',
+                  '${_dateToString(stopDate)}',
+                  key: Key('historyCard_stopDate'),
                   style: Theme.of(context).textTheme.bodyText2!.merge(TextStyle(
                       color: Theme.of(context).colorScheme.secondary)),
                 ),
@@ -116,17 +123,18 @@ class HistoryCard extends StatelessWidget {
 }
 
 class _LineChart extends StatelessWidget {
-  _LineChart(this.data);
+  _LineChart(this.data, this.maxY);
 
   List<int> data;
+  double maxY;
 
   @override
   Widget build(BuildContext context) {
     return LineChart(LineChartData(
         minX: 1,
-        maxX: data.length == 1 ? 10 : data.length.toDouble(),
-        minY: (data.reduce(min) - 1).toDouble(),
-        maxY: (data.reduce(max) + 1).toDouble(),
+        maxX: data.length <= 1 || data.length > 10 ? 10 : data.length.toDouble(),
+        minY: 0, //(data.reduce(min) - 1).toDouble()
+        maxY: data.reduce(max) + 1 < maxY ? maxY : (data.reduce(max) + 1).toDouble(),
         axisTitleData: FlAxisTitleData(show: false),
         titlesData: FlTitlesData(show: false),
         borderData: FlBorderData(show: false),
@@ -138,14 +146,15 @@ class _LineChart extends StatelessWidget {
   List<LineChartBarData> _getDataPoint() {
     final List<FlSpot> dataPoint = [];
 
-    if (data.length == 1) {
+    if (data.length <= 1) {
       for (int index = 1; index <= 10; index++) {
         dataPoint.add(FlSpot(index.toDouble(), data[0].toDouble()));
       }
     } else {
-      for (int index = data.length; index > 0; index--) {
+      List<int> yData = data.length > 10 ? data.sublist(0, 10): data;
+      for (int index = yData.length; index > 0; index--) {
         dataPoint.add(
-            FlSpot(index.toDouble(), data[data.length - index].toDouble()));
+            FlSpot(index.toDouble(), yData[yData.length - index].toDouble()));
       }
     }
 
@@ -153,7 +162,7 @@ class _LineChart extends StatelessWidget {
       LineChartBarData(
           colors: [Color(0xFF515070)],
           spots: dataPoint,
-          isCurved: true,
+          isCurved: false,
           dotData: FlDotData(show: false))
     ];
   }
