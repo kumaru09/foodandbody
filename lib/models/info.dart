@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:foodandbody/models/info_entity.dart';
 import 'package:foodandbody/models/nutrient.dart';
 import 'package:meta/meta.dart';
@@ -11,6 +12,7 @@ class Info {
   final String? gender;
   final String? photoUrl;
   final Nutrient? goalNutrient;
+  final Timestamp? birthDate;
 
   Info(
       {this.name,
@@ -19,7 +21,8 @@ class Info {
       this.weight,
       this.gender,
       this.photoUrl,
-      this.goalNutrient});
+      this.goalNutrient,
+      this.birthDate});
 
   Info copyWith(
       {String? name,
@@ -28,7 +31,8 @@ class Info {
       int? weight,
       String? gender,
       String? photoUrl,
-      Nutrient? goalNutrient}) {
+      Nutrient? goalNutrient,
+      Timestamp? birthDate}) {
     return Info(
         name: name ?? this.name,
         goal: goal ?? this.goal,
@@ -36,7 +40,8 @@ class Info {
         weight: weight ?? this.weight,
         gender: gender ?? this.gender,
         photoUrl: photoUrl ?? this.photoUrl,
-        goalNutrient: goalNutrient ?? this.goalNutrient);
+        goalNutrient: goalNutrient ?? this.goalNutrient,
+        birthDate: birthDate ?? this.birthDate);
   }
 
   @override
@@ -47,7 +52,8 @@ class Info {
       weight.hashCode ^
       gender.hashCode ^
       photoUrl.hashCode ^
-      goalNutrient.hashCode;
+      goalNutrient.hashCode ^
+      birthDate.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -60,16 +66,18 @@ class Info {
           weight == other.weight &&
           gender == other.gender &&
           photoUrl == other.photoUrl &&
-          goalNutrient == other.goalNutrient;
+          goalNutrient == other.goalNutrient &&
+          birthDate == other.birthDate;
 
   @override
   String toString() {
-    return 'Todo { name: $name, goal: $goal, height: $height, weight: $weight, gender: $gender, photoUrl: $photoUrl, goalNutrient: $goalNutrient}';
+    return 'Info { name: $name, birthDate: $birthDate, goal: $goal, height: $height, weight: $weight, gender: $gender, photoUrl: $photoUrl, goalNutrient: $goalNutrient}';
   }
 
   InfoEntity toEntity() {
     return InfoEntity(
         name: name,
+        birthDate: birthDate,
         goal: goal,
         height: height,
         weight: weight,
@@ -81,6 +89,7 @@ class Info {
   static Info fromEntity(InfoEntity entity) {
     return Info(
         name: entity.name,
+        birthDate: entity.birthDate,
         goal: entity.goal,
         height: entity.height,
         weight: entity.weight,
