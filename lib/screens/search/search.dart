@@ -41,8 +41,10 @@ class _SearchAppBarState extends State<SearchAppBar> {
   final _textController = TextEditingController();
   late SearchBloc _searchBloc;
   String _lastText = '';
+  List<String> _selectFilter = [];
   List<String> _filterList = ['แกง', 'ผัด', 'ยำ', 'ทอด'];
-  late List<bool> _isChecked = List<bool>.generate(_filterList.length, (i) => false);
+  late List<bool> _isChecked =
+      List<bool>.generate(_filterList.length, (i) => false);
 
   @override
   void initState() {
@@ -62,83 +64,14 @@ class _SearchAppBarState extends State<SearchAppBar> {
     _searchBloc.add(TextChanged(text: ''));
   }
 
-  _onSelectFilter(BuildContext context) async {
-    showModalBottomSheet(
-      context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(15.0),
-          topRight: Radius.circular(15.0),
-        ),
-        side: BorderSide(color: Colors.white, width: 3),
-      ),
-      builder: (context) {
-        return Wrap(
-          children: [
-            ListTile(
-              title: Text(
-                'ชนิดอาหาร',
-                style: Theme.of(context).textTheme.subtitle1!.merge(
-                    TextStyle(color: Theme.of(context).colorScheme.secondary)),
-              ),
-            ),
-            Container(
-              width: MediaQuery.of(context).size.width,
-              child: Divider(
-                color: Color(0x21212114),
-                thickness: 1,
-              ),
-            ),
-            StatefulBuilder(
-                builder: (BuildContext context, StateSetter setState) {
-              return ListView.builder(
-                shrinkWrap: true,
-                itemCount: _filterList.length,
-                itemBuilder: (context, index) {
-                  return CheckboxListTile(
-                    controlAffinity: ListTileControlAffinity.trailing,
-                    title: Text(
-                      '${_filterList[index]}',
-                      style: Theme.of(context).textTheme.subtitle1!.merge(
-                          TextStyle(
-                              color: Theme.of(context).colorScheme.secondary)),
-                    ),
-                    activeColor: Theme.of(context).colorScheme.secondary,
-                    value: _isChecked[index],
-                    onChanged: (bool? value) =>
-                        setState(() => _isChecked[index] = value!),
-                  );
-                },
-              );
-            }),
-            Padding(
-              padding: EdgeInsets.only(bottom: 14),
-              child: Center(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50)),
-                    primary: Theme.of(context).primaryColor,
-                    fixedSize: Size(182, 39),
-                  ),
-                  onPressed: () {
-                    print('isCheck: $_isChecked'); //filter
-                    // _searchBloc.add(TextChanged(text: text));
-                    Navigator.pop(context);
-                  },
-                  child: Text(
-                    "ค้นหา",
-                    style: Theme.of(context).textTheme.button!.merge(
-                          TextStyle(color: Colors.white),
-                        ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
+  void _mapIndexFilter() {
+    for (var i = 0; i < _isChecked.length; i++) {
+      if (_isChecked[i] == true && !_selectFilter.contains(_filterList[i]))
+        _selectFilter.add(_filterList[i]);
+      else if (_isChecked[i] == false &&
+          _selectFilter.contains(_filterList[i]))
+        _selectFilter.remove(_filterList[i]);
+    }
   }
 
   @override
@@ -152,7 +85,8 @@ class _SearchAppBarState extends State<SearchAppBar> {
         onChanged: (text) {
           if (_lastText != text) {
             _lastText = text;
-            print('isCheck: $_isChecked'); //filter
+            print('isCheck: $_isChecked');
+            print('filter: $_selectFilter');
             _searchBloc.add(TextChanged(text: text));
           }
         },
@@ -175,7 +109,85 @@ class _SearchAppBarState extends State<SearchAppBar> {
               Icon(Icons.clear, color: Theme.of(context).colorScheme.secondary),
         ),
         IconButton(
-          onPressed: () => _onSelectFilter(context),
+          onPressed: () => showModalBottomSheet(
+            context: context,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(15.0),
+                topRight: Radius.circular(15.0),
+              ),
+              side: BorderSide(color: Colors.white, width: 3),
+            ),
+            builder: (context) {
+              return Wrap(
+                children: [
+                  ListTile(
+                    title: Text(
+                      'ชนิดอาหาร',
+                      style: Theme.of(context).textTheme.subtitle1!.merge(
+                          TextStyle(
+                              color: Theme.of(context).colorScheme.secondary)),
+                    ),
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    child: Divider(
+                      color: Color(0x21212114),
+                      thickness: 1,
+                    ),
+                  ),
+                  StatefulBuilder(
+                      builder: (BuildContext context, StateSetter setState) {
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: _filterList.length,
+                      itemBuilder: (context, index) {
+                        return CheckboxListTile(
+                          controlAffinity: ListTileControlAffinity.trailing,
+                          title: Text(
+                            '${_filterList[index]}',
+                            style: Theme.of(context).textTheme.subtitle1!.merge(
+                                TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .secondary)),
+                          ),
+                          activeColor: Theme.of(context).colorScheme.secondary,
+                          value: _isChecked[index],
+                          onChanged: (bool? value) =>
+                              setState(() => _isChecked[index] = value!),
+                        );
+                      },
+                    );
+                  }),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 14),
+                    child: Center(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(50)),
+                          primary: Theme.of(context).primaryColor,
+                          fixedSize: Size(182, 39),
+                        ),
+                        onPressed: () {
+                          _mapIndexFilter();
+                          // _searchBloc.add(TextChanged(text: text));
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          "ค้นหา",
+                          style: Theme.of(context).textTheme.button!.merge(
+                                TextStyle(color: Colors.white),
+                              ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
           icon: Icon(Icons.filter_list,
               color: Theme.of(context).colorScheme.secondary),
         ),
