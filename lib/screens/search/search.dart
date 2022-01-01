@@ -5,9 +5,14 @@ import 'package:foodandbody/repositories/search_repository.dart';
 import 'package:foodandbody/screens/menu/menu.dart';
 import 'package:foodandbody/screens/search/bloc/search_bloc.dart';
 
-class Search extends StatelessWidget {
+class Search extends StatefulWidget {
   const Search({Key? key}) : super(key: key);
 
+  @override
+  _SearchState createState() => _SearchState();
+}
+
+class _SearchState extends State<Search> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -15,25 +20,18 @@ class Search extends StatelessWidget {
           SearchBloc(searchRepository: context.read<SearchRepository>()),
       child: Scaffold(
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          title: SearchAppBar(),
-          leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Icon(Icons.arrow_back,
-                color: Theme.of(context).colorScheme.secondary),
-          ),
-        ),
+        appBar: SearchAppBar(),
         body: SearchBody(),
       ),
     );
   }
 }
 
-class SearchAppBar extends StatefulWidget {
+class SearchAppBar extends StatefulWidget implements PreferredSizeWidget {
   const SearchAppBar({Key? key}) : super(key: key);
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 
   @override
   _SearchAppBarState createState() => _SearchAppBarState();
@@ -43,6 +41,10 @@ class _SearchAppBarState extends State<SearchAppBar> {
   final _textController = TextEditingController();
   late SearchBloc _searchBloc;
   String _lastText = '';
+  List<String> _selectFilter = [];
+  List<String> _filterList = ['แกง', 'ผัด', 'ยำ', 'ทอด'];
+  late List<bool> _isChecked =
+      List<bool>.generate(_filterList.length, (i) => false);
 
   @override
   void initState() {
@@ -62,20 +64,29 @@ class _SearchAppBarState extends State<SearchAppBar> {
     _searchBloc.add(TextChanged(text: ''));
   }
 
+  void _mapIndexFilter() {
+    for (var i = 0; i < _isChecked.length; i++) {
+      if (_isChecked[i] == true && !_selectFilter.contains(_filterList[i]))
+        _selectFilter.add(_filterList[i]);
+      else if (_isChecked[i] == false &&
+          _selectFilter.contains(_filterList[i]))
+        _selectFilter.remove(_filterList[i]);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(50),
-      ),
-      child: TextField(
+    return AppBar(
+      backgroundColor: Colors.white,
+      title: TextField(
         key: const Key('search_appbar_textfield'),
         controller: _textController,
         autocorrect: false,
         onChanged: (text) {
           if (_lastText != text) {
             _lastText = text;
+            print('isCheck: $_isChecked');
+            print('filter: $_selectFilter');
             _searchBloc.add(TextChanged(text: text));
           }
         },
@@ -84,17 +95,109 @@ class _SearchAppBarState extends State<SearchAppBar> {
             .subtitle1!
             .merge(TextStyle(color: Theme.of(context).colorScheme.secondary)),
         decoration: InputDecoration(
-            suffixIcon: GestureDetector(
-              onTap: _onClearTapped,
-              child: Icon(Icons.clear,
-                  color: Theme.of(context).colorScheme.secondary),
-            ),
             hintText: 'ค้นหาเมนู',
             hintStyle: Theme.of(context)
                 .textTheme
                 .bodyText1!
                 .merge(TextStyle(color: Color(0xFF7E7C9F))),
             border: InputBorder.none),
+      ),
+      actions: [
+        IconButton(
+          onPressed: _onClearTapped,
+          icon:
+              Icon(Icons.clear, color: Theme.of(context).colorScheme.secondary),
+        ),
+        IconButton(
+          onPressed: () => showModalBottomSheet(
+            context: context,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(15.0),
+                topRight: Radius.circular(15.0),
+              ),
+              side: BorderSide(color: Colors.white, width: 3),
+            ),
+            builder: (context) {
+              return Wrap(
+                children: [
+                  ListTile(
+                    title: Text(
+                      'ชนิดอาหาร',
+                      style: Theme.of(context).textTheme.subtitle1!.merge(
+                          TextStyle(
+                              color: Theme.of(context).colorScheme.secondary)),
+                    ),
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    child: Divider(
+                      color: Color(0x21212114),
+                      thickness: 1,
+                    ),
+                  ),
+                  StatefulBuilder(
+                      builder: (BuildContext context, StateSetter setState) {
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: _filterList.length,
+                      itemBuilder: (context, index) {
+                        return CheckboxListTile(
+                          controlAffinity: ListTileControlAffinity.trailing,
+                          title: Text(
+                            '${_filterList[index]}',
+                            style: Theme.of(context).textTheme.subtitle1!.merge(
+                                TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .secondary)),
+                          ),
+                          activeColor: Theme.of(context).colorScheme.secondary,
+                          value: _isChecked[index],
+                          onChanged: (bool? value) =>
+                              setState(() => _isChecked[index] = value!),
+                        );
+                      },
+                    );
+                  }),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 14),
+                    child: Center(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(50)),
+                          primary: Theme.of(context).primaryColor,
+                          fixedSize: Size(182, 39),
+                        ),
+                        onPressed: () {
+                          _mapIndexFilter();
+                          // _searchBloc.add(TextChanged(text: text));
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          "ค้นหา",
+                          style: Theme.of(context).textTheme.button!.merge(
+                                TextStyle(color: Colors.white),
+                              ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+          icon: Icon(Icons.filter_list,
+              color: Theme.of(context).colorScheme.secondary),
+        ),
+      ],
+      leading: IconButton(
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        icon: Icon(Icons.arrow_back,
+            color: Theme.of(context).colorScheme.secondary),
       ),
     );
   }
