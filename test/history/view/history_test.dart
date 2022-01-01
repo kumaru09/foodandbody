@@ -51,12 +51,30 @@ void main() {
       bodyEndDate: DateTime.now(),
       weightStartDate: DateTime(2021),
       weightEndDate: DateTime.now());
+  final GraphList mockGraphListNoData = GraphList(
+      caloriesList: List<int>.generate(10, (x) => x= 0),
+      proteinList: List<int>.generate(10, (x) => x= 0),
+      fatList: List<int>.generate(10, (x) => x= 0),
+      carbList: List<int>.generate(10, (x) => x= 0),
+      waterList: List<int>.generate(10, (x) => x= 0),
+      waistList: [],
+      shoulderList: [],
+      chestList: [],
+      weightList: [],
+      hipList: [],
+      foodStartDate: DateTime(2021),
+      foodEndDate: DateTime.now(),
+      bodyStartDate: DateTime(2021),
+      bodyEndDate: DateTime.now(),
+      weightStartDate: DateTime(2021),
+      weightEndDate: DateTime.now());
   final List<HistoryMenuItem> mockMenuList = [
     HistoryMenuItem(
         name: 'ชื่ออาหาร',
         date: Timestamp.fromDate(DateTime.now()),
         calory: 300)
   ];
+  final List<HistoryMenuItem> mockMenuListEmpty = [];
 
   setUpAll(() {
     registerFallbackValue<HistoryState>(FakeHistoryState());
@@ -87,6 +105,16 @@ void main() {
         expect(find.text('ร่างกาย'), findsOneWidget);
       });
 
+      testWidgets('CircularProgressIndicator when status is initial', (tester) async {
+        when(() => historyBloc.state).thenReturn(HistoryState(
+            status: HistoryStatus.initial,
+            graphList: mockGraphList,
+            menuList: mockMenuList,
+            dateMenuList: DateTime.now()));
+        await tester.pumpHistory(historyBloc);
+        expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      });
+
       testWidgets('HistoryMenu when tab menu', (tester) async {
         when(() => historyBloc.state).thenReturn(HistoryState(
             status: HistoryStatus.success,
@@ -109,6 +137,20 @@ void main() {
         await tester.tap(find.text('สารอาหาร'));
         await tester.pumpAndSettle();
         expect(find.byType(HistoryNutrient), findsOneWidget);
+        expect(find.text('ไม่มีประวัติสารอาหารในขณะนี้'), findsNothing);
+      });
+
+      testWidgets('no HistoryNutrient when tab nutrient and not have nutrient data in list', (tester) async {
+        when(() => historyBloc.state).thenReturn(HistoryState(
+            status: HistoryStatus.success,
+            graphList: mockGraphListNoData,
+            menuList: mockMenuListEmpty,
+            dateMenuList: DateTime.now()));
+        await tester.pumpHistory(historyBloc);
+        await tester.tap(find.text('สารอาหาร'));
+        await tester.pumpAndSettle();
+        expect(find.byType(HistoryNutrient), findsNothing);
+        expect(find.text('ไม่มีประวัติสารอาหารในขณะนี้'), findsOneWidget);
       });
 
       testWidgets('HistoryBody when tab body', (tester) async {
