@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:foodandbody/screens/home/bloc/home_bloc.dart';
+import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
+import 'package:foodandbody/screens/setting/bloc/info_bloc.dart';
+import 'package:provider/src/provider.dart';
 
 class AddExerciseButton extends StatelessWidget {
   const AddExerciseButton({Key? key}) : super(key: key);
@@ -8,9 +12,15 @@ class AddExerciseButton extends StatelessWidget {
     return ElevatedButton.icon(
       key: const Key('home_add_exercise_button'),
       onPressed: () async {
-        await showDialog(
+        final value = await showDialog(
             context: context,
             builder: (BuildContext context) => _AddExerciseDialog());
+        if (value != null) {
+          context.read<PlanBloc>().add(AddExercise(
+              id: value['activity'],
+              min: value['time'],
+              weight: context.read<InfoBloc>().state.info!.weight!));
+        }
       },
       style: ElevatedButton.styleFrom(
           primary: Theme.of(context).scaffoldBackgroundColor, elevation: 0),
@@ -103,7 +113,8 @@ class __AddExerciseDialogState extends State<_AddExerciseDialog> {
       actions: <Widget>[
         TextButton(
           key: const Key("add_exercise_dialog_ok_button"),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.pop(
+              context, {'activity': _activity, 'time': int.parse(_time)}),
           child: Text(
             "ตกลง",
             style: Theme.of(context).textTheme.button!.merge(

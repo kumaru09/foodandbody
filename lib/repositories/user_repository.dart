@@ -84,7 +84,7 @@ class UserRepository implements IUserRepository {
           .FirebaseFirestore.instance
           .collection('users')
           .doc(firebase_auth.FirebaseAuth.instance.currentUser?.uid)
-          .collection('weights');
+          .collection('weight');
       await weights.add({"date": Timestamp.now(), "weight": weight});
     } catch (e) {
       throw Exception('error updating info');

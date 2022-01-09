@@ -3,6 +3,8 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:foodandbody/models/exercise_entity.dart';
+import 'package:foodandbody/models/exercise_repo.dart';
 import 'package:foodandbody/models/history.dart';
 import 'package:foodandbody/models/history_entity.dart';
 import 'package:foodandbody/models/menu.dart';
@@ -179,7 +181,77 @@ class PlanRepository implements IPlanRepository {
     if (plan.docs.isNotEmpty) {
       return plan.docs.first.get('totalWater');
     } else {
-      throw Exception('error fetching water');
+      return 0;
+    }
+  }
+
+  Future<void> addExercise(ExerciseRepo exercise) async {
+    final CollectionReference foodHistories = FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .collection('foodhistories');
+    final plan = await foodHistories
+        .where('date', isGreaterThanOrEqualTo: lastMidnight)
+        .get();
+    if (plan.docs.isNotEmpty) {
+      List<ExerciseRepo> exerciseList = await plan.docs.first
+          .get('exerciseList')
+          .map<ExerciseRepo>((exercise) => ExerciseRepo.fromJson(exercise))
+          .toList();
+      exerciseList.add(exercise);
+      List<Map> exerciseMap = exerciseList.map((e) => e.toJson()).toList();
+      await plan.docs.first.reference.update({
+        'exerciseList': exerciseMap,
+        'totalBurn': double.parse(
+            (plan.docs.first.get('totalBurn') + exercise.calory)
+                .toStringAsFixed(1))
+      });
+    } else {
+      throw Exception('error adding exerciseList');
+    }
+  }
+
+  Future<List<ExerciseRepo>> getExercise() async {
+    final CollectionReference foodhistories = FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .collection('foodhistories');
+    final plan = await foodhistories
+        .where('date', isGreaterThanOrEqualTo: lastMidnight)
+        .get();
+    if (plan.docs.isNotEmpty) {
+      List<ExerciseRepo> exerciseList = plan.docs.first
+          .get('exerciseList')
+          .map<ExerciseRepo>((e) => ExerciseRepo.fromJson(e))
+          .toList();
+      return exerciseList;
+    } else {
+      return List.empty();
+    }
+  }
+
+  Future<void> deleteExercise(ExerciseRepo exercise) async {
+    final CollectionReference foodhistories = FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .collection('foodhistories');
+    final plan = await foodhistories
+        .where('timestamp', isGreaterThanOrEqualTo: lastMidnight)
+        .get();
+    if (plan.docs.isNotEmpty) {
+      final List<ExerciseRepo> exerciseList = plan.docs.first
+          .get('exerciseList')
+          .map((e) => ExerciseRepo.fromJson(e))
+          .toList();
+      exerciseList.removeWhere((element) =>
+          element.id == exercise.id && element.timestamp == exercise.timestamp);
+      List<Map> exerciseMap = exerciseList.map((e) => e.toJson()).toList();
+      await plan.docs.first.reference.update({
+        'exerciseList': exerciseMap,
+        'totalBurn': plan.docs.first.get('totalBurn') - exercise.calory
+      });
+    } else {
+      throw Exception('error deleting exercise');
     }
   }
 }

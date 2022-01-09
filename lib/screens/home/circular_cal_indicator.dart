@@ -10,7 +10,7 @@ class CircularCalIndicator extends StatelessWidget {
   final Info _info;
   late double _totalCal = _plan.totalCal;
   late double _goalCal = _info.goal!.toDouble();
-  late double _exercise = 0;
+  late double _exercise = _plan.totalBurn;
 
   @override
   Widget build(BuildContext context) {

@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:foodandbody/models/exercise_repo.dart';
 
 class ExerciseList extends StatelessWidget {
-  ExerciseList({Key? key}) : super(key: key);
+  ExerciseList(this._exercise, {Key? key}) : super(key: key);
 
-  late List<Exercise> _exercise = [
-    Exercise(exercise: "แอโรบิค", time: "30", calories: 165),
-    Exercise(exercise: "วิ่ง", time: "30", calories: 240),
-    Exercise(exercise: "ปั่นจักรยาน", time: "45", calories: 265)
-  ];
+  final List<ExerciseRepo> _exercise;
+  // [
+  //   Exercise(exercise: "แอโรบิค", time: "30", calories: 165),
+  //   Exercise(exercise: "วิ่ง", time: "30", calories: 240),
+  //   Exercise(exercise: "ปั่นจักรยาน", time: "45", calories: 265)
+  // ];
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +24,7 @@ class ExerciseList extends StatelessWidget {
     );
   }
 
-  Widget _buildExerciseCard(BuildContext context, Exercise item) {
+  Widget _buildExerciseCard(BuildContext context, ExerciseRepo item) {
     return Card(
       color: Colors.white,
       elevation: 2,
@@ -38,7 +40,7 @@ class ExerciseList extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   padding: EdgeInsets.only(left: 16, top: 16),
                   child: Text(
-                    "${item.exercise}",
+                    "${item.name}",
                     style: Theme.of(context).textTheme.subtitle1!.merge(
                           TextStyle(
                             color: Color(0xFF515070),
@@ -50,7 +52,7 @@ class ExerciseList extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   padding: EdgeInsets.only(left: 16, bottom: 16),
                   child: Text(
-                    "${item.time} นาที",
+                    "${item.min} นาที",
                     style: Theme.of(context).textTheme.bodyText2!.merge(
                           TextStyle(
                             color: Color(0xFFA19FB9),
@@ -64,7 +66,7 @@ class ExerciseList extends StatelessWidget {
           Container(
             margin: EdgeInsets.only(right: 15),
             child: Text(
-              "${item.calories.round()}",
+              "${item.calory.round()}",
               style: Theme.of(context).textTheme.headline6!.merge(
                     TextStyle(
                       color: Color(0xFF515070),
@@ -90,10 +92,10 @@ class ExerciseList extends StatelessWidget {
 }
 
 //test class: can delete when implement complete
-class Exercise {
-  Exercise(
-      {required this.exercise, required this.time, required this.calories});
-  final String exercise;
-  final String time;
-  final double calories;
-}
+// class Exercise {
+//   Exercise(
+//       {required this.exercise, required this.time, required this.calories});
+//   final String exercise;
+//   final String time;
+//   final double calories;
+// }
