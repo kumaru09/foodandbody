@@ -3,21 +3,18 @@ import 'package:foodandbody/models/graph_list.dart';
 import 'package:foodandbody/screens/history/tab/history_card.dart';
 
 class HistoryNutrient extends StatelessWidget {
-  const HistoryNutrient(
-      {Key? key, required this.data})
-      : super(key: key);
+  const HistoryNutrient({Key? key, required this.data}) : super(key: key);
 
   final GraphList? data;
 
-  bool _isNotZeroList(List<int> list){
-    return list.length >= 10 
-    ? list.sublist(0, 10).any((x) => x > 0)
-    : list.any((x) => x > 0) ; 
+  bool _isNotZeroList(List<int> list) {
+    return list.length >= 10
+        ? list.sublist(0, 10).any((x) => x > 0)
+        : list.any((x) => x > 0);
   }
 
   @override
   Widget build(BuildContext context) {
-    final List<int> exerciseList = [250, 300, 150, 400, 350, 500, 200, 540, 340, 600];
     return SafeArea(
       child: SingleChildScrollView(
         child: Padding(
@@ -59,10 +56,10 @@ class HistoryNutrient extends StatelessWidget {
                     startDate: data!.foodEndDate,
                     stopDate: data!.foodStartDate,
                     isBody: false),
-              if (_isNotZeroList(exerciseList))
+              if (_isNotZeroList(data!.burnList))
                 HistoryCard(
                     name: 'เผาผลาญพลังงาน',
-                    dataList: exerciseList,
+                    dataList: data!.burnList,
                     startDate: data!.foodEndDate,
                     stopDate: data!.foodStartDate,
                     isBody: false),
