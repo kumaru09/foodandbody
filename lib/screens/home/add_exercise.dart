@@ -37,7 +37,8 @@ class _AddExerciseDialog extends StatefulWidget {
 
 class __AddExerciseDialogState extends State<_AddExerciseDialog> {
   String? _activity;
-  String _time = '0';
+  String? _time;
+  final _formKey = GlobalKey<FormState>();
 
   List<DropdownMenuItem<String>> _dropdownItem = [
     DropdownMenuItem(
@@ -67,43 +68,54 @@ class __AddExerciseDialogState extends State<_AddExerciseDialog> {
               TextStyle(color: Theme.of(context).colorScheme.secondary),
             ),
       ),
-      content: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          DropdownButtonFormField<String>(
-            key: const Key("activity_select_dropdown"),
-            items: _dropdownItem,
-            value: _activity,
-            decoration: InputDecoration(
-              labelText: "กิจกรรม",
-              border: OutlineInputBorder(borderSide: BorderSide()),
+      content: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            DropdownButtonFormField<String>(
+              key: const Key("activity_select_dropdown"),
+              items: _dropdownItem,
+              value: _activity,
+              validator: (value) => value == null ? "กรุณาเลือกกิจกกรม" : null,
+              decoration: InputDecoration(
+                labelText: "กิจกรรม",
+                border: OutlineInputBorder(borderSide: BorderSide()),
+              ),
+              onChanged: (String? activity) {
+                setState(() {
+                  _activity = activity;
+                });
+              },
             ),
-            onChanged: (String? activity) {
-              setState(() {
-                _activity = activity;
-              });
-            },
-          ),
-          SizedBox(height: 20),
-          TextFormField(
+            SizedBox(height: 20),
+            TextFormField(
               key: const Key("time_text_field"),
               keyboardType: TextInputType.number,
               textInputAction: TextInputAction.done,
+              validator: (value) => (value == null || value.isEmpty) ? "กรุณากรอกเวลา" : null,
               decoration: InputDecoration(
                 labelText: "เวลา (นาที)",
                 hintText: "ตัวอย่าง 30, 45, 60",
                 border: OutlineInputBorder(borderSide: BorderSide()),
               ),
               onChanged: (time) => setState(() {
-                    _time = time;
-                  }))
-        ],
+                _time = time;
+              }),
+            ),
+          ],
+        ),
       ),
       actions: <Widget>[
         TextButton(
           key: const Key("add_exercise_dialog_ok_button"),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            if (_formKey.currentState!.validate()) {
+              _formKey.currentState!.save();
+              Navigator.pop(context);
+            }
+          },
           child: Text(
             "ตกลง",
             style: Theme.of(context).textTheme.button!.merge(
