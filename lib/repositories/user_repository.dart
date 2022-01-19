@@ -8,13 +8,11 @@ import 'package:foodandbody/models/info_entity.dart';
 import 'package:foodandbody/models/nutrient.dart';
 import 'package:foodandbody/models/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' as cloud_firestore;
-import 'package:foodandbody/repositories/i_user_repository.dart';
 
-class UserRepository implements IUserRepository {
+class UserRepository {
   final cloud_firestore.CollectionReference users =
       cloud_firestore.FirebaseFirestore.instance.collection('users');
 
-  @override
   Future<void> addUserInfo(Info info) async {
     final uid = firebase_auth.FirebaseAuth.instance.currentUser?.uid;
     final infoE = info.copyWith(
@@ -29,7 +27,6 @@ class UserRepository implements IUserRepository {
         .add({'weight': info.weight, "date": cloud_firestore.Timestamp.now()});
   }
 
-  @override
   Future<Info> getInfo() async {
     final data = await users
         .doc(firebase_auth.FirebaseAuth.instance.currentUser?.uid)
@@ -40,11 +37,6 @@ class UserRepository implements IUserRepository {
     } else {
       throw Exception('No Info data');
     }
-  }
-
-  @override
-  Future<void> updateInfo(User user) {
-    return users.doc(user.uid).update(user.info!.toEntity().toDocument());
   }
 
   Future<void> updateGoalInfo(int goal) async {
