@@ -56,8 +56,8 @@ class HistoryCard extends StatelessWidget {
                       dataList[dataList.length - 1] -
                                   dataList[dataList.length - 2] >
                               0
-                          ? Icons.arrow_drop_up
-                          : Icons.arrow_drop_down,
+                          ? Icons.arrow_drop_down
+                          : Icons.arrow_drop_up,
                       color: Theme.of(context).colorScheme.secondary,
                       size: 40),
                   Text(
