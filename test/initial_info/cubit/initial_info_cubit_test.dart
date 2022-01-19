@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:foodandbody/models/birth_date.dart';
 import 'package:foodandbody/models/exercise.dart';
 import 'package:foodandbody/models/gender.dart';
@@ -332,7 +333,7 @@ void main() {
               name: validUsernameString,
               weight: int.parse(validWeightString),
               height: int.parse(validHeightString),
-              // bDate: int.parse(validBDateString),
+              birthDate: Timestamp.fromDate(DateTime.parse(validBDateString)),
               gender: validGenderString,
               goal: validGoal,
               photoUrl: '',
@@ -350,7 +351,7 @@ void main() {
               name: validUsernameString,
               weight: int.parse(validWeightString),
               height: int.parse(validHeightString),
-              // bDate: int.parse(validBDateString),
+              birthDate: Timestamp.fromDate(DateTime.parse(validBDateString)),
               gender: validGenderString,
               goal: validGoal,
               photoUrl: '',
@@ -399,7 +400,7 @@ void main() {
               name: validUsernameString,
               weight: int.parse(validWeightString),
               height: int.parse(validHeightString),
-              // bDate: int.parse(validBDateString),
+              birthDate: Timestamp.fromDate(DateTime.parse(validBDateString)),
               gender: validGenderString,
               goal: validGoal,
               photoUrl: '',
