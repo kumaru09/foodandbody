@@ -15,6 +15,7 @@ class EditBodyFigure extends StatelessWidget {
         backgroundColor: Theme.of(context).primaryColor,
         elevation: 0,
         leading: IconButton(
+          key: const Key("body_close_button"),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -27,19 +28,10 @@ class EditBodyFigure extends StatelessWidget {
               ),
         ),
         actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: Text(
-              "บันทึก",
-              style: Theme.of(context).textTheme.button!.merge(
-                    TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-            ),
-          ),
+          IconButton(
+              key: const Key("body_save_button"),
+              onPressed: () {},
+              icon: Icon(Icons.done, color: Colors.white))
         ],
       ),
       body: SingleChildScrollView(
@@ -77,6 +69,7 @@ class __EditShoulderState extends State<_EditShoulder> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      key: const Key("body_edit_shoulder_text_filed"),
       keyboardType: TextInputType.number,
       textInputAction: TextInputAction.next,
       initialValue: _currentShoulder,
@@ -104,6 +97,7 @@ class __EditChestState extends State<_EditChest> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      key: const Key("body_edit_chest_text_filed"),
       keyboardType: TextInputType.number,
       textInputAction: TextInputAction.next,
       initialValue: _currentChest,
@@ -131,6 +125,7 @@ class __EditWaistState extends State<_EditWaist> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      key: const Key("body_edit_waist_text_filed"),
       keyboardType: TextInputType.number,
       textInputAction: TextInputAction.next,
       initialValue: _currentWaist,
@@ -158,6 +153,7 @@ class __EditHipState extends State<_EditHip> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      key: const Key("body_edit_hip_text_filed"),
       keyboardType: TextInputType.number,
       textInputAction: TextInputAction.next,
       initialValue: _currentHip,

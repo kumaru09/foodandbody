@@ -41,16 +41,19 @@ class _LineChart extends StatelessWidget {
         weight.add(weight[weight.length - 1]);
       }
     }
-    return LineChart(LineChartData(
-        minX: 1,
-        maxX: 10,
-        minY: isEmpty ? 0 : (weight.reduce(min) - 1).toDouble(),
-        maxY: isEmpty ? 10 : (weight.reduce(max) + 1).toDouble(),
-        axisTitleData: FlAxisTitleData(show: false),
-        titlesData: FlTitlesData(show: false),
-        borderData: FlBorderData(show: false),
-        gridData: FlGridData(show: false),
-        lineBarsData: _getDataPoint()));
+    return LineChart(
+      LineChartData(
+          minX: 1,
+          maxX: 10,
+          minY: isEmpty ? 0 : (weight.reduce(min) - 1).toDouble(),
+          maxY: isEmpty ? 10 : (weight.reduce(max) + 1).toDouble(),
+          axisTitleData: FlAxisTitleData(show: false),
+          titlesData: FlTitlesData(show: false),
+          borderData: FlBorderData(show: false),
+          gridData: FlGridData(show: false),
+          lineBarsData: _getDataPoint()),
+      key: const Key("body_weight_graph"),
+    );
   }
 
   List<LineChartBarData> _getDataPoint() {

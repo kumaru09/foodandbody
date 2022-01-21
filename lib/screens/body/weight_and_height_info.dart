@@ -74,6 +74,7 @@ class WeightAndHeightInfo extends StatelessWidget {
                     alignment: Alignment.topRight,
                     constraints: BoxConstraints.tightFor(height: 30),
                     child: TextButton(
+                      key: const Key("body_edit_weight_button"),
                       style: TextButton.styleFrom(
                         padding: EdgeInsets.only(right: 16, bottom: 11),
                         minimumSize: Size.zero,
@@ -163,6 +164,7 @@ class WeightAndHeightInfo extends StatelessWidget {
                 alignment: Alignment.topRight,
                 constraints: BoxConstraints.tightFor(height: 30),
                 child: TextButton(
+                  key: const Key("body_edit_height_button"),
                   style: TextButton.styleFrom(
                       padding: EdgeInsets.only(right: 16, bottom: 11),
                       minimumSize: Size.zero,
@@ -199,6 +201,7 @@ class _WeightDialog extends State<EditWeightDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      key: const Key("body_edit_weight_dialog"),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       elevation: 0,
       backgroundColor: Colors.white,
@@ -208,6 +211,7 @@ class _WeightDialog extends State<EditWeightDialog> {
               .headline6!
               .merge(TextStyle(color: Theme.of(context).primaryColor))),
       content: TextField(
+        key: const Key("body_edit_weight_dialog_text_field"),
         keyboardType: TextInputType.number,
         decoration: InputDecoration(hintText: "ตัวอย่าง 50"),
         onChanged: (weight) => setState(() {
@@ -216,6 +220,7 @@ class _WeightDialog extends State<EditWeightDialog> {
       ),
       actions: <Widget>[
         TextButton(
+            key: const Key("body_edit_weight_dialog_save_button"),
             onPressed: () => Navigator.pop(context, int.parse(_currentWeight)),
             child: Text("ตกลง",
                 style: Theme.of(context)
@@ -223,6 +228,7 @@ class _WeightDialog extends State<EditWeightDialog> {
                     .button!
                     .merge(TextStyle(color: Theme.of(context).primaryColor)))),
         TextButton(
+            key: const Key("body_edit_weight_dialog_cancel_button"),
             onPressed: () {
               Navigator.of(context).pop();
             },
@@ -248,6 +254,7 @@ class _HeightDialog extends State<EditHeightDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      key: const Key("body_edit_height_dialog"),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       elevation: 0,
       backgroundColor: Colors.white,
@@ -257,6 +264,7 @@ class _HeightDialog extends State<EditHeightDialog> {
               .headline6!
               .merge(TextStyle(color: Theme.of(context).primaryColor))),
       content: TextField(
+          key: const Key("body_edit_height_dialog_text_field"),
           keyboardType: TextInputType.number,
           decoration: InputDecoration(hintText: "ตัวอย่าง 165"),
           onChanged: (height) => setState(() {
@@ -264,6 +272,7 @@ class _HeightDialog extends State<EditHeightDialog> {
               })),
       actions: <Widget>[
         TextButton(
+            key: const Key("body_edit_height_dialog_save_button"),
             onPressed: () => Navigator.pop(context, int.parse(_currentHeight)),
             child: Text("ตกลง",
                 style: Theme.of(context)
@@ -271,6 +280,7 @@ class _HeightDialog extends State<EditHeightDialog> {
                     .button!
                     .merge(TextStyle(color: Theme.of(context).primaryColor)))),
         TextButton(
+            key: const Key("body_edit_height_dialog_cancel_button"),
             onPressed: () {
               Navigator.of(context).pop();
             },

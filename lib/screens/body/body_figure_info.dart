@@ -131,6 +131,7 @@ class BodyFigureInfo extends StatelessWidget {
                 ),
               ),
               TextButton(
+                key: const Key("body_figure_info_edit_button"),
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.only(right: 16),
                   minimumSize: Size.zero,
