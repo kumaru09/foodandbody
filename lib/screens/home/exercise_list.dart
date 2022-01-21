@@ -1,27 +1,86 @@
 import 'package:flutter/material.dart';
 import 'package:foodandbody/models/exercise_repo.dart';
 
-class ExerciseList extends StatelessWidget {
-  ExerciseList(this._exercise, {Key? key}) : super(key: key);
+class ExerciseList extends StatefulWidget {
+  const ExerciseList(this._exercise, {Key? key}) : super(key: key);
 
   final List<ExerciseRepo> _exercise;
-  // [
-  //   Exercise(exercise: "แอโรบิค", time: "30", calories: 165),
-  //   Exercise(exercise: "วิ่ง", time: "30", calories: 240),
-  //   Exercise(exercise: "ปั่นจักรยาน", time: "45", calories: 265)
-  // ];
+
+  @override
+  _ExerciseListState createState() => _ExerciseListState(_exercise);
+}
+
+class _ExerciseListState extends State<ExerciseList> {
+  _ExerciseListState(this._exercise);
+  late List<ExerciseRepo> _exercise;
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> _exerciseList = [];
-    for (int index = 0; index < _exercise.length; index++) {
-      _exerciseList.add(_buildExerciseCard(context, _exercise[index]));
-    }
+    return ListView.builder(
+        padding: EdgeInsets.zero,
+        shrinkWrap: true,
+        itemCount: _exercise.length,
+        physics: NeverScrollableScrollPhysics(),
+        itemBuilder: (context, index) {
+          return Dismissible(
+            key: ObjectKey(_exercise[index]),
+            child: _buildExerciseCard(context, _exercise[index]),
+            direction: DismissDirection.endToStart,
+            background: Container(
+              alignment: Alignment.centerRight,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15), color: Colors.red),
+              padding: EdgeInsets.only(right: 20),
+              child: Icon(
+                Icons.delete,
+                color: Colors.white,
+                size: 30,
+              ),
+            ),
+            confirmDismiss: (direction) {
+              return showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      content: Text("คุณต้องการลบกิจกรรมนี้หรือไม่"),
+                      actions: <Widget>[
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(true),
+                          child: Text(
+                            "ตกลง",
+                            style: Theme.of(context).textTheme.button!.merge(
+                                  TextStyle(
+                                      color: Theme.of(context).primaryColor),
+                                ),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(false),
+                          child: Text(
+                            "ยกเลิก",
+                            style: Theme.of(context).textTheme.button!.merge(
+                                  TextStyle(
+                                      color: Theme.of(context).primaryColor),
+                                ),
+                          ),
+                        )
+                      ],
+                    );
+                  });
+            },
+            onDismissed: (DismissDirection direction) {
+              if (direction == DismissDirection.endToStart) {
+                deleteItem(index);
+              }
+            },
+          );
+        });
+  }
 
-    return Column(
-      key: const Key('home_exercise_list'),
-      children: _exerciseList,
-    );
+  void deleteItem(index) {
+    setState(() {
+      _exercise.removeAt(index);
+    });
   }
 
   Widget _buildExerciseCard(BuildContext context, ExerciseRepo item) {

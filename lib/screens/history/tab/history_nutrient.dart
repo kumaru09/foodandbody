@@ -21,35 +21,37 @@ class HistoryNutrient extends StatelessWidget {
           padding: EdgeInsets.all(16),
           child: Column(
             children: [
-              if (_isNotZeroList(data!.caloriesList))
+              if (_isNotZeroList(data!.caloriesList) &&
+                  data!.caloriesList.isNotEmpty)
                 HistoryCard(
                     name: 'แคลอรี',
                     dataList: data!.caloriesList,
                     startDate: data!.foodEndDate,
                     stopDate: data!.foodStartDate,
                     isBody: false),
-              if (_isNotZeroList(data!.proteinList))
+              if (_isNotZeroList(data!.proteinList) &&
+                  data!.proteinList.isNotEmpty)
                 HistoryCard(
                     name: 'โปรตีน',
                     dataList: data!.proteinList,
                     startDate: data!.foodEndDate,
                     stopDate: data!.foodStartDate,
                     isBody: false),
-              if (_isNotZeroList(data!.carbList))
+              if (_isNotZeroList(data!.carbList) && data!.carbList.isNotEmpty)
                 HistoryCard(
                     name: 'คาร์โบไฮเดรต',
                     dataList: data!.carbList,
                     startDate: data!.foodEndDate,
                     stopDate: data!.foodStartDate,
                     isBody: false),
-              if (_isNotZeroList(data!.fatList))
+              if (_isNotZeroList(data!.fatList) && data!.fatList.isNotEmpty)
                 HistoryCard(
                     name: 'ไขมัน',
                     dataList: data!.fatList,
                     startDate: data!.foodEndDate,
                     stopDate: data!.foodStartDate,
                     isBody: false),
-              if (_isNotZeroList(data!.waterList))
+              if (_isNotZeroList(data!.waterList) && data!.waterList.isNotEmpty)
                 HistoryCard(
                     name: 'น้ำ',
                     dataList: data!.waterList,
