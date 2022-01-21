@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'dart:math';
 
-import 'package:foodandbody/models/body.dart';
 import 'package:foodandbody/models/weight_list.dart';
 
+// ignore: must_be_immutable
 class WeightGraph extends StatelessWidget {
   WeightGraph(this.weightList);
 
@@ -24,6 +24,7 @@ class WeightGraph extends StatelessWidget {
   }
 }
 
+// ignore: must_be_immutable
 class _LineChart extends StatelessWidget {
   _LineChart({required this.weight});
 
@@ -56,7 +57,8 @@ class _LineChart extends StatelessWidget {
     final List<FlSpot> weightPoint = [];
 
     for (int index = weight.length - 1; index >= 0; index--) {
-      weightPoint.add(FlSpot((weight.length - index).toDouble(), weight[index].toDouble()));
+      weightPoint.add(
+          FlSpot((weight.length - index).toDouble(), weight[index].toDouble()));
     }
 
     return [
