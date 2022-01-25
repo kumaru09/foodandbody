@@ -31,6 +31,7 @@ class WeightAndHeightInfo extends StatelessWidget {
           constraints: BoxConstraints(minHeight: 100),
           width: MediaQuery.of(context).size.width * 0.45,
           child: Card(
+            key: const Key("body_weight_card"),
             elevation: 2,
             color: Colors.white,
             shape:
@@ -110,6 +111,7 @@ class WeightAndHeightInfo extends StatelessWidget {
               constraints: BoxConstraints(minHeight: 100),
               width: MediaQuery.of(context).size.width * 0.45,
               child: Card(
+                key: const Key("body_height_card"),
                   elevation: 2,
                   color: Colors.white,
                   shape: RoundedRectangleBorder(
@@ -124,6 +126,7 @@ class WeightAndHeightInfo extends StatelessWidget {
               constraints: BoxConstraints(minHeight: 100),
               width: MediaQuery.of(context).size.width * 0.45,
               child: Card(
+                key: const Key("body_bmi_card"),
                   elevation: 2,
                   color: Colors.white,
                   shape: RoundedRectangleBorder(

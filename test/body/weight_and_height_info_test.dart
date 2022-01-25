@@ -20,8 +20,12 @@ void main() {
     WeightList(weight: 54, date: Timestamp.now()),
   ];
 
+  const bodyWeightCardKey = Key("body_weight_card");
   const bodyWeightGraphKey = Key("body_weight_graph");
   const bodyEditWeightButtonKey = Key("body_edit_weight_button");
+  const bodyHeightCardKey = Key("body_height_card");
+  const bodyEditHeightButtonKey = Key("body_edit_height_button");
+  const bodyBmiCardKey = Key("body_bmi_card");
 
   const bodyEditWeightDialogKey = Key("body_edit_weight_dialog");
   const bodyEditWeightDialogTextFieldKey =
@@ -30,7 +34,7 @@ void main() {
       Key("body_edit_weight_dialog_save_button");
   const bodyEditWeightDialogCancelButtonKey =
       Key("body_edit_weight_dialog_cancel_button");
-  const bodyEditHeightButtonKey = Key("body_edit_height_button");
+  
   const bodyEditHeightDialogKey = Key("body_edit_height_dialog");
   const bodyEditHeightDialogTextFieldKey =
       Key("body_edit_height_dialog_text_field");
@@ -51,7 +55,7 @@ void main() {
       testWidgets("weight card", (tester) async {
         await tester.pumpWidget(
             MaterialApp(home: WeightAndHeightInfo(info, mockWeightList)));
-        expect(find.text("น้ำหนัก"), findsOneWidget);
+        expect(find.byKey(bodyWeightCardKey), findsOneWidget);
         expect(
             find.text(mockWeightList.first.weight.toString()), findsOneWidget);
         expect(
@@ -65,7 +69,7 @@ void main() {
       testWidgets("height card", (tester) async {
         await tester.pumpWidget(
             MaterialApp(home: WeightAndHeightInfo(info, mockWeightList)));
-        expect(find.text("ส่วนสูง"), findsOneWidget);
+        expect(find.byKey(bodyHeightCardKey), findsOneWidget);
         expect(find.text(info.height.toString()), findsOneWidget);
         expect(find.byKey(bodyEditHeightButtonKey), findsOneWidget);
       });
@@ -77,7 +81,7 @@ void main() {
         final double expectBMI = double.parse(
             (mockWeightList.first.weight / pow(info.height! / 100, 2))
                 .toStringAsFixed(2));
-        expect(find.text("BMI"), findsOneWidget);
+        expect(find.byKey(bodyBmiCardKey), findsOneWidget);
         expect(find.text(expectBMI.toString()), findsOneWidget);
       });
     });
