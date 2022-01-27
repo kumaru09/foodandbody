@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:convert';
+import 'dart:convert'; 
 
 import 'package:http/http.dart' as http;
 import 'package:foodandbody/models/search_result.dart';
@@ -36,7 +36,7 @@ class SearchCache {
 class SearchClient {
   SearchClient({
     http.Client? httpClient,
-    this.baseUrl = "https://foodandbody-api.azurewebsites.net/api/menu/name/",
+    this.baseUrl = "https://foodandbody-api.azurewebsites.net/api/menu/name?",
   }) : this.httpClient = httpClient ?? http.Client();
 
   final String baseUrl;
