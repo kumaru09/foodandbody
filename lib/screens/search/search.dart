@@ -61,7 +61,7 @@ class _SearchAppBarState extends State<SearchAppBar> {
   void _onClearTapped() {
     _textController.text = '';
     _lastText = '';
-    _searchBloc.add(TextChanged(text: ''));
+    _searchBloc.add(TextChanged(text: '', selectFilter: _selectFilter));
   }
 
   void _mapIndexFilter() {
@@ -85,9 +85,7 @@ class _SearchAppBarState extends State<SearchAppBar> {
         onChanged: (text) {
           if (_lastText != text) {
             _lastText = text;
-            print('isCheck: $_isChecked');
-            print('filter: $_selectFilter');
-            _searchBloc.add(TextChanged(text: text));
+            _searchBloc.add(TextChanged(text: text, selectFilter: _selectFilter));
           }
         },
         style: Theme.of(context)
@@ -171,8 +169,8 @@ class _SearchAppBarState extends State<SearchAppBar> {
                           fixedSize: Size(182, 39),
                         ),
                         onPressed: () {
-                          _mapIndexFilter();
-                          // _searchBloc.add(TextChanged(text: text));
+                          _mapIndexFilter();  
+                          _searchBloc.add(TextChanged(text: _lastText, selectFilter: _selectFilter));
                           Navigator.pop(context);
                         },
                         child: Text(
@@ -230,7 +228,7 @@ class _SearchBodyState extends State<SearchBody> {
   }
 
   void _onScroll() {
-    if (_isBottom) _searchBloc.add(TextChanged(text: _searchBloc.keySearch));
+    if (_isBottom) _searchBloc.add(TextChanged(text: _searchBloc.text, selectFilter: _searchBloc.filter));
   }
 
   bool get _isBottom {
