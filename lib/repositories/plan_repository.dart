@@ -216,9 +216,8 @@ class PlanRepository implements IPlanRepository {
         .collection('users')
         .doc(FirebaseAuth.instance.currentUser?.uid)
         .collection('foodhistories');
-    final plan = await foodhistories
-        .where('date', isGreaterThanOrEqualTo: lastMidnight)
-        .get();
+    final plan =
+        await foodhistories.orderBy('date', descending: true).limit(1).get();
     if (plan.docs.isNotEmpty) {
       List<ExerciseRepo> exerciseList = plan.docs.first
           .get('exerciseList')
@@ -235,13 +234,12 @@ class PlanRepository implements IPlanRepository {
         .collection('users')
         .doc(FirebaseAuth.instance.currentUser?.uid)
         .collection('foodhistories');
-    final plan = await foodhistories
-        .where('timestamp', isGreaterThanOrEqualTo: lastMidnight)
-        .get();
+    final plan =
+        await foodhistories.orderBy('date', descending: true).limit(1).get();
     if (plan.docs.isNotEmpty) {
       final List<ExerciseRepo> exerciseList = plan.docs.first
           .get('exerciseList')
-          .map((e) => ExerciseRepo.fromJson(e))
+          .map<ExerciseRepo>((e) => ExerciseRepo.fromJson(e))
           .toList();
       exerciseList.removeWhere((element) =>
           element.id == exercise.id && element.timestamp == exercise.timestamp);

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:foodandbody/models/exercise_repo.dart';
+import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
+import 'package:provider/src/provider.dart';
 
 class ExerciseList extends StatefulWidget {
   const ExerciseList(this._exercise, {Key? key}) : super(key: key);
@@ -70,6 +72,9 @@ class _ExerciseListState extends State<ExerciseList> {
             },
             onDismissed: (DismissDirection direction) {
               if (direction == DismissDirection.endToStart) {
+                context
+                    .read<PlanBloc>()
+                    .add(DeleteExercise(exerciseRepo: _exercise[index]));
                 deleteItem(index);
               }
             },

@@ -25,3 +25,17 @@ class AddExercise extends PlanEvent {
   @override
   List<Object> get props => [id, min, weight];
 }
+
+class DeleteExercise extends PlanEvent {
+  final ExerciseRepo exerciseRepo;
+
+  const DeleteExercise({required this.exerciseRepo});
+
+  @override
+  String toString() {
+    return 'deleteExercise {$exerciseRepo}';
+  }
+
+  @override
+  List<Object> get props => [exerciseRepo];
+}

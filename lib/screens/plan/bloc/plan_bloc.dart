@@ -16,6 +16,7 @@ class PlanBloc extends Bloc<PlanEvent, PlanState> {
         super(PlanState(plan: History(Timestamp.now()))) {
     on<LoadPlan>(_fetchPlan);
     on<AddExercise>(_onAddExercise);
+    on<DeleteExercise>(_deleteExercies);
   }
 
   final PlanRepository _planRepository;
@@ -57,6 +58,19 @@ class PlanBloc extends Bloc<PlanEvent, PlanState> {
     } catch (e) {
       emit(state.copyWith(status: PlanStatus.failure));
       print('onAddExercise error: $e');
+    }
+  }
+
+  Future<void> _deleteExercies(
+      DeleteExercise event, Emitter<PlanState> emit) async {
+    try {
+      await _planRepository.deleteExercise(event.exerciseRepo);
+      emit(state.copyWith(status: PlanStatus.loading));
+      final plan = await _planRepository.getPlanById();
+      emit(state.copyWith(status: PlanStatus.success, plan: plan));
+    } catch (e) {
+      emit(state.copyWith(status: PlanStatus.failure));
+      print('_deleteExercise error: $e');
     }
   }
 }
