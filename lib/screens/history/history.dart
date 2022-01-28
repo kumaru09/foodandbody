@@ -17,6 +17,7 @@ class History extends StatelessWidget {
 
   bool _isNoDataInNutrient(GraphList? list) {
     return _isNotZeroList(list!.caloriesList) ||
+            _isNotZeroList(list.burnList) ||
             _isNotZeroList(list.carbList) ||
             _isNotZeroList(list.proteinList) ||
             _isNotZeroList(list.proteinList) ||

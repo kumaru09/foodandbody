@@ -7,11 +7,16 @@ class MenuCardRepository {
         .collection('users')
         .doc(FirebaseAuth.instance.currentUser?.uid)
         .collection('favorites');
-    final data =
-        await favorite.orderBy('count', descending: true).limit(10).get();
-    if (data.docs.isNotEmpty) {
-      return data.docs.map<String>((doc) => doc.get('menu')).toList();
-    } else {
+    try {
+      final data =
+          await favorite.orderBy('count', descending: true).limit(10).get();
+      if (data.docs.isNotEmpty) {
+        return data.docs.map<String>((doc) => doc.get('menu')).toList();
+      } else {
+        return List.empty();
+      }
+    } catch (e) {
+      print('getNameMenuListById error: $e');
       return List.empty();
     }
   }
@@ -19,11 +24,16 @@ class MenuCardRepository {
   Future<List<String>> getNameMenuListAll() async {
     final CollectionReference favorite =
         FirebaseFirestore.instance.collection('favorites');
-    final data =
-        await favorite.orderBy('count', descending: true).limit(10).get();
-    if (data.docs.isNotEmpty) {
-      return data.docs.map<String>((doc) => doc.get('menu')).toList();
-    } else {
+    try {
+      final data =
+          await favorite.orderBy('count', descending: true).limit(10).get();
+      if (data.docs.isNotEmpty) {
+        return data.docs.map<String>((doc) => doc.get('menu')).toList();
+      } else {
+        return List.empty();
+      }
+    } catch (e) {
+      print('getNameMenuListAll error: $e');
       return List.empty();
     }
   }

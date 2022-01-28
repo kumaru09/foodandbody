@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodandbody/models/exercise_repo.dart';
 import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:stream_transform/stream_transform.dart';
 

@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:foodandbody/models/exercise_repo.dart';
+import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
+import 'package:provider/src/provider.dart';
 
 class ExerciseList extends StatefulWidget {
-  const ExerciseList({Key? key}) : super(key: key);
+  const ExerciseList(this._exercise, {Key? key}) : super(key: key);
+
+  final List<ExerciseRepo> _exercise;
 
   @override
-  _ExerciseListState createState() => _ExerciseListState();
+  _ExerciseListState createState() => _ExerciseListState(_exercise);
 }
 
 class _ExerciseListState extends State<ExerciseList> {
-  late List<Exercise> _exercise = [
-    Exercise(exercise: "แอโรบิค", time: "30", calories: 165),
-    Exercise(exercise: "วิ่ง", time: "30", calories: 240),
-    Exercise(exercise: "ปั่นจักรยาน", time: "45", calories: 265)
-  ];
+  _ExerciseListState(this._exercise);
+  late List<ExerciseRepo> _exercise;
 
   @override
   Widget build(BuildContext context) {
@@ -70,6 +72,9 @@ class _ExerciseListState extends State<ExerciseList> {
             },
             onDismissed: (DismissDirection direction) {
               if (direction == DismissDirection.endToStart) {
+                context
+                    .read<PlanBloc>()
+                    .add(DeleteExercise(exerciseRepo: _exercise[index]));
                 deleteItem(index);
               }
             },
@@ -83,7 +88,7 @@ class _ExerciseListState extends State<ExerciseList> {
     });
   }
 
-  Widget _buildExerciseCard(BuildContext context, Exercise item) {
+  Widget _buildExerciseCard(BuildContext context, ExerciseRepo item) {
     return Card(
       color: Colors.white,
       elevation: 2,
@@ -99,7 +104,7 @@ class _ExerciseListState extends State<ExerciseList> {
                   alignment: Alignment.centerLeft,
                   padding: EdgeInsets.only(left: 16, top: 16),
                   child: Text(
-                    "${item.exercise}",
+                    "${item.name}",
                     style: Theme.of(context).textTheme.subtitle1!.merge(
                           TextStyle(
                             color: Color(0xFF515070),
@@ -111,7 +116,7 @@ class _ExerciseListState extends State<ExerciseList> {
                   alignment: Alignment.centerLeft,
                   padding: EdgeInsets.only(left: 16, bottom: 16),
                   child: Text(
-                    "${item.time} นาที",
+                    "${item.min} นาที",
                     style: Theme.of(context).textTheme.bodyText2!.merge(
                           TextStyle(
                             color: Color(0xFFA19FB9),
@@ -125,7 +130,7 @@ class _ExerciseListState extends State<ExerciseList> {
           Container(
             margin: EdgeInsets.only(right: 15),
             child: Text(
-              "${item.calories.round()}",
+              "${item.calory.round()}",
               style: Theme.of(context).textTheme.headline6!.merge(
                     TextStyle(
                       color: Color(0xFF515070),
@@ -151,10 +156,10 @@ class _ExerciseListState extends State<ExerciseList> {
 }
 
 //test class: can delete when implement complete
-class Exercise {
-  Exercise(
-      {required this.exercise, required this.time, required this.calories});
-  final String exercise;
-  final String time;
-  final double calories;
-}
+// class Exercise {
+//   Exercise(
+//       {required this.exercise, required this.time, required this.calories});
+//   final String exercise;
+//   final String time;
+//   final double calories;
+// }
