@@ -5,4 +5,6 @@ abstract class MenuCardEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class MenuCardFetched extends MenuCardEvent {}
+class FetchedBothMenuCard extends MenuCardEvent {}
+class FetchedFavMenuCard extends MenuCardEvent {}
+class FetchedMyFavMenuCard extends MenuCardEvent {}
