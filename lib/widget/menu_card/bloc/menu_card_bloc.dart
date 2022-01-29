@@ -21,10 +21,6 @@ EventTransformer<E> throttleDroppable<E>(Duration duration) {
 class MenuCardBloc extends Bloc<MenuCardEvent, MenuCardState> {
   MenuCardBloc({required this.menuCardRepository})
       : super(const MenuCardState()) {
-    on<FetchedBothMenuCard>(
-      _onFetchedBothMenuCard,
-      transformer: throttleDroppable(throttleDuration),
-    );
     on<FetchedFavMenuCard>(
       _onFetchedFavMenuCard,
       transformer: throttleDroppable(throttleDuration),
@@ -33,31 +29,17 @@ class MenuCardBloc extends Bloc<MenuCardEvent, MenuCardState> {
       _onFetchedMyFavMenuCard,
       transformer: throttleDroppable(throttleDuration),
     );
+    on<ReFetchedFavMenuCard>(
+      _onReFetchedFavMenuCard,
+      transformer: throttleDroppable(throttleDuration),
+    );
+    on<ReFetchedMyFavMenuCard>(
+      _onReFetchedMyFavMenuCard,
+      transformer: throttleDroppable(throttleDuration),
+    );
   }
 
   final MenuCardRepository menuCardRepository;
-
-  Future<void> _onFetchedBothMenuCard(
-    FetchedBothMenuCard event,
-    Emitter<MenuCardState> emit,
-  ) async {
-    try {
-      if (state.status != MenuCardStatus.initial)
-        return emit(state.copyWith(status: MenuCardStatus.initial));
-      List<MenuList> fav = await menuCardRepository.getMenuList(false);
-      List<MenuList> myFav = await menuCardRepository.getMenuList(true);
-      if (state.status == MenuCardStatus.initial) {
-        return emit(state.copyWith(
-          status: MenuCardStatus.success,
-          fav: fav,
-          myFav: myFav,
-        ));
-      }
-    } catch (e) {
-      print('e: $e');
-      emit(state.copyWith(status: MenuCardStatus.failure));
-    }
-  }
 
   Future<void> _onFetchedFavMenuCard(
     FetchedFavMenuCard event,
@@ -65,8 +47,8 @@ class MenuCardBloc extends Bloc<MenuCardEvent, MenuCardState> {
   ) async {
     try {
       if (state.status != MenuCardStatus.initial)
-        return emit(state.copyWith(status: MenuCardStatus.initial));
-      List<MenuList> fav = await menuCardRepository.getMenuList(false);
+        emit(state.copyWith(status: MenuCardStatus.initial));
+      List<MenuList> fav = await menuCardRepository.getMenuList(isMyFav: false, checkCache: true);
       if (state.status == MenuCardStatus.initial) {
         return emit(state.copyWith(
           status: MenuCardStatus.success,
@@ -85,8 +67,48 @@ class MenuCardBloc extends Bloc<MenuCardEvent, MenuCardState> {
   ) async {
     try {
       if (state.status != MenuCardStatus.initial)
-        return emit(state.copyWith(status: MenuCardStatus.initial));
-      List<MenuList> myFav = await menuCardRepository.getMenuList(true);
+        emit(state.copyWith(status: MenuCardStatus.initial));
+      List<MenuList> myFav = await menuCardRepository.getMenuList(isMyFav: true, checkCache: true);
+      if (state.status == MenuCardStatus.initial) {
+        return emit(state.copyWith(
+          status: MenuCardStatus.success,
+          myFav: myFav,
+        ));
+      }
+    } catch (e) {
+      print('e: $e');
+      emit(state.copyWith(status: MenuCardStatus.failure));
+    }
+  }
+
+  Future<void> _onReFetchedFavMenuCard(
+    ReFetchedFavMenuCard event,
+    Emitter<MenuCardState> emit,
+  ) async {
+    try {
+      if (state.status != MenuCardStatus.initial)
+        emit(state.copyWith(status: MenuCardStatus.initial));
+      List<MenuList> fav = await menuCardRepository.getMenuList(isMyFav: false, checkCache: false);
+      if (state.status == MenuCardStatus.initial) {
+        return emit(state.copyWith(
+          status: MenuCardStatus.success,
+          fav: fav,
+        ));
+      }
+    } catch (e) {
+      print('e: $e');
+      emit(state.copyWith(status: MenuCardStatus.failure));
+    }
+  }
+
+  Future<void> _onReFetchedMyFavMenuCard(
+    ReFetchedMyFavMenuCard event,
+    Emitter<MenuCardState> emit,
+  ) async {
+    try {
+      if (state.status != MenuCardStatus.initial)
+        emit(state.copyWith(status: MenuCardStatus.initial));
+      List<MenuList> myFav = await menuCardRepository.getMenuList(isMyFav: true, checkCache: false);
       if (state.status == MenuCardStatus.initial) {
         return emit(state.copyWith(
           status: MenuCardStatus.success,

@@ -14,18 +14,49 @@ class MenuCard extends StatelessWidget {
         builder: (context, state) {
           switch (state.status) {
             case MenuCardStatus.failure:
-              return const Center(child: Text('failed to fetch menu'));
+              return Center(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                        'ไม่สามารถโหลด${isMyFav ? "เมนูที่กินบ่อย" : "เมนูยอดนิยม"}ได้ในขณะนี้',
+                        style: Theme.of(context).textTheme.bodyText2!.merge(
+                            TextStyle(
+                                color:
+                                    Theme.of(context).colorScheme.secondary))),
+                    OutlinedButton(
+                      child: Text('ลองอีกครั้ง'),
+                      style: OutlinedButton.styleFrom(
+                        primary: Theme.of(context).colorScheme.secondary,
+                        shape: const RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(50))),
+                      ),
+                      onPressed: () {
+                        isMyFav
+                            ? context
+                                .read<MenuCardBloc>()
+                                .add(ReFetchedMyFavMenuCard())
+                            : context
+                                .read<MenuCardBloc>()
+                                .add(ReFetchedFavMenuCard());
+                      },
+                    ),
+                  ],
+                ),
+              );
             case MenuCardStatus.success:
               if ((!isMyFav && state.fav.isEmpty) ||
                   (isMyFav && state.myFav.isEmpty)) {
                 return Center(
                   child: Text(
                       '${isMyFav ? "ไม่มีเมนูที่กินบ่อยในขณะนี้" : "ไม่มีเมนูยอดนิยมในขณะนี้"}',
-                      style: Theme.of(context).textTheme.subtitle1!.merge(
-                          TextStyle(color: Theme.of(context).primaryColor))),
+                      style: Theme.of(context).textTheme.bodyText2!.merge(
+                          TextStyle(
+                              color: Theme.of(context).colorScheme.secondary))),
                 );
               } else {
-                final menu = isMyFav ? state.myFav: state.fav ;
+                final menu = isMyFav ? state.myFav : state.fav;
                 return Container(
                   height: 200,
                   child: ListView.builder(

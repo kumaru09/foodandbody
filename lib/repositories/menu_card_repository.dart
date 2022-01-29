@@ -11,13 +11,14 @@ class MenuCardRepository {
   final MenuCardCache cache;
   final MenuCardClient client;
 
-  Future<List<MenuList>> getMenuList(bool isMyFav) async {
-    final cachedResult = cache.get(isMyFav);
-    if (cachedResult != null) {
-      return cachedResult;
-    } 
+  Future<List<MenuList>> getMenuList({ required bool isMyFav, required bool checkCache}) async {
+    if (checkCache) {
+      final cachedResult = cache.get(isMyFav);
+      if (cachedResult != null) return cachedResult;
+    }
     List<MenuList> menu = [];
-    List<String> nameList = isMyFav? await _getNameMenuListById() : await _getNameMenuListAll();
+    List<String> nameList =
+        isMyFav ? await _getNameMenuListById() : await _getNameMenuListAll();
     for (var name in nameList) menu.add(await client.fetchMenu(name));
     cache.set(isMyFav, menu);
     return menu;

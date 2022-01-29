@@ -87,7 +87,7 @@ class _MainScreenState extends State<MainScreen> {
             BlocProvider(
                 create: (_) => MenuCardBloc(
                     menuCardRepository: context.read<MenuCardRepository>())
-                  ..add(FetchedBothMenuCard())),
+                  ..add(FetchedFavMenuCard())),
           ],
           child: _getPage(_currentIndex),
         ),
