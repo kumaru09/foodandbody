@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:foodandbody/models/exercise_repo.dart';
 import 'package:foodandbody/models/history.dart';
 import 'package:foodandbody/models/history_entity.dart';
 import 'package:foodandbody/models/menu.dart';
@@ -10,7 +11,8 @@ class HistoryRepository {
         .collection('users')
         .doc(FirebaseAuth.instance.currentUser?.uid)
         .collection('foodhistories');
-    final history = await foodHistories.orderBy('date', descending: true).get();
+    final history =
+        await foodHistories.orderBy('date', descending: true).limit(10).get();
     if (history.docs.isNotEmpty) {
       return history.docs
           .map((history) =>

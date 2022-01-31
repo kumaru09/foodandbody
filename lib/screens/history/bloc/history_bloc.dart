@@ -33,6 +33,7 @@ class HistoryBloc extends Bloc<HistoryEvent, HistoryState> {
       final weight = await bodyRepository.getWeightList();
       final graphList = GraphList(
           caloriesList: history.map((e) => e.totalCal.toInt()).toList(),
+          burnList: history.map((e) => e.totalBurn.toInt()).toList(),
           proteinList:
               history.map((e) => e.totalNutrientList.protein.toInt()).toList(),
           carbList:
