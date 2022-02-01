@@ -1,12 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:foodandbody/models/menu_list.dart';
 import 'package:foodandbody/repositories/menu_card_repository.dart';
-import 'package:http/http.dart' as http;
 import 'package:stream_transform/stream_transform.dart';
 
 part 'menu_card_event.dart';
@@ -21,34 +19,40 @@ EventTransformer<E> throttleDroppable<E>(Duration duration) {
 }
 
 class MenuCardBloc extends Bloc<MenuCardEvent, MenuCardState> {
-  MenuCardBloc({required this.isMyFav, required this.menuCardRepository})
+  MenuCardBloc({required this.menuCardRepository})
       : super(const MenuCardState()) {
-    on<MenuCardFetched>(
-      _onMenuCardFetched,
+    on<FetchedFavMenuCard>(
+      _onFetchedFavMenuCard,
+      transformer: throttleDroppable(throttleDuration),
+    );
+    on<FetchedMyFavMenuCard>(
+      _onFetchedMyFavMenuCard,
+      transformer: throttleDroppable(throttleDuration),
+    );
+    on<ReFetchedFavMenuCard>(
+      _onReFetchedFavMenuCard,
+      transformer: throttleDroppable(throttleDuration),
+    );
+    on<ReFetchedMyFavMenuCard>(
+      _onReFetchedMyFavMenuCard,
       transformer: throttleDroppable(throttleDuration),
     );
   }
 
-  final bool isMyFav;
   final MenuCardRepository menuCardRepository;
 
-  Future<void> _onMenuCardFetched(
-    MenuCardFetched event,
+  Future<void> _onFetchedFavMenuCard(
+    FetchedFavMenuCard event,
     Emitter<MenuCardState> emit,
   ) async {
     try {
-      List<MenuList> menu = [];
-      List<String> menuList = isMyFav
-          ? await menuCardRepository.getNameMenuListById()
-          : await menuCardRepository.getNameMenuListAll();
-      for (var item in menuList) {
-        MenuList temp = await _fetchMenuCards(item);
-        menu.add(temp);
-      }
+      if (state.status != MenuCardStatus.initial)
+        emit(state.copyWith(status: MenuCardStatus.initial));
+      List<MenuList> fav = await menuCardRepository.getMenuList(isMyFav: false, checkCache: true);
       if (state.status == MenuCardStatus.initial) {
         return emit(state.copyWith(
           status: MenuCardStatus.success,
-          menu: menu,
+          fav: fav,
         ));
       }
     } catch (e) {
@@ -57,11 +61,63 @@ class MenuCardBloc extends Bloc<MenuCardEvent, MenuCardState> {
     }
   }
 
-  Future<MenuList> _fetchMenuCards(String path) async {
-    final response = await http.get(
-        Uri.parse("https://foodandbody-api.azurewebsites.net/api/Menu/$path"));
-    if (response.statusCode == 200)
-      return MenuList.fromJson(json.decode(response.body));
-    throw Exception('error fetching menu');
+  Future<void> _onFetchedMyFavMenuCard(
+    FetchedMyFavMenuCard event,
+    Emitter<MenuCardState> emit,
+  ) async {
+    try {
+      if (state.status != MenuCardStatus.initial)
+        emit(state.copyWith(status: MenuCardStatus.initial));
+      List<MenuList> myFav = await menuCardRepository.getMenuList(isMyFav: true, checkCache: true);
+      if (state.status == MenuCardStatus.initial) {
+        return emit(state.copyWith(
+          status: MenuCardStatus.success,
+          myFav: myFav,
+        ));
+      }
+    } catch (e) {
+      print('e: $e');
+      emit(state.copyWith(status: MenuCardStatus.failure));
+    }
+  }
+
+  Future<void> _onReFetchedFavMenuCard(
+    ReFetchedFavMenuCard event,
+    Emitter<MenuCardState> emit,
+  ) async {
+    try {
+      if (state.status != MenuCardStatus.initial)
+        emit(state.copyWith(status: MenuCardStatus.initial));
+      List<MenuList> fav = await menuCardRepository.getMenuList(isMyFav: false, checkCache: false);
+      if (state.status == MenuCardStatus.initial) {
+        return emit(state.copyWith(
+          status: MenuCardStatus.success,
+          fav: fav,
+        ));
+      }
+    } catch (e) {
+      print('e: $e');
+      emit(state.copyWith(status: MenuCardStatus.failure));
+    }
+  }
+
+  Future<void> _onReFetchedMyFavMenuCard(
+    ReFetchedMyFavMenuCard event,
+    Emitter<MenuCardState> emit,
+  ) async {
+    try {
+      if (state.status != MenuCardStatus.initial)
+        emit(state.copyWith(status: MenuCardStatus.initial));
+      List<MenuList> myFav = await menuCardRepository.getMenuList(isMyFav: true, checkCache: false);
+      if (state.status == MenuCardStatus.initial) {
+        return emit(state.copyWith(
+          status: MenuCardStatus.success,
+          myFav: myFav,
+        ));
+      }
+    } catch (e) {
+      print('e: $e');
+      emit(state.copyWith(status: MenuCardStatus.failure));
+    }
   }
 }

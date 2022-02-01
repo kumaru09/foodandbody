@@ -3,11 +3,11 @@ import 'package:foodandbody/widget/menu_card/bloc/menu_card_bloc.dart';
 
 void main() {
   group('MenuCardEvent', () {
-    group('MenuCardFetched', () {
-      test('supports value comparison', () {
-        expect(MenuCardFetched(), MenuCardFetched());
-      });
+    test('supports value comparison', () {
+      expect(FetchedFavMenuCard(), FetchedFavMenuCard());
+      expect(FetchedMyFavMenuCard(), FetchedMyFavMenuCard());
+      expect(ReFetchedFavMenuCard(), ReFetchedFavMenuCard());
+      expect(ReFetchedMyFavMenuCard(), ReFetchedMyFavMenuCard());
     });
   });
 }
-
