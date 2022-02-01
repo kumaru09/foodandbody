@@ -1,123 +1,124 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:foodandbody/models/menu_list.dart';
+import 'package:foodandbody/repositories/menu_card_repository.dart';
 import 'package:foodandbody/widget/menu_card/bloc/menu_card_bloc.dart';
-import 'package:http/http.dart' as http;
+// import 'package:http/http.dart' as http;
 import 'package:mocktail/mocktail.dart';
 
-class MockClient extends Mock implements http.Client {}
+// class MockClient extends Mock implements http.Client {}
+class MockMenuCardRepository extends Mock implements MenuCardRepository {}
 
-Uri _menuCardUrl({required String path}) {
-  return Uri.https('foodandbody-api.azurewebsites.net', path);
-}
+// Uri _menuCardUrl({required String path}) {
+//   return Uri.https('foodandbody-api.azurewebsites.net', path);
+// }
 
 void main() {
   group('MenuCardBloc', () {
-    const mockMenuCard = [MenuList(name: 'menuName1', calory: 405, imageUrl: 'testUrl1')];
+    const mockMenuCard = [
+      MenuList(name: 'menuName1', calory: 405, imageUrl: 'testUrl1')
+    ];
 
-    late http.Client httpClient;
+    // late http.Client httpClient;
+    late MenuCardRepository menuCardRepository;
 
-    setUpAll(() {
-      registerFallbackValue(Uri());
-    });
+    // setUpAll(() {
+    //   registerFallbackValue(Uri());
+    // });
 
     setUp(() {
-      httpClient = MockClient();
+      // httpClient = MockClient();
+      menuCardRepository = MockMenuCardRepository();
     });
 
     test('initial state is MenuCardState()', () {
-      expect(MenuCardBloc(httpClient: httpClient, path: '/api/menu').state, const MenuCardState());
+      expect(MenuCardBloc(menuCardRepository: menuCardRepository).state,
+          const MenuCardState());
     });
 
-    group('MenuCardFetched', () {
-
+    group('FetchedFavMenuCard', () {
       blocTest<MenuCardBloc, MenuCardState>(
-        'emits successful status when http fetches initial menuCard',
+        'emits successful status when  fetches initial menuCard',
         setUp: () {
-          when(() => httpClient.get(any())).thenAnswer((_) async {
-            return http.Response(
-              '[{"name": "menuName1","calories":405,"imageUrl": "testUrl1"}]',
-              200,
-            );
-          });
+          when(() => menuCardRepository.getMenuList(
+              isMyFav: false,
+              checkCache: true)).thenAnswer((_) async => mockMenuCard);
         },
-        build: () => MenuCardBloc(httpClient: httpClient, path: '/api/menu'),
-        act: (bloc) => bloc.add(MenuCardFetched()),
+        build: () => MenuCardBloc(menuCardRepository: menuCardRepository),
+        act: (bloc) => bloc.add(FetchedFavMenuCard()),
         expect: () => const <MenuCardState>[
           MenuCardState(
             status: MenuCardStatus.success,
-            menu: mockMenuCard,
+            fav: mockMenuCard,
           )
         ],
         verify: (_) {
-          verify(() => httpClient.get(_menuCardUrl(path: '/api/menu'))).called(1);
+          verify(() => menuCardRepository.getMenuList(
+              isMyFav: false, checkCache: true)).called(1);
         },
       );
 
       blocTest<MenuCardBloc, MenuCardState>(
         'drops new events when processing current event',
         setUp: () {
-          when(() => httpClient.get(any())).thenAnswer((_) async {
-            return http.Response(
-              '[{ "name": "menuName1", "calories": 405, "imageUrl": "testUrl1" }]',
-              200,
-            );
-          });
+          when(() => menuCardRepository.getMenuList(
+              isMyFav: false,
+              checkCache: true)).thenAnswer((_) async => mockMenuCard);
         },
-        build: () => MenuCardBloc(httpClient: httpClient, path: '/api/menu'),
+        build: () => MenuCardBloc(menuCardRepository: menuCardRepository),
         act: (bloc) => bloc
-          ..add(MenuCardFetched())
-          ..add(MenuCardFetched()),
+          ..add(FetchedFavMenuCard())
+          ..add(FetchedFavMenuCard()),
         expect: () => const <MenuCardState>[
           MenuCardState(
             status: MenuCardStatus.success,
-            menu: mockMenuCard,
+            fav: mockMenuCard,
           )
         ],
         verify: (_) {
-          verify(() => httpClient.get(any())).called(1);
+          verify(() => menuCardRepository.getMenuList(
+              isMyFav: false, checkCache: true)).called(1);
         },
       );
 
       blocTest<MenuCardBloc, MenuCardState>(
         'throttles events',
         setUp: () {
-          when(() => httpClient.get(any())).thenAnswer((_) async {
-            return http.Response(
-              '[{ "name": "menuName1", "calories": 405, "imageUrl": "testUrl1" }]',
-              200,
-            );
-          });
+          when(() => menuCardRepository.getMenuList(
+              isMyFav: false,
+              checkCache: true)).thenAnswer((_) async => mockMenuCard);
         },
-        build: () => MenuCardBloc(httpClient: httpClient, path: '/api/menu'),
+        build: () => MenuCardBloc(menuCardRepository: menuCardRepository),
         act: (bloc) async {
-          bloc.add(MenuCardFetched());
+          bloc.add(FetchedFavMenuCard());
           await Future<void>.delayed(Duration.zero);
-          bloc.add(MenuCardFetched());
+          bloc.add(FetchedFavMenuCard());
         },
         expect: () => const <MenuCardState>[
           MenuCardState(
             status: MenuCardStatus.success,
-            menu: mockMenuCard,
+            fav: mockMenuCard,
           )
         ],
         verify: (_) {
-          verify(() => httpClient.get(any())).called(1);
+          verify(() => menuCardRepository.getMenuList(
+              isMyFav: false, checkCache: true)).called(1);
         },
       );
 
       blocTest<MenuCardBloc, MenuCardState>(
-        'emits failure status when http fetches menuCard and throw exception',
+        'emits failure status when fetches menuCard and throw exception',
         setUp: () {
-          when(() => httpClient.get(any())).thenAnswer(
-            (_) async => http.Response('', 500),
-          );
+          when(() => menuCardRepository.getMenuList(
+              isMyFav: false,
+              checkCache: true)).thenAnswer((_) async => throw Exception());
         },
-        build: () => MenuCardBloc(httpClient: httpClient, path: '/api/menu'),
-        act: (bloc) => bloc.add(MenuCardFetched()),
+        build: () => MenuCardBloc(menuCardRepository: menuCardRepository),
+        act: (bloc) => bloc.add(FetchedFavMenuCard()),
         expect: () => <MenuCardState>[const MenuCardState(status: MenuCardStatus.failure)],
         verify: (_) {
-          verify(() => httpClient.get(_menuCardUrl(path: '/api/menu'))).called(1);
+          verify(() => menuCardRepository.getMenuList(
+              isMyFav: false, checkCache: true)).called(1);
         },
       );
 
@@ -125,44 +126,348 @@ void main() {
         'emits successful status when '
         '0 additional menuCard are fetched',
         setUp: () {
-          when(() => httpClient.get(any())).thenAnswer(
-            (_) async => http.Response('[]', 200),
-          );
+          when(() => menuCardRepository.getMenuList(
+              isMyFav: false,
+              checkCache: true)).thenAnswer((_) async => []);
         },
-        build: () => MenuCardBloc(httpClient: httpClient, path: '/api/menu'),
-        act: (bloc) => bloc.add(MenuCardFetched()),
+        build: () => MenuCardBloc(menuCardRepository: menuCardRepository),
+        act: (bloc) => bloc.add(FetchedFavMenuCard()),
         expect: () => const <MenuCardState>[
           MenuCardState(
             status: MenuCardStatus.success,
-            menu: [],
+            fav: [],
           )
         ],
         verify: (_) {
-          verify(() => httpClient.get(_menuCardUrl(path: '/api/menu'))).called(1);
+          verify(() => menuCardRepository.getMenuList(
+              isMyFav: false, checkCache: true)).called(1);
+        },
+      );
+    });
+
+    group('FetchedMyFavMenuCard', () {
+      blocTest<MenuCardBloc, MenuCardState>(
+        'emits successful status when  fetches initial menuCard',
+        setUp: () {
+          when(() => menuCardRepository.getMenuList(
+              isMyFav: true,
+              checkCache: true)).thenAnswer((_) async => mockMenuCard);
+        },
+        build: () => MenuCardBloc(menuCardRepository: menuCardRepository),
+        act: (bloc) => bloc.add(FetchedMyFavMenuCard()),
+        expect: () => const <MenuCardState>[
+          MenuCardState(
+            status: MenuCardStatus.success,
+            myFav: mockMenuCard,
+          )
+        ],
+        verify: (_) {
+          verify(() => menuCardRepository.getMenuList(
+              isMyFav: true, checkCache: true)).called(1);
         },
       );
 
       blocTest<MenuCardBloc, MenuCardState>(
-        'emits successful status'
-        'when additional menuCard are fetched',
+        'drops new events when processing current event',
         setUp: () {
-          when(() => httpClient.get(any())).thenAnswer((_) async {
-            return http.Response(
-              '[{ "name": "menuName1", "calories": 405, "imageUrl": "testUrl1" }]',
-              200,
-            );
-          });
+          when(() => menuCardRepository.getMenuList(
+              isMyFav: true,
+              checkCache: true)).thenAnswer((_) async => mockMenuCard);
         },
-        build: () => MenuCardBloc(httpClient: httpClient, path: '/api/menu'),
-        act: (bloc) => bloc.add(MenuCardFetched()),
-        expect: () => <MenuCardState>[
+        build: () => MenuCardBloc(menuCardRepository: menuCardRepository),
+        act: (bloc) => bloc
+          ..add(FetchedMyFavMenuCard())
+          ..add(FetchedMyFavMenuCard()),
+        expect: () => const <MenuCardState>[
           MenuCardState(
             status: MenuCardStatus.success,
-            menu: [...mockMenuCard],
+            myFav: mockMenuCard,
           )
         ],
         verify: (_) {
-          verify(() => httpClient.get(_menuCardUrl(path: '/api/menu'))).called(1);
+          verify(() => menuCardRepository.getMenuList(
+              isMyFav: true, checkCache: true)).called(1);
+        },
+      );
+
+      blocTest<MenuCardBloc, MenuCardState>(
+        'throttles events',
+        setUp: () {
+          when(() => menuCardRepository.getMenuList(
+              isMyFav: true,
+              checkCache: true)).thenAnswer((_) async => mockMenuCard);
+        },
+        build: () => MenuCardBloc(menuCardRepository: menuCardRepository),
+        act: (bloc) async {
+          bloc.add(FetchedMyFavMenuCard());
+          await Future<void>.delayed(Duration.zero);
+          bloc.add(FetchedMyFavMenuCard());
+        },
+        expect: () => const <MenuCardState>[
+          MenuCardState(
+            status: MenuCardStatus.success,
+            myFav: mockMenuCard,
+          )
+        ],
+        verify: (_) {
+          verify(() => menuCardRepository.getMenuList(
+              isMyFav: true, checkCache: true)).called(1);
+        },
+      );
+
+      blocTest<MenuCardBloc, MenuCardState>(
+        'emits failure status when fetches menuCard and throw exception',
+        setUp: () {
+          when(() => menuCardRepository.getMenuList(
+              isMyFav: true,
+              checkCache: true)).thenAnswer((_) async => throw Exception());
+        },
+        build: () => MenuCardBloc(menuCardRepository: menuCardRepository),
+        act: (bloc) => bloc.add(FetchedMyFavMenuCard()),
+        expect: () => <MenuCardState>[const MenuCardState(status: MenuCardStatus.failure)],
+        verify: (_) {
+          verify(() => menuCardRepository.getMenuList(
+              isMyFav: true, checkCache: true)).called(1);
+        },
+      );
+
+      blocTest<MenuCardBloc, MenuCardState>(
+        'emits successful status when '
+        '0 additional menuCard are fetched',
+        setUp: () {
+          when(() => menuCardRepository.getMenuList(
+              isMyFav: true,
+              checkCache: true)).thenAnswer((_) async => []);
+        },
+        build: () => MenuCardBloc(menuCardRepository: menuCardRepository),
+        act: (bloc) => bloc.add(FetchedMyFavMenuCard()),
+        expect: () => const <MenuCardState>[
+          MenuCardState(
+            status: MenuCardStatus.success,
+            myFav: [],
+          )
+        ],
+        verify: (_) {
+          verify(() => menuCardRepository.getMenuList(
+              isMyFav: true, checkCache: true)).called(1);
+        },
+      );
+    });
+
+    group('ReFetchedFavMenuCard', () {
+      blocTest<MenuCardBloc, MenuCardState>(
+        'emits successful status when refetches menuCard',
+        setUp: () {
+          when(() => menuCardRepository.getMenuList(
+              isMyFav: false,
+              checkCache: false)).thenAnswer((_) async => mockMenuCard);
+        },
+        build: () => MenuCardBloc(menuCardRepository: menuCardRepository),
+        act: (bloc) => bloc.add(ReFetchedFavMenuCard()),
+        expect: () => const <MenuCardState>[
+          MenuCardState(
+            status: MenuCardStatus.success,
+            fav: mockMenuCard,
+          )
+        ],
+        verify: (_) {
+          verify(() => menuCardRepository.getMenuList(
+              isMyFav: false, checkCache: false)).called(1);
+        },
+      );
+
+      blocTest<MenuCardBloc, MenuCardState>(
+        'drops new events when processing current event',
+        setUp: () {
+          when(() => menuCardRepository.getMenuList(
+              isMyFav: false,
+              checkCache: false)).thenAnswer((_) async => mockMenuCard);
+        },
+        build: () => MenuCardBloc(menuCardRepository: menuCardRepository),
+        act: (bloc) => bloc
+          ..add(ReFetchedFavMenuCard())
+          ..add(ReFetchedFavMenuCard()),
+        expect: () => const <MenuCardState>[
+          MenuCardState(
+            status: MenuCardStatus.success,
+            fav: mockMenuCard,
+          )
+        ],
+        verify: (_) {
+          verify(() => menuCardRepository.getMenuList(
+              isMyFav: false, checkCache: false)).called(1);
+        },
+      );
+
+      blocTest<MenuCardBloc, MenuCardState>(
+        'throttles events',
+        setUp: () {
+          when(() => menuCardRepository.getMenuList(
+              isMyFav: false,
+              checkCache: false)).thenAnswer((_) async => mockMenuCard);
+        },
+        build: () => MenuCardBloc(menuCardRepository: menuCardRepository),
+        act: (bloc) async {
+          bloc.add(ReFetchedFavMenuCard());
+          await Future<void>.delayed(Duration.zero);
+          bloc.add(ReFetchedFavMenuCard());
+        },
+        expect: () => const <MenuCardState>[
+          MenuCardState(
+            status: MenuCardStatus.success,
+            fav: mockMenuCard,
+          )
+        ],
+        verify: (_) {
+          verify(() => menuCardRepository.getMenuList(
+              isMyFav: false, checkCache: false)).called(1);
+        },
+      );
+
+      blocTest<MenuCardBloc, MenuCardState>(
+        'emits failure status when fetches menuCard and throw exception',
+        setUp: () {
+          when(() => menuCardRepository.getMenuList(
+              isMyFav: false,
+              checkCache: false)).thenAnswer((_) async => throw Exception());
+        },
+        build: () => MenuCardBloc(menuCardRepository: menuCardRepository),
+        act: (bloc) => bloc.add(ReFetchedFavMenuCard()),
+        expect: () => <MenuCardState>[const MenuCardState(status: MenuCardStatus.failure)],
+        verify: (_) {
+          verify(() => menuCardRepository.getMenuList(
+              isMyFav: false, checkCache: false)).called(1);
+        },
+      );
+
+      blocTest<MenuCardBloc, MenuCardState>(
+        'emits successful status when '
+        '0 additional menuCard are fetched',
+        setUp: () {
+          when(() => menuCardRepository.getMenuList(
+              isMyFav: false,
+              checkCache: false)).thenAnswer((_) async => []);
+        },
+        build: () => MenuCardBloc(menuCardRepository: menuCardRepository),
+        act: (bloc) => bloc.add(ReFetchedFavMenuCard()),
+        expect: () => const <MenuCardState>[
+          MenuCardState(
+            status: MenuCardStatus.success,
+            fav: [],
+          )
+        ],
+        verify: (_) {
+          verify(() => menuCardRepository.getMenuList(
+              isMyFav: false, checkCache: false)).called(1);
+        },
+      );
+    });
+
+    group('ReFetchedMyFavMenuCard', () {
+      blocTest<MenuCardBloc, MenuCardState>(
+        'emits successful status when refetches menuCard',
+        setUp: () {
+          when(() => menuCardRepository.getMenuList(
+              isMyFav: true,
+              checkCache: false)).thenAnswer((_) async => mockMenuCard);
+        },
+        build: () => MenuCardBloc(menuCardRepository: menuCardRepository),
+        act: (bloc) => bloc.add(ReFetchedMyFavMenuCard()),
+        expect: () => const <MenuCardState>[
+          MenuCardState(
+            status: MenuCardStatus.success,
+            myFav: mockMenuCard,
+          )
+        ],
+        verify: (_) {
+          verify(() => menuCardRepository.getMenuList(
+              isMyFav: true, checkCache: false)).called(1);
+        },
+      );
+
+      blocTest<MenuCardBloc, MenuCardState>(
+        'drops new events when processing current event',
+        setUp: () {
+          when(() => menuCardRepository.getMenuList(
+              isMyFav: true,
+              checkCache: false)).thenAnswer((_) async => mockMenuCard);
+        },
+        build: () => MenuCardBloc(menuCardRepository: menuCardRepository),
+        act: (bloc) => bloc
+          ..add(ReFetchedMyFavMenuCard())
+          ..add(ReFetchedMyFavMenuCard()),
+        expect: () => const <MenuCardState>[
+          MenuCardState(
+            status: MenuCardStatus.success,
+            myFav: mockMenuCard,
+          )
+        ],
+        verify: (_) {
+          verify(() => menuCardRepository.getMenuList(
+              isMyFav: true, checkCache: false)).called(1);
+        },
+      );
+
+      blocTest<MenuCardBloc, MenuCardState>(
+        'throttles events',
+        setUp: () {
+          when(() => menuCardRepository.getMenuList(
+              isMyFav: true,
+              checkCache: false)).thenAnswer((_) async => mockMenuCard);
+        },
+        build: () => MenuCardBloc(menuCardRepository: menuCardRepository),
+        act: (bloc) async {
+          bloc.add(ReFetchedMyFavMenuCard());
+          await Future<void>.delayed(Duration.zero);
+          bloc.add(ReFetchedMyFavMenuCard());
+        },
+        expect: () => const <MenuCardState>[
+          MenuCardState(
+            status: MenuCardStatus.success,
+            myFav: mockMenuCard,
+          )
+        ],
+        verify: (_) {
+          verify(() => menuCardRepository.getMenuList(
+              isMyFav: true, checkCache: false)).called(1);
+        },
+      );
+
+      blocTest<MenuCardBloc, MenuCardState>(
+        'emits failure status when fetches menuCard and throw exception',
+        setUp: () {
+          when(() => menuCardRepository.getMenuList(
+              isMyFav: true,
+              checkCache: false)).thenAnswer((_) async => throw Exception());
+        },
+        build: () => MenuCardBloc(menuCardRepository: menuCardRepository),
+        act: (bloc) => bloc.add(ReFetchedMyFavMenuCard()),
+        expect: () => <MenuCardState>[const MenuCardState(status: MenuCardStatus.failure)],
+        verify: (_) {
+          verify(() => menuCardRepository.getMenuList(
+              isMyFav: true, checkCache: false)).called(1);
+        },
+      );
+
+      blocTest<MenuCardBloc, MenuCardState>(
+        'emits successful status when '
+        '0 additional menuCard are fetched',
+        setUp: () {
+          when(() => menuCardRepository.getMenuList(
+              isMyFav: true,
+              checkCache: false)).thenAnswer((_) async => []);
+        },
+        build: () => MenuCardBloc(menuCardRepository: menuCardRepository),
+        act: (bloc) => bloc.add(ReFetchedMyFavMenuCard()),
+        expect: () => const <MenuCardState>[
+          MenuCardState(
+            status: MenuCardStatus.success,
+            myFav: [],
+          )
+        ],
+        verify: (_) {
+          verify(() => menuCardRepository.getMenuList(
+              isMyFav: true, checkCache: false)).called(1);
         },
       );
     });

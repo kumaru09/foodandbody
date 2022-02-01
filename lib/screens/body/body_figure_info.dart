@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foodandbody/models/body.dart';
+import 'package:foodandbody/screens/body/cubit/body_cubit.dart';
 import 'package:foodandbody/screens/body/edit_body_figure.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/src/provider.dart';
 
 // ignore: must_be_immutable
 class BodyFigureInfo extends StatelessWidget {
@@ -140,11 +142,13 @@ class BodyFigureInfo extends StatelessWidget {
                 child: Text("แก้ไข",
                     style: Theme.of(context).textTheme.button!.merge(TextStyle(
                         color: Theme.of(context).colorScheme.secondary))),
-                onPressed: () {
-                  Navigator.push(
+                onPressed: () async {
+                  final value = await Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) => EditBodyFigure(body: body)));
+                  await context.read<BodyCubit>().updateBody(value['shoulder'],
+                      value['chest'], value['waist'], value['hip']);
                 },
               )
             ],
