@@ -20,7 +20,7 @@ class WeightAndHeightInfo extends StatelessWidget {
   late int? height = _info.height;
   late double bmi =
       double.parse((weight! / pow(height! / 100, 2)).toStringAsFixed(2));
-  late String date = DateFormat("dd/MM/yyyy").format(DateTime.now());
+  late String date = DateFormat("dd/MM/yyyy").format(weightList.first.date!.toDate());
 
   @override
   Widget build(BuildContext context) {

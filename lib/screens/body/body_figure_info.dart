@@ -14,7 +14,7 @@ class BodyFigureInfo extends StatelessWidget {
   late int chest = body.chest;
   late int waist = body.waist;
   late int hip = body.hip;
-  late String date = DateFormat.yMd().add_Hm().format(body.date.toDate());
+  late String date = DateFormat("dd/MM/yyyy HH:mm").format(body.date.toDate());
 
   @override
   Widget build(BuildContext context) {
