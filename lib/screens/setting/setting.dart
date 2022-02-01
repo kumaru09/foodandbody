@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/models/user.dart';
+import 'package:foodandbody/repositories/user_repository.dart';
+import 'package:foodandbody/screens/edit_profile/cubit/edit_profile_cubit.dart';
 import 'package:foodandbody/screens/edit_profile/edit_profile.dart';
 
 class Setting extends StatelessWidget {
@@ -125,7 +127,12 @@ class Setting extends StatelessWidget {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => EditProfile()));
+                                    builder: (context) =>
+                                        BlocProvider<EditProfileCubit>(
+                                          create: (context) => EditProfileCubit(
+                                              context.read<UserRepository>()),
+                                          child: EditProfile(),
+                                        )));
                           },
                           style: TextButton.styleFrom(
                               minimumSize: Size.zero,

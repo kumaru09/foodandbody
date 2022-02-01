@@ -1,14 +1,35 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:foodandbody/models/info.dart';
 import 'package:foodandbody/models/info_entity.dart';
 import 'package:foodandbody/models/nutrient.dart';
-import 'package:foodandbody/models/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' as cloud_firestore;
 import 'package:foodandbody/repositories/i_user_repository.dart';
+
+class UpdatePasswordFaliure implements Exception {
+  final message;
+
+  const UpdatePasswordFaliure([this.message = 'เกิดข้อผิดพลาดบางอย่าง']);
+
+  factory UpdatePasswordFaliure.fromCode(String code) {
+    switch (code) {
+      case 'weak-password':
+        return const UpdatePasswordFaliure();
+      case 'requires-recent-login':
+        return const UpdatePasswordFaliure(
+            'ไม่สามารถแก้ไขได้ กรุณาเข้าสู่ระบบใหม่อีกครั้ง');
+      default:
+        return const UpdatePasswordFaliure();
+    }
+  }
+}
+
+class UpdateInfoFailure implements Exception {
+  final message;
+  const UpdateInfoFailure([this.message = 'เกิดข้อผิดพลาดบางอย่าง']);
+}
 
 class UserRepository implements IUserRepository {
   final cloud_firestore.CollectionReference users =
@@ -43,8 +64,19 @@ class UserRepository implements IUserRepository {
   }
 
   @override
-  Future<void> updateInfo(User user) {
-    return users.doc(user.uid).update(user.info!.toEntity().toDocument());
+  Future<void> updateInfo(Info newInfo) async {
+    try {
+      final info = cloud_firestore.FirebaseFirestore.instance
+          .collection('users')
+          .doc(firebase_auth.FirebaseAuth.instance.currentUser?.uid);
+      await info.update({
+        'name': newInfo.name,
+        'photoUrl': newInfo.photoUrl,
+        'gender': newInfo.gender
+      });
+    } catch (e) {
+      throw UpdateInfoFailure();
+    }
   }
 
   Future<void> updateGoalInfo(int goal) async {
@@ -88,6 +120,22 @@ class UserRepository implements IUserRepository {
       await weights.add({"date": Timestamp.now(), "weight": weight});
     } catch (e) {
       throw Exception('error updating info');
+    }
+  }
+
+  Future<void> updatePassword(String newPassword, String oldPassword) async {
+    try {
+      final user = firebase_auth.FirebaseAuth.instance.currentUser!;
+      firebase_auth.AuthCredential credential =
+          firebase_auth.EmailAuthProvider.credential(
+              email: user.email!, password: oldPassword);
+      await firebase_auth.FirebaseAuth.instance.currentUser!
+          .reauthenticateWithCredential(credential);
+      await user.updatePassword(newPassword);
+    } on firebase_auth.FirebaseAuthException catch (e) {
+      throw UpdatePasswordFaliure.fromCode(e.code);
+    } catch (e) {
+      throw UpdatePasswordFaliure();
     }
   }
 }
