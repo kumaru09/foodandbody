@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodandbody/repositories/menu_card_repository.dart';
 import 'package:foodandbody/screens/search/search.dart';
+import 'package:foodandbody/widget/menu_card/bloc/menu_card_bloc.dart';
 import 'package:foodandbody/widget/menu_card/menu_card.dart';
 
 class SearchPage extends StatelessWidget {
@@ -23,7 +26,6 @@ class SearchPage extends StatelessWidget {
                 .merge(TextStyle(color: Colors.white))),
         leading: IconButton(
             onPressed: () {
-              // change page to setting page
               Navigator.pop(context);
             },
             icon: Icon(Icons.arrow_back, color: Colors.white)),
@@ -50,7 +52,12 @@ class SearchPage extends StatelessWidget {
                     ),
               ),
             ),
-            MenuCard(isMyFav: false),
+            BlocProvider(
+              create: (_) => MenuCardBloc(
+                menuCardRepository: context.read<MenuCardRepository>(),
+              )..add(FetchedFavMenuCard()),
+              child: MenuCard(isMyFav: false),
+            ),
             Container(
               padding: EdgeInsets.fromLTRB(16, 0, 16, 5),
               child: Text(
@@ -60,7 +67,12 @@ class SearchPage extends StatelessWidget {
                     ),
               ),
             ),
-            MenuCard(isMyFav: true),
+            BlocProvider(
+              create: (_) => MenuCardBloc(
+                menuCardRepository: context.read<MenuCardRepository>(),
+              )..add(FetchedMyFavMenuCard()),
+              child: MenuCard(isMyFav: true),
+            ),
           ],
         ),
       ),

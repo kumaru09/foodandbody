@@ -26,7 +26,7 @@ class BodyState extends Equatable {
     return BodyState(
         body: body ?? this.body,
         status: status ?? this.status,
-        weightList: weightList);
+        weightList: weightList ?? this.weightList);
   }
 
   @override

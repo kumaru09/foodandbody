@@ -74,4 +74,16 @@ class BodyRepository {
       throw Exception('error adding weight');
     }
   }
+
+  Future<void> updateBody(Body body) async {
+    final CollectionReference bodyHistories = FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .collection('bodyhistories');
+    try {
+      await bodyHistories.add(body.toEntity().toJson());
+    } catch (e) {
+      throw Exception('error updating body');
+    }
+  }
 }

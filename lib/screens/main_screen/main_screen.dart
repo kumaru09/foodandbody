@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/repositories/body_repository.dart';
 import 'package:foodandbody/repositories/camera_repository.dart';
 import 'package:foodandbody/repositories/history_repository.dart';
+import 'package:foodandbody/repositories/menu_card_repository.dart';
 import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/screens/body/body.dart';
@@ -17,6 +18,7 @@ import 'package:foodandbody/screens/main_screen/bottom_appbar.dart';
 import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
 import 'package:foodandbody/screens/plan/plan.dart';
 import 'package:foodandbody/screens/setting/bloc/info_bloc.dart';
+import 'package:foodandbody/widget/menu_card/bloc/menu_card_bloc.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key, required this.index}) : super(key: key);
@@ -81,7 +83,11 @@ class _MainScreenState extends State<MainScreen> {
             BlocProvider(
                 create: (_) =>
                     HomeBloc(planRepository: context.read<PlanRepository>())
-                      ..add(LoadWater()))
+                      ..add(LoadWater())),
+            BlocProvider(
+                create: (_) => MenuCardBloc(
+                    menuCardRepository: context.read<MenuCardRepository>())
+                  ..add(FetchedFavMenuCard())),
           ],
           child: _getPage(_currentIndex),
         ),
