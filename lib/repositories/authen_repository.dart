@@ -98,6 +98,14 @@ class AuthenRepository {
     }
   }
 
+  Future<void> sendForgetPasswordEmail(String email) async {
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+    } catch (e) {
+      throw Exception();
+    }
+  }
+
   Future<void> logOut() async {
     try {
       await Future.wait([_firebaseAuth.signOut()]);
