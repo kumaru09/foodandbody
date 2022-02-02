@@ -5,6 +5,7 @@ import 'package:foodandbody/models/user.dart';
 import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/screens/edit_profile/cubit/edit_profile_cubit.dart';
 import 'package:foodandbody/screens/edit_profile/edit_profile.dart';
+import 'package:foodandbody/screens/setting/edit_password.dart';
 
 class Setting extends StatelessWidget {
   const Setting({Key? key}) : super(key: key);
@@ -140,6 +141,41 @@ class Setting extends StatelessWidget {
                               padding: EdgeInsets.zero),
                           child: Text(
                             "แก้ไขโปรไฟล์",
+                            style: Theme.of(context).textTheme.bodyText1!.merge(
+                                  TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary),
+                                ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        constraints: BoxConstraints.tightFor(height: 45),
+                        padding: EdgeInsets.only(left: 17),
+                        alignment: Alignment.topLeft,
+                        child: TextButton(
+                          onPressed: () {
+                            // Navigator.push(
+                            //     context,
+                            //     MaterialPageRoute(
+                            //         builder: (context) =>
+                            //             BlocProvider<EditProfileCubit>(
+                            //               create: (context) => EditProfileCubit(
+                            //                   context.read<UserRepository>()),
+                            //               child: EditProfile(),
+                            //             )));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => EditPassword()));
+                          },
+                          style: TextButton.styleFrom(
+                              minimumSize: Size.zero,
+                              alignment: Alignment.topLeft,
+                              padding: EdgeInsets.zero),
+                          child: Text(
+                            "แก้ไขรหัสผ่าน",
                             style: Theme.of(context).textTheme.bodyText1!.merge(
                                   TextStyle(
                                       color: Theme.of(context)
