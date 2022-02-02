@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'dart:math';
 
-import 'package:foodandbody/models/body.dart';
 import 'package:foodandbody/models/weight_list.dart';
 
+// ignore: must_be_immutable
 class WeightGraph extends StatelessWidget {
   WeightGraph(this.weightList);
 
@@ -24,6 +24,7 @@ class WeightGraph extends StatelessWidget {
   }
 }
 
+// ignore: must_be_immutable
 class _LineChart extends StatelessWidget {
   _LineChart({required this.weight});
 
@@ -40,23 +41,27 @@ class _LineChart extends StatelessWidget {
         weight.add(weight[weight.length - 1]);
       }
     }
-    return LineChart(LineChartData(
-        minX: 1,
-        maxX: 10,
-        minY: isEmpty ? 0 : (weight.reduce(min) - 1).toDouble(),
-        maxY: isEmpty ? 10 : (weight.reduce(max) + 1).toDouble(),
-        axisTitleData: FlAxisTitleData(show: false),
-        titlesData: FlTitlesData(show: false),
-        borderData: FlBorderData(show: false),
-        gridData: FlGridData(show: false),
-        lineBarsData: _getDataPoint()));
+    return LineChart(
+      LineChartData(
+          minX: 1,
+          maxX: 10,
+          minY: isEmpty ? 0 : (weight.reduce(min) - 1).toDouble(),
+          maxY: isEmpty ? 10 : (weight.reduce(max) + 1).toDouble(),
+          axisTitleData: FlAxisTitleData(show: false),
+          titlesData: FlTitlesData(show: false),
+          borderData: FlBorderData(show: false),
+          gridData: FlGridData(show: false),
+          lineBarsData: _getDataPoint()),
+      key: const Key("body_weight_graph"),
+    );
   }
 
   List<LineChartBarData> _getDataPoint() {
     final List<FlSpot> weightPoint = [];
 
     for (int index = weight.length - 1; index >= 0; index--) {
-      weightPoint.add(FlSpot((weight.length - index).toDouble(), weight[index].toDouble()));
+      weightPoint.add(
+          FlSpot((weight.length - index).toDouble(), weight[index].toDouble()));
     }
 
     return [
