@@ -78,18 +78,18 @@ class EditProfile extends StatelessWidget {
                   alignment: Alignment.topLeft,
                   child: _EditUsername(),
                 ),
-                Container(
-                  padding: EdgeInsets.only(left: 16, top: 26, right: 15),
-                  width: MediaQuery.of(context).size.width,
-                  alignment: Alignment.topLeft,
-                  child: _EditPassword(),
-                ),
-                Container(
-                  padding: EdgeInsets.only(left: 16, top: 26, right: 15),
-                  width: MediaQuery.of(context).size.width,
-                  alignment: Alignment.topLeft,
-                  child: _ConfirmEditPassword(),
-                ),
+                // Container(
+                //   padding: EdgeInsets.only(left: 16, top: 26, right: 15),
+                //   width: MediaQuery.of(context).size.width,
+                //   alignment: Alignment.topLeft,
+                //   child: _EditPassword(),
+                // ),
+                // Container(
+                //   padding: EdgeInsets.only(left: 16, top: 26, right: 15),
+                //   width: MediaQuery.of(context).size.width,
+                //   alignment: Alignment.topLeft,
+                //   child: _ConfirmEditPassword(),
+                // ),
                 Container(
                   padding: EdgeInsets.only(left: 16, top: 26, right: 15),
                   width: MediaQuery.of(context).size.width,
@@ -232,86 +232,86 @@ class _EditUsername extends StatelessWidget {
   }
 }
 
-class _EditPassword extends StatefulWidget {
-  @override
-  __EditPasswordState createState() => __EditPasswordState();
-}
+// class _EditPassword extends StatefulWidget {
+//   @override
+//   __EditPasswordState createState() => __EditPasswordState();
+// }
 
-class __EditPasswordState extends State<_EditPassword> {
-  bool _isHidden = true;
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<EditProfileCubit, EditProfileState>(
-      buildWhen: (previous, current) => previous.password != current.password,
-      builder: (context, state) {
-        return TextFormField(
-          textInputAction: TextInputAction.next,
-          onChanged: (password) =>
-              context.read<EditProfileCubit>().passwordChanged(password),
-          decoration: InputDecoration(
-            labelText: "รหัสผ่านใหม่",
-            errorText: state.password.invalid
-                ? 'รหัสผ่านต้องประกอบไปด้วยตัวอักษรตัวเล็ก,ตัวใหญ่ และตัวเลข อย่างน้อย 8 ตัว'
-                : null,
-            border: OutlineInputBorder(
-              borderSide: BorderSide(),
-            ),
-            suffixIcon: InkWell(
-              child: Icon(_isHidden ? Icons.visibility : Icons.visibility_off),
-              onTap: () {
-                setState(() {
-                  _isHidden = !_isHidden;
-                });
-              },
-            ),
-          ),
-          obscureText: _isHidden,
-        );
-      },
-    );
-  }
-}
+// class __EditPasswordState extends State<_EditPassword> {
+//   bool _isHidden = true;
+//   @override
+//   Widget build(BuildContext context) {
+//     return BlocBuilder<EditProfileCubit, EditProfileState>(
+//       buildWhen: (previous, current) => previous.password != current.password,
+//       builder: (context, state) {
+//         return TextFormField(
+//           textInputAction: TextInputAction.next,
+//           onChanged: (password) =>
+//               context.read<EditProfileCubit>().passwordChanged(password),
+//           decoration: InputDecoration(
+//             labelText: "รหัสผ่านใหม่",
+//             errorText: state.password.invalid
+//                 ? 'รหัสผ่านต้องประกอบไปด้วยตัวอักษรตัวเล็ก,ตัวใหญ่ และตัวเลข อย่างน้อย 8 ตัว'
+//                 : null,
+//             border: OutlineInputBorder(
+//               borderSide: BorderSide(),
+//             ),
+//             suffixIcon: InkWell(
+//               child: Icon(_isHidden ? Icons.visibility : Icons.visibility_off),
+//               onTap: () {
+//                 setState(() {
+//                   _isHidden = !_isHidden;
+//                 });
+//               },
+//             ),
+//           ),
+//           obscureText: _isHidden,
+//         );
+//       },
+//     );
+//   }
+// }
 
-class _ConfirmEditPassword extends StatefulWidget {
-  @override
-  __ConfirmEditPasswordState createState() => __ConfirmEditPasswordState();
-}
+// class _ConfirmEditPassword extends StatefulWidget {
+//   @override
+//   __ConfirmEditPasswordState createState() => __ConfirmEditPasswordState();
+// }
 
-class __ConfirmEditPasswordState extends State<_ConfirmEditPassword> {
-  bool _isHidden = true;
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<EditProfileCubit, EditProfileState>(
-        buildWhen: (previous, current) =>
-            previous.confirmedPassword != current.confirmedPassword,
-        builder: (context, state) {
-          return TextFormField(
-            textInputAction: TextInputAction.next,
-            onChanged: (confirmPassword) => context
-                .read<EditProfileCubit>()
-                .confirmedPasswordChanged(confirmPassword),
-            decoration: InputDecoration(
-              labelText: "ยืนยันรหัสผ่าน",
-              errorText:
-                  state.confirmedPassword.invalid ? 'รหัสผ่านไม่ตรงกัน' : null,
-              border: OutlineInputBorder(
-                borderSide: BorderSide(),
-              ),
-              suffixIcon: InkWell(
-                child:
-                    Icon(_isHidden ? Icons.visibility : Icons.visibility_off),
-                onTap: () {
-                  setState(() {
-                    _isHidden = !_isHidden;
-                  });
-                },
-              ),
-            ),
-            obscureText: _isHidden,
-          );
-        });
-  }
-}
+// class __ConfirmEditPasswordState extends State<_ConfirmEditPassword> {
+//   bool _isHidden = true;
+//   @override
+//   Widget build(BuildContext context) {
+//     return BlocBuilder<EditProfileCubit, EditProfileState>(
+//         buildWhen: (previous, current) =>
+//             previous.confirmedPassword != current.confirmedPassword,
+//         builder: (context, state) {
+//           return TextFormField(
+//             textInputAction: TextInputAction.next,
+//             onChanged: (confirmPassword) => context
+//                 .read<EditProfileCubit>()
+//                 .confirmedPasswordChanged(confirmPassword),
+//             decoration: InputDecoration(
+//               labelText: "ยืนยันรหัสผ่าน",
+//               errorText:
+//                   state.confirmedPassword.invalid ? 'รหัสผ่านไม่ตรงกัน' : null,
+//               border: OutlineInputBorder(
+//                 borderSide: BorderSide(),
+//               ),
+//               suffixIcon: InkWell(
+//                 child:
+//                     Icon(_isHidden ? Icons.visibility : Icons.visibility_off),
+//                 onTap: () {
+//                   setState(() {
+//                     _isHidden = !_isHidden;
+//                   });
+//                 },
+//               ),
+//             ),
+//             obscureText: _isHidden,
+//           );
+//         });
+//   }
+// }
 
 class _EditGender extends StatefulWidget {
   @override
