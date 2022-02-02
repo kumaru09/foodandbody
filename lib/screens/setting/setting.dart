@@ -168,7 +168,11 @@ class Setting extends StatelessWidget {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => EditPassword()));
+                                    builder: (context) => BlocProvider<
+                                            EditProfileCubit>(
+                                        create: (context) => EditProfileCubit(
+                                            context.read<UserRepository>()),
+                                        child: EditPassword())));
                           },
                           style: TextButton.styleFrom(
                               minimumSize: Size.zero,

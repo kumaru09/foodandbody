@@ -24,6 +24,13 @@ class EditProfileCubit extends Cubit<EditProfileState> {
     ));
   }
 
+  void oldPasswordChanged(String value) {
+    final oldPassword = Password.dirty(value);
+    emit(state.copyWith(
+      oldPassword: oldPassword,
+    ));
+  }
+
   void passwordChanged(String value) {
     final password = Password.dirty(value);
     final confirmedPassword = ConfirmedPassword.dirty(
@@ -65,14 +72,14 @@ class EditProfileCubit extends Cubit<EditProfileState> {
 
   Future<void> editFormSubmitted() async {
     try {
-      if (state.password.value.isNotEmpty && state.confirmedPassword.valid) {
+      if (state.oldPassword.value.isNotEmpty &&
+          state.password.value.isNotEmpty &&
+          state.confirmedPassword.valid) {
         print('update Info&pass');
-        await _userRepository.updateInfo(Info(
-            name: state.name.value,
-            photoUrl: state.photoUrl,
-            gender: state.gender.value));
+        await _userRepository.updatePassword(
+            state.password.value, state.oldPassword.value);
         emit(state.copyWith(status: FormzStatus.submissionSuccess));
-      } else {
+      } else if (state.name.value.isNotEmpty && state.gender.value.isNotEmpty) {
         print('update Info');
         await _userRepository.updateInfo(Info(
             name: state.name.value,

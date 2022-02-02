@@ -9,7 +9,7 @@ class EditProfileState extends Equatable {
       this.confirmedPassword = const ConfirmedPassword.pure(),
       this.password = const Password.pure(),
       this.photoUrl = '',
-      this.oldPassword = '',
+      this.oldPassword = const Password.pure(),
       this.status = FormzStatus.pure,
       this.errorMessage});
 
@@ -20,7 +20,7 @@ class EditProfileState extends Equatable {
   final ConfirmedPassword confirmedPassword;
   final FormzStatus status;
   final String? errorMessage;
-  final String oldPassword;
+  final Password oldPassword;
 
   EditProfileState copyWith(
       {Username? name,
@@ -30,7 +30,7 @@ class EditProfileState extends Equatable {
       ConfirmedPassword? confirmedPassword,
       FormzStatus? status,
       String? errorMessage,
-      String? oldPassword}) {
+      Password? oldPassword}) {
     return EditProfileState(
         name: name ?? this.name,
         gender: gender ?? this.gender,

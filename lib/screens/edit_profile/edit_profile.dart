@@ -52,7 +52,7 @@ class EditProfile extends StatelessWidget {
             actions: [
               IconButton(
                 onPressed: () {
-                  // context.read<EditProfileCubit>().editFormSubmitted();
+                  context.read<EditProfileCubit>().editFormSubmitted();
                 },
                 icon: Icon(
                   Icons.done,
