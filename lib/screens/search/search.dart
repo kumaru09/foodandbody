@@ -18,12 +18,15 @@ class _SearchState extends State<Search> {
     return BlocProvider(
       create: (_) =>
           SearchBloc(searchRepository: context.read<SearchRepository>()),
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        backgroundColor: Colors.white,
-        appBar: SearchAppBar(),
-        body: 
-          SearchBody(),),
+      child: GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: Scaffold(
+          resizeToAvoidBottomInset: false,
+          backgroundColor: Colors.white,
+          appBar: SearchAppBar(),
+          body: SearchBody(),
+        ),
+      ),
     );
   }
 }
@@ -110,6 +113,7 @@ class _SearchAppBarState extends State<SearchAppBar> {
         IconButton(
           onPressed: () => showModalBottomSheet(
             context: context,
+            isDismissible: false,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(15.0),

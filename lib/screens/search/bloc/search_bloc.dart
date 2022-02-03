@@ -42,7 +42,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       try {
         //ถ้าเป็นคำใหม่หรือ filter ใหม่จะกำหนด querypage 1 เก็บ keySearch ใหม่
         //ถ้าคำเดิมและ filter เดิมจะเพิ่ม querypage +1
-        if (event.text != text || event.selectFilter != filter) {
+        if (event.text != text || !ListEquality().equals(event.selectFilter, filter)) {
           numpage = 1;
           text = event.text;
           filter = List.from(event.selectFilter);
@@ -75,13 +75,14 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     Emitter<SearchState> emit,
   ) async {
     try {
+      numpage = 1;
+      emit(state.copyWith(status: SearchStatus.loading));
       final results =
           await searchRepository.search('${keySearch}querypage=$numpage');
       return emit(
         state.copyWith(
           status: SearchStatus.success,
-          result:
-              numpage == 1 ? results : (List.of(state.result)..addAll(results)),
+          result: results,
           hasReachedMax: results.length < 10 ? true : false,
         ),
       );
