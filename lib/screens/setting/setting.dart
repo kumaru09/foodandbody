@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,12 +9,16 @@ import 'package:foodandbody/screens/edit_profile/cubit/edit_profile_cubit.dart';
 import 'package:foodandbody/screens/edit_profile/edit_profile.dart';
 import 'package:foodandbody/screens/setting/edit_password.dart';
 
-class Setting extends StatelessWidget {
+class Setting extends StatefulWidget {
   const Setting({Key? key}) : super(key: key);
+  @override
+  State<StatefulWidget> createState() => _SettingState();
+}
 
+class _SettingState extends State<Setting> {
   @override
   Widget build(BuildContext context) {
-    final User _user = context.read<AppBloc>().state.user;
+    final _user = context.read<AppBloc>().state.user;
     final bool hasPhotoUrl;
     final String photoUrl;
 
@@ -124,7 +130,7 @@ class Setting extends StatelessWidget {
                         padding: EdgeInsets.only(left: 17),
                         alignment: Alignment.topLeft,
                         child: TextButton(
-                          onPressed: () {
+                          onPressed: () async {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -133,7 +139,7 @@ class Setting extends StatelessWidget {
                                           create: (context) => EditProfileCubit(
                                               context.read<UserRepository>()),
                                           child: EditProfile(),
-                                        )));
+                                        ))).then((value) => setState(() {}));
                           },
                           style: TextButton.styleFrom(
                               minimumSize: Size.zero,

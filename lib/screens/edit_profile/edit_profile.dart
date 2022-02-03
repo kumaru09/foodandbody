@@ -5,7 +5,9 @@ import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/models/info.dart';
 import 'package:foodandbody/models/user.dart';
+import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/screens/edit_profile/cubit/edit_profile_cubit.dart';
+import 'package:foodandbody/screens/setting/bloc/info_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -20,6 +22,12 @@ class EditProfile extends StatelessWidget {
               ..showSnackBar(
                 SnackBar(content: Text('แก้ไขข้อมูลเรียบร้อยแล้ว')),
               );
+            final info = context.read<AppBloc>().state.user.info!.copyWith(
+                name: state.name.value,
+                photoUrl: state.photoUrl,
+                gender: state.gender.value);
+            context.read<AppBloc>().add(EditInfoRequested(
+                context.read<AppBloc>().state.user.copyWith(info: info)));
             Navigator.of(context).pop();
           } else if (state.status.isSubmissionFailure) {
             ScaffoldMessenger.of(context)
@@ -116,12 +124,20 @@ class __EditProfileImageState extends State<_EditProfileImage> {
       final ImagePicker _picker = ImagePicker();
       final _pickedImage = await _picker.pickImage(source: source);
 
-      if (_pickedImage == null) return;
+      if (_pickedImage == null)
+        return;
+      else {
+        final uri = await context
+            .read<UserRepository>()
+            .uploadProfilePic(File(_pickedImage.path));
+        print(uri);
+        context.read<EditProfileCubit>().photoUrlChanged(uri.toString());
+      }
       setState(() {
         image = File(_pickedImage.path);
-        print("image: $image");
       });
     } catch (e) {
+      print('pickImage: $e');
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(const SnackBar(
@@ -130,9 +146,11 @@ class __EditProfileImageState extends State<_EditProfileImage> {
   }
 
   String _getInitialImage(BuildContext context, User user) {
-    if (user.info!.photoUrl != "")
-      return user.info!.photoUrl.toString();
-    else if (user.photoUrl != null)
+    if (user.info!.photoUrl != "") {
+      final uri = user.info!.photoUrl.toString();
+      context.read<EditProfileCubit>().photoUrlChanged(uri);
+      return uri;
+    } else if (user.photoUrl != null)
       return user.photoUrl.toString();
     else
       return "";
