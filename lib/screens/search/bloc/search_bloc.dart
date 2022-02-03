@@ -30,13 +30,13 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     TextChanged event,
     Emitter<SearchState> emit,
   ) async {
-    if (event.text == '' && event.selectFilter == []) {
+    if (event.text == '' && event.selectFilter.isEmpty) {
       text = '';
       filter = [];
       return emit(state.copyWith(status: SearchStatus.initial));
     }
     //ทำเมื่อ search คำใหม่ หรือ filter ใหม่ หรือ คำเดิม filter เดืมที่ยังแสดงไม่หมด
-    if (event.text != text ||
+    else if (event.text != text ||
         !ListEquality().equals(event.selectFilter, filter) ||
         state.hasReachedMax == false) {
       try {
@@ -54,7 +54,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
           numpage += 1;
         final results =
             await searchRepository.search('${keySearch}querypage=$numpage');
-        emit(
+        return emit(
           state.copyWith(
             status: SearchStatus.success,
             result: numpage == 1
@@ -65,7 +65,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         );
       } catch (error) {
         print('e: $error');
-        emit(state.copyWith(status: SearchStatus.failure));
+        return emit(state.copyWith(status: SearchStatus.failure));
       }
     }
   }
@@ -77,7 +77,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     try {
       final results =
           await searchRepository.search('${keySearch}querypage=$numpage');
-      emit(
+      return emit(
         state.copyWith(
           status: SearchStatus.success,
           result:
@@ -87,7 +87,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       );
     } catch (error) {
       print('e: $error');
-      emit(state.copyWith(status: SearchStatus.failure));
+      return emit(state.copyWith(status: SearchStatus.failure));
     }
   }
 }

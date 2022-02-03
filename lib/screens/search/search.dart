@@ -18,15 +18,12 @@ class _SearchState extends State<Search> {
     return BlocProvider(
       create: (_) =>
           SearchBloc(searchRepository: context.read<SearchRepository>()),
-      child: GestureDetector(
-        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-        child: Scaffold(
-          resizeToAvoidBottomInset: false,
-          backgroundColor: Colors.white,
-          appBar: SearchAppBar(),
-          body: SearchBody(),
-        ),
-      ),
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        backgroundColor: Colors.white,
+        appBar: SearchAppBar(),
+        body: 
+          SearchBody(),),
     );
   }
 }
