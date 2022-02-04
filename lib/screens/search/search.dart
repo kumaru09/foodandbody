@@ -332,31 +332,35 @@ class _SearchResultItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        ListTile(
-          minVerticalPadding: 16,
-          title: Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Expanded(
-                child: Text('${item.name}',
-                    style: Theme.of(context).textTheme.subtitle1!.merge(
+        Material(
+          child: ListTile(
+            minVerticalPadding: 16,
+            title: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: Text('${item.name}',
+                      style: Theme.of(context).textTheme.subtitle1!.merge(
+                          TextStyle(
+                              color: Theme.of(context).colorScheme.secondary))),
+                ),
+                Text('${item.calory} ',
+                    style: Theme.of(context).textTheme.headline6!.merge(
                         TextStyle(
                             color: Theme.of(context).colorScheme.secondary))),
-              ),
-              Text('${item.calory} ',
-                  style: Theme.of(context).textTheme.headline6!.merge(TextStyle(
-                      color: Theme.of(context).colorScheme.secondary))),
-              Text('แคล',
-                  style: Theme.of(context).textTheme.caption!.merge(TextStyle(
-                      color: Theme.of(context).colorScheme.secondary))),
-            ],
+                Text('แคล',
+                    style: Theme.of(context).textTheme.caption!.merge(TextStyle(
+                        color: Theme.of(context).colorScheme.secondary))),
+              ],
+            ),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          MenuPage.menu(menuName: item.name)));
+            },
           ),
-          onTap: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => MenuPage.menu(menuName: item.name)));
-          },
         ),
         const Divider(
           height: 2,
