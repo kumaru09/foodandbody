@@ -7,7 +7,6 @@ import 'package:foodandbody/models/info.dart';
 import 'package:foodandbody/models/info_entity.dart';
 import 'package:foodandbody/models/nutrient.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' as cloud_firestore;
-import 'package:foodandbody/repositories/i_user_repository.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:path/path.dart' as p;
 
@@ -49,7 +48,7 @@ class UpdateInfoFailure implements Exception {
   const UpdateInfoFailure([this.message = 'เกิดข้อผิดพลาดบางอย่าง']);
 }
 
-class UserRepository implements IUserRepository {
+class UserRepository {
   UserRepository(
       {firebase_auth.FirebaseAuth? firebaseAuth,
       firebase_storage.FirebaseStorage? firebaseStorage})
@@ -62,7 +61,6 @@ class UserRepository implements IUserRepository {
   final cloud_firestore.CollectionReference users =
       cloud_firestore.FirebaseFirestore.instance.collection('users');
 
-  @override
   Future<void> addUserInfo(Info info) async {
     final uid = _firebaseAuth.currentUser?.uid;
     final infoE = info.copyWith(
@@ -77,7 +75,6 @@ class UserRepository implements IUserRepository {
         .add({'weight': info.weight, "date": cloud_firestore.Timestamp.now()});
   }
 
-  @override
   Future<Info> getInfo() async {
     final data = await users.doc(_firebaseAuth.currentUser?.uid).get();
     if (data.exists) {
@@ -88,7 +85,6 @@ class UserRepository implements IUserRepository {
     }
   }
 
-  @override
   Future<void> updateInfo(Info newInfo) async {
     try {
       final info = users.doc(_firebaseAuth.currentUser?.uid);
@@ -134,6 +130,25 @@ class UserRepository implements IUserRepository {
       await weights.add({"date": Timestamp.now(), "weight": weight});
     } catch (e) {
       throw Exception('error updating info');
+    }
+  }
+
+  Future<void> deleteUser(String password) async {
+    try {
+      final user = _firebaseAuth.currentUser!;
+      firebase_auth.AuthCredential credential =
+          firebase_auth.EmailAuthProvider.credential(
+              email: user.email!, password: password);
+      await user.reauthenticateWithCredential(credential);
+      final doc = await users.doc(user.uid).collection('foodhistories').get();
+      if (doc.docs.isNotEmpty) {
+        for (var item in doc.docs) {
+          item.reference.delete();
+        }
+      }
+      await user.delete();
+    } on firebase_auth.FirebaseAuthException catch (e) {
+      throw Exception();
     }
   }
 
