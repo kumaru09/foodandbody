@@ -36,6 +36,7 @@ void main() {
   late HistoryBloc historyBloc;
   final GraphList mockGraphList = GraphList(
       caloriesList: List<int>.generate(10, (x) => x = x + 1),
+      burnList: List<int>.generate(10, (x) => x = x + 1),
       proteinList: List<int>.generate(10, (x) => x = x + 1),
       fatList: List<int>.generate(10, (x) => x = x + 1),
       carbList: List<int>.generate(10, (x) => x = x + 1),
@@ -53,6 +54,7 @@ void main() {
       weightEndDate: DateTime.now());
   final GraphList mockGraphListNoData = GraphList(
       caloriesList: List<int>.generate(10, (x) => x= 0),
+      burnList: List<int>.generate(10, (x) => x = 0),
       proteinList: List<int>.generate(10, (x) => x= 0),
       fatList: List<int>.generate(10, (x) => x= 0),
       carbList: List<int>.generate(10, (x) => x= 0),
