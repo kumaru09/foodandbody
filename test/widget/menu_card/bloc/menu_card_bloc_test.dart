@@ -3,15 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:foodandbody/models/menu_list.dart';
 import 'package:foodandbody/repositories/menu_card_repository.dart';
 import 'package:foodandbody/widget/menu_card/bloc/menu_card_bloc.dart';
-// import 'package:http/http.dart' as http;
 import 'package:mocktail/mocktail.dart';
 
-// class MockClient extends Mock implements http.Client {}
 class MockMenuCardRepository extends Mock implements MenuCardRepository {}
-
-// Uri _menuCardUrl({required String path}) {
-//   return Uri.https('foodandbody-api.azurewebsites.net', path);
-// }
 
 void main() {
   group('MenuCardBloc', () {
@@ -19,15 +13,9 @@ void main() {
       MenuList(name: 'menuName1', calory: 405, imageUrl: 'testUrl1')
     ];
 
-    // late http.Client httpClient;
     late MenuCardRepository menuCardRepository;
 
-    // setUpAll(() {
-    //   registerFallbackValue(Uri());
-    // });
-
     setUp(() {
-      // httpClient = MockClient();
       menuCardRepository = MockMenuCardRepository();
     });
 

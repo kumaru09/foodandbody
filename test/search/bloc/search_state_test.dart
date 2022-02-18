@@ -1,20 +1,20 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:foodandbody/models/menu_list.dart';
-import 'package:foodandbody/widget/menu_card/bloc/menu_card_bloc.dart';
+import 'package:foodandbody/models/search_result.dart';
+import 'package:foodandbody/screens/search/bloc/search_bloc.dart';
 
 void main() {
-  final List<MenuList> mockMenuList = [MenuList(name: 'menuName1', calory: 450, imageUrl: '')];
-  group('MenuCardState', () {
+  final List<SearchResultItem> mockSearchItems = [SearchResultItem(name: 'menuName1', calory: 450)];
+  group('SearchState', () {
 
-    MenuCardState createSubject({
-      MenuCardStatus status = MenuCardStatus.initial,
-      List<MenuList>? fav,
-      List<MenuList>? myFav,
+    SearchState createSubject({
+      SearchStatus status = SearchStatus.initial,
+      List<SearchResultItem>? result,
+      bool? hasReachedMax,
     }) {
-      return MenuCardState(
+      return SearchState(
         status: status,
-        fav: fav ?? mockMenuList,
-        myFav: myFav ?? mockMenuList,
+        result: result ?? mockSearchItems,
+        hasReachedMax: hasReachedMax ?? false,
       );
     }
 
@@ -26,24 +26,24 @@ void main() {
     });
 
     test('supports value comparison', () {
-      expect(MenuCardState(), MenuCardState());
+      expect(SearchState(), SearchState());
       expect(
-        MenuCardState().toString(),
-        MenuCardState().toString(),
+        SearchState().toString(),
+        SearchState().toString(),
       );
     });
 
     test('props are correct', () {
       expect(
         createSubject(
-          status: MenuCardStatus.initial,
-          fav: mockMenuList,
-          myFav: mockMenuList,
+          status: SearchStatus.initial,
+          result: mockSearchItems,
+          hasReachedMax: false,
         ).props,
         equals(<Object?>[
-          MenuCardStatus.initial, // status
-          mockMenuList, // fav
-          mockMenuList, // myFav
+          SearchStatus.initial, // status
+          mockSearchItems, // result
+          false, // hasReachedMax
         ]),
       );
     });
@@ -60,8 +60,8 @@ void main() {
         expect(
           createSubject().copyWith(
             status: null,
-            fav: null,
-            myFav: null,
+            result: null,
+            hasReachedMax: null,
           ),
           equals(createSubject()),
         );
@@ -70,15 +70,15 @@ void main() {
       test('replaces every non-null parameter', () {
         expect(
           createSubject().copyWith(
-            status: MenuCardStatus.success,
-            fav: [],
-            myFav: [],
+            status: SearchStatus.success,
+            result: [],
+            hasReachedMax: true,
           ),
           equals(
             createSubject(
-              status: MenuCardStatus.success,
-              fav: [],
-              myFav: [],
+              status: SearchStatus.success,
+              result: [],
+              hasReachedMax: true,
             ),
           ),
         );
@@ -86,4 +86,3 @@ void main() {
     });
   });
 }
-
