@@ -1,48 +1,61 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodandbody/repositories/authen_repository.dart';
+import 'package:foodandbody/screens/forgot_password/cubit/forgot_password_cubit.dart';
+import 'package:formz/formz.dart';
 
 class ForgotPassword extends StatelessWidget {
   const ForgotPassword({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).primaryColor,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  Image(image: AssetImage('assets/logo.png')),
-                  Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Text('ตั้งค่ารหัสผ่านใหม่',
-                        style: Theme.of(context)
-                            .textTheme
-                            .headline5!
-                            .merge(TextStyle(color: Colors.white))),
+    return BlocProvider(
+        create: (context) =>
+            ForgotPasswordCubit(context.read<AuthenRepository>()),
+        child: Scaffold(
+          backgroundColor: Theme.of(context).primaryColor,
+          body: SafeArea(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      Image(image: AssetImage('assets/logo.png')),
+                      Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Text('ตั้งค่ารหัสผ่านใหม่',
+                            style: Theme.of(context)
+                                .textTheme
+                                .headline5!
+                                .merge(TextStyle(color: Colors.white))),
+                      ),
+                      Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: BlocBuilder<ForgotPasswordCubit,
+                                ForgotPasswordState>(
+                              builder: (context, state) {
+                                return state.status.isSubmissionSuccess
+                                    ? _SendMessageToEmail()
+                                    : _GetEmail();
+                              },
+                            ) //if bloc state to render _GetEmail(), _SendMessageToEmail() or  _SetNewPassword(),
+                            //  _SendMessageToEmail(),
+                            // _SetNewPassword(),
+                            ),
+                      ),
+                    ],
                   ),
-                  Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: //if bloc state to render _GetEmail(), _SendMessageToEmail() or  _SetNewPassword(), 
-                      _GetEmail(),
-                      //  _SendMessageToEmail(),
-                      // _SetNewPassword(), 
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 }
 
@@ -115,37 +128,51 @@ class _SetNewPassword extends StatelessWidget {
 class _EmailInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      key: const Key('forgot_password_emailInput_textField'),
-      onChanged: (text) {},
-      keyboardType: TextInputType.emailAddress,
-      textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-        labelText: 'อีเมล',
-        border: OutlineInputBorder(borderSide: BorderSide()),
-        // errorText: state.email.invalid ? 'invalid email' : null,
-      ),
-    );
+    return BlocBuilder<ForgotPasswordCubit, ForgotPasswordState>(
+        buildWhen: (previous, current) => previous.email != current.email,
+        builder: (context, state) {
+          return TextFormField(
+            key: const Key('forgot_password_emailInput_textField'),
+            onChanged: (text) =>
+                context.read<ForgotPasswordCubit>().emailChanged(text),
+            keyboardType: TextInputType.emailAddress,
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(
+              labelText: 'อีเมล',
+              border: OutlineInputBorder(borderSide: BorderSide()),
+              // errorText: state.email.invalid ? 'invalid email' : null,
+            ),
+          );
+        });
   }
 }
 
 class _GetEmailButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        key: const Key('forgot_password_continue_raisedButton'),
-        onPressed: () {},
-        child: Text('ยืนยัน'),
-        style: ElevatedButton.styleFrom(
-          primary: Theme.of(context).colorScheme.secondary,
-          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 50.0),
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(50))),
-        ),
-      ),
-    );
+    return BlocBuilder<ForgotPasswordCubit, ForgotPasswordState>(
+        buildWhen: (previous, current) => previous.status != current.status,
+        builder: (context, state) {
+          return SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              key: const Key('forgot_password_continue_raisedButton'),
+              onPressed: state.status.isValidated
+                  ? () => context
+                      .read<ForgotPasswordCubit>()
+                      .forgotPasswordSubmitted()
+                  : null,
+              child: Text('ยืนยัน'),
+              style: ElevatedButton.styleFrom(
+                primary: Theme.of(context).colorScheme.secondary,
+                padding: const EdgeInsets.symmetric(
+                    vertical: 10.0, horizontal: 50.0),
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(50))),
+              ),
+            ),
+          );
+        });
   }
 }
 
@@ -160,22 +187,21 @@ class _PasswordInputState extends State<PasswordInput> {
   @override
   Widget build(BuildContext context) {
     return TextField(
-            onChanged: (password) {},
-            decoration: InputDecoration(
-                labelText: 'รหัสผ่าน',
-                border: OutlineInputBorder(),
-                // errorText: state.password.invalid ? 'invalid password' : null,
-                suffixIcon: InkWell(
-                  onTap: () {
-                    setState(() {
-                      _isHidden = !_isHidden;
-                    });
-                  },
-                  child:
-                      Icon(_isHidden ? Icons.visibility : Icons.visibility_off),
-                )),
-            obscureText: _isHidden,
-          );
+      onChanged: (password) {},
+      decoration: InputDecoration(
+          labelText: 'รหัสผ่าน',
+          border: OutlineInputBorder(),
+          // errorText: state.password.invalid ? 'invalid password' : null,
+          suffixIcon: InkWell(
+            onTap: () {
+              setState(() {
+                _isHidden = !_isHidden;
+              });
+            },
+            child: Icon(_isHidden ? Icons.visibility : Icons.visibility_off),
+          )),
+      obscureText: _isHidden,
+    );
   }
 }
 
@@ -190,24 +216,23 @@ class _ConfirmPasswordInputState extends State<ConfirmPasswordInput> {
   @override
   Widget build(BuildContext context) {
     return TextField(
-            onChanged: (confirmPassword) {},
-            decoration: InputDecoration(
-                labelText: 'ยืนยันรหัสผ่าน',
-                border: OutlineInputBorder(),
-                // errorText: state.confirmedPassword.invalid
-                //     ? 'passwords do not match'
-                //     : null,
-                suffixIcon: InkWell(
-                  onTap: () {
-                    setState(() {
-                      _isHidden = !_isHidden;
-                    });
-                  },
-                  child:
-                      Icon(_isHidden ? Icons.visibility : Icons.visibility_off),
-                )),
-            obscureText: _isHidden,
-          );
+      onChanged: (confirmPassword) {},
+      decoration: InputDecoration(
+          labelText: 'ยืนยันรหัสผ่าน',
+          border: OutlineInputBorder(),
+          // errorText: state.confirmedPassword.invalid
+          //     ? 'passwords do not match'
+          //     : null,
+          suffixIcon: InkWell(
+            onTap: () {
+              setState(() {
+                _isHidden = !_isHidden;
+              });
+            },
+            child: Icon(_isHidden ? Icons.visibility : Icons.visibility_off),
+          )),
+      obscureText: _isHidden,
+    );
   }
 }
 

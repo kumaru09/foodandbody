@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:foodandbody/models/body.dart';
-import 'package:foodandbody/screens/body/cubit/body_cubit.dart';
-import 'package:provider/src/provider.dart';
+// import 'package:foodandbody/screens/body/cubit/body_cubit.dart';
+// import 'package:provider/src/provider.dart';
 
 class EditBodyFigure extends StatefulWidget {
   const EditBodyFigure({required this.body});
@@ -27,6 +27,7 @@ class _EditBodyState extends State<EditBodyFigure> {
         backgroundColor: Theme.of(context).primaryColor,
         elevation: 0,
         leading: IconButton(
+          key: const Key("body_close_button"),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -40,6 +41,7 @@ class _EditBodyState extends State<EditBodyFigure> {
         ),
         actions: [
           TextButton(
+            key: const Key("body_save_button"),
             onPressed: () async {
               Navigator.pop(context, {
                 'shoulder': '$_currentShoulder',
@@ -66,6 +68,7 @@ class _EditBodyState extends State<EditBodyFigure> {
             children: [
               SizedBox(height: 4),
               TextFormField(
+                key: const Key("body_edit_shoulder_text_filed"),
                 keyboardType: TextInputType.number,
                 textInputAction: TextInputAction.next,
                 initialValue: _currentShoulder,
@@ -78,6 +81,7 @@ class _EditBodyState extends State<EditBodyFigure> {
               ),
               SizedBox(height: 20),
               TextFormField(
+                key: const Key("body_edit_chest_text_filed"),
                 keyboardType: TextInputType.number,
                 textInputAction: TextInputAction.next,
                 initialValue: _currentChest,
@@ -90,6 +94,7 @@ class _EditBodyState extends State<EditBodyFigure> {
               ),
               SizedBox(height: 20),
               TextFormField(
+                key: const Key("body_edit_waist_text_filed"),
                 keyboardType: TextInputType.number,
                 textInputAction: TextInputAction.next,
                 initialValue: _currentWaist,
@@ -102,6 +107,7 @@ class _EditBodyState extends State<EditBodyFigure> {
               ),
               SizedBox(height: 20),
               TextFormField(
+                key: const Key("body_edit_hip_text_filed"),
                 keyboardType: TextInputType.number,
                 textInputAction: TextInputAction.next,
                 initialValue: _currentHip,
