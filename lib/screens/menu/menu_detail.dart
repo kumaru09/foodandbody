@@ -30,10 +30,13 @@ class MenuDetail extends StatefulWidget {
 }
 
 class _MenuDetailState extends State<MenuDetail> {
+  late MenuBloc _menuBloc;
+
   @override
   void initState() {
     super.initState();
-    context.read<MenuBloc>().add(MenuFetched());
+    _menuBloc = context.read<MenuBloc>();
+    _menuBloc.add(MenuFetched());
   }
 
   String toRound(double value) {
@@ -71,32 +74,35 @@ class _MenuDetailState extends State<MenuDetail> {
     }
   }
 
-  // List<NearRestaurant> items = [
-  //   NearRestaurant(
-  //     name: 'ร้านกุ้งยุดยา',
-  //     imageUrl: 'https://bnn.blob.core.windows.net/food/shrimp-fried-rice.jpg',
-  //     distance: 2.0,
-  //     rating: 3.2,
-  //     open: TimeOfDay(hour: 8, minute: 0),
-  //     close: TimeOfDay(hour: 20, minute: 0),
-  //   ),
-  //   NearRestaurant(
-  //     name: 'สมปองการกุ้ง',
-  //     imageUrl: 'https://bnn.blob.core.windows.net/food/shrimp-fried-rice.jpg',
-  //     distance: 4.5,
-  //     rating: 4.5,
-  //     open: TimeOfDay(hour: 12, minute: 0),
-  //     close: TimeOfDay(hour: 22, minute: 0),
-  //   ),
-  // ];
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<MenuBloc, MenuState>(
       builder: (context, state) {
         switch (state.status) {
           case MenuStatus.failure:
-            return const Center(child: Text('failed to fetch menu'));
+            return Center(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image(image: AssetImage('assets/error.png')),
+                  SizedBox(height: 10),
+                  Text('ไม่สามารถโหลดข้อมูลได้ในขณะนี้',
+                      style: Theme.of(context).textTheme.bodyText2!.merge(
+                          TextStyle(
+                              color: Theme.of(context).colorScheme.secondary))),
+                  OutlinedButton(
+                    child: Text('ลองอีกครั้ง'),
+                    style: OutlinedButton.styleFrom(
+                      primary: Theme.of(context).colorScheme.secondary,
+                      shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(50))),
+                    ),
+                    onPressed: () => _menuBloc.add(MenuFetched()),
+                  ),
+                ],
+              ),
+            );
           case MenuStatus.success:
             return Column(
               children: <Widget>[
@@ -162,11 +168,10 @@ class _MenuDetailState extends State<MenuDetail> {
                               value:
                                   '${widget.isPlanMenu ? toRound(widget.menu.fat) : toRound(state.menu.fat)} กรัม',
                             ),
-                            if (state.nearRestaurant.isNotEmpty)
-                              _NearRestaurant(
-                                items: state.nearRestaurant,
-                                defaultUrl: state.menu.imageUrl,
-                              ),
+                            _NearRestaurant(
+                              items: state.nearRestaurant,
+                              defaultUrl: state.menu.imageUrl,
+                            ),
                           ],
                         ),
                       ),
@@ -200,22 +205,31 @@ class _NearRestaurant extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('สถานที่ใกล้คุณ',
+        SizedBox(height: 10),
+        Text('ร้านใกล้คุณ',
             style: Theme.of(context).textTheme.subtitle1!.merge(
                 TextStyle(color: Theme.of(context).colorScheme.secondary))),
-        ListView.builder(
-          itemBuilder: (BuildContext context, int index) {
-            return _NearRestaurantItem(
-              item: items[index],
-              defaultUrl: defaultUrl,
-            );
-          },
-          itemCount: items.length,
-          scrollDirection: Axis.vertical,
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          padding: EdgeInsets.symmetric(vertical: 10),
-        ),
+        items.isEmpty
+            ? Center(
+                heightFactor: 2,
+                child: Text('ไม่มีร้านใกล้คุณในขณะนี้',
+                    style: Theme.of(context).textTheme.bodyText2!.merge(
+                        TextStyle(
+                            color: Theme.of(context).colorScheme.secondary))),
+              )
+            : ListView.builder(
+                itemBuilder: (BuildContext context, int index) {
+                  return _NearRestaurantItem(
+                    item: items[index],
+                    defaultUrl: defaultUrl,
+                  );
+                },
+                itemCount: items.length,
+                scrollDirection: Axis.vertical,
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                padding: EdgeInsets.symmetric(vertical: 10),
+              ),
       ],
     );
   }

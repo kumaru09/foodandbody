@@ -6,3 +6,4 @@ abstract class MenuEvent extends Equatable {
 }
 
 class MenuFetched extends MenuEvent {}
+class MenuReFetched extends MenuEvent {}

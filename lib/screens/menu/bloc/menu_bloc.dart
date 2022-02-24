@@ -39,6 +39,10 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
       _onMenuFetched,
       transformer: throttleDroppable(throttleDuration),
     );
+    on<MenuReFetched>(
+      _onMenuReFetched,
+      transformer: throttleDroppable(throttleDuration),
+    );
   }
 
   final http.Client httpClient;
@@ -54,7 +58,7 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
     Emitter<MenuState> emit,
   ) async {
     try {
-      if (state.status == MenuStatus.initial) {
+      if (state.status != MenuStatus.initial) emit(state.copyWith(status: MenuStatus.initial));
         final menu = await _fetchMenus(path);
         final List<NearRestaurant> nearRestaurant =
             await _fetchRestaurant(path);
@@ -62,7 +66,25 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
             status: MenuStatus.success,
             menu: menu,
             nearRestaurant: nearRestaurant));
-      }
+    } catch (e) {
+      print(e);
+      emit(state.copyWith(status: MenuStatus.failure));
+    }
+  }
+
+  Future<void> _onMenuReFetched(
+    MenuReFetched event,
+    Emitter<MenuState> emit,
+  ) async {
+    try {
+      if (state.status != MenuStatus.success) return;
+        final menu = await _fetchMenus(path);
+        final List<NearRestaurant> nearRestaurant =
+            await _fetchRestaurant(path);
+        return emit(state.copyWith(
+            status: MenuStatus.success,
+            menu: menu,
+            nearRestaurant: nearRestaurant));
     } catch (e) {
       print(e);
       emit(state.copyWith(status: MenuStatus.failure));
