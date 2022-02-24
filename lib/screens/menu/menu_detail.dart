@@ -334,9 +334,10 @@ class _AddToPlanButton extends StatelessWidget {
                 name: name,
                 isEatNow: false,
                 volumn: double.parse(value.toString()));
-            Navigator.of(context).pushReplacement(MaterialPageRoute(
-              builder: (context) => MainScreen(index: 1),
-            ));
+
+            Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => MainScreen(index: 1)),
+                (Route<dynamic> route) => route.isFirst);
           }
         },
       ),
@@ -366,9 +367,11 @@ class _EatNowButton extends StatelessWidget {
     if (value != 'cancel' && value != null) {
       await context.read<MenuBloc>().addMenu(
           name: name, isEatNow: true, volumn: double.parse(value.toString()));
-      Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) => MainScreen(index: 1),
-      ));
+
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => MainScreen(index: 1)),
+        (Route<dynamic> route) => route.isFirst,
+      );
     }
   }
 
