@@ -39,6 +39,12 @@ class _MenuDetailState extends State<MenuDetail> {
     _menuBloc.add(MenuFetched());
   }
 
+  Future _onRefresh() async {
+    await Future.delayed(Duration(seconds: 2));
+    _menuBloc.add(MenuReFetched());
+    setState(() {});
+  }
+
   String toRound(double value) {
     if (value - value.toInt() == 0.0)
       return value.toInt().toString();
@@ -104,25 +110,39 @@ class _MenuDetailState extends State<MenuDetail> {
               ),
             );
           case MenuStatus.success:
-            return Column(
-              children: <Widget>[
-                Expanded(
-                  child: ListView(
-                    children: <Widget>[
-                      Image.network(
-                        state.menu.imageUrl,
-                        alignment: Alignment.center,
-                        height: 300,
-                        fit: BoxFit.cover,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: Column(
-                          children: <Widget>[
-                            Row(
-                              children: <Widget>[
-                                Expanded(
-                                  child: Text('แคลอรีรวม',
+            return RefreshIndicator(
+              onRefresh: _onRefresh,
+              child: Column(
+                children: <Widget>[
+                  Expanded(
+                    child: ListView(
+                      children: <Widget>[
+                        Image.network(
+                          state.menu.imageUrl,
+                          alignment: Alignment.center,
+                          height: 300,
+                          fit: BoxFit.cover,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: Column(
+                            children: <Widget>[
+                              Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Text('แคลอรีรวม',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline5!
+                                            .merge(TextStyle(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .secondary))),
+                                  ),
+                                  Text(
+                                      widget.isPlanMenu
+                                          ? '${widget.menu.calories.round()} แคล'
+                                          : '${state.menu.calory.round()} แคล',
                                       style: Theme.of(context)
                                           .textTheme
                                           .headline5!
@@ -130,60 +150,49 @@ class _MenuDetailState extends State<MenuDetail> {
                                               color: Theme.of(context)
                                                   .colorScheme
                                                   .secondary))),
-                                ),
-                                Text(
-                                    widget.isPlanMenu
-                                        ? '${widget.menu.calories.round()} แคล'
-                                        : '${state.menu.calory.round()} แคล',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headline5!
-                                        .merge(TextStyle(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .secondary))),
-                              ],
-                            ),
-                            SizedBox(height: 16.0),
-                            NutrientDetail(
-                              label: 'หน่วยบริโภค',
-                              value:
-                                  '${widget.isPlanMenu ? toRound(widget.menu.volumn) : toRound(state.menu.serve)} ${state.menu.unit}',
-                            ),
-                            SizedBox(height: 7.0),
-                            NutrientDetail(
-                              label: 'โปรตีน',
-                              value:
-                                  '${widget.isPlanMenu ? toRound(widget.menu.protein) : toRound(state.menu.protein)} กรัม',
-                            ),
-                            SizedBox(height: 7.0),
-                            NutrientDetail(
-                              label: 'คาร์โบไฮเดรต',
-                              value:
-                                  '${widget.isPlanMenu ? toRound(widget.menu.carb) : toRound(state.menu.carb)} กรัม',
-                            ),
-                            SizedBox(height: 7.0),
-                            NutrientDetail(
-                              label: 'ไขมัน',
-                              value:
-                                  '${widget.isPlanMenu ? toRound(widget.menu.fat) : toRound(state.menu.fat)} กรัม',
-                            ),
-                            _NearRestaurant(
-                              items: state.nearRestaurant,
-                              defaultUrl: state.menu.imageUrl,
-                            ),
-                          ],
+                                ],
+                              ),
+                              SizedBox(height: 16.0),
+                              NutrientDetail(
+                                label: 'หน่วยบริโภค',
+                                value:
+                                    '${widget.isPlanMenu ? toRound(widget.menu.volumn) : toRound(state.menu.serve)} ${state.menu.unit}',
+                              ),
+                              SizedBox(height: 7.0),
+                              NutrientDetail(
+                                label: 'โปรตีน',
+                                value:
+                                    '${widget.isPlanMenu ? toRound(widget.menu.protein) : toRound(state.menu.protein)} กรัม',
+                              ),
+                              SizedBox(height: 7.0),
+                              NutrientDetail(
+                                label: 'คาร์โบไฮเดรต',
+                                value:
+                                    '${widget.isPlanMenu ? toRound(widget.menu.carb) : toRound(state.menu.carb)} กรัม',
+                              ),
+                              SizedBox(height: 7.0),
+                              NutrientDetail(
+                                label: 'ไขมัน',
+                                value:
+                                    '${widget.isPlanMenu ? toRound(widget.menu.fat) : toRound(state.menu.fat)} กรัม',
+                              ),
+                              _NearRestaurant(
+                                items: state.nearRestaurant,
+                                defaultUrl: state.menu.imageUrl,
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: displayButton(
-                      state.menu.name, state.menu.serve, state.menu.unit),
-                ),
-              ],
+                  Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: displayButton(
+                        state.menu.name, state.menu.serve, state.menu.unit),
+                  ),
+                ],
+              ),
             );
           default:
             return const Center(child: CircularProgressIndicator());
