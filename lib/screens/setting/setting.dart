@@ -212,7 +212,8 @@ class _SettingState extends State<Setting> {
                         child: TextButton(
                           onPressed: () {
                             context.read<AppBloc>().add(AppLogoutRequested());
-                            Navigator.pop(context);
+                            Navigator.popUntil(
+                                context, (Route<dynamic> route) => false);
                           },
                           style: TextButton.styleFrom(
                               padding: EdgeInsets.zero,

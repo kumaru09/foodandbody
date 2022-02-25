@@ -24,6 +24,7 @@ class Home extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           elevation: 0,
+          automaticallyImplyLeading: false,
           title: Text("หน้าหลัก",
               style: Theme.of(context)
                   .textTheme
