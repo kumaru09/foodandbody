@@ -36,7 +36,6 @@ class _MenuDetailState extends State<MenuDetail> {
   void initState() {
     super.initState();
     _menuBloc = context.read<MenuBloc>();
-    _menuBloc.add(MenuFetched());
   }
 
   Future _onRefresh() async {
@@ -45,14 +44,14 @@ class _MenuDetailState extends State<MenuDetail> {
     setState(() {});
   }
 
-  String toRound(double value) {
+  String _toRound(double value) {
     if (value - value.toInt() == 0.0)
       return value.toInt().toString();
     else
       return value.toString();
   }
 
-  Widget displayButton(String name, double serve, String unit) {
+  Widget _displayButton(String name, double serve, String unit) {
     if (widget.isPlanMenu) {
       return Row(
         children: [
@@ -113,6 +112,7 @@ class _MenuDetailState extends State<MenuDetail> {
             return RefreshIndicator(
               onRefresh: _onRefresh,
               child: Column(
+                key: Key('menu_column'),
                 children: <Widget>[
                   Expanded(
                     child: ListView(
@@ -156,25 +156,25 @@ class _MenuDetailState extends State<MenuDetail> {
                               NutrientDetail(
                                 label: 'หน่วยบริโภค',
                                 value:
-                                    '${widget.isPlanMenu ? toRound(widget.menu.volumn) : toRound(state.menu.serve)} ${state.menu.unit}',
+                                    '${widget.isPlanMenu ? _toRound(widget.menu.volumn) : _toRound(state.menu.serve)} ${state.menu.unit}',
                               ),
                               SizedBox(height: 7.0),
                               NutrientDetail(
                                 label: 'โปรตีน',
                                 value:
-                                    '${widget.isPlanMenu ? toRound(widget.menu.protein) : toRound(state.menu.protein)} กรัม',
+                                    '${widget.isPlanMenu ? _toRound(widget.menu.protein) : _toRound(state.menu.protein)} กรัม',
                               ),
                               SizedBox(height: 7.0),
                               NutrientDetail(
                                 label: 'คาร์โบไฮเดรต',
                                 value:
-                                    '${widget.isPlanMenu ? toRound(widget.menu.carb) : toRound(state.menu.carb)} กรัม',
+                                    '${widget.isPlanMenu ? _toRound(widget.menu.carb) : _toRound(state.menu.carb)} กรัม',
                               ),
                               SizedBox(height: 7.0),
                               NutrientDetail(
                                 label: 'ไขมัน',
                                 value:
-                                    '${widget.isPlanMenu ? toRound(widget.menu.fat) : toRound(state.menu.fat)} กรัม',
+                                    '${widget.isPlanMenu ? _toRound(widget.menu.fat) : _toRound(state.menu.fat)} กรัม',
                               ),
                               _NearRestaurant(
                                 items: state.nearRestaurant,
@@ -188,7 +188,7 @@ class _MenuDetailState extends State<MenuDetail> {
                   ),
                   Padding(
                     padding: EdgeInsets.all(16.0),
-                    child: displayButton(
+                    child: _displayButton(
                         state.menu.name, state.menu.serve, state.menu.unit),
                   ),
                 ],
@@ -265,6 +265,7 @@ class _NearRestaurantItem extends StatelessWidget {
             borderRadius: BorderRadius.all(Radius.circular(15)),
             child: Image.network(
               item.imageUrl == null ? defaultUrl : item.imageUrl!,
+              key: const Key('nearRestaurant_image'),
               width: 100,
               height: 100,
               alignment: Alignment.center,
@@ -285,7 +286,7 @@ class _NearRestaurantItem extends StatelessWidget {
                     style: Theme.of(context).textTheme.caption!.merge(TextStyle(
                         color: Theme.of(context).colorScheme.secondary))),
                 RatingBarIndicator(
-                  rating: item.rating!,
+                  rating: item.rating ?? 0.0,
                   itemBuilder: (context, index) => Icon(
                     Icons.star,
                     color: Theme.of(context).primaryColor,
