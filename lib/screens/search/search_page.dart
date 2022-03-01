@@ -31,13 +31,10 @@ class SearchPage extends StatelessWidget {
             icon: Icon(Icons.arrow_back, color: Colors.white)),
         actions: [
           IconButton(
-            icon: Icon(Icons.search, color: Colors.white),
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => Search(),
-              ),
-            ),
-          ),
+              icon: Icon(Icons.search, color: Colors.white),
+              onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => Search()),
+                  )),
         ],
       ),
       body: SafeArea(
