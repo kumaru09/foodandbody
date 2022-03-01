@@ -28,6 +28,8 @@ class HistoryBloc extends Bloc<HistoryEvent, HistoryState> {
   Future<void> _onFetchHistory(
       LoadHistory event, Emitter<HistoryState> emit) async {
     try {
+      if (state.status != HistoryStatus.initial)
+        emit(state.copyWith(status: HistoryStatus.initial));
       final history = await historyRepository.getHistory();
       final body = await bodyRepository.getBodyList();
       final weight = await bodyRepository.getWeightList();
