@@ -23,7 +23,7 @@ class PlanBloc extends Bloc<PlanEvent, PlanState> {
 
   Future<void> _fetchPlan(LoadPlan event, Emitter<PlanState> emit) async {
     try {
-      emit(state.copyWith(status: PlanStatus.loading));
+      if (!event.isRefresh) emit(state.copyWith(status: PlanStatus.loading));
       final plan = await _planRepository.getPlanById();
       emit(state.copyWith(status: PlanStatus.success, plan: plan));
     } catch (e) {

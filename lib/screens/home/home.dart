@@ -11,37 +11,52 @@ import 'package:foodandbody/screens/search/search_page.dart';
 import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
 import 'package:foodandbody/screens/setting/bloc/info_bloc.dart';
 import 'package:foodandbody/screens/setting/setting.dart';
+import 'package:foodandbody/widget/menu_card/bloc/menu_card_bloc.dart';
 import 'package:foodandbody/widget/menu_card/menu_card.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
+
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  Future<void> _onReFrech() async {
+    await Future.delayed(Duration(seconds: 2));
+    context.read<HomeBloc>().add(LoadWater(isRefresh: true));
+    context.read<PlanBloc>().add(LoadPlan(isRefresh: true));
+    context.read<MenuCardBloc>().add(FetchedFavMenuCard(isRefresh: true));
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        extendBody: true,
+      extendBody: true,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: AppBar(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          elevation: 0,
-          automaticallyImplyLeading: false,
-          title: Text("หน้าหลัก",
-              style: Theme.of(context)
-                  .textTheme
-                  .headline5!
-                  .merge(TextStyle(color: Theme.of(context).primaryColor))),
-          actions: [
-            IconButton(
-                key: const Key('setting_button'),
-                onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Setting()));
-                },
-                icon:
-                    Icon(Icons.settings, color: Theme.of(context).primaryColor))
-          ],
-        ),
-        body: SingleChildScrollView(
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        title: Text("หน้าหลัก",
+            style: Theme.of(context)
+                .textTheme
+                .headline5!
+                .merge(TextStyle(color: Theme.of(context).primaryColor))),
+        actions: [
+          IconButton(
+              key: const Key('setting_button'),
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => Setting()));
+              },
+              icon: Icon(Icons.settings, color: Theme.of(context).primaryColor))
+        ],
+      ),
+      body: RefreshIndicator(
+        onRefresh: _onReFrech,
+        child: SingleChildScrollView(
           child: BlocBuilder<PlanBloc, PlanState>(builder: (context, state) {
             return Column(
               children: [
@@ -148,7 +163,9 @@ class Home extends StatelessWidget {
               ],
             );
           }),
-        ));
+        ),
+      ),
+    );
   }
 
   Widget _buildCard(BuildContext context, History plan) {

@@ -46,7 +46,7 @@ class MenuCardBloc extends Bloc<MenuCardEvent, MenuCardState> {
     Emitter<MenuCardState> emit,
   ) async {
     try {
-      if (state.status != MenuCardStatus.initial)
+      if (!event.isRefresh && state.status != MenuCardStatus.initial)
         emit(state.copyWith(status: MenuCardStatus.initial));
       List<MenuList> fav = await menuCardRepository.getMenuList(isMyFav: false, checkCache: true);
       if (state.status == MenuCardStatus.initial) {
@@ -66,7 +66,7 @@ class MenuCardBloc extends Bloc<MenuCardEvent, MenuCardState> {
     Emitter<MenuCardState> emit,
   ) async {
     try {
-      if (state.status != MenuCardStatus.initial)
+      if (!event.isRefresh && state.status != MenuCardStatus.initial)
         emit(state.copyWith(status: MenuCardStatus.initial));
       List<MenuList> myFav = await menuCardRepository.getMenuList(isMyFav: true, checkCache: true);
       if (state.status == MenuCardStatus.initial) {
