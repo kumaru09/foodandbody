@@ -73,11 +73,11 @@ class HistoryBloc extends Bloc<HistoryEvent, HistoryState> {
         midNight.add(new Duration(hours: 23, minutes: 59, seconds: 59));
     final Timestamp stateTime = Timestamp.fromDate(midNight);
     final Timestamp endTime = Timestamp.fromDate(beforeMidNight);
-    print('${stateTime.toDate()}, ${endTime.toDate()}');
+    // print('${stateTime.toDate()}, ${endTime.toDate()}');
     try {
       final List<Menu> menuList =
           await historyRepository.getMenuListByDate(stateTime, endTime);
-      if (menuList.isNotEmpty) print('have menu: ${menuList.length}');
+      // if (menuList.isNotEmpty) print('have menu: ${menuList.length}');
       emit(state.copyWith(
           status: HistoryStatus.success,
           menuList: menuList
