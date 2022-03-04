@@ -94,7 +94,7 @@ class _HomeState extends State<Home> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "เมนูแนะนำ",
+                        "เมนูยอดนิยม",
                         style: Theme.of(context).textTheme.bodyText1!.merge(
                             TextStyle(color: Theme.of(context).primaryColor)),
                       ),
