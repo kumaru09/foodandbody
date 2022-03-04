@@ -135,7 +135,10 @@ void main() {
           .thenReturn(InfoState(status: InfoStatus.success, info: mockInfo));
       when(() => menuCardBloc.state).thenReturn(
           MenuCardState(status: MenuCardStatus.success, fav: mockMenuCard));
-      when(() => homeBloc.state).thenReturn(HomeState(status: HomeStatus.success, water: 1, exerciseList: mockExerciseList));
+      when(() => homeBloc.state).thenReturn(HomeState(
+          status: HomeStatus.success,
+          water: 1,
+          exerciseList: mockExerciseList));
       when(() => user.email).thenReturn('test@gmail.com');
       when(() => appBloc.state).thenReturn(AppState.authenticated(user));
       // when(() => plan.totalNutrientList)
@@ -288,7 +291,8 @@ void main() {
       //   });
       // }); //"when pressed ดูทั้งหมด button"
 
-      testWidgets("call home bloc function when pressed remove button", (tester) async {
+      testWidgets("call home bloc function when pressed remove button",
+          (tester) async {
         await mockNetworkImages(() async {
           await tester.pumpWidget(MaterialApp(
             home: MultiBlocProvider(
@@ -309,7 +313,8 @@ void main() {
         });
       }); //"when pressed remove button"
 
-      testWidgets("call home bloc function when pressed add button", (tester) async {
+      testWidgets("call home bloc function when pressed add button",
+          (tester) async {
         await mockNetworkImages(() async {
           await tester.pumpWidget(MaterialApp(
             home: MultiBlocProvider(
@@ -329,6 +334,28 @@ void main() {
           verify(() => homeBloc.add(WaterChanged(water: 2))).called(1);
         });
       }); //"when pressed add button"
+
+      testWidgets("call refresh function when drag screen down",
+          (tester) async {
+        await mockNetworkImages(() async {
+          await tester.pumpWidget(MaterialApp(
+            home: MultiBlocProvider(
+              providers: [
+                BlocProvider.value(value: planBloc),
+                BlocProvider.value(value: homeBloc),
+                BlocProvider.value(value: menuCardBloc),
+                BlocProvider.value(value: infoBloc),
+              ],
+              child: Home(),
+            ),
+          ));
+          await tester.dragFrom(Offset(0, 500), Offset(0, 100));
+          await tester.pumpAndSettle();
+          verify(() => menuCardBloc.add(ReFetchedFavMenuCard())).called(1);
+          verify(() => planBloc.add(LoadPlan())).called(1);
+          verify(() => homeBloc.add(LoadWater())).called(1);
+        });
+      });
     }); //group "action"
   }); //group "Home Page"
 } //main

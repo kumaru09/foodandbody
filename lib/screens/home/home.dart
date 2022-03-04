@@ -26,7 +26,7 @@ class _HomeState extends State<Home> {
     await Future.delayed(Duration(seconds: 2));
     context.read<HomeBloc>().add(LoadWater(isRefresh: true));
     context.read<PlanBloc>().add(LoadPlan(isRefresh: true));
-    context.read<MenuCardBloc>().add(FetchedFavMenuCard(isRefresh: true));
+    context.read<MenuCardBloc>().add(ReFetchedFavMenuCard(isRefresh: true));
     setState(() {});
   }
 

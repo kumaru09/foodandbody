@@ -6,13 +6,16 @@ abstract class MenuCardEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class FetchedFavMenuCard extends MenuCardEvent {
-  const FetchedFavMenuCard({this.isRefresh = false});
+class FetchedFavMenuCard extends MenuCardEvent {}
+
+class FetchedMyFavMenuCard extends MenuCardEvent {}
+
+class ReFetchedFavMenuCard extends MenuCardEvent {
+  const ReFetchedFavMenuCard({this.isRefresh = false});
   final bool isRefresh;
 }
-class FetchedMyFavMenuCard extends MenuCardEvent {
-  const FetchedMyFavMenuCard({this.isRefresh = false});
+
+class ReFetchedMyFavMenuCard extends MenuCardEvent {
+  const ReFetchedMyFavMenuCard({this.isRefresh = false});
   final bool isRefresh;
 }
-class ReFetchedFavMenuCard extends MenuCardEvent {}
-class ReFetchedMyFavMenuCard extends MenuCardEvent {}
