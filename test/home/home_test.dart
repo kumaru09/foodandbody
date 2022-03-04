@@ -184,6 +184,51 @@ void main() {
         });
       }); //"calories circular progress"
 
+      testWidgets("fail calories circular progress when plan status is failure", (tester) async {
+        await mockNetworkImages(() async {
+          when(() => planBloc.state)
+          .thenReturn(PlanState(status: PlanStatus.failure, plan: mockHistory));
+          await tester.pumpWidget(MaterialApp(
+            home: MultiBlocProvider(
+              providers: [
+                BlocProvider.value(value: planBloc),
+                BlocProvider.value(value: menuCardBloc),
+                BlocProvider.value(value: infoBloc),
+                BlocProvider.value(value: homeBloc),
+              ],
+              child: Home(),
+            ),
+          ));
+          expect(find.text('แคลอรีวันนี้'), findsOneWidget);
+          expect(find.byKey(circularIndicatorKey), findsNothing);
+          expect(find.text('ไม่สามารถโหลดข้อมูลได้ในขณะนี้'), findsNWidgets(2));
+          expect(find.text('ลองอีกครั้ง'), findsNWidgets(2));
+        });
+      });
+
+      testWidgets("fail calories circular progress when info status is failure", (tester) async {
+        await mockNetworkImages(() async {
+          when(() => infoBloc.state)
+          .thenReturn(InfoState(status: InfoStatus.failure));
+          await tester.pumpWidget(MaterialApp(
+            home: MultiBlocProvider(
+              providers: [
+                BlocProvider.value(value: planBloc),
+                BlocProvider.value(value: menuCardBloc),
+                BlocProvider.value(value: infoBloc),
+                BlocProvider.value(value: homeBloc),
+              ],
+              child: Home(),
+            ),
+          ));
+          await tester.pumpAndSettle();
+          expect(find.text('แคลอรีวันนี้'), findsOneWidget);
+          expect(find.byKey(circularIndicatorKey), findsNothing);
+          expect(find.text('ไม่สามารถโหลดข้อมูลได้ในขณะนี้'), findsOneWidget);
+          expect(find.text('ลองอีกครั้ง'), findsOneWidget);
+        });
+      });
+
       testWidgets("menu card", (tester) async {
         await mockNetworkImages(() async {
           await tester.pumpWidget(MaterialApp(
@@ -243,10 +288,56 @@ void main() {
             ),
           ));
           await tester.dragFrom(Offset(0, 300), Offset(0, -300));
-          await tester.pumpAndSettle();
           expect(find.text('ออกกำลังกาย'), findsOneWidget);
+          expect(find.text('เพิ่มการออกกำลังกาย'), findsOneWidget);
           expect(find.text('exerciseName'), findsOneWidget);
           expect(find.byType(ExerciseList), findsOneWidget);
+        });
+      });
+
+      testWidgets("fail exercise list when plan status is failure", (tester) async {
+        await mockNetworkImages(() async {
+          when(() => planBloc.state)
+          .thenReturn(PlanState(status: PlanStatus.failure, plan: mockHistory));
+          await tester.pumpWidget(MaterialApp(
+            home: MultiBlocProvider(
+              providers: [
+                BlocProvider.value(value: planBloc),
+                BlocProvider.value(value: homeBloc),
+                BlocProvider.value(value: menuCardBloc),
+                BlocProvider.value(value: infoBloc),
+              ],
+              child: Home(),
+            ),
+          ));
+          await tester.dragFrom(Offset(0, 300), Offset(0, -300));
+          expect(find.text('ออกกำลังกาย'), findsOneWidget);
+          expect(find.text('เพิ่มการออกกำลังกาย'), findsNothing);
+          expect(find.text('exerciseName'), findsNothing);
+          expect(find.byType(ExerciseList), findsNothing);
+          expect(find.text('ไม่สามารถโหลดข้อมูลได้ในขณะนี้'), findsNWidgets(2));
+          expect(find.text('ลองอีกครั้ง'), findsNWidgets(2));
+        });
+      });
+
+      testWidgets("dialog add exercise list when pressed add exercise icon", (tester) async {
+        await mockNetworkImages(() async {
+          await tester.pumpWidget(MaterialApp(
+            home: MultiBlocProvider(
+              providers: [
+                BlocProvider.value(value: planBloc),
+                BlocProvider.value(value: homeBloc),
+                BlocProvider.value(value: menuCardBloc),
+                BlocProvider.value(value: infoBloc),
+              ],
+              child: Home(),
+            ),
+          ));
+          await tester.dragFrom(Offset(0, 300), Offset(0, -300));
+          expect(find.text('เพิ่มการออกกำลังกาย'), findsOneWidget);
+          await tester.tap(find.text('เพิ่มการออกกำลังกาย'));
+          await tester.pumpAndSettle();
+          expect(find.byKey(Key("home_add_exercise_dialog")), findsOneWidget);
         });
       });
     }); //group "render"
@@ -354,6 +445,73 @@ void main() {
           verify(() => menuCardBloc.add(ReFetchedFavMenuCard())).called(1);
           verify(() => planBloc.add(LoadPlan())).called(1);
           verify(() => homeBloc.add(LoadWater())).called(1);
+        });
+      });
+
+      testWidgets("call plan bloc when pressed try again at circle indicator",
+          (tester) async {
+        await mockNetworkImages(() async {
+          when(() => planBloc.state)
+          .thenReturn(PlanState(status: PlanStatus.failure, plan: mockHistory));
+          await tester.pumpWidget(MaterialApp(
+            home: MultiBlocProvider(
+              providers: [
+                BlocProvider.value(value: planBloc),
+                BlocProvider.value(value: homeBloc),
+                BlocProvider.value(value: menuCardBloc),
+                BlocProvider.value(value: infoBloc),
+              ],
+              child: Home(),
+            ),
+          ));
+          await tester.tap(find.byKey(Key('home_tryAgain_button_circle')));
+          await tester.pumpAndSettle();
+          verify(() => planBloc.add(LoadPlan())).called(1);
+        });
+      });
+
+      testWidgets("call info bloc when pressed try again at circle indicator",
+          (tester) async {
+        await mockNetworkImages(() async {
+          when(() => infoBloc.state)
+          .thenReturn(InfoState(status: InfoStatus.failure));
+          await tester.pumpWidget(MaterialApp(
+            home: MultiBlocProvider(
+              providers: [
+                BlocProvider.value(value: planBloc),
+                BlocProvider.value(value: homeBloc),
+                BlocProvider.value(value: menuCardBloc),
+                BlocProvider.value(value: infoBloc),
+              ],
+              child: Home(),
+            ),
+          ));
+          await tester.tap(find.text('ลองอีกครั้ง'));
+          await tester.pumpAndSettle();
+          verify(() => infoBloc.add(LoadInfo())).called(1);
+        });
+      });
+
+      testWidgets("call plan bloc when pressed try again at exercise list",
+          (tester) async {
+        await mockNetworkImages(() async {
+          when(() => planBloc.state)
+          .thenReturn(PlanState(status: PlanStatus.failure, plan: mockHistory));
+          await tester.pumpWidget(MaterialApp(
+            home: MultiBlocProvider(
+              providers: [
+                BlocProvider.value(value: planBloc),
+                BlocProvider.value(value: homeBloc),
+                BlocProvider.value(value: menuCardBloc),
+                BlocProvider.value(value: infoBloc),
+              ],
+              child: Home(),
+            ),
+          ));
+          await tester.dragFrom(Offset(0, 300), Offset(0, -300));
+          await tester.tap(find.byKey(Key('home_tryAgain_button_exercise')));
+          await tester.pumpAndSettle();
+          verify(() => planBloc.add(LoadPlan())).called(1);
         });
       });
     }); //group "action"

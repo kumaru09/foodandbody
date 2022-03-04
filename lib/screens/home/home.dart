@@ -102,6 +102,7 @@ class _HomeState extends State<Home> {
                                                     .secondary))),
                                     OutlinedButton(
                                       child: Text('ลองอีกครั้ง'),
+                                      key: const Key('home_tryAgain_button_circle'),
                                       style: OutlinedButton.styleFrom(
                                         primary: Theme.of(context)
                                             .colorScheme
@@ -226,6 +227,7 @@ class _HomeState extends State<Home> {
                                               .secondary))),
                               OutlinedButton(
                                 child: Text('ลองอีกครั้ง'),
+                                key: const Key('home_tryAgain_button_exercise'),
                                 style: OutlinedButton.styleFrom(
                                   primary:
                                       Theme.of(context).colorScheme.secondary,
