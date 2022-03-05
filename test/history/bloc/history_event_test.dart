@@ -1,35 +1,37 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:foodandbody/screens/menu/bloc/menu_bloc.dart';
+import 'package:foodandbody/screens/history/bloc/history_bloc.dart';
 
 void main() {
-  group('MenuEvent', () {
-    group('MenuFetched', () {
+  group('HistoryEvent', () {
+    group('LoadHistory', () {
       test('supports value equality', () {
         expect(
-          MenuFetched(),
-          equals(MenuFetched()),
+          LoadHistory(),
+          equals(LoadHistory()),
         );
       });
 
       test('props are correct', () {
         expect(
-          MenuFetched().props,
+          LoadHistory().props,
           equals(<Object?>[]),
         );
       });
     });
 
-    group('MenuReFetched', () {
+    group('LoadMenuList', () {
       test('supports value equality', () {
         expect(
-          MenuReFetched(),
-          equals(MenuReFetched()),
+          LoadMenuList(dateTime: DateTime(2022)),
+          equals(
+            LoadMenuList(dateTime: DateTime(2022)),
+          ),
         );
       });
 
       test('props are correct', () {
         expect(
-          MenuReFetched().props,
+          LoadMenuList(dateTime: DateTime(2022)).props,
           equals(<Object?>[]),
         );
       });
