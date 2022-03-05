@@ -48,6 +48,7 @@ void main() {
         build: () => bodyCubit,
         act: (bloc) => bloc.fetchBody(),
         expect: () => <BodyState>[
+          BodyState(status: BodyStatus.loading),
           BodyState(
             status: BodyStatus.success,
             body: mockBody,
@@ -71,6 +72,7 @@ void main() {
         build: () => bodyCubit,
         act: (bloc) => bloc.fetchBody(),
         expect: () => <BodyState>[
+          BodyState(status: BodyStatus.loading),
           BodyState(
             status: BodyStatus.success,
             body: Body.empty,
@@ -93,7 +95,7 @@ void main() {
         },
         build: () => bodyCubit,
         act: (bloc) => bloc.fetchBody(),
-        expect: () => <BodyState>[BodyState(status: BodyStatus.failure)],
+        expect: () => <BodyState>[BodyState(status: BodyStatus.loading),BodyState(status: BodyStatus.failure)],
         verify: (_) {
           verify(() => bodyRepository.getBodyLatest()).called(1);
           verifyNever(() => bodyRepository.getWeightList());
@@ -110,7 +112,7 @@ void main() {
         },
         build: () => bodyCubit,
         act: (bloc) => bloc.fetchBody(),
-        expect: () => <BodyState>[BodyState(status: BodyStatus.failure)],
+        expect: () => <BodyState>[BodyState(status: BodyStatus.loading),BodyState(status: BodyStatus.failure)],
         verify: (_) {
           verify(() => bodyRepository.getBodyLatest()).called(1);
           verify(() => bodyRepository.getWeightList()).called(1);
@@ -129,7 +131,6 @@ void main() {
         build: () => bodyCubit,
         act: (bloc) => bloc.updateWeight(50),
         expect: () => <BodyState>[
-          BodyState(status: BodyStatus.loading),
           BodyState(
             status: BodyStatus.success,
             weightList: mockWeightList,
@@ -151,7 +152,6 @@ void main() {
         build: () => bodyCubit,
         act: (bloc) => bloc.updateWeight(50),
         expect: () => <BodyState>[
-          BodyState(status: BodyStatus.loading),
           BodyState(
             status: BodyStatus.success,
             weightList: mockWeightList,
