@@ -147,7 +147,7 @@ class BodyFigureInfo extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                           builder: (context) => EditBodyFigure(body: body)));
-                  await context.read<BodyCubit>().updateBody(value['shoulder'],
+                  if(value != 'cancel') await context.read<BodyCubit>().updateBody(value['shoulder'],
                       value['chest'], value['waist'], value['hip']);
                 },
               )

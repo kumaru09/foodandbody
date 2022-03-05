@@ -15,6 +15,7 @@ class BodyCubit extends Cubit<BodyState> {
 
   Future<void> fetchBody() async {
     try {
+      emit(state.copyWith(status: BodyStatus.loading));
       final body = await _bodyRepository.getBodyLatest();
       final weightList = await _bodyRepository.getWeightList();
       emit(state.copyWith(
@@ -26,7 +27,7 @@ class BodyCubit extends Cubit<BodyState> {
 
   Future<void> updateWeight(int weight) async {
     try {
-      emit(state.copyWith(status: BodyStatus.loading));
+      // emit(state.copyWith(status: BodyStatus.loading));
       await _bodyRepository.addWeight(weight);
       final weightList = await _bodyRepository.getWeightList();
       emit(state.copyWith(status: BodyStatus.success, weightList: weightList));
