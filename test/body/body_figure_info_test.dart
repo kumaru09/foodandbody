@@ -102,7 +102,7 @@ void main() {
         ));
         expect(
             find.text("วันที่ " +
-                DateFormat.yMd().add_Hm().format(body.date.toDate())),
+                DateFormat("dd/MM/yyyy HH:mm").format(body.date.toDate())),
             findsOneWidget);
       });
 
@@ -131,12 +131,12 @@ void main() {
             child: BodyFigureInfo(body),
           ),
         ),
-      ));
+      )); 
       expect(find.text("-"), findsNWidgets(4));
       expect(find.text("เซนติเมตร"), findsNWidgets(4));
       expect(
           find.text(
-              "วันที่ " + DateFormat.yMd().add_Hm().format(body.date.toDate())),
+              "วันที่ " + DateFormat("dd/MM/yyyy HH:mm").format(body.date.toDate())),
           findsOneWidget);
     });
 
