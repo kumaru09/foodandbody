@@ -8,9 +8,10 @@ import 'package:foodandbody/screens/setting/bloc/info_bloc.dart';
 class Body extends StatelessWidget {
   const Body({Key? key}) : super(key: key);
 
-  Widget _failureWidget(BuildContext context, String state) {
+  Widget _failureWidget(BuildContext context, bool isBody) {
     return Center(
       child: Column(
+        key: Key('body_failure_widget'),
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -26,7 +27,7 @@ class Body extends StatelessWidget {
               shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(50))),
             ),
-            onPressed: () => state == 'body'
+            onPressed: () => isBody
                 ? context.read<BodyCubit>().fetchBody()
                 : context.read<InfoBloc>().add(LoadInfo()),
           ),
@@ -60,7 +61,7 @@ class Body extends StatelessWidget {
                     return SingleChildScrollView(
                       child: Column(
                         children: [
-                          Container(
+                          Container( 
                               padding:
                                   EdgeInsets.only(left: 16, top: 16, right: 15),
                               constraints: BoxConstraints(minHeight: 100),
@@ -88,13 +89,13 @@ class Body extends StatelessWidget {
                       ),
                     );
                   case InfoStatus.failure:
-                    return _failureWidget(context, 'info');
+                    return _failureWidget(context, false);
                   default:
                     return Center(child: CircularProgressIndicator());
                 }
               });
             case BodyStatus.failure:
-              return _failureWidget(context, 'body');
+              return _failureWidget(context, true);
             default:
               return Center(child: CircularProgressIndicator());
           }
