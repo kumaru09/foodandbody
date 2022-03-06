@@ -50,7 +50,7 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
   final PlanRepository planRepository;
   final FavoriteRepository favoriteRepository;
   final googlePlace =
-      google_place.GooglePlace("AIzaSyDpXYjDqWeb8vWEoUkbApUyQn3pQ42CbZE");
+      google_place.GooglePlace("AIzaSyAAw4dLXy4iLB73faed51VGnNumwkU7mFY");
   final Dio dio = Dio();
 
   Future<void> _onMenuFetched(
