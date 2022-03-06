@@ -29,7 +29,7 @@ class _EditBodyState extends State<EditBodyFigure> {
         leading: IconButton(
           key: const Key("body_close_button"),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pop(context, 'cancel');
           },
           icon: Icon(Icons.close, color: Colors.white),
         ),
@@ -44,10 +44,10 @@ class _EditBodyState extends State<EditBodyFigure> {
             key: const Key("body_save_button"),
             onPressed: () async {
               Navigator.pop(context, {
-                'shoulder': '$_currentShoulder',
-                'chest': '$_currentChest',
-                'waist': '$_currentWaist',
-                'hip': '$_currentHip'
+                'shoulder': '${_currentShoulder=="" ? "0": _currentShoulder}',
+                'chest': '${_currentChest=="" ? "0": _currentChest}',
+                'waist': '${_currentWaist=="" ? "0": _currentWaist}',
+                'hip': '${_currentHip=="" ? "0": _currentHip}'
               });
             },
             child: Text(
