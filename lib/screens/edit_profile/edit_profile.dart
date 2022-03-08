@@ -35,7 +35,7 @@ class EditProfile extends StatelessWidget {
               ..showSnackBar(
                 SnackBar(
                     content: Text(
-                        '${state.errorMessage ?? 'เกิดข้อผิดพลาดบางอย่าง'}')),
+                        '${state.errorMessage ?? 'แก้ไขข้อมูลไม่สำเร็จ กรุณาลองอีกครั้ง'}')),
               );
           }
         },
@@ -52,6 +52,7 @@ class EditProfile extends StatelessWidget {
                   ),
             ),
             leading: IconButton(
+              key: Key('editProfile_backButton'),
               icon: Icon(Icons.arrow_back, color: Colors.white),
               onPressed: () {
                 Navigator.pop(context);
@@ -59,6 +60,7 @@ class EditProfile extends StatelessWidget {
             ),
             actions: [
               IconButton(
+                key: Key('editProfile_saveButton'),
                 onPressed: () {
                   context.read<EditProfileCubit>().editFormSubmitted();
                 },
@@ -166,24 +168,21 @@ class __EditProfileImageState extends State<_EditProfileImage> {
           child: CircleAvatar(
               radius: 77,
               backgroundColor: Colors.white,
-              child: image != null
-                  ? CircleAvatar(
-                      foregroundImage: Image.file(image!).image,
-                      backgroundColor: Colors.white,
-                      radius: 74,
-                    )
-                  : CircleAvatar(
-                      foregroundImage: _hasProfileImage
-                          ? NetworkImage(_getInitialImage(context, _user))
-                          : Image.asset("assets/default_profile_image.png")
-                              .image,
-                      backgroundColor: Colors.white,
-                      radius: 74,
-                    ))),
+              child: CircleAvatar(
+                key: Key('editProfile_image'),
+                foregroundImage: image != null
+                    ? Image.file(image!).image
+                    : _hasProfileImage
+                        ? NetworkImage(_getInitialImage(context, _user))
+                        : Image.asset("assets/default_profile_image.png").image,
+                backgroundColor: Colors.white,
+                radius: 74,
+              ))),
       Positioned(
           top: MediaQuery.of(context).size.height * 0.01,
           left: MediaQuery.of(context).size.width * 0.255,
           child: ElevatedButton(
+            key: Key('editProfile_editImageButton'),
             style: ElevatedButton.styleFrom(
                 shape: CircleBorder(),
                 primary: Theme.of(context).colorScheme.secondary),
@@ -237,6 +236,7 @@ class _EditUsername extends StatelessWidget {
         buildWhen: (previous, current) => previous.name != current.name,
         builder: (context, state) {
           return TextFormField(
+            key: Key('editProfile_username'),
             initialValue: context.read<AppBloc>().state.user.info!.name,
             onChanged: (name) =>
                 context.read<EditProfileCubit>().usernameChanged(name),
@@ -353,6 +353,7 @@ class __EditGenderState extends State<_EditGender> {
     String? _gender = context.read<AppBloc>().state.user.info!.gender;
 
     return DropdownButtonFormField(
+      key: Key('editProfile_gender'),
       value: _gender,
       decoration: InputDecoration(
         labelText: "เพศ",
