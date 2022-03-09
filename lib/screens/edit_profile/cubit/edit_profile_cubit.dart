@@ -75,12 +75,12 @@ class EditProfileCubit extends Cubit<EditProfileState> {
       if (state.oldPassword.value.isNotEmpty &&
           state.password.value.isNotEmpty &&
           state.confirmedPassword.valid) {
-        print('update Info&pass');
+        // print('update Info&pass');
         await _userRepository.updatePassword(
             state.password.value, state.oldPassword.value);
         emit(state.copyWith(status: FormzStatus.submissionSuccess));
       } else if (state.name.value.isNotEmpty && state.gender.value.isNotEmpty) {
-        print('update Info');
+        // print('update Info');
         await _userRepository.updateInfo(Info(
             name: state.name.value,
             photoUrl: state.photoUrl,
