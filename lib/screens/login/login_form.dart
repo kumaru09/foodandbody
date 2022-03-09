@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodandbody/repositories/authen_repository.dart';
+import 'package:foodandbody/screens/forgot_password/cubit/forgot_password_cubit.dart';
 import 'package:foodandbody/screens/login/cubit/login_cubit.dart';
 import 'package:foodandbody/screens/register/register.dart';
 import 'package:foodandbody/screens/forgot_password/forgot_password.dart';
@@ -64,7 +66,11 @@ class LoginForm extends StatelessWidget {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => ForgotPassword()),
+                                        builder: (context) => BlocProvider(
+                                            create: (context) =>
+                                                ForgotPasswordCubit(context
+                                                    .read<AuthenRepository>()),
+                                            child: ForgotPassword())),
                                   );
                                 },
                               ),
