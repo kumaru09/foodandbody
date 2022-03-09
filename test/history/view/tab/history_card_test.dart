@@ -6,8 +6,8 @@ import 'package:foodandbody/screens/history/tab/history_card.dart';
 void main() {
   final mockList = List<int>.generate(10, (x) => x = x + 1);
   final mockList1 = [123];
-  final mockListLess = [200, 100];
-  final mockListMore = [100, 200];
+  final mockListMore = [200, 100, 0, 0, 0];
+  final mockListLess = [100, 200, 0, 0, 0];
   final startDate = DateTime(2021);
   final stopDate = DateTime.now();
 

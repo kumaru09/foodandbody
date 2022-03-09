@@ -53,15 +53,13 @@ class HistoryCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Icon(
-                      dataList[dataList.length - 1] -
-                                  dataList[dataList.length - 2] >
-                              0
-                          ? Icons.arrow_drop_down
-                          : Icons.arrow_drop_up,
+                      dataList[0] - dataList[1] > 0
+                          ? Icons.arrow_drop_up
+                          : Icons.arrow_drop_down,
                       color: Theme.of(context).colorScheme.secondary,
                       size: 40),
                   Text(
-                    '${(dataList[dataList.length - 1] - dataList[dataList.length - 2]).abs()} ',
+                    '${(dataList[0] - dataList[1]).abs()} ',
                     style: Theme.of(context).textTheme.headline5!.merge(
                         TextStyle(
                             color: Theme.of(context).colorScheme.secondary)),
@@ -132,9 +130,12 @@ class _LineChart extends StatelessWidget {
   Widget build(BuildContext context) {
     return LineChart(LineChartData(
         minX: 1,
-        maxX: data.length <= 1 || data.length > 10 ? 10 : data.length.toDouble(),
+        maxX:
+            data.length <= 1 || data.length > 10 ? 10 : data.length.toDouble(),
         minY: 0, //(data.reduce(min) - 1).toDouble()
-        maxY: data.reduce(max) + 1 < maxY ? maxY : (data.reduce(max) + 1).toDouble(),
+        maxY: data.reduce(max) + 1 < maxY
+            ? maxY
+            : (data.reduce(max) + 1).toDouble(),
         axisTitleData: FlAxisTitleData(show: false),
         titlesData: FlTitlesData(show: false),
         borderData: FlBorderData(show: false),
@@ -151,7 +152,7 @@ class _LineChart extends StatelessWidget {
         dataPoint.add(FlSpot(index.toDouble(), data[0].toDouble()));
       }
     } else {
-      List<int> yData = data.length > 10 ? data.sublist(0, 10): data;
+      List<int> yData = data.length > 10 ? data.sublist(0, 10) : data;
       for (int index = yData.length; index > 0; index--) {
         dataPoint.add(
             FlSpot(index.toDouble(), yData[yData.length - index].toDouble()));
