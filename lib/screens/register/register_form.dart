@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/screens/register/cubit/register_cubit.dart';
+import 'package:foodandbody/screens/register/verify_email.dart';
 import 'package:formz/formz.dart';
 
 class RegisterForm extends StatelessWidget {
@@ -176,9 +177,11 @@ class _RegisterButton extends StatelessWidget {
                   child: ElevatedButton(
                     key: const Key('registerForm_continue_raisedButton'),
                     onPressed: state.status.isValidated
-                        ? () => context
-                            .read<RegisterCubit>()
-                            .registerFormSubmitted()
+                        ? () {
+                            Navigator.push(context, MaterialPageRoute(
+                                    builder: (context) => VerifyEmail()));
+                            // context.read<RegisterCubit>().registerFormSubmitted();
+                          }
                         : null,
                     child: Text('ลงทะเบียน'),
                     style: ElevatedButton.styleFrom(
