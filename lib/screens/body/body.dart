@@ -4,6 +4,7 @@ import 'package:foodandbody/screens/body/body_figure_info.dart';
 import 'package:foodandbody/screens/body/cubit/body_cubit.dart';
 import 'package:foodandbody/screens/body/weight_and_height_info.dart';
 import 'package:foodandbody/screens/setting/bloc/info_bloc.dart';
+import 'package:intl/intl.dart';
 
 class Body extends StatelessWidget {
   const Body({Key? key}) : super(key: key);
@@ -61,7 +62,7 @@ class Body extends StatelessWidget {
                     return SingleChildScrollView(
                       child: Column(
                         children: [
-                          Container( 
+                          Container(
                               padding:
                                   EdgeInsets.only(left: 16, top: 16, right: 15),
                               constraints: BoxConstraints(minHeight: 100),
@@ -84,7 +85,17 @@ class Body extends StatelessWidget {
                               padding: EdgeInsets.only(
                                   left: 16, top: 8, right: 15, bottom: 100),
                               width: MediaQuery.of(context).size.width,
-                              child: BodyFigureInfo(bodyState.body))
+                              child: BodyFigureInfo(
+                                shoulder:
+                                    int.parse(bodyState.shoulder.value),
+                                chest: int.parse(bodyState.chest.value),
+                                waist: int.parse(bodyState.waist.value),
+                                hip: int.parse(bodyState.hip.value),
+                                date: bodyState.bodyDate == null
+                                    ? "-"
+                                    : DateFormat("dd/MM/yyyy HH:mm")
+                                        .format(bodyState.bodyDate!.toDate()),
+                              ))
                         ],
                       ),
                     );

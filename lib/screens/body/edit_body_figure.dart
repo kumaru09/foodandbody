@@ -1,23 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:foodandbody/models/body.dart';
-// import 'package:foodandbody/screens/body/cubit/body_cubit.dart';
-// import 'package:provider/src/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodandbody/screens/body/cubit/body_cubit.dart';
+import 'package:foodandbody/screens/main_screen/main_screen.dart';
+import 'package:formz/formz.dart';
 
 class EditBodyFigure extends StatefulWidget {
-  const EditBodyFigure({required this.body});
+  const EditBodyFigure({
+    required this.shoulder,
+    required this.chest,
+    required this.waist,
+    required this.hip,
+  });
 
-  final Body body;
+  final int shoulder;
+  final int chest;
+  final int waist;
+  final int hip;
 
   @override
   State<StatefulWidget> createState() => _EditBodyState();
 }
 
 class _EditBodyState extends State<EditBodyFigure> {
-  late String _currentShoulder = widget.body.shoulder.toString();
-  late String _currentChest = widget.body.chest.toString();
-  late String _currentWaist = widget.body.waist.toString();
-  late String _currentHip = widget.body.hip.toString();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,25 +44,28 @@ class _EditBodyState extends State<EditBodyFigure> {
               ),
         ),
         actions: [
-          TextButton(
-            key: const Key("body_save_button"),
-            onPressed: () async {
-              Navigator.pop(context, {
-                'shoulder': '${_currentShoulder=="" ? "0": _currentShoulder}',
-                'chest': '${_currentChest=="" ? "0": _currentChest}',
-                'waist': '${_currentWaist=="" ? "0": _currentWaist}',
-                'hip': '${_currentHip=="" ? "0": _currentHip}'
-              });
-            },
-            child: Text(
-              "บันทึก",
-              style: Theme.of(context).textTheme.button!.merge(
-                    TextStyle(
-                      color: Colors.white,
-                    ),
+          BlocBuilder<BodyCubit, BodyState>(
+              buildWhen: (previous, current) =>
+                  previous.editBodyStatus != current.editBodyStatus,
+              builder: (context, state) {
+                return TextButton(
+                  key: const Key("body_save_button"),
+                  onPressed: state.editBodyStatus.isValidated
+                      ? () async {
+                          context.read<BodyCubit>().updateBody();
+                          Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                  builder: (context) => MainScreen(index: 2)),
+                              (Route<dynamic> route) => route.isFirst);
+                        }
+                      : null,
+                  child: Text("บันทึก"),
+                  style: TextButton.styleFrom(
+                    primary: Colors.white,
+                    onSurface: Theme.of(context).primaryColor, // Disable color
                   ),
-            ),
-          ),
+                );
+              }),
         ],
       ),
       body: SingleChildScrollView(
@@ -67,57 +74,13 @@ class _EditBodyState extends State<EditBodyFigure> {
           child: Column(
             children: [
               SizedBox(height: 4),
-              TextFormField(
-                key: const Key("body_edit_shoulder_text_filed"),
-                keyboardType: TextInputType.number,
-                textInputAction: TextInputAction.next,
-                initialValue: _currentShoulder,
-                decoration: InputDecoration(
-                    labelText: "ไหล่",
-                    border: OutlineInputBorder(borderSide: BorderSide())),
-                onChanged: (shoulder) => setState(() {
-                  _currentShoulder = shoulder;
-                }),
-              ),
+              _ShoulderInput(widget.shoulder.toString()),
               SizedBox(height: 20),
-              TextFormField(
-                key: const Key("body_edit_chest_text_filed"),
-                keyboardType: TextInputType.number,
-                textInputAction: TextInputAction.next,
-                initialValue: _currentChest,
-                decoration: InputDecoration(
-                    labelText: "รอบอก",
-                    border: OutlineInputBorder(borderSide: BorderSide())),
-                onChanged: (chest) => setState(() {
-                  _currentChest = chest;
-                }),
-              ),
+              _ChestInput(widget.chest.toString()),
               SizedBox(height: 20),
-              TextFormField(
-                key: const Key("body_edit_waist_text_filed"),
-                keyboardType: TextInputType.number,
-                textInputAction: TextInputAction.next,
-                initialValue: _currentWaist,
-                decoration: InputDecoration(
-                    labelText: "รอบเอว",
-                    border: OutlineInputBorder(borderSide: BorderSide())),
-                onChanged: (waist) => setState(() {
-                  _currentWaist = waist;
-                }),
-              ),
+              _WaistInput(widget.waist.toString()),
               SizedBox(height: 20),
-              TextFormField(
-                key: const Key("body_edit_hip_text_filed"),
-                keyboardType: TextInputType.number,
-                textInputAction: TextInputAction.next,
-                initialValue: _currentHip,
-                decoration: InputDecoration(
-                    labelText: "รอบสะโพก",
-                    border: OutlineInputBorder(borderSide: BorderSide())),
-                onChanged: (hip) => setState(() {
-                  _currentHip = hip;
-                }),
-              )
+              _HipInput(widget.hip.toString()),
             ],
           ),
         ),
@@ -126,110 +89,103 @@ class _EditBodyState extends State<EditBodyFigure> {
   }
 }
 
-// class _EditShoulder extends StatefulWidget {
-//   final int shoulder;
-//   const _EditShoulder({required this.shoulder});
+class _ShoulderInput extends StatelessWidget {
+  const _ShoulderInput(this._shoulder);
+  final String _shoulder;
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<BodyCubit, BodyState>(
+        buildWhen: (previous, current) => previous.shoulder != current.shoulder,
+        builder: (context, state) {
+          return TextFormField(
+            key: const Key("body_edit_shoulder_text_filed"),
+            onChanged: (shoulder) =>
+                context.read<BodyCubit>().shoulderChanged(shoulder),
+            keyboardType: TextInputType.number,
+            textInputAction: TextInputAction.next,
+            initialValue: _shoulder,
+            decoration: InputDecoration(
+              labelText: 'ไหล่',
+              border: OutlineInputBorder(borderSide: BorderSide()),
+              errorText:
+                  state.shoulder.invalid ? 'กรุณาระบุน้ำหนักให้ถูกต้อง' : null,
+            ),
+          );
+        });
+  }
+}
 
-//   @override
-//   __EditShoulderState createState() => __EditShoulderState();
-// }
+class _ChestInput extends StatelessWidget {
+  const _ChestInput(this._chest);
+  final String _chest;
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<BodyCubit, BodyState>(
+        buildWhen: (previous, current) => previous.chest != current.chest,
+        builder: (context, state) {
+          return TextFormField(
+            key: const Key("body_edit_chest_text_filed"),
+            onChanged: (chest) => context.read<BodyCubit>().chestChanged(chest),
+            keyboardType: TextInputType.number,
+            textInputAction: TextInputAction.next,
+            initialValue: _chest,
+            decoration: InputDecoration(
+              labelText: 'รอบอก',
+              border: OutlineInputBorder(borderSide: BorderSide()),
+              errorText:
+                  state.chest.invalid ? 'กรุณาระบุน้ำหนักให้ถูกต้อง' : null,
+            ),
+          );
+        });
+  }
+}
 
-// class __EditShoulderState extends State<_EditShoulder> {
-//   late String _currentShoulder = widget.shoulder.toString();
+class _WaistInput extends StatelessWidget {
+  const _WaistInput(this._waist);
+  final String _waist;
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<BodyCubit, BodyState>(
+        buildWhen: (previous, current) => previous.waist != current.waist,
+        builder: (context, state) {
+          return TextFormField(
+            key: const Key("body_edit_waist_text_filed"),
+            onChanged: (waist) => context.read<BodyCubit>().waistChanged(waist),
+            keyboardType: TextInputType.number,
+            textInputAction: TextInputAction.next,
+            initialValue: _waist,
+            decoration: InputDecoration(
+              labelText: 'รอบเอว',
+              border: OutlineInputBorder(borderSide: BorderSide()),
+              errorText:
+                  state.waist.invalid ? 'กรุณาระบุน้ำหนักให้ถูกต้อง' : null,
+            ),
+          );
+        });
+  }
+}
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return TextFormField(
-//       keyboardType: TextInputType.number,
-//       textInputAction: TextInputAction.next,
-//       initialValue: _currentShoulder,
-//       decoration: InputDecoration(
-//           labelText: "ไหล่",
-//           border: OutlineInputBorder(borderSide: BorderSide())),
-//       onChanged: (shoulder) => setState(() {
-//         _currentShoulder = shoulder;
-//       }),
-//     );
-//   }
-// }
-
-// class _EditChest extends StatefulWidget {
-//   final int chest;
-//   const _EditChest({required this.chest});
-
-//   @override
-//   __EditChestState createState() => __EditChestState();
-// }
-
-// class __EditChestState extends State<_EditChest> {
-//   late String _currentChest = widget.chest.toString();
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return TextFormField(
-//       keyboardType: TextInputType.number,
-//       textInputAction: TextInputAction.next,
-//       initialValue: _currentChest,
-//       decoration: InputDecoration(
-//           labelText: "รอบอก",
-//           border: OutlineInputBorder(borderSide: BorderSide())),
-//       onChanged: (chest) => setState(() {
-//         _currentChest = chest;
-//       }),
-//     );
-//   }
-// }
-
-// class _EditWaist extends StatefulWidget {
-//   final int waist;
-//   const _EditWaist({required this.waist});
-
-//   @override
-//   __EditWaistState createState() => __EditWaistState();
-// }
-
-// class __EditWaistState extends State<_EditWaist> {
-//   late String _currentWaist = widget.waist.toString();
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return TextFormField(
-//       keyboardType: TextInputType.number,
-//       textInputAction: TextInputAction.next,
-//       initialValue: _currentWaist,
-//       decoration: InputDecoration(
-//           labelText: "รอบเอว",
-//           border: OutlineInputBorder(borderSide: BorderSide())),
-//       onChanged: (waist) => setState(() {
-//         _currentWaist = waist;
-//       }),
-//     );
-//   }
-// }
-
-// class _EditHip extends StatefulWidget {
-//   final int hip;
-//   const _EditHip({required this.hip});
-
-//   @override
-//   __EditHipState createState() => __EditHipState();
-// }
-
-// class __EditHipState extends State<_EditHip> {
-//   late String _currentHip = widget.hip.toString();
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return TextFormField(
-//       keyboardType: TextInputType.number,
-//       textInputAction: TextInputAction.next,
-//       initialValue: _currentHip,
-//       decoration: InputDecoration(
-//           labelText: "รอบสะโพก",
-//           border: OutlineInputBorder(borderSide: BorderSide())),
-//       onChanged: (hip) => setState(() {
-//         _currentHip = hip;
-//       }),
-//     );
-//   }
-// }
+class _HipInput extends StatelessWidget {
+  const _HipInput(this._hip);
+  final String _hip;
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<BodyCubit, BodyState>(
+        buildWhen: (previous, current) => previous.hip != current.hip,
+        builder: (context, state) {
+          return TextFormField(
+            key: const Key("body_edit_hip_text_filed"),
+            onChanged: (hip) => context.read<BodyCubit>().hipChanged(hip),
+            keyboardType: TextInputType.number,
+            textInputAction: TextInputAction.next,
+            initialValue: _hip,
+            decoration: InputDecoration(
+              labelText: 'รอบสะโพก',
+              border: OutlineInputBorder(borderSide: BorderSide()),
+              errorText:
+                  state.hip.invalid ? 'กรุณาระบุน้ำหนักให้ถูกต้อง' : null,
+            ),
+          );
+        });
+  }
+}

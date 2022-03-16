@@ -10,25 +10,48 @@ extension BodyStatusX on BodyStatus {
 }
 
 class BodyState extends Equatable {
-  BodyState(
-      {this.status = BodyStatus.initial,
-      Body? body,
-      List<WeightList>? weightList})
-      : body = body ?? Body.empty,
-        weightList = weightList ?? List.empty();
+  BodyState({
+    this.status = BodyStatus.initial,
+    List<WeightList>? weightList,
+    this.editBodyStatus = FormzStatus.pure,
+    this.shoulder = const BodyFigure.pure(),
+    this.chest = const BodyFigure.pure(),
+    this.waist = const BodyFigure.pure(),
+    this.hip = const BodyFigure.pure(),
+    this.bodyDate,
+  })  : weightList = weightList ?? List.empty();
 
   final BodyStatus status;
-  final Body body;
   final List<WeightList> weightList;
+  final FormzStatus editBodyStatus;
+  final BodyFigure shoulder;
+  final BodyFigure chest;
+  final BodyFigure waist;
+  final BodyFigure hip;
+  final Timestamp? bodyDate;
 
-  BodyState copyWith(
-      {BodyStatus? status, Body? body, List<WeightList>? weightList}) {
+  BodyState copyWith({
+    BodyStatus? status,
+    List<WeightList>? weightList,
+    FormzStatus? editBodyStatus,
+    BodyFigure? shoulder,
+    BodyFigure? chest,
+    BodyFigure? waist,
+    BodyFigure? hip,
+    Timestamp? bodyDate
+  }) {
     return BodyState(
-        body: body ?? this.body,
-        status: status ?? this.status,
-        weightList: weightList ?? this.weightList);
+      status: status ?? this.status,
+      weightList: weightList ?? this.weightList,
+      editBodyStatus: editBodyStatus ?? this.editBodyStatus,
+      shoulder: shoulder ?? this.shoulder,
+      chest: chest ?? this.chest,
+      waist: waist ?? this.waist,
+      hip: hip ?? this.hip,
+      bodyDate: bodyDate ?? this.bodyDate,
+    );
   }
 
   @override
-  List<Object> get props => [status, body, weightList];
+  List<Object> get props => [status, weightList, editBodyStatus, shoulder, chest, waist, hip];
 }
