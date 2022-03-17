@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:foodandbody/models/body.dart';
 import 'package:foodandbody/models/body_figure.dart';
+import 'package:foodandbody/models/weight.dart';
 import 'package:foodandbody/models/weight_list.dart';
 import 'package:foodandbody/repositories/body_repository.dart';
 import 'package:foodandbody/repositories/user_repository.dart';
@@ -11,15 +12,16 @@ import 'package:formz/formz.dart';
 part 'body_state.dart';
 
 class BodyCubit extends Cubit<BodyState> {
-  BodyCubit(this._bodyRepository) : super(BodyState());
+  BodyCubit({required this.bodyRepository, required this.userRepository}) : super(BodyState());
 
-  final BodyRepository _bodyRepository;
+  final BodyRepository bodyRepository;
+  final UserRepository userRepository;
 
   Future<void> fetchBody() async {
     try {
       emit(state.copyWith(status: BodyStatus.loading));
-      final body = await _bodyRepository.getBodyLatest();
-      final weightList = await _bodyRepository.getWeightList();
+      final body = await bodyRepository.getBodyLatest();
+      final weightList = await bodyRepository.getWeightList();
       emit(state.copyWith(
         status: BodyStatus.success,
         weightList: weightList,
@@ -34,22 +36,32 @@ class BodyCubit extends Cubit<BodyState> {
     }
   }
 
-  Future<void> updateWeight(int weight) async {
+  Future<void> updateWeight(String value) async {
     try {
-      // emit(state.copyWith(status: BodyStatus.loading));
-      await _bodyRepository.addWeight(weight);
-      final weightList = await _bodyRepository.getWeightList();
-      emit(state.copyWith(status: BodyStatus.success, weightList: weightList));
+      emit(state.copyWith(weightStatus: FormzStatus.submissionInProgress));
+      await userRepository.updateWeightInfo(int.parse(value));
+      final weightList = await bodyRepository.getWeightList();
+      emit(state.copyWith( 
+          weightStatus: FormzStatus.submissionSuccess, weightList: weightList));
     } catch (e) {
-      print(e);
+      print('updateWeight: $e');
+      emit(state.copyWith(weightStatus: FormzStatus.submissionFailure));
     }
+  }
+
+  void weightChanged(String value) {
+    final weight = Weight.dirty(value);
+    emit(state.copyWith(
+      weight: weight,
+      weightStatus: Formz.validate([weight]),
+    ));
   }
 
   Future<void> updateBody() async {
     if (!state.editBodyStatus.isValidated) return;
     emit(state.copyWith(editBodyStatus: FormzStatus.submissionInProgress));
     try {
-      await _bodyRepository.updateBody(Body(
+      await bodyRepository.updateBody(Body(
           date: Timestamp.now(),
           shoulder: int.parse(state.shoulder.value),
           chest: int.parse(state.chest.value),

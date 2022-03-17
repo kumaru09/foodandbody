@@ -1,15 +1,19 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/models/info.dart';
 import 'package:foodandbody/models/weight_list.dart';
+import 'package:foodandbody/repositories/body_repository.dart';
+import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/screens/body/cubit/body_cubit.dart';
 import 'package:foodandbody/screens/body/weight_graph.dart';
+import 'package:foodandbody/screens/history/bloc/history_bloc.dart';
 import 'package:foodandbody/screens/setting/bloc/info_bloc.dart';
+import 'package:formz/formz.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/src/provider.dart';
 
-// ignore: must_be_immutable
 class WeightAndHeightInfo extends StatelessWidget {
   WeightAndHeightInfo(this._info, this.weightList);
 
@@ -20,7 +24,8 @@ class WeightAndHeightInfo extends StatelessWidget {
   late int? height = _info.height;
   late double bmi =
       double.parse((weight! / pow(height! / 100, 2)).toStringAsFixed(2));
-  late String date = DateFormat("dd/MM/yyyy").format(weightList.first.date!.toDate());
+  late String date =
+      DateFormat("dd/MM/yyyy").format(weightList.first.date!.toDate());
 
   @override
   Widget build(BuildContext context) {
@@ -88,15 +93,19 @@ class WeightAndHeightInfo extends StatelessWidget {
                                       .colorScheme
                                       .secondary))),
                       onPressed: () async {
-                        final value = await showDialog<int?>(
-                            context: context,
-                            builder: (BuildContext context) =>
-                                EditWeightDialog());
-                        if (value != null && value != 0) {
-                          context
-                              .read<InfoBloc>()
-                              .add(UpdateWeight(weight: value));
+                        final value = await showDialog<String>(
+                          context: context,
+                          builder: (BuildContext context) =>
+                              BlocProvider<BodyCubit>(
+                            create: (_) => BodyCubit(
+                                bodyRepository: context.read<BodyRepository>(),
+                                userRepository: context.read<UserRepository>()),
+                            child: EditWeightDialog(),
+                          ),
+                        );
+                        if (value != 'cancel' && value != null) {
                           context.read<BodyCubit>().updateWeight(value);
+                          context.read<HistoryBloc>().add(LoadHistory());
                         }
                       },
                     ))
@@ -111,7 +120,7 @@ class WeightAndHeightInfo extends StatelessWidget {
               constraints: BoxConstraints(minHeight: 100),
               width: MediaQuery.of(context).size.width * 0.45,
               child: Card(
-                key: const Key("body_height_card"),
+                  key: const Key("body_height_card"),
                   elevation: 2,
                   color: Colors.white,
                   shape: RoundedRectangleBorder(
@@ -126,7 +135,7 @@ class WeightAndHeightInfo extends StatelessWidget {
               constraints: BoxConstraints(minHeight: 100),
               width: MediaQuery.of(context).size.width * 0.45,
               child: Card(
-                key: const Key("body_bmi_card"),
+                  key: const Key("body_bmi_card"),
                   elevation: 2,
                   color: Colors.white,
                   shape: RoundedRectangleBorder(
@@ -192,15 +201,9 @@ class WeightAndHeightInfo extends StatelessWidget {
   }
 }
 
-class EditWeightDialog extends StatefulWidget {
+class EditWeightDialog extends StatelessWidget {
   const EditWeightDialog({Key? key}) : super(key: key);
 
-  @override
-  State<StatefulWidget> createState() => _WeightDialog();
-}
-
-class _WeightDialog extends State<EditWeightDialog> {
-  String _currentWeight = '0';
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -213,27 +216,45 @@ class _WeightDialog extends State<EditWeightDialog> {
               .textTheme
               .headline6!
               .merge(TextStyle(color: Theme.of(context).primaryColor))),
-      content: TextField(
-        key: const Key("body_edit_weight_dialog_text_field"),
-        keyboardType: TextInputType.number,
-        decoration: InputDecoration(hintText: "ตัวอย่าง 50"),
-        onChanged: (weight) => setState(() {
-          _currentWeight = weight;
-        }),
-      ),
+      content: BlocBuilder<BodyCubit, BodyState>(
+          buildWhen: (previous, current) => previous.weight != current.weight,
+          builder: (context, state) {
+            return TextFormField(
+              key: const Key("body_edit_weight_dialog_text_field"),
+              onChanged: (weight) =>
+                  context.read<BodyCubit>().weightChanged(weight),
+              keyboardType: TextInputType.number,
+              textInputAction: TextInputAction.next,
+              decoration: InputDecoration(
+                hintText: 'ตัวอย่าง 50',
+                errorText:
+                    state.weight.invalid ? 'กรุณาระบุน้ำหนักให้ถูกต้อง' : null,
+              ),
+            );
+          }),
       actions: <Widget>[
-        TextButton(
-            key: const Key("body_edit_weight_dialog_save_button"),
-            onPressed: () => Navigator.pop(context, int.parse(_currentWeight)),
-            child: Text("ตกลง",
-                style: Theme.of(context)
-                    .textTheme
-                    .button!
-                    .merge(TextStyle(color: Theme.of(context).primaryColor)))),
+        BlocBuilder<BodyCubit, BodyState>(
+            buildWhen: (previous, current) =>
+                previous.weightStatus != current.weightStatus,
+            builder: (context, state) {
+              return TextButton(
+                key: const Key("body_edit_weight_dialog_save_button"),
+                onPressed: state.weightStatus.isValidated
+                    ? () => Navigator.pop(context, state.weight.value)
+                    : null,
+                child: Text("ตกลง"),
+                style: TextButton.styleFrom(
+                  primary: Theme.of(context).primaryColor,
+                  onSurface: Theme.of(context)
+                      .colorScheme
+                      .primaryVariant, // Disable color
+                ),
+              );
+            }),
         TextButton(
             key: const Key("body_edit_weight_dialog_cancel_button"),
             onPressed: () {
-              Navigator.of(context).pop();
+              Navigator.pop(context, 'cancel');
             },
             child: Text("ยกเลิก",
                 style: Theme.of(context)

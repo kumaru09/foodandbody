@@ -1,6 +1,6 @@
 part of 'body_cubit.dart';
 
-enum BodyStatus { initial, loading, success, failure }
+enum BodyStatus { initial, loading, success, failure}
 
 extension BodyStatusX on BodyStatus {
   bool get isInitial => this == BodyStatus.initial;
@@ -19,6 +19,8 @@ class BodyState extends Equatable {
     this.waist = const BodyFigure.pure(),
     this.hip = const BodyFigure.pure(),
     this.bodyDate,
+    this.weightStatus = FormzStatus.pure,
+    this.weight = const Weight.pure(),
   })  : weightList = weightList ?? List.empty();
 
   final BodyStatus status;
@@ -29,6 +31,8 @@ class BodyState extends Equatable {
   final BodyFigure waist;
   final BodyFigure hip;
   final Timestamp? bodyDate;
+  final FormzStatus weightStatus;
+  final Weight weight;
 
   BodyState copyWith({
     BodyStatus? status,
@@ -38,7 +42,9 @@ class BodyState extends Equatable {
     BodyFigure? chest,
     BodyFigure? waist,
     BodyFigure? hip,
-    Timestamp? bodyDate
+    Timestamp? bodyDate,
+    FormzStatus? weightStatus,
+    Weight? weight,
   }) {
     return BodyState(
       status: status ?? this.status,
@@ -49,9 +55,11 @@ class BodyState extends Equatable {
       waist: waist ?? this.waist,
       hip: hip ?? this.hip,
       bodyDate: bodyDate ?? this.bodyDate,
+      weightStatus: weightStatus ?? this.weightStatus,
+      weight: weight ?? this.weight,
     );
   }
 
   @override
-  List<Object> get props => [status, weightList, editBodyStatus, shoulder, chest, waist, hip];
+  List<Object> get props => [status, weightList, editBodyStatus, shoulder, chest, waist, hip, weightStatus, weight];
 }

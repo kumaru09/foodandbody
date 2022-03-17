@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/models/body.dart';
 import 'package:foodandbody/repositories/body_repository.dart';
+import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/screens/body/cubit/body_cubit.dart';
 import 'package:foodandbody/screens/body/edit_body_figure.dart';
 import 'package:intl/intl.dart';
@@ -151,7 +152,9 @@ class BodyFigureInfo extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => BlocProvider<BodyCubit>(
-                      create: (_) => BodyCubit(context.read<BodyRepository>())
+                      create: (_) => BodyCubit(
+                          bodyRepository: context.read<BodyRepository>(),
+                          userRepository: context.read<UserRepository>())
                         ..editBodyFigure(
                             shoulder: shoulder.toString(),
                             chest: chest.toString(),
