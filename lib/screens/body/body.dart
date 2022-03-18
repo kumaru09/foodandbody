@@ -43,7 +43,7 @@ class Body extends StatelessWidget {
     showDialog<String>(
         context: context,
         builder: (BuildContext context) {
-          _timer = Timer(Duration(seconds: 3), () {
+          _timer = Timer(Duration(seconds: 2), () {
             Navigator.of(context).pop();
           });
           return AlertDialog(

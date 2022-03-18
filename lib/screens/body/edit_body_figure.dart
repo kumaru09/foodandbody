@@ -1,11 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/screens/body/cubit/body_cubit.dart';
 import 'package:foodandbody/screens/main_screen/main_screen.dart';
 import 'package:formz/formz.dart';
 
-class EditBodyFigure extends StatefulWidget {
-  const EditBodyFigure({
+class EditBodyFigure extends StatelessWidget {
+  EditBodyFigure({
     required this.shoulder,
     required this.chest,
     required this.waist,
@@ -17,11 +19,40 @@ class EditBodyFigure extends StatefulWidget {
   final int waist;
   final int hip;
 
-  @override
-  State<StatefulWidget> createState() => _EditBodyState();
-}
+  late Timer _timer;
 
-class _EditBodyState extends State<EditBodyFigure> {
+  void _failUpdateWeightHeight(BuildContext context) {
+    showDialog<String>(
+        context: context,
+        builder: (BuildContext context) {
+          _timer = Timer(Duration(seconds: 2), () {
+            Navigator.of(context).pop();
+          });
+          return AlertDialog(
+            content: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.report,
+                    color: Theme.of(context).colorScheme.secondary, size: 80),
+                Text('กรอกข้อมูลไม่สำเร็จ',
+                    style: Theme.of(context).textTheme.subtitle1!.merge(
+                        TextStyle(
+                            color: Theme.of(context).colorScheme.secondary))),
+                Text('กรุณาลองอีกครั้ง',
+                    style: Theme.of(context).textTheme.subtitle1!.merge(
+                        TextStyle(
+                            color: Theme.of(context).colorScheme.secondary))),
+              ],
+            ),
+          );
+        }).then((val) {
+      if (_timer.isActive) {
+        _timer.cancel();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,11 +83,15 @@ class _EditBodyState extends State<EditBodyFigure> {
                   key: const Key("body_save_button"),
                   onPressed: state.editBodyStatus.isValidated
                       ? () async {
-                          context.read<BodyCubit>().updateBody();
-                          Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                  builder: (context) => MainScreen(index: 2)),
-                              (Route<dynamic> route) => route.isFirst);
+                          await context.read<BodyCubit>().updateBody();
+                          context.read<BodyCubit>().state.editBodyStatus ==
+                                  FormzStatus.submissionFailure
+                              ? _failUpdateWeightHeight(context)
+                              : Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          MainScreen(index: 2)),
+                                  (Route<dynamic> route) => route.isFirst);
                         }
                       : null,
                   child: Text("บันทึก"),
@@ -74,13 +109,13 @@ class _EditBodyState extends State<EditBodyFigure> {
           child: Column(
             children: [
               SizedBox(height: 4),
-              _ShoulderInput(widget.shoulder.toString()),
+              _ShoulderInput(shoulder.toString()),
               SizedBox(height: 20),
-              _ChestInput(widget.chest.toString()),
+              _ChestInput(chest.toString()),
               SizedBox(height: 20),
-              _WaistInput(widget.waist.toString()),
+              _WaistInput(waist.toString()),
               SizedBox(height: 20),
-              _HipInput(widget.hip.toString()),
+              _HipInput(hip.toString()),
             ],
           ),
         ),
