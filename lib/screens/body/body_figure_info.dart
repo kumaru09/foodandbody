@@ -155,7 +155,7 @@ class BodyFigureInfo extends StatelessWidget {
                       create: (_) => BodyCubit(
                           bodyRepository: context.read<BodyRepository>(),
                           userRepository: context.read<UserRepository>())
-                        ..editBodyFigure(
+                        ..initBodyFigure(
                             shoulder: shoulder.toString(),
                             chest: chest.toString(),
                             waist: waist.toString(),

@@ -100,7 +100,7 @@ class BodyCubit extends Cubit<BodyState> {
     }
   }
 
-  void editBodyFigure({
+  void initBodyFigure({
     required String shoulder,
     required String chest,
     required String waist,
