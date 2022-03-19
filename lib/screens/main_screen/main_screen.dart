@@ -1,3 +1,4 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/repositories/body_repository.dart';
@@ -8,8 +9,10 @@ import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/screens/body/body.dart';
 import 'package:foodandbody/screens/body/cubit/body_cubit.dart';
+import 'package:foodandbody/screens/camera/ar_camera.dart';
 import 'package:foodandbody/screens/camera/bloc/camera_bloc.dart';
 import 'package:foodandbody/screens/camera/camera.dart';
+import 'package:foodandbody/screens/camera/show_food_result.dart';
 import 'package:foodandbody/screens/history/bloc/history_bloc.dart';
 import 'package:foodandbody/screens/history/history.dart';
 import 'package:foodandbody/screens/home/bloc/home_bloc.dart';
@@ -18,6 +21,7 @@ import 'package:foodandbody/screens/main_screen/bottom_appbar.dart';
 import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
 import 'package:foodandbody/screens/plan/plan.dart';
 import 'package:foodandbody/screens/setting/bloc/info_bloc.dart';
+import 'package:foodandbody/services/arcore_service.dart';
 import 'package:foodandbody/widget/menu_card/bloc/menu_card_bloc.dart';
 
 class MainScreen extends StatefulWidget {
@@ -96,9 +100,24 @@ class _MainScreenState extends State<MainScreen> {
             visible: isKeyboardOpen,
             child: FloatingActionButton(
               key: const Key('camera_floating_button'),
-              onPressed: () {
+              onPressed: () async {
                 Navigator.push(
-                    context, MaterialPageRoute(builder: (context) => Camera()));
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ARCamera(
+                              arCoreService: context.read<ARCoreService>(),
+                            )));
+                // final value = await Navigator.push<XFile?>(
+                //     context,
+                //     MaterialPageRoute(
+                //         builder: (context) => ARCamera(
+                //               arCoreService: context.read<ARCoreService>(),
+                //             )));
+                // // if (value != null) {
+                //   print(value.path);
+                // }
+                // await Navigator.push(context,
+                //     MaterialPageRoute(builder: (context) => ShowFoodResult()));
               },
               elevation: 0.4,
               child: Icon(Icons.photo_camera),

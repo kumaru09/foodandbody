@@ -5,6 +5,7 @@ import 'package:foodandbody/app/bloc_observer.dart';
 import 'package:foodandbody/repositories/authen_repository.dart';
 import 'package:bloc/bloc.dart';
 import 'package:foodandbody/repositories/user_repository.dart';
+import 'package:foodandbody/services/arcore_service.dart';
 
 void main() async {
   Bloc.observer = AppBlocObserver();
@@ -12,7 +13,9 @@ void main() async {
   await Firebase.initializeApp();
   final authenRepository = AuthenRepository();
   final userRepository = UserRepository();
+  // final arCoreService = ARCoreService();
   await authenRepository.user.first;
+  // await arCoreService.isARCoreSupported();
   runApp(App(
     authenRepository: authenRepository,
     userRepository: userRepository,

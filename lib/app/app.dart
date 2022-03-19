@@ -15,6 +15,7 @@ import 'package:foodandbody/repositories/search_repository.dart';
 import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/screens/camera/bloc/camera_bloc.dart';
 import 'package:foodandbody/screens/setting/bloc/info_bloc.dart';
+import 'package:foodandbody/services/arcore_service.dart';
 import 'package:foodandbody/theme.dart';
 
 class App extends StatelessWidget {
@@ -47,11 +48,13 @@ class App extends StatelessWidget {
         RepositoryProvider<FavoriteRepository>(
             create: (context) => FavoriteRepository()),
         RepositoryProvider<MenuCardRepository>(
-            create: (context) => MenuCardRepository(MenuCardCache(), MenuCardClient())),
+            create: (context) =>
+                MenuCardRepository(MenuCardCache(), MenuCardClient())),
         RepositoryProvider<HistoryRepository>(
             create: (context) => HistoryRepository()),
         RepositoryProvider<CameraRepository>(
-            create: (context) => CameraRepository())
+            create: (context) => CameraRepository()),
+        RepositoryProvider<ARCoreService>(create: (context) => ARCoreService())
       ],
       child: MultiBlocProvider(
         providers: [
