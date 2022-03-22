@@ -143,7 +143,7 @@ class _ShoulderInput extends StatelessWidget {
               labelText: 'ไหล่',
               border: OutlineInputBorder(borderSide: BorderSide()),
               errorText:
-                  state.shoulder.invalid ? 'กรุณาระบุน้ำหนักให้ถูกต้อง' : null,
+                  state.shoulder.invalid ? 'กรุณาระบุไหล่ให้ถูกต้อง' : null,
             ),
           );
         });
@@ -168,7 +168,7 @@ class _ChestInput extends StatelessWidget {
               labelText: 'รอบอก',
               border: OutlineInputBorder(borderSide: BorderSide()),
               errorText:
-                  state.chest.invalid ? 'กรุณาระบุน้ำหนักให้ถูกต้อง' : null,
+                  state.chest.invalid ? 'กรุณาระบุรอบอกให้ถูกต้อง' : null,
             ),
           );
         });
@@ -193,7 +193,7 @@ class _WaistInput extends StatelessWidget {
               labelText: 'รอบเอว',
               border: OutlineInputBorder(borderSide: BorderSide()),
               errorText:
-                  state.waist.invalid ? 'กรุณาระบุน้ำหนักให้ถูกต้อง' : null,
+                  state.waist.invalid ? 'กรุณาระบุรอบเอวให้ถูกต้อง' : null,
             ),
           );
         });
@@ -218,7 +218,7 @@ class _HipInput extends StatelessWidget {
               labelText: 'รอบสะโพก',
               border: OutlineInputBorder(borderSide: BorderSide()),
               errorText:
-                  state.hip.invalid ? 'กรุณาระบุน้ำหนักให้ถูกต้อง' : null,
+                  state.hip.invalid ? 'กรุณาระบุรอบสะโพกให้ถูกต้อง' : null,
             ),
           );
         });
