@@ -7,7 +7,7 @@ import 'package:foodandbody/models/user.dart';
 import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/screens/edit_profile/cubit/edit_profile_cubit.dart';
 import 'package:foodandbody/screens/edit_profile/edit_profile.dart';
-import 'package:foodandbody/screens/setting/edit_password.dart';
+import 'package:foodandbody/screens/edit_profile/edit_password.dart';
 
 class Setting extends StatefulWidget {
   const Setting({Key? key}) : super(key: key);

@@ -16,7 +16,7 @@ class EditProfile extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocListener<EditProfileCubit, EditProfileState>(
         listener: (context, state) {
-          if (state.status.isSubmissionSuccess) {
+          if (state.statusProfile.isSubmissionSuccess) {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(
@@ -29,7 +29,7 @@ class EditProfile extends StatelessWidget {
             context.read<AppBloc>().add(EditInfoRequested(
                 context.read<AppBloc>().state.user.copyWith(info: info)));
             Navigator.of(context).pop();
-          } else if (state.status.isSubmissionFailure) {
+          } else if (state.statusProfile.isSubmissionFailure) {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(
@@ -62,7 +62,7 @@ class EditProfile extends StatelessWidget {
               IconButton(
                 key: Key('editProfile_saveButton'),
                 onPressed: () {
-                  context.read<EditProfileCubit>().editFormSubmitted();
+                  context.read<EditProfileCubit>().editProfileSubmitted();
                 },
                 icon: Icon(
                   Icons.done,

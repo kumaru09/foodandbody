@@ -15,14 +15,14 @@ class _EditPasswordState extends State<EditPassword> {
   Widget build(BuildContext context) {
     return BlocListener<EditProfileCubit, EditProfileState>(
         listener: (context, state) {
-          if (state.status.isSubmissionSuccess) {
+          if (state.statusPassword.isSubmissionSuccess) {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(
                 SnackBar(content: Text('เปลี่ยนรหัสผ่านเรียบร้อยแล้ว')),
               );
             Navigator.of(context).pop();
-          } else if (state.status.isSubmissionFailure) {
+          } else if (state.statusPassword.isSubmissionFailure) {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(
@@ -56,7 +56,7 @@ class _EditPasswordState extends State<EditPassword> {
             actions: [
               IconButton(
                   onPressed: () =>
-                      context.read<EditProfileCubit>().editFormSubmitted(),
+                      context.read<EditProfileCubit>().editPasswordSubmitted(),
                   icon: Icon(Icons.done, color: Colors.white))
             ],
           ),
