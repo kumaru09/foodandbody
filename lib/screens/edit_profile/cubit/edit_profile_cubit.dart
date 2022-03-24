@@ -15,12 +15,21 @@ class EditProfileCubit extends Cubit<EditProfileState> {
 
   final UserRepository _userRepository;
 
+  void initProfile({
+    required String name,
+    required String gender,
+  }) {
+    emit(state.copyWith(
+      name: Username.dirty(name),
+      gender: Gender.dirty(gender),
+    ));
+  }
+
   void usernameChanged(String value) {
     final username = Username.dirty(value);
     emit(state.copyWith(
       name: username,
-      statusProfile: Formz.validate(
-          [username, state.gender]),
+      statusProfile: Formz.validate([username, state.gender]),
     ));
   }
 
@@ -28,8 +37,7 @@ class EditProfileCubit extends Cubit<EditProfileState> {
     final gender = Gender.dirty(value);
     emit(state.copyWith(
       gender: gender,
-      statusProfile: Formz.validate(
-          [state.password, gender]),
+      statusProfile: Formz.validate([state.name, gender]),
     ));
   }
 
@@ -55,8 +63,8 @@ class EditProfileCubit extends Cubit<EditProfileState> {
     emit(state.copyWith(
       password: password,
       confirmedPassword: confirmedPassword,
-      statusPassword: Formz.validate(
-          [state.oldPassword, password, confirmedPassword]),
+      statusPassword:
+          Formz.validate([state.oldPassword, password, confirmedPassword]),
     ));
   }
 
@@ -74,23 +82,20 @@ class EditProfileCubit extends Cubit<EditProfileState> {
 
   Future<void> editProfileSubmitted() async {
     try {
-      if (state.name.value.isNotEmpty && state.gender.value.isNotEmpty) {
-        // print('update Info');
-        await _userRepository.updateInfo(Info(
-            name: state.name.value,
-            photoUrl: state.photoUrl,
-            gender: state.gender.value));
-        emit(state.copyWith(statusProfile: FormzStatus.submissionSuccess));
-      }
+      await _userRepository.updateInfo(Info(
+          name: state.name.value,
+          photoUrl: state.photoUrl,
+          gender: state.gender.value));
+      emit(state.copyWith(statusProfile: FormzStatus.submissionSuccess));
     } on UpdateInfoFailure catch (e) {
-      emit(state.copyWith(
-          statusProfile: FormzStatus.submissionFailure, errorMessage: e.message));
-    }  catch (_) {
+      print('editProfileSubmitted error: $e');
+      emit(state.copyWith(statusProfile: FormzStatus.submissionFailure));
+    } catch (_) {
       emit(state.copyWith(statusProfile: FormzStatus.submissionFailure));
     }
   }
 
-    Future<void> editPasswordSubmitted() async {
+  Future<void> editPasswordSubmitted() async {
     try {
       if (state.oldPassword.value.isNotEmpty &&
           state.password.value.isNotEmpty &&
@@ -102,7 +107,8 @@ class EditProfileCubit extends Cubit<EditProfileState> {
       }
     } on UpdatePasswordFaliure catch (e) {
       emit(state.copyWith(
-          statusPassword: FormzStatus.submissionFailure, errorMessage: e.message));
+          statusPassword: FormzStatus.submissionFailure,
+          errorMessage: e.message));
     } catch (_) {
       emit(state.copyWith(statusPassword: FormzStatus.submissionFailure));
     }

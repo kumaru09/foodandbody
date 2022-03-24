@@ -137,7 +137,20 @@ class _SettingState extends State<Setting> {
                                     builder: (context) =>
                                         BlocProvider<EditProfileCubit>(
                                           create: (context) => EditProfileCubit(
-                                              context.read<UserRepository>()),
+                                              context.read<UserRepository>())
+                                            ..initProfile(
+                                                name: context
+                                                    .read<AppBloc>()
+                                                    .state
+                                                    .user
+                                                    .info!
+                                                    .name!,
+                                                gender: context
+                                                    .read<AppBloc>()
+                                                    .state
+                                                    .user
+                                                    .info!
+                                                    .gender!),
                                           child: EditProfile(),
                                         ))).then((value) => setState(() {}));
                           },

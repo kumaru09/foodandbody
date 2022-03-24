@@ -3,11 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:foodandbody/models/info.dart';
 import 'package:foodandbody/models/user.dart';
 import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/screens/edit_profile/cubit/edit_profile_cubit.dart';
-import 'package:foodandbody/screens/setting/bloc/info_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -17,6 +15,7 @@ class EditProfile extends StatelessWidget {
     return BlocListener<EditProfileCubit, EditProfileState>(
         listener: (context, state) {
           if (state.statusProfile.isSubmissionSuccess) {
+            FocusManager.instance.primaryFocus?.unfocus();
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(
@@ -30,13 +29,11 @@ class EditProfile extends StatelessWidget {
                 context.read<AppBloc>().state.user.copyWith(info: info)));
             Navigator.of(context).pop();
           } else if (state.statusProfile.isSubmissionFailure) {
+            FocusManager.instance.primaryFocus?.unfocus();
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
-              ..showSnackBar(
-                SnackBar(
-                    content: Text(
-                        '${state.errorMessage ?? 'แก้ไขข้อมูลไม่สำเร็จ กรุณาลองอีกครั้ง'}')),
-              );
+              ..showSnackBar(SnackBar(
+                  content: Text('แก้ไขข้อมูลไม่สำเร็จ กรุณาลองอีกครั้ง')));
           }
         },
         child: Scaffold(
@@ -59,16 +56,25 @@ class EditProfile extends StatelessWidget {
               },
             ),
             actions: [
-              IconButton(
-                key: Key('editProfile_saveButton'),
-                onPressed: () {
-                  context.read<EditProfileCubit>().editProfileSubmitted();
-                },
-                icon: Icon(
-                  Icons.done,
-                  color: Colors.white,
-                ),
-              )
+              BlocBuilder<EditProfileCubit, EditProfileState>(
+                  buildWhen: (previous, current) =>
+                      previous.statusProfile != current.statusProfile,
+                  builder: (context, state) {
+                    return TextButton(
+                      key: const Key('editProfile_saveButton'),
+                      onPressed: state.statusProfile.isValidated
+                          ? () => context
+                              .read<EditProfileCubit>()
+                              .editProfileSubmitted()
+                          : null,
+                      child: Text("บันทึก"),
+                      style: TextButton.styleFrom(
+                        primary: Colors.white,
+                        onSurface:
+                            Theme.of(context).primaryColor, // Disable color
+                      ),
+                    );
+                  }),
             ],
           ),
           body: SingleChildScrollView(
@@ -88,23 +94,12 @@ class EditProfile extends StatelessWidget {
                   alignment: Alignment.topLeft,
                   child: _EditUsername(),
                 ),
-                // Container(
-                //   padding: EdgeInsets.only(left: 16, top: 26, right: 15),
-                //   width: MediaQuery.of(context).size.width,
-                //   alignment: Alignment.topLeft,
-                //   child: _EditPassword(),
-                // ),
-                // Container(
-                //   padding: EdgeInsets.only(left: 16, top: 26, right: 15),
-                //   width: MediaQuery.of(context).size.width,
-                //   alignment: Alignment.topLeft,
-                //   child: _ConfirmEditPassword(),
-                // ),
                 Container(
                   padding: EdgeInsets.only(left: 16, top: 26, right: 15),
                   width: MediaQuery.of(context).size.width,
                   alignment: Alignment.topLeft,
-                  child: _EditGender(),
+                  child: _EditGender(
+                      context.read<EditProfileCubit>().state.gender.value),
                 )
               ],
             ),
@@ -237,7 +232,7 @@ class _EditUsername extends StatelessWidget {
         builder: (context, state) {
           return TextFormField(
             key: Key('editProfile_username'),
-            initialValue: context.read<AppBloc>().state.user.info!.name,
+            initialValue: context.read<EditProfileCubit>().state.name.value,
             onChanged: (name) =>
                 context.read<EditProfileCubit>().usernameChanged(name),
             textInputAction: TextInputAction.next,
@@ -250,131 +245,45 @@ class _EditUsername extends StatelessWidget {
   }
 }
 
-// class _EditPassword extends StatefulWidget {
-//   @override
-//   __EditPasswordState createState() => __EditPasswordState();
-// }
-
-// class __EditPasswordState extends State<_EditPassword> {
-//   bool _isHidden = true;
-//   @override
-//   Widget build(BuildContext context) {
-//     return BlocBuilder<EditProfileCubit, EditProfileState>(
-//       buildWhen: (previous, current) => previous.password != current.password,
-//       builder: (context, state) {
-//         return TextFormField(
-//           textInputAction: TextInputAction.next,
-//           onChanged: (password) =>
-//               context.read<EditProfileCubit>().passwordChanged(password),
-//           decoration: InputDecoration(
-//             labelText: "รหัสผ่านใหม่",
-//             errorText: state.password.invalid
-//                 ? 'รหัสผ่านต้องประกอบไปด้วยตัวอักษรตัวเล็ก,ตัวใหญ่ และตัวเลข อย่างน้อย 8 ตัว'
-//                 : null,
-//             border: OutlineInputBorder(
-//               borderSide: BorderSide(),
-//             ),
-//             suffixIcon: InkWell(
-//               child: Icon(_isHidden ? Icons.visibility : Icons.visibility_off),
-//               onTap: () {
-//                 setState(() {
-//                   _isHidden = !_isHidden;
-//                 });
-//               },
-//             ),
-//           ),
-//           obscureText: _isHidden,
-//         );
-//       },
-//     );
-//   }
-// }
-
-// class _ConfirmEditPassword extends StatefulWidget {
-//   @override
-//   __ConfirmEditPasswordState createState() => __ConfirmEditPasswordState();
-// }
-
-// class __ConfirmEditPasswordState extends State<_ConfirmEditPassword> {
-//   bool _isHidden = true;
-//   @override
-//   Widget build(BuildContext context) {
-//     return BlocBuilder<EditProfileCubit, EditProfileState>(
-//         buildWhen: (previous, current) =>
-//             previous.confirmedPassword != current.confirmedPassword,
-//         builder: (context, state) {
-//           return TextFormField(
-//             textInputAction: TextInputAction.next,
-//             onChanged: (confirmPassword) => context
-//                 .read<EditProfileCubit>()
-//                 .confirmedPasswordChanged(confirmPassword),
-//             decoration: InputDecoration(
-//               labelText: "ยืนยันรหัสผ่าน",
-//               errorText:
-//                   state.confirmedPassword.invalid ? 'รหัสผ่านไม่ตรงกัน' : null,
-//               border: OutlineInputBorder(
-//                 borderSide: BorderSide(),
-//               ),
-//               suffixIcon: InkWell(
-//                 child:
-//                     Icon(_isHidden ? Icons.visibility : Icons.visibility_off),
-//                 onTap: () {
-//                   setState(() {
-//                     _isHidden = !_isHidden;
-//                   });
-//                 },
-//               ),
-//             ),
-//             obscureText: _isHidden,
-//           );
-//         });
-//   }
-// }
-
 class _EditGender extends StatefulWidget {
+  const _EditGender(this.gender);
+  final String gender;
   @override
   __EditGenderState createState() => __EditGenderState();
 }
 
 class __EditGenderState extends State<_EditGender> {
   @override
-  void initState() {
-    super.initState();
-    context
-        .read<EditProfileCubit>()
-        .genderChanged(context.read<AppBloc>().state.user.info!.gender!);
-    context
-        .read<EditProfileCubit>()
-        .usernameChanged(context.read<AppBloc>().state.user.info!.name!);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    String? _gender = context.read<AppBloc>().state.user.info!.gender;
+    String? _gender = widget.gender;
 
-    return DropdownButtonFormField(
-      key: Key('editProfile_gender'),
-      value: _gender,
-      decoration: InputDecoration(
-        labelText: "เพศ",
-        border: OutlineInputBorder(borderSide: BorderSide()),
-      ),
-      items: [
-        DropdownMenuItem<String>(
-          child: Text("ชาย"),
-          value: "M",
-        ),
-        DropdownMenuItem<String>(
-          child: Text("หญิง"),
-          value: "F",
-        )
-      ],
-      onChanged: (String? gender) {
-        setState(() {
-          _gender = gender;
+    return BlocBuilder<EditProfileCubit, EditProfileState>(
+        buildWhen: (previous, current) => previous.gender != current.gender,
+        builder: (context, state) {
+          return DropdownButtonFormField(
+            key: Key('editProfile_gender'),
+            value: _gender,
+            decoration: InputDecoration(
+              labelText: "เพศ",
+              border: OutlineInputBorder(borderSide: BorderSide()),
+            ),
+            items: [
+              DropdownMenuItem<String>(
+                child: Text("ชาย"),
+                value: "M",
+              ),
+              DropdownMenuItem<String>(
+                child: Text("หญิง"),
+                value: "F",
+              )
+            ],
+            onChanged: (String? gender) {
+              setState(() {
+                _gender = gender;
+              });
+              context.read<EditProfileCubit>().genderChanged(gender!);
+            },
+          );
         });
-        context.read<EditProfileCubit>().genderChanged(gender!);
-      },
-    );
   }
 }
