@@ -139,18 +139,20 @@ class _SettingState extends State<Setting> {
                                           create: (context) => EditProfileCubit(
                                               context.read<UserRepository>())
                                             ..initProfile(
-                                                name: context
-                                                    .read<AppBloc>()
-                                                    .state
-                                                    .user
-                                                    .info!
-                                                    .name!,
-                                                gender: context
-                                                    .read<AppBloc>()
-                                                    .state
-                                                    .user
-                                                    .info!
-                                                    .gender!),
+                                              name: context
+                                                  .read<AppBloc>()
+                                                  .state
+                                                  .user
+                                                  .info!
+                                                  .name!,
+                                              gender: context
+                                                  .read<AppBloc>()
+                                                  .state
+                                                  .user
+                                                  .info!
+                                                  .gender!,
+                                              photoUrl: photoUrl,
+                                            ),
                                           child: EditProfile(),
                                         ))).then((value) => setState(() {}));
                           },

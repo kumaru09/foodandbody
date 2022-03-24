@@ -18,10 +18,12 @@ class EditProfileCubit extends Cubit<EditProfileState> {
   void initProfile({
     required String name,
     required String gender,
+    required String photoUrl,
   }) {
     emit(state.copyWith(
       name: Username.dirty(name),
       gender: Gender.dirty(gender),
+      photoUrl: photoUrl,
     ));
   }
 
@@ -42,10 +44,14 @@ class EditProfileCubit extends Cubit<EditProfileState> {
   }
 
   void photoUrlChanged(String value) {
-    // final photo = Username.dirty(value);
+    final photo = Username.dirty(value);
     emit(state.copyWith(
       photoUrl: value,
-      // statusProfile: Formz.validate([state.name, state.gender, photo]),
+      statusProfile:
+          Formz.validate([state.name, state.gender]) == FormzStatus.valid &&
+                  value != state.photoUrl
+              ? FormzStatus.valid
+              : FormzStatus.invalid,
     ));
   }
 
