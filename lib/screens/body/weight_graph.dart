@@ -51,6 +51,7 @@ class _LineChart extends StatelessWidget {
           titlesData: FlTitlesData(show: false),
           borderData: FlBorderData(show: false),
           gridData: FlGridData(show: false),
+          lineTouchData: lineTouchData,
           lineBarsData: _getDataPoint()),
       key: const Key("body_weight_graph"),
     );
@@ -71,5 +72,30 @@ class _LineChart extends StatelessWidget {
           isCurved: true,
           dotData: FlDotData(show: false))
     ];
+  }
+
+  LineTouchData get lineTouchData => LineTouchData(
+        handleBuiltInTouches: true,
+        touchTooltipData: LineTouchTooltipData(
+            tooltipBgColor: Color(0xFF515070),
+            getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
+              return touchedBarSpots.map((barSpot) {
+                return LineTooltipItem(
+                  '${toRound(barSpot.y)}',
+                  const TextStyle(
+                    color: Colors.white,
+                  ),
+                );
+              }).toList();
+            }),
+      );
+
+  String toRound(double value) {
+    if (value - value.toInt() == 0.0 ||
+        value - value.toInt() < 0.01 ||
+        value - value.toInt() >= 0.99)
+      return value.toInt().toString();
+    else
+      return value.toStringAsFixed(2);
   }
 }

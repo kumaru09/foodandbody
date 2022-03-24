@@ -12,8 +12,8 @@ class InfoBloc extends Bloc<InfoEvent, InfoState> {
         super(InfoState()) {
     on<LoadInfo>(getInfo);
     on<UpdateGoal>(updateGoal);
-    on<UpdateHeight>(updateHeight);
-    on<UpdateWeight>(updateWeight);
+    // on<UpdateHeight>(updateHeight);
+    // on<UpdateWeight>(updateWeight);
   }
 
   final UserRepository _userRepository;
@@ -40,25 +40,25 @@ class InfoBloc extends Bloc<InfoEvent, InfoState> {
     }
   }
 
-  Future<void> updateHeight(UpdateHeight event, Emitter<InfoState> emit) async {
-    try {
-      emit(state.copyWith(status: InfoStatus.loading));
-      await _userRepository.updateHeightInfo(event.height);
-      final info = await _userRepository.getInfo();
-      emit(state.copyWith(status: InfoStatus.success, info: info));
-    } catch (e) {
-      print(e);
-    }
-  }
+  // Future<void> updateHeight(UpdateHeight event, Emitter<InfoState> emit) async {
+  //   try {
+  //     emit(state.copyWith(status: InfoStatus.loading));
+  //     await _userRepository.updateHeightInfo(event.height);
+  //     final info = await _userRepository.getInfo();
+  //     emit(state.copyWith(status: InfoStatus.success, info: info));
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
 
-  Future<void> updateWeight(UpdateWeight event, Emitter<InfoState> emit) async {
-    try {
-      emit(state.copyWith(status: InfoStatus.loading));
-      await _userRepository.updateWeightInfo(event.weight);
-      final info = await _userRepository.getInfo();
-      emit(state.copyWith(status: InfoStatus.success, info: info));
-    } catch (e) {
-      print(e);
-    }
-  }
+  // Future<void> updateWeight(UpdateWeight event, Emitter<InfoState> emit) async {
+  //   try {
+  //     emit(state.copyWith(status: InfoStatus.loading));
+  //     await _userRepository.updateWeightInfo(event.weight);
+  //     final info = await _userRepository.getInfo();
+  //     emit(state.copyWith(status: InfoStatus.success, info: info));
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
 }
