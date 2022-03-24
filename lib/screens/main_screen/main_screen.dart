@@ -81,7 +81,7 @@ class _MainScreenState extends State<MainScreen> {
                         ..add(LoadInfo())),
               BlocProvider(
                   create: (_) =>
-                      BodyCubit(context.read<BodyRepository>())..fetchBody()),
+                      BodyCubit(bodyRepository: context.read<BodyRepository>(), userRepository: context.read<UserRepository>())..fetchBody()),
               BlocProvider(
                   create: (_) =>
                       HomeBloc(planRepository: context.read<PlanRepository>())
