@@ -33,7 +33,7 @@ class EditProfile extends StatelessWidget {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(SnackBar(
-                  content: Text('แก้ไขข้อมูลไม่สำเร็จ กรุณาลองอีกครั้ง')));
+                  content: Text('${state.errorMessage}')));
           }
         },
         child: Scaffold(
