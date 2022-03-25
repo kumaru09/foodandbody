@@ -14,12 +14,18 @@ class EditProfileCubit extends Cubit<EditProfileState> {
   EditProfileCubit(this._userRepository) : super(const EditProfileState());
 
   final UserRepository _userRepository;
+  late String _name;
+  late String _gender;
+  late String _photoUrl;
 
   void initProfile({
     required String name,
     required String gender,
     required String photoUrl,
   }) {
+    _name = name;
+    _gender = gender;
+    _photoUrl = photoUrl;
     emit(state.copyWith(
       name: Username.dirty(name),
       gender: Gender.dirty(gender),
@@ -27,11 +33,22 @@ class EditProfileCubit extends Cubit<EditProfileState> {
     ));
   }
 
+  FormzStatus _editProfileFormValidate(
+      Username username, Gender gender, String photoUrl) {
+    return Formz.validate([username, gender]) == FormzStatus.valid &&
+            (username.value != _name ||
+                gender.value != _gender ||
+                photoUrl != _photoUrl)
+        ? FormzStatus.valid
+        : FormzStatus.invalid;
+  }
+
   void usernameChanged(String value) {
     final username = Username.dirty(value);
     emit(state.copyWith(
       name: username,
-      statusProfile: Formz.validate([username, state.gender]),
+      statusProfile:
+          _editProfileFormValidate(username, state.gender, state.photoUrl),
     ));
   }
 
@@ -39,18 +56,15 @@ class EditProfileCubit extends Cubit<EditProfileState> {
     final gender = Gender.dirty(value);
     emit(state.copyWith(
       gender: gender,
-      statusProfile: Formz.validate([state.name, gender]),
+      statusProfile:
+          _editProfileFormValidate(state.name, gender, state.photoUrl),
     ));
   }
 
   void photoUrlChanged(String value) {
     emit(state.copyWith(
       photoUrl: value,
-      statusProfile:
-          Formz.validate([state.name, state.gender]) == FormzStatus.valid &&
-                  value != state.photoUrl
-              ? FormzStatus.valid
-              : FormzStatus.invalid,
+      statusProfile: _editProfileFormValidate(state.name, state.gender, value),
     ));
   }
 
