@@ -9,10 +9,12 @@ import 'package:formz/formz.dart';
 void main() {
   const Username mockName = Username.dirty('user');
   const Gender mockGender = Gender.dirty('F');
+  const Password mockOldPassword = Password.dirty('user0123');
   const Password mockPassword = Password.dirty('user1234');
   final ConfirmedPassword mockConfirmedPassword =
       ConfirmedPassword.dirty(password: 'user1234', value: 'user1234');
   const String mockPhotoUrl = 'imgUrl';
+  const String mockErrorMessage = 'เกิดข้อผิดพลาด กรุณาลองใหม่';
 
   group('EditProfileState', () {
 
@@ -24,9 +26,9 @@ void main() {
       expect(EditProfileState().copyWith(), EditProfileState());
     });
 
-    test('returns object with updated status when status is passed', () {
+    test('returns object with updated statusProfile when status is passed', () {
       expect(
-        EditProfileState().copyWith(status: FormzStatus.pure),
+        EditProfileState().copyWith(statusProfile: FormzStatus.pure),
         EditProfileState(),
       );
     });
@@ -52,6 +54,20 @@ void main() {
       );
     });
 
+    test('returns object with updated statusPassword when status is passed', () {
+      expect(
+        EditProfileState().copyWith(statusPassword: FormzStatus.pure),
+        EditProfileState(),
+      );
+    });
+
+    test('returns object with updated oldPassword when oldPassword is passed', () {
+      expect(
+        EditProfileState().copyWith(password: mockOldPassword),
+        EditProfileState(password: mockOldPassword),
+      );
+    });
+
     test('returns object with updated password when password is passed', () {
       expect(
         EditProfileState().copyWith(password: mockPassword),
@@ -65,6 +81,15 @@ void main() {
       expect(
         EditProfileState().copyWith(confirmedPassword: mockConfirmedPassword),
         EditProfileState(confirmedPassword: mockConfirmedPassword),
+      );
+    });
+
+    test(
+        'returns object with updated errorMessage when errorMessage is passed',
+        () {
+      expect(
+        EditProfileState().copyWith(errorMessage: mockErrorMessage),
+        EditProfileState(errorMessage: mockErrorMessage),
       );
     });
   });

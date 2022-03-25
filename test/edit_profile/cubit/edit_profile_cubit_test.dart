@@ -68,29 +68,122 @@ void main() {
     group('usernameChanged', () {
       blocTest<EditProfileCubit, EditProfileState>(
         'emits [invalid] when username are invalid',
-        build: () => EditProfileCubit(userRepository),
+        build: () => EditProfileCubit(userRepository)
+          ..initProfile(
+              name: 'user', gender: validGenderString, photoUrl: mockImgUrl),
         act: (cubit) => cubit.usernameChanged(invalidUsernameString),
         expect: () => const <EditProfileState>[
-          EditProfileState(name: invalidUsername, status: FormzStatus.invalid),
+          EditProfileState(
+            name: invalidUsername,
+            gender: validGender,
+            photoUrl: mockImgUrl,
+            statusProfile: FormzStatus.invalid,
+          ),
         ],
       );
 
       blocTest<EditProfileCubit, EditProfileState>(
         'emits [valid] when username are valid',
-        build: () => EditProfileCubit(userRepository),
-        seed: () => EditProfileState(
-          password: validPassword,
-          confirmedPassword: validConfirmedPassword,
-          gender: validGender,
-        ),
+        build: () => EditProfileCubit(userRepository)
+          ..initProfile(
+              name: 'user', gender: validGenderString, photoUrl: mockImgUrl),
         act: (cubit) => cubit.usernameChanged(validUsernameString),
         expect: () => const <EditProfileState>[
           EditProfileState(
             name: validUsername,
+            gender: validGender,
+            photoUrl: mockImgUrl,
+            statusProfile: FormzStatus.valid,
+          ),
+        ],
+      );
+    });
+
+    group('GenderChanged', () {
+      blocTest<EditProfileCubit, EditProfileState>(
+        'emits [invalid] when gender are invalid',
+        build: () => EditProfileCubit(userRepository)
+          ..initProfile(
+              name: validUsernameString, gender: 'M', photoUrl: mockImgUrl),
+        act: (cubit) => cubit.genderChanged(invalidGenderString),
+        expect: () => const <EditProfileState>[
+          EditProfileState(
+            name: validUsername,
+            gender: invalidGender,
+            photoUrl: mockImgUrl,
+            statusProfile: FormzStatus.invalid,
+          ),
+        ],
+      );
+
+      blocTest<EditProfileCubit, EditProfileState>(
+        'emits [valid] when gender are valid',
+        build: () => EditProfileCubit(userRepository)
+          ..initProfile(
+              name: validUsernameString, gender: 'M', photoUrl: mockImgUrl),
+        act: (cubit) => cubit.genderChanged(validGenderString),
+        expect: () => const <EditProfileState>[
+          EditProfileState(
+            name: validUsername,
+            gender: validGender,
+            photoUrl: mockImgUrl,
+            statusProfile: FormzStatus.valid,
+          ),
+        ],
+      );
+    });
+
+    blocTest<EditProfileCubit, EditProfileState>(
+      'photoUrlChanged emits photoUrl',
+      build: () => EditProfileCubit(userRepository)
+        ..initProfile(
+            name: validUsernameString,
+            gender: validGenderString,
+            photoUrl: 'mockImgUrl'),
+      act: (cubit) => cubit.photoUrlChanged(mockImgUrl),
+      expect: () => const <EditProfileState>[
+        EditProfileState(
+          name: validUsername,
+          gender: validGender,
+          photoUrl: mockImgUrl,
+          statusProfile: FormzStatus.valid,
+        ),
+      ],
+    );
+
+    group('oldPasswordChanged', () {
+      blocTest<EditProfileCubit, EditProfileState>(
+        'emits [invalid] when oldPassword are invalid',
+        build: () => EditProfileCubit(userRepository),
+        seed: () => EditProfileState(
+          password: validPassword,
+          confirmedPassword: validConfirmedPassword,
+        ),
+        act: (cubit) => cubit.oldPasswordChanged(invalidOldPasswordString),
+        expect: () => const <EditProfileState>[
+          EditProfileState(
+            oldPassword: invalidOldPassword,
             password: validPassword,
             confirmedPassword: validConfirmedPassword,
-            gender: validGender,
-            status: FormzStatus.valid,
+            statusPassword: FormzStatus.invalid,
+          ),
+        ],
+      );
+
+      blocTest<EditProfileCubit, EditProfileState>(
+        'emits [valid] when password are valid',
+        build: () => EditProfileCubit(userRepository),
+        seed: () => EditProfileState(
+          password: validPassword,
+          confirmedPassword: validConfirmedPassword,
+        ),
+        act: (cubit) => cubit.oldPasswordChanged(validOldPasswordString),
+        expect: () => const <EditProfileState>[
+          EditProfileState(
+            oldPassword: validOldPassword,
+            password: validPassword,
+            confirmedPassword: validConfirmedPassword,
+            statusPassword: FormzStatus.valid,
           ),
         ],
       );
@@ -107,7 +200,7 @@ void main() {
             confirmedPassword: ConfirmedPassword.dirty(
               password: invalidPasswordString,
             ),
-            status: FormzStatus.invalid,
+            statusPassword: FormzStatus.invalid,
           ),
         ],
       );
@@ -116,18 +209,16 @@ void main() {
         'emits [valid] when password are valid',
         build: () => EditProfileCubit(userRepository),
         seed: () => EditProfileState(
-          name: validUsername,
+          oldPassword: validOldPassword,
           confirmedPassword: validConfirmedPassword,
-          gender: validGender,
         ),
         act: (cubit) => cubit.passwordChanged(validPasswordString),
         expect: () => const <EditProfileState>[
           EditProfileState(
-            name: validUsername,
+            oldPassword: validOldPassword,
             password: validPassword,
             confirmedPassword: validConfirmedPassword,
-            gender: validGender,
-            status: FormzStatus.valid,
+            statusPassword: FormzStatus.valid,
           ),
         ],
       );
@@ -142,7 +233,7 @@ void main() {
         expect: () => const <EditProfileState>[
           EditProfileState(
             confirmedPassword: invalidConfirmedPassword,
-            status: FormzStatus.invalid,
+            statusPassword: FormzStatus.invalid,
           ),
         ],
       );
@@ -151,81 +242,77 @@ void main() {
         'emits [valid] when confirmedPassword are valid',
         build: () => EditProfileCubit(userRepository),
         seed: () => EditProfileState(
-          name: validUsername,
+          oldPassword: validOldPassword,
           password: validPassword,
-          gender: validGender,
         ),
         act: (cubit) =>
             cubit.confirmedPasswordChanged(validConfirmedPasswordString),
         expect: () => const <EditProfileState>[
           EditProfileState(
-            name: validUsername,
+            oldPassword: validOldPassword,
             password: validPassword,
             confirmedPassword: validConfirmedPassword,
-            gender: validGender,
-            status: FormzStatus.valid,
+            statusPassword: FormzStatus.valid,
           ),
         ],
       );
     });
 
-    group('GenderChanged', () {
+    group('editProfileSubmitted', () {
       blocTest<EditProfileCubit, EditProfileState>(
-        'emits [invalid] when gender are invalid',
-        build: () => EditProfileCubit(userRepository),
-        act: (cubit) => cubit.genderChanged(invalidGenderString),
-        expect: () => const <EditProfileState>[
-          EditProfileState(
-            gender: invalidGender,
-            status: FormzStatus.invalid,
-          ),
-        ],
-      );
-
-      blocTest<EditProfileCubit, EditProfileState>(
-        'emits [valid] when gender are valid',
+        'emit submissionSuccess when call updateInfo pass',
         build: () => EditProfileCubit(userRepository),
         seed: () => EditProfileState(
+          statusProfile: FormzStatus.valid,
           name: validUsername,
-          password: validPassword,
-          confirmedPassword: validConfirmedPassword,
+          gender: validGender,
+          photoUrl: mockImgUrl,
         ),
-        act: (cubit) => cubit.genderChanged(validGenderString),
+        act: (cubit) => cubit.editProfileSubmitted(),
         expect: () => const <EditProfileState>[
           EditProfileState(
+            statusProfile: FormzStatus.submissionSuccess,
             name: validUsername,
-            password: validPassword,
-            confirmedPassword: validConfirmedPassword,
             gender: validGender,
-            status: FormzStatus.valid,
-          ),
+            photoUrl: mockImgUrl,
+          )
         ],
+        verify: (_) => verify(() => userRepository.updateInfo(Info(
+            name: validUsernameString,
+            photoUrl: mockImgUrl,
+            gender: validGenderString))).called(1),
+      );
+
+      blocTest<EditProfileCubit, EditProfileState>(
+        'emit submissionSuccess when call updateInfo then throw Exception()',
+        setUp: () => when(() => userRepository.updateInfo(Info(
+            name: validUsernameString,
+            gender: validGenderString,
+            photoUrl: mockImgUrl))).thenAnswer((_) => throw Exception()),
+        build: () => EditProfileCubit(userRepository),
+        seed: () => EditProfileState(
+          statusProfile: FormzStatus.valid,
+          name: validUsername,
+          gender: validGender,
+          photoUrl: mockImgUrl,
+        ),
+        act: (cubit) => cubit.editProfileSubmitted(),
+        expect: () => const <EditProfileState>[
+          EditProfileState(
+            statusProfile: FormzStatus.submissionFailure,
+            name: validUsername,
+            gender: validGender,
+            photoUrl: mockImgUrl,
+          )
+        ],
+        verify: (_) => verify(() => userRepository.updateInfo(Info(
+            name: validUsernameString,
+            photoUrl: mockImgUrl,
+            gender: validGenderString))).called(1),
       );
     });
 
-    blocTest<EditProfileCubit, EditProfileState>(
-      'oldPasswordChanged emits oldPassword',
-      build: () => EditProfileCubit(userRepository),
-      act: (cubit) => cubit.oldPasswordChanged(validOldPasswordString),
-      expect: () => const <EditProfileState>[
-        EditProfileState(
-          oldPassword: validOldPassword,
-        ),
-      ],
-    );
-
-    blocTest<EditProfileCubit, EditProfileState>(
-      'photoUrlChanged emits photoUrl',
-      build: () => EditProfileCubit(userRepository),
-      act: (cubit) => cubit.photoUrlChanged(mockImgUrl),
-      expect: () => const <EditProfileState>[
-        EditProfileState(
-          photoUrl: mockImgUrl,
-        ),
-      ],
-    );
-
-    group('editFormSubmitted', () {
+    group('editPasswordSubmitted', () {
       blocTest<EditProfileCubit, EditProfileState>(
         'emit submissionSuccess when call updatePassword pass',
         build: () => EditProfileCubit(userRepository),
@@ -234,13 +321,13 @@ void main() {
           confirmedPassword: validConfirmedPassword,
           oldPassword: validOldPassword,
         ),
-        act: (cubit) => cubit.editFormSubmitted(),
+        act: (cubit) => cubit.editPasswordSubmitted(),
         expect: () => const <EditProfileState>[
           EditProfileState(
             password: validPassword,
             confirmedPassword: validConfirmedPassword,
             oldPassword: validOldPassword,
-            status: FormzStatus.submissionSuccess,
+            statusPassword: FormzStatus.submissionSuccess,
           ),
         ],
         verify: (_) {
@@ -262,13 +349,13 @@ void main() {
           confirmedPassword: validConfirmedPassword,
           oldPassword: validOldPassword,
         ),
-        act: (cubit) => cubit.editFormSubmitted(),
+        act: (cubit) => cubit.editPasswordSubmitted(),
         expect: () => const <EditProfileState>[
           EditProfileState(
             password: validPassword,
             confirmedPassword: validConfirmedPassword,
             oldPassword: validOldPassword,
-            status: FormzStatus.submissionFailure,
+            statusPassword: FormzStatus.submissionFailure,
           ),
         ],
         verify: (_) {
@@ -277,58 +364,6 @@ void main() {
                 validPasswordString, validOldPasswordString),
           ).called(1);
         },
-      );
-
-      blocTest<EditProfileCubit, EditProfileState>(
-        'emit submissionSuccess when call updateInfo pass',
-        build: () => EditProfileCubit(userRepository),
-        seed: () => EditProfileState(
-          status: FormzStatus.valid,
-          name: validUsername,
-          gender: validGender,
-          photoUrl: mockImgUrl,
-        ),
-        act: (cubit) => cubit.editFormSubmitted(),
-        expect: () => const <EditProfileState>[
-          EditProfileState(
-            status: FormzStatus.submissionSuccess,
-            name: validUsername,
-            gender: validGender,
-            photoUrl: mockImgUrl,
-          )
-        ],
-        verify: (_) => verify(() => userRepository.updateInfo(Info(
-            name: validUsernameString,
-            photoUrl: mockImgUrl,
-            gender: validGenderString))).called(1),
-      );
-
-      blocTest<EditProfileCubit, EditProfileState>(
-        'emit submissionSuccess when call updateInfo then throw Exception()',
-        setUp: () => when(() => userRepository.updateInfo(Info(
-            name: validUsernameString,
-            gender: validGenderString,
-            photoUrl: mockImgUrl))).thenAnswer((_) => throw Exception()),
-        build: () => EditProfileCubit(userRepository),
-        seed: () => EditProfileState(
-          status: FormzStatus.valid,
-          name: validUsername,
-          gender: validGender,
-          photoUrl: mockImgUrl,
-        ),
-        act: (cubit) => cubit.editFormSubmitted(),
-        expect: () => const <EditProfileState>[
-          EditProfileState(
-            status: FormzStatus.submissionFailure,
-            name: validUsername,
-            gender: validGender,
-            photoUrl: mockImgUrl,
-          )
-        ],
-        verify: (_) => verify(() => userRepository.updateInfo(Info(
-            name: validUsernameString,
-            photoUrl: mockImgUrl,
-            gender: validGenderString))).called(1),
       );
     });
   });

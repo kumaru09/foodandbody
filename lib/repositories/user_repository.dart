@@ -14,7 +14,7 @@ import 'package:path/path.dart' as p;
 class UpdatePasswordFaliure implements Exception {
   final message;
 
-  const UpdatePasswordFaliure([this.message = 'เกิดข้อผิดพลาดบางอย่าง']);
+  const UpdatePasswordFaliure([this.message = 'เกิดข้อผิดพลาด กรุณาลองใหม่']);
 
   factory UpdatePasswordFaliure.fromCode(String code) {
     switch (code) {
@@ -32,7 +32,7 @@ class UpdatePasswordFaliure implements Exception {
 class UploadProfilePicFailure implements Exception {
   final message;
 
-  const UploadProfilePicFailure([this.message = 'เกิดข้อผิดพลาดบางอย่าง']);
+  const UploadProfilePicFailure([this.message = 'อัปโหลดรูปภาพไม่สำเร็จ กรุณาลองใหม่']);
 
   factory UploadProfilePicFailure.fromCode(String code) {
     switch (code) {
@@ -46,7 +46,7 @@ class UploadProfilePicFailure implements Exception {
 
 class UpdateInfoFailure implements Exception {
   final message;
-  const UpdateInfoFailure([this.message = 'เกิดข้อผิดพลาดบางอย่าง']);
+  const UpdateInfoFailure([this.message = 'แก้ไขข้อมูลไม่สำเร็จ กรุณาลองใหม่']);
 }
 
 class UserRepository implements IUserRepository {
