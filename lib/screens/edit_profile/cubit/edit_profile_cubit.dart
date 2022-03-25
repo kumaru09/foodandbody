@@ -44,7 +44,6 @@ class EditProfileCubit extends Cubit<EditProfileState> {
   }
 
   void photoUrlChanged(String value) {
-    final photo = Username.dirty(value);
     emit(state.copyWith(
       photoUrl: value,
       statusProfile:
@@ -60,7 +59,11 @@ class EditProfileCubit extends Cubit<EditProfileState> {
     emit(state.copyWith(
       oldPassword: oldPassword,
       statusPassword: Formz.validate(
-          [oldPassword, state.password, state.confirmedPassword]),
+                      [oldPassword, state.password, state.confirmedPassword]) ==
+                  FormzStatus.valid &&
+              state.password.value != oldPassword.value
+          ? FormzStatus.valid
+          : FormzStatus.invalid,
     ));
   }
 
@@ -74,7 +77,11 @@ class EditProfileCubit extends Cubit<EditProfileState> {
       password: password,
       confirmedPassword: confirmedPassword,
       statusPassword:
-          Formz.validate([state.oldPassword, password, confirmedPassword]),
+          Formz.validate([state.oldPassword, password, confirmedPassword]) ==
+                      FormzStatus.valid &&
+                  password.value != state.oldPassword.value
+              ? FormzStatus.valid
+              : FormzStatus.invalid,
     ));
   }
 
@@ -86,7 +93,11 @@ class EditProfileCubit extends Cubit<EditProfileState> {
     emit(state.copyWith(
       confirmedPassword: confirmedPassword,
       statusPassword: Formz.validate(
-          [state.oldPassword, state.password, confirmedPassword]),
+                      [state.oldPassword, state.password, confirmedPassword]) ==
+                  FormzStatus.valid &&
+              state.password.value != state.oldPassword.value
+          ? FormzStatus.valid
+          : FormzStatus.invalid,
     ));
   }
 

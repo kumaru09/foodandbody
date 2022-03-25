@@ -99,7 +99,8 @@ class EditPassword extends StatelessWidget {
                 SizedBox(height: 20),
                 BlocBuilder<EditProfileCubit, EditProfileState>(
                     buildWhen: (previous, current) =>
-                        previous.password != current.password,
+                        previous.password != current.password ||
+                        previous.oldPassword != current.oldPassword,
                     builder: (context, state) {
                       return TextFormField(
                         textInputAction: TextInputAction.next,
@@ -107,7 +108,11 @@ class EditPassword extends StatelessWidget {
                             labelText: "รหัสผ่านใหม่",
                             errorText: state.password.invalid
                                 ? 'รหัสผ่านอย่างน้อย 8 ตัว มีตัวอักษรตัวเล็ก ตัวใหญ๋ และตัวเลข'
-                                : null,
+                                : state.password.valid &&
+                                        state.password.value ==
+                                            state.oldPassword.value
+                                    ? 'รหัสผ่านใหม่ซ้ำกับรหัสผ่านเดิม'
+                                    : null,
                             errorMaxLines: 2,
                             border:
                                 OutlineInputBorder(borderSide: BorderSide())),
@@ -126,7 +131,8 @@ class EditPassword extends StatelessWidget {
                         textInputAction: TextInputAction.next,
                         decoration: InputDecoration(
                             labelText: "ยืนยันรหัสผ่านใหม่",
-                            errorText: state.confirmedPassword.invalid
+                            errorText: state.confirmedPassword.invalid &&
+                                    state.confirmedPassword.value != ''
                                 ? 'รหัสผ่านไม่ตรงกัน'
                                 : null,
                             border:
