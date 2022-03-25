@@ -40,6 +40,7 @@ class EditPassword extends StatelessWidget {
                 ),
           ),
           leading: IconButton(
+            key: const Key('editPassword_backButton'),
             onPressed: () {
               Navigator.of(context).pop();
             },
@@ -82,6 +83,7 @@ class EditPassword extends StatelessWidget {
                         previous.oldPassword != current.oldPassword,
                     builder: (context, state) {
                       return TextFormField(
+                  key: const Key('editPassword_oldPassword_textFormField'),
                         textInputAction: TextInputAction.next,
                         decoration: InputDecoration(
                             labelText: "รหัสผ่านเดิม",
@@ -103,6 +105,7 @@ class EditPassword extends StatelessWidget {
                         previous.oldPassword != current.oldPassword,
                     builder: (context, state) {
                       return TextFormField(
+                  key: const Key('editPassword_password_textFormField'),
                         textInputAction: TextInputAction.next,
                         decoration: InputDecoration(
                             labelText: "รหัสผ่านใหม่",
@@ -128,6 +131,7 @@ class EditPassword extends StatelessWidget {
                         previous.confirmedPassword != current.confirmedPassword,
                     builder: (context, state) {
                       return TextFormField(
+                  key: const Key('editPassword_confirmedPassword_textFormField'),
                         textInputAction: TextInputAction.next,
                         decoration: InputDecoration(
                             labelText: "ยืนยันรหัสผ่านใหม่",
