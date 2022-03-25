@@ -140,7 +140,7 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
       return NearRestaurant(
           name: e.name,
           imageUrl: detail!.result!.photos != null
-              ? "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${detail.result?.photos?.first.photoReference}&key=AIzaSyDpXYjDqWeb8vWEoUkbApUyQn3pQ42CbZE"
+              ? "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${detail.result?.photos?.first.photoReference}&key=AIzaSyAAw4dLXy4iLB73faed51VGnNumwkU7mFY"
               : null,
           distance: await _getDistance(
               e.geometry!.location!.lat!,
@@ -169,7 +169,7 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
       double desLat, double desLng, double oriLat, double oriLng) async {
     try {
       final res = await dio.get(
-          "https://maps.googleapis.com/maps/api/distancematrix/json?destinations=$desLat,$desLng&origins=$oriLat,$oriLng&key=AIzaSyDpXYjDqWeb8vWEoUkbApUyQn3pQ42CbZE");
+          "https://maps.googleapis.com/maps/api/distancematrix/json?destinations=$desLat,$desLng&origins=$oriLat,$oriLng&key=AIzaSyAAw4dLXy4iLB73faed51VGnNumwkU7mFY");
       // print(res.data);
       final distance = DistanceMatrix.fromJson(res.data);
       return distance.elements.first.distance.text;
