@@ -177,15 +177,6 @@ class _SettingState extends State<Setting> {
                         alignment: Alignment.topLeft,
                         child: TextButton(
                           onPressed: () {
-                            // Navigator.push(
-                            //     context,
-                            //     MaterialPageRoute(
-                            //         builder: (context) =>
-                            //             BlocProvider<EditProfileCubit>(
-                            //               create: (context) => EditProfileCubit(
-                            //                   context.read<UserRepository>()),
-                            //               child: EditProfile(),
-                            //             )));
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
