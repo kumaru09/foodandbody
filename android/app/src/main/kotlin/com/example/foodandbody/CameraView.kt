@@ -40,6 +40,7 @@ import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
+import kotlin.collections.ArrayList
 import kotlin.math.atan
 
 
@@ -693,49 +694,6 @@ class CameraView(val activity: Activity, dartExecutor: DartExecutor) : DefaultLi
             return
         }
 
-//        synchronized(frameInUseLock) {
-//            try {
-//                session!!.setCameraTextureNames(IntArray(1) { 0 });
-//                val frame = session!!.update();
-//                val camera = frame.camera;
-//
-//                if (camera.trackingState != TrackingState.TRACKING) {
-//                    return
-//                }
-//
-//                var containsNewDepthData: Boolean;
-//                try {
-//                    frame.acquireDepthImage().use { depthImage ->
-//                        containsNewDepthData = depthTimestamp == depthImage.timestamp
-//                        depthTimestamp = depthImage.timestamp
-//                    }
-//                } catch (e: NotYetAvailableException) {
-//                    // This is normal at the beginning of session, where depth hasn't been estimated yet.
-//                    containsNewDepthData = false
-//                }
-//
-//                if (containsNewDepthData) {
-//                    val depth = DepthData.create(session, frame)
-//
-//                    if (depth != null) {
-//                        depthReceived = true;
-//                        renderer.update(depth);
-//                    }
-//                }
-//
-//                val projectionMatrix = FloatArray(16)
-//                camera.getProjectionMatrix(projectionMatrix, 0, 0.1f, 100.0f)
-//                val viewMatrix = FloatArray(16)
-//                camera.getViewMatrix(viewMatrix, 0)
-//
-//                renderer.draw(viewMatrix, projectionMatrix);
-//
-//            } catch (t: Throwable) {
-//                // Avoid crashing the application due to unhandled exceptions.
-//                Log.e("ARCore", "Exception on the OpenGL thread", t)
-//            }
-//        }
-
         displayRotationHelper.updateSessionIfNeeded(session);
 
         synchronized(frameInUseLock) {
@@ -772,6 +730,15 @@ class CameraView(val activity: Activity, dartExecutor: DartExecutor) : DefaultLi
 
         try {
             frame.acquireDepthImage().use { depthImage ->
+                containsNewDepthData = depthTimestamp == depthImage.timestamp
+                depthTimestamp = depthImage.timestamp
+//                if (containsNewDepthData) {
+//                    val plane = depthImage.planes[0]
+//                    val buffer = plane.buffer.order(ByteOrder.nativeOrder())
+//                    val array = ShortArray(buffer.remaining() / 2)
+//                    buffer.asShortBuffer().get(array)
+//                    Log.d("ARCore", "${array.toCollection(ArrayList())}")
+//                }
                 activity.runOnUiThread {
                     if (event != null) event!!.success(true)
                 }
@@ -800,7 +767,7 @@ class CameraView(val activity: Activity, dartExecutor: DartExecutor) : DefaultLi
                 val array = ShortArray(buffer.remaining() / 2)
                 buffer.asShortBuffer().get(array)
                 isGetDepth = false
-                flutterResult.success("{\"depth\":\"${array.toCollection(ArrayList())}\",\"fovW\":\"$fovW\", \"fovH\":\"$fovH\"}")
+                flutterResult.success("{\"depth\":\"${array.toCollection(ArrayList())}\", \"fovW\":\"$fovW\", \"fovH\":\"$fovH\"}")
             }
         }
 

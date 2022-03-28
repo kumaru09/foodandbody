@@ -9,6 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:foodandbody/screens/camera/bloc/camera_bloc.dart';
 import 'package:foodandbody/screens/camera/show_food_result.dart';
+import 'package:foodandbody/screens/camera/show_predict_result.dart';
 import 'package:foodandbody/screens/help/help.dart';
 import 'package:foodandbody/services/arcore_service.dart';
 import 'package:loader_overlay/loader_overlay.dart';
@@ -47,6 +48,8 @@ class _State extends State<ARCamera> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance!.addObserver(this);
+    context.read<CameraBloc>().add(SetIsFlat(isFlat: 120));
+    context.read<CameraBloc>().add(SetHasPlane(hasPlane: false));
     if (defaultTargetPlatform == TargetPlatform.android) {
       visibilityDetector = VisibilityDetector(
           key: Key('visible-camera-key'),
@@ -63,20 +66,20 @@ class _State extends State<ARCamera> with WidgetsBindingObserver {
       final norm = sqrt(pow(event.x, 2) + pow(event.y, 2) + pow(event.z, 2));
       final inclination = (acos(event.z / norm) * (180 / pi)).round();
       // print(inclination);
-      if (inclination < 2 || inclination > 178) {
+      if (inclination < 1 || inclination > 179) {
         if (context.read<CameraBloc>().state.isFlat > inclination) {
           context.read<CameraBloc>().add(SetIsFlat(isFlat: inclination));
         }
       } else {
-        if (context.read<CameraBloc>().state.isFlat < inclination) {
+        // if (context.read<CameraBloc>().state.isFlat < inclination) {
+        //   context.read<CameraBloc>().add(SetIsFlat(isFlat: inclination));
+        // }
+        if (inclination < 10 || inclination > 170) {
           context.read<CameraBloc>().add(SetIsFlat(isFlat: inclination));
         }
-        if (inclination == 5 || inclination == 175) {
-          context.read<CameraBloc>().add(SetIsFlat(isFlat: inclination));
-        }
-        if (inclination == 10 || inclination == 170) {
-          context.read<CameraBloc>().add(SetIsFlat(isFlat: inclination));
-        }
+        // if (inclination == 10 || inclination == 170) {
+        //   context.read<CameraBloc>().add(SetIsFlat(isFlat: inclination));
+        // }
       }
     }));
   }
@@ -164,8 +167,8 @@ class _State extends State<ARCamera> with WidgetsBindingObserver {
                       return Text('Searching Surface');
                     }
                     if (state.hasPlane &&
-                        state.isFlat > 2 &&
-                        state.isFlat < 178) {
+                        state.isFlat > 1 &&
+                        state.isFlat < 179) {
                       return Text('Device is not flat: ${state.isFlat}');
                     } else {
                       return Text('Ready for take photo');
@@ -199,8 +202,8 @@ class _State extends State<ARCamera> with WidgetsBindingObserver {
               context
                   .read<CameraBloc>()
                   .add(GetPredictonWithDepth(file: image, depth: depth));
-              Navigator.of(context).pushReplacement(
-                  (MaterialPageRoute(builder: (context) => ShowFoodResult())));
+              // Navigator.of(context).pushReplacement((MaterialPageRoute(
+              //     builder: (context) => ShowPredictResult())));
             }
             // final image = await cameraController?.takePicture();
             // _showResult(isFoodCamera: _isFoodCamera, imagePath: image.path);
