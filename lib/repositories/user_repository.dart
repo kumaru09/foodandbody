@@ -86,7 +86,6 @@ class UserRepository {
     }
   }
 
-  @override
   Future<void> updateInfo(Info newInfo) async {
     try {
       final info = users.doc(_firebaseAuth.currentUser?.uid);
