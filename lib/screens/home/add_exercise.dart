@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:foodandbody/screens/home/bloc/home_bloc.dart';
+import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
+import 'package:foodandbody/screens/setting/bloc/info_bloc.dart';
+import 'package:provider/src/provider.dart';
 
 class AddExerciseButton extends StatelessWidget {
   const AddExerciseButton({Key? key}) : super(key: key);
@@ -8,9 +12,15 @@ class AddExerciseButton extends StatelessWidget {
     return ElevatedButton.icon(
       key: const Key('home_add_exercise_button'),
       onPressed: () async {
-        await showDialog(
+        final value = await showDialog(
             context: context,
             builder: (BuildContext context) => _AddExerciseDialog());
+        if (value != null) {
+          context.read<PlanBloc>().add(AddExercise(
+              id: value['activity'],
+              min: value['time'],
+              weight: context.read<InfoBloc>().state.info!.weight!));
+        }
       },
       style: ElevatedButton.styleFrom(
           primary: Theme.of(context).scaffoldBackgroundColor, elevation: 0),
@@ -37,7 +47,8 @@ class _AddExerciseDialog extends StatefulWidget {
 
 class __AddExerciseDialogState extends State<_AddExerciseDialog> {
   String? _activity;
-  String _time = '0';
+  String? _time;
+  final _formKey = GlobalKey<FormState>();
 
   List<DropdownMenuItem<String>> _dropdownItem = [
     DropdownMenuItem(
@@ -67,43 +78,51 @@ class __AddExerciseDialogState extends State<_AddExerciseDialog> {
               TextStyle(color: Theme.of(context).colorScheme.secondary),
             ),
       ),
-      content: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          DropdownButtonFormField<String>(
-            key: const Key("activity_select_dropdown"),
-            items: _dropdownItem,
-            value: _activity,
-            decoration: InputDecoration(
-              labelText: "กิจกรรม",
-              border: OutlineInputBorder(borderSide: BorderSide()),
+      content: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            DropdownButtonFormField<String>(
+              key: const Key("activity_select_dropdown"),
+              items: _dropdownItem,
+              value: _activity,
+              validator: (value) => value == null ? "กรุณาเลือกกิจกกรม" : null,
+              decoration: InputDecoration(
+                labelText: "กิจกรรม",
+                border: OutlineInputBorder(borderSide: BorderSide()),
+              ),
+              onChanged: (String? activity) {
+                setState(() {
+                  _activity = activity;
+                });
+              },
             ),
-            onChanged: (String? activity) {
-              setState(() {
-                _activity = activity;
-              });
-            },
-          ),
-          SizedBox(height: 20),
-          TextFormField(
+            SizedBox(height: 20),
+            TextFormField(
               key: const Key("time_text_field"),
               keyboardType: TextInputType.number,
               textInputAction: TextInputAction.done,
+              validator: (value) =>
+                  (value == null || value.isEmpty) ? "กรุณากรอกเวลา" : null,
               decoration: InputDecoration(
                 labelText: "เวลา (นาที)",
                 hintText: "ตัวอย่าง 30, 45, 60",
                 border: OutlineInputBorder(borderSide: BorderSide()),
               ),
               onChanged: (time) => setState(() {
-                    _time = time;
-                  }))
-        ],
+                _time = time;
+              }),
+            ),
+          ],
+        ),
       ),
       actions: <Widget>[
         TextButton(
           key: const Key("add_exercise_dialog_ok_button"),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.pop(
+              context, {'activity': _activity, 'time': int.parse(_time!)}),
           child: Text(
             "ตกลง",
             style: Theme.of(context).textTheme.button!.merge(

@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/models/graph_list.dart';
-import 'package:foodandbody/repositories/body_repository.dart';
-import 'package:foodandbody/repositories/history_repository.dart';
 import 'package:foodandbody/screens/history/bloc/history_bloc.dart';
 import 'package:foodandbody/screens/history/tab/history_body.dart';
 import 'package:foodandbody/screens/history/tab/history_menu.dart';
 import 'package:foodandbody/screens/history/tab/history_nutrient.dart';
 
 class History extends StatelessWidget {
-  // const History({Key? key}) : super(key: key);
   History({Key? key}) : super(key: key);
 
   late DateTime startDate = stopDate.subtract(new Duration(days: 10));
@@ -17,11 +14,11 @@ class History extends StatelessWidget {
 
   bool _isNoDataInNutrient(GraphList? list) {
     return _isNotZeroList(list!.caloriesList) ||
+            _isNotZeroList(list.burnList) ||
             _isNotZeroList(list.carbList) ||
             _isNotZeroList(list.proteinList) ||
-            _isNotZeroList(list.proteinList) ||
+            _isNotZeroList(list.fatList) ||
             _isNotZeroList(list.waterList)
-        // || _isNotZeroList(list.exerciseList)
         ? false
         : true;
   }
@@ -60,29 +57,69 @@ class History extends StatelessWidget {
           ),
           body:
               BlocBuilder<HistoryBloc, HistoryState>(builder: (context, state) {
-            if (state.status == HistoryStatus.success &&
-                state.graphList != null) {
-              return TabBarView(
-                children: [
-                  HistoryMenu(
-                      startDate: state.graphList!.foodEndDate,
-                      items: state.menuList,
-                      dateMenuList: state.dateMenuList),
-                  _isNoDataInNutrient(state.graphList)
-                      ? Center(
-                          child: Text(
-                          'ไม่มีประวัติสารอาหารในขณะนี้',
-                          style: Theme.of(context).textTheme.subtitle1!.merge(
+            switch (state.status) {
+              case HistoryStatus.failure:
+                return Center(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image(image: AssetImage('assets/error.png')),
+                      SizedBox(height: 10),
+                      Text('ไม่สามารถโหลดข้อมูลได้ในขณะนี้',
+                          style: Theme.of(context).textTheme.bodyText2!.merge(
                               TextStyle(
-                                  color:
-                                      Theme.of(context).colorScheme.secondary)),
-                        ))
-                      : HistoryNutrient(data: state.graphList),
-                  HistoryBody(data: state.graphList),
-                ],
-              );
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .secondary))),
+                      OutlinedButton(
+                        child: Text('ลองอีกครั้ง'),
+                        style: OutlinedButton.styleFrom(
+                          primary: Theme.of(context).colorScheme.secondary,
+                          shape: const RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(50))),
+                        ),
+                        onPressed: () {
+                          context.read<HistoryBloc>().add(LoadHistory());
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              case HistoryStatus.success:
+                if (state.graphList != null)
+                  return TabBarView(
+                    children: [
+                      HistoryMenu(
+                          startDate: state.graphList!.foodEndDate,
+                          items: state.menuList,
+                          dateMenuList: state.dateMenuList),
+                      _isNoDataInNutrient(state.graphList)
+                          ? Center(
+                              child: Text(
+                              'ไม่มีประวัติสารอาหารในขณะนี้',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .subtitle1!
+                                  .merge(TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary)),
+                            ))
+                          : HistoryNutrient(data: state.graphList),
+                      HistoryBody(data: state.graphList),
+                    ],
+                  );
+                return Center(
+                    child: Text(
+                  'ไม่มีข้อมูลประวัติในขณะนี้',
+                  style: Theme.of(context).textTheme.subtitle1!.merge(TextStyle(
+                      color: Theme.of(context).colorScheme.secondary)),
+                ));
+              default:
+                return Center(child: CircularProgressIndicator());
             }
-            return Center(child: CircularProgressIndicator());
           })),
     );
   }

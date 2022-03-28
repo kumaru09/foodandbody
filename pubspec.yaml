@@ -52,6 +52,8 @@ dependencies:
   location: ^4.3.0
   dio: ^4.0.1
   firebase_dynamic_links: ^4.0.4
+  firebase_storage: ^10.2.6
+  path: ^1.8.0
   
 
 dev_dependencies:

@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodandbody/models/exercise_repo.dart';
 import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:stream_transform/stream_transform.dart';
 
@@ -42,7 +44,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   Future<void> _onFetchWater(LoadWater event, Emitter<HomeState> emit) async {
     try {
-      emit(state.copyWith(status: HomeStatus.loading));
+      if (!event.isRefresh) emit(state.copyWith(status: HomeStatus.loading));
       emit(state.copyWith(
           status: HomeStatus.success,
           water: await planRepository.getWaterPlan()));

@@ -16,12 +16,12 @@ class UpdateGoal extends InfoEvent {
   final int goal;
 }
 
-class UpdateHeight extends InfoEvent {
-  UpdateHeight({required this.height});
-  final int height;
-}
+// class UpdateHeight extends InfoEvent {
+//   UpdateHeight({required this.height});
+//   final int height;
+// }
 
-class UpdateWeight extends InfoEvent {
-  UpdateWeight({required this.weight});
-  final int weight;
-}
+// class UpdateWeight extends InfoEvent {
+//   UpdateWeight({required this.weight});
+//   final int weight;
+// }

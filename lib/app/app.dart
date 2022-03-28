@@ -47,7 +47,7 @@ class App extends StatelessWidget {
         RepositoryProvider<FavoriteRepository>(
             create: (context) => FavoriteRepository()),
         RepositoryProvider<MenuCardRepository>(
-            create: (context) => MenuCardRepository()),
+            create: (context) => MenuCardRepository(MenuCardCache(), MenuCardClient())),
         RepositoryProvider<HistoryRepository>(
             create: (context) => HistoryRepository()),
         RepositoryProvider<CameraRepository>(

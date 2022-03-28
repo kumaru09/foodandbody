@@ -26,6 +26,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppUserChanged>(_userChanged);
     on<AppLogoutRequested>(_logout);
     on<AddInfoRequested>(_infoChanged);
+    on<EditInfoRequested>(_editInfo);
   }
 
   final AuthenRepository _authenRepository;
@@ -57,6 +58,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
   void _infoChanged(AddInfoRequested event, Emitter<AppState> emit) {
     emit(AppState.initialize(event.user));
+  }
+
+  void _editInfo(EditInfoRequested event, Emitter<AppState> emit) {
+    emit(AppState.authenticated(event.user));
   }
 
   @override

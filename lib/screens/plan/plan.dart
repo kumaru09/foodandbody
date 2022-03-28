@@ -28,6 +28,7 @@ class _PlanPageState extends State<Plan> {
         appBar: AppBar(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           elevation: 0,
+          automaticallyImplyLeading: false,
           title: Text("แผน",
               style: Theme.of(context)
                   .textTheme
@@ -36,9 +37,9 @@ class _PlanPageState extends State<Plan> {
         ),
         body: SingleChildScrollView(
             child: BlocBuilder<PlanBloc, PlanState>(builder: (context, state) {
-          if (state is PlanLoaded) {
+          if (state.status == PlanStatus.success) {
             return _buildPlan(context, state.plan);
-          } else if (state is PlanError) {
+          } else if (state.status == PlanStatus.failure) {
             return Container();
           }
           return Center(child: CircularProgressIndicator());

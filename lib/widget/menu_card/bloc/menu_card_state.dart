@@ -5,27 +5,31 @@ enum MenuCardStatus { initial, success, failure }
 class MenuCardState extends Equatable {
   const MenuCardState({
     this.status = MenuCardStatus.initial,
-    this.menu = const <MenuList>[],
+    this.fav = const <MenuList>[],
+    this.myFav = const <MenuList>[],
   });
 
   final MenuCardStatus status;
-  final List<MenuList> menu;
+  final List<MenuList> fav;
+  final List<MenuList> myFav;
 
   MenuCardState copyWith({
     MenuCardStatus? status,
-    List<MenuList>? menu,
+    List<MenuList>? fav,
+    List<MenuList>? myFav,
   }) {
     return MenuCardState(
       status: status ?? this.status,
-      menu: menu ?? this.menu,
+      fav: fav ?? this.fav,
+      myFav: myFav ?? this.myFav,
     );
   }
 
   @override
   String toString() {
-    return '''MenuCardState { status: $status, menu: ${menu.length} }''';
+    return '''MenuCardState { status: $status, fav: ${fav.length}, myFav: ${myFav.length} }''';
   }
 
   @override
-  List<Object> get props => [status, menu];
+  List<Object> get props => [status, fav, myFav];
 }

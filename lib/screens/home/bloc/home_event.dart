@@ -24,4 +24,7 @@ class WaterChanged extends HomeEvent {
   }
 }
 
-class LoadWater extends HomeEvent {}
+class LoadWater extends HomeEvent {
+  const LoadWater({this.isRefresh = false});
+  final bool isRefresh;
+}

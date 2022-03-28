@@ -1,33 +1,22 @@
 part of 'plan_bloc.dart';
 
-abstract class PlanState extends Equatable {
-  const PlanState();
+enum PlanStatus { initial, loading, success, failure }
 
-  @override
-  List<Object> get props => [];
-}
-
-class PlanInitial extends PlanState {
-  const PlanInitial();
-
-  @override
-  List<Object> get props => [];
-}
-
-class PlanLoading extends PlanState {
-  const PlanLoading();
-
-  @override
-  List<Object> get props => [];
-}
-
-class PlanLoaded extends PlanState {
+class PlanState extends Equatable {
+  final PlanStatus status;
   final History plan;
 
-  const PlanLoaded(this.plan);
+  PlanState({this.status = PlanStatus.initial, required this.plan});
+
+  PlanState copyWith({PlanStatus? status, History? plan}) {
+    return PlanState(status: status ?? this.status, plan: plan ?? this.plan);
+  }
 
   @override
-  List<Object> get props => [plan];
-}
+  String toString() {
+    return 'PlanState {status: $status, plan: $plan}';
+  }
 
-class PlanError extends PlanState {}
+  @override
+  List<Object> get props => [status, plan];
+}

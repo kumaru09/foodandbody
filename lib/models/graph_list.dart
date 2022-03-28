@@ -4,6 +4,7 @@ import 'package:foodandbody/models/weight_list.dart';
 class GraphList extends Equatable {
   GraphList(
       {required this.caloriesList,
+      required this.burnList,
       required this.proteinList,
       required this.fatList,
       required this.carbList,
@@ -20,6 +21,7 @@ class GraphList extends Equatable {
       required this.weightStartDate,
       required this.weightEndDate});
   final List<int> caloriesList;
+  final List<int> burnList;
   final List<int> proteinList;
   final List<int> fatList;
   final List<int> carbList;
@@ -38,6 +40,7 @@ class GraphList extends Equatable {
 
   GraphList copyWith(
       {List<int>? caloriesList,
+      List<int>? burnList,
       List<int>? proteinList,
       List<int>? fatList,
       List<int>? carbList,
@@ -55,6 +58,7 @@ class GraphList extends Equatable {
       DateTime? weightEndDate}) {
     return GraphList(
         caloriesList: caloriesList ?? this.caloriesList,
+        burnList: burnList ?? this.burnList,
         proteinList: proteinList ?? this.proteinList,
         fatList: fatList ?? this.fatList,
         carbList: carbList ?? this.carbList,
@@ -74,12 +78,13 @@ class GraphList extends Equatable {
 
   @override
   String toString() {
-    return "GraphList { $caloriesList, $proteinList, $fatList, $carbList, $waterList, $shoulderList, $chestList, $waistList, $hipList, $weightList, $foodStartDate - $foodEndDate, $bodyStartDate - $bodyEndDate, $weightStartDate - $weightEndDate }";
+    return "GraphList { $caloriesList, $burnList, $proteinList, $fatList, $carbList, $waterList, $shoulderList, $chestList, $waistList, $hipList, $weightList, $foodStartDate - $foodEndDate, $bodyStartDate - $bodyEndDate, $weightStartDate - $weightEndDate }";
   }
 
   @override
   List<Object?> get props => [
         caloriesList,
+        burnList,
         proteinList,
         fatList,
         carbList,

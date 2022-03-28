@@ -28,11 +28,14 @@ class HistoryBloc extends Bloc<HistoryEvent, HistoryState> {
   Future<void> _onFetchHistory(
       LoadHistory event, Emitter<HistoryState> emit) async {
     try {
+      if (state.status != HistoryStatus.initial)
+        emit(state.copyWith(status: HistoryStatus.initial));
       final history = await historyRepository.getHistory();
       final body = await bodyRepository.getBodyList();
       final weight = await bodyRepository.getWeightList();
       final graphList = GraphList(
           caloriesList: history.map((e) => e.totalCal.toInt()).toList(),
+          burnList: history.map((e) => e.totalBurn.toInt()).toList(),
           proteinList:
               history.map((e) => e.totalNutrientList.protein.toInt()).toList(),
           carbList:
@@ -70,11 +73,11 @@ class HistoryBloc extends Bloc<HistoryEvent, HistoryState> {
         midNight.add(new Duration(hours: 23, minutes: 59, seconds: 59));
     final Timestamp stateTime = Timestamp.fromDate(midNight);
     final Timestamp endTime = Timestamp.fromDate(beforeMidNight);
-    print('${stateTime.toDate()}, ${endTime.toDate()}');
+    // print('${stateTime.toDate()}, ${endTime.toDate()}');
     try {
       final List<Menu> menuList =
           await historyRepository.getMenuListByDate(stateTime, endTime);
-      if (menuList.isNotEmpty) print('have menu: ${menuList.length}');
+      // if (menuList.isNotEmpty) print('have menu: ${menuList.length}');
       emit(state.copyWith(
           status: HistoryStatus.success,
           menuList: menuList

@@ -1,45 +1,37 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:foodandbody/models/history.dart';
 import 'package:foodandbody/models/info.dart';
-import 'package:foodandbody/models/user.dart';
 import 'package:foodandbody/screens/home/circular_cal_indicator.dart';
 import 'package:foodandbody/theme.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
-
-class MockUser extends Mock implements User {}
-
-class MockPlan extends Mock implements History {}
 
 void main() {
   const homeCaloriesCircularKey = Key('home_calories_circular');
   const homeCaloriesDataColumnKey = Key('home_calories_data_column');
   const homeUserCaloriesInfoKey = Key('home_user_calories_info');
-  late User user;
-  late History plan;
 
-  setUp(() {
-    user = MockUser();
-    plan = MockPlan();
-    when(() => plan.totalCal).thenReturn(1800);
-    when(() => user.info).thenReturn(Info(goal: 2200));
-  });
+  final Timestamp mockDate = Timestamp.fromDate(DateTime.now());
+  final History mockPlan = History(mockDate, totalCal: 1000);
+  final History mockPlanEqual = History(mockDate, totalCal: 2000);
+  final History mockPlanGrater = History(mockDate, totalCal: 3000);
+  final Info mockUser = Info(name: 'user', goal: 2000);
+
   group("Calories Circular Progress", () {
     testWidgets("can render", (tester) async {
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
-          body: CircularCalIndicator(plan, user.info!),
+          body: CircularCalIndicator(mockPlan, mockUser),
         ),
       ));
       expect(find.byKey(homeCaloriesCircularKey), findsOneWidget);
     }); //"can render"
 
     testWidgets("when total calories less than goal calories", (tester) async {
-      when(() => plan.totalCal).thenReturn(1500.3);
       await tester.pumpWidget(MaterialApp(
         theme: AppTheme.themeData,
-        home: Scaffold(body: CircularCalIndicator(plan, user.info!)),
+        home: Scaffold(body: CircularCalIndicator(mockPlan, mockUser)),
       ));
       var circularProgressFinder = find.byKey(homeCaloriesCircularKey);
       Column circularDataColumnFinder =
@@ -55,7 +47,7 @@ void main() {
       expect(
           tester.widget(circularProgressFinder),
           isA<CircularPercentIndicator>().having(
-              (t) => t.percent, "percent", plan.totalCal / user.info!.goal!));
+              (t) => t.percent, "percent", mockPlan.totalCal / (mockUser.goal! + mockPlan.totalBurn)));
       expect(
           circularDataColumnFinder.children[0].toString(), contains("เหลือ"));
       expect(circularDataColumnFinder.children[1].toString(),
@@ -63,10 +55,9 @@ void main() {
     }); //"when total calories less than goal calories"
 
     testWidgets("when total calories equals goal calories", (tester) async {
-      when(() => plan.totalCal).thenReturn(2200);
       await tester.pumpWidget(MaterialApp(
         theme: AppTheme.themeData,
-        home: Scaffold(body: CircularCalIndicator(plan, user.info!)),
+        home: Scaffold(body: CircularCalIndicator(mockPlanEqual, mockUser)),
       ));
       var circularProgressFinder = find.byKey(homeCaloriesCircularKey);
       Column circularDataColumnFinder =
@@ -82,7 +73,7 @@ void main() {
       expect(
           tester.widget(circularProgressFinder),
           isA<CircularPercentIndicator>().having(
-              (t) => t.percent, "percent", plan.totalCal / user.info!.goal!));
+              (t) => t.percent, "percent", mockPlanEqual.totalCal / (mockUser.goal! + mockPlanEqual.totalBurn)));
       expect(
           circularDataColumnFinder.children[0].toString(), contains("เหลือ"));
       expect(circularDataColumnFinder.children[1].toString(),
@@ -91,11 +82,10 @@ void main() {
 
     testWidgets("when total calories greater than goal calories",
         (tester) async {
-      when(() => plan.totalCal).thenReturn(2250.7);
       await tester.pumpWidget(MaterialApp(
         theme: AppTheme.themeData,
         home: Scaffold(
-          body: CircularCalIndicator(plan, user.info!)
+          body: CircularCalIndicator(mockPlanGrater, mockUser)
         ),
       ));
       var circularProgressFinder = find.byKey(homeCaloriesCircularKey);
@@ -127,7 +117,7 @@ void main() {
       await tester.pumpWidget(MaterialApp(
         theme: AppTheme.themeData,
         home: Scaffold(
-          body: CircularCalIndicator(plan, user.info!),
+          body: CircularCalIndicator(mockPlan, mockUser),
         ),
       ));
       expect(find.byKey(homeUserCaloriesInfoKey), findsOneWidget);

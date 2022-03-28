@@ -1,15 +1,24 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/models/user.dart';
+import 'package:foodandbody/repositories/user_repository.dart';
+import 'package:foodandbody/screens/edit_profile/cubit/edit_profile_cubit.dart';
 import 'package:foodandbody/screens/edit_profile/edit_profile.dart';
+import 'package:foodandbody/screens/edit_profile/edit_password.dart';
 
-class Setting extends StatelessWidget {
+class Setting extends StatefulWidget {
   const Setting({Key? key}) : super(key: key);
+  @override
+  State<StatefulWidget> createState() => _SettingState();
+}
 
+class _SettingState extends State<Setting> {
   @override
   Widget build(BuildContext context) {
-    final User _user = context.read<AppBloc>().state.user;
+    final _user = context.read<AppBloc>().state.user;
     final bool hasPhotoUrl;
     final String photoUrl;
 
@@ -121,11 +130,31 @@ class Setting extends StatelessWidget {
                         padding: EdgeInsets.only(left: 17),
                         alignment: Alignment.topLeft,
                         child: TextButton(
-                          onPressed: () {
+                          onPressed: () async {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => EditProfile()));
+                                    builder: (context) =>
+                                        BlocProvider<EditProfileCubit>(
+                                          create: (context) => EditProfileCubit(
+                                              context.read<UserRepository>())
+                                            ..initProfile(
+                                              name: context
+                                                  .read<AppBloc>()
+                                                  .state
+                                                  .user
+                                                  .info!
+                                                  .name!,
+                                              gender: context
+                                                  .read<AppBloc>()
+                                                  .state
+                                                  .user
+                                                  .info!
+                                                  .gender!,
+                                              photoUrl: photoUrl,
+                                            ),
+                                          child: EditProfile(),
+                                        ))).then((value) => setState(() {}));
                           },
                           style: TextButton.styleFrom(
                               minimumSize: Size.zero,
@@ -133,6 +162,45 @@ class Setting extends StatelessWidget {
                               padding: EdgeInsets.zero),
                           child: Text(
                             "แก้ไขโปรไฟล์",
+                            style: Theme.of(context).textTheme.bodyText1!.merge(
+                                  TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary),
+                                ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        constraints: BoxConstraints.tightFor(height: 45),
+                        padding: EdgeInsets.only(left: 17),
+                        alignment: Alignment.topLeft,
+                        child: TextButton(
+                          onPressed: () {
+                            // Navigator.push(
+                            //     context,
+                            //     MaterialPageRoute(
+                            //         builder: (context) =>
+                            //             BlocProvider<EditProfileCubit>(
+                            //               create: (context) => EditProfileCubit(
+                            //                   context.read<UserRepository>()),
+                            //               child: EditProfile(),
+                            //             )));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => BlocProvider<
+                                            EditProfileCubit>(
+                                        create: (context) => EditProfileCubit(
+                                            context.read<UserRepository>()),
+                                        child: EditPassword())));
+                          },
+                          style: TextButton.styleFrom(
+                              minimumSize: Size.zero,
+                              alignment: Alignment.topLeft,
+                              padding: EdgeInsets.zero),
+                          child: Text(
+                            "แก้ไขรหัสผ่าน",
                             style: Theme.of(context).textTheme.bodyText1!.merge(
                                   TextStyle(
                                       color: Theme.of(context)
@@ -159,7 +227,8 @@ class Setting extends StatelessWidget {
                         child: TextButton(
                           onPressed: () {
                             context.read<AppBloc>().add(AppLogoutRequested());
-                            Navigator.pop(context);
+                            Navigator.popUntil(
+                                context, (Route<dynamic> route) => false);
                           },
                           style: TextButton.styleFrom(
                               padding: EdgeInsets.zero,
