@@ -9,8 +9,7 @@ import 'package:foodandbody/screens/register/cubit/register_cubit.dart';
 import 'package:formz/formz.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockAuthenticationRepository extends Mock
-    implements AuthenRepository {}
+class MockAuthenticationRepository extends Mock implements AuthenRepository {}
 
 void main() {
   const invalidEmailString = 'invalid';
@@ -42,12 +41,12 @@ void main() {
 
     setUp(() {
       authenticationRepository = MockAuthenticationRepository();
-      when(
-        () => authenticationRepository.signUp(
-          email: any(named: 'email'),
-          password: any(named: 'password'),
-        ),
-      ).thenAnswer((_) async {});
+      when(() => authenticationRepository.signUp(
+            email: any(named: 'email'),
+            password: any(named: 'password'),
+          )).thenAnswer((_) async {});
+      when(() => authenticationRepository.sendVerifyEmail())
+          .thenAnswer((_) async {});
     });
 
     test('initial state is RegisterState', () {
@@ -260,14 +259,43 @@ void main() {
 
       blocTest<RegisterCubit, RegisterState>(
         'emits [submissionInProgress, submissionFailure] '
-        'when register fails',
+        'when signUp() throw Exception',
         build: () {
-          when(
-            () => authenticationRepository.signUp(
-              email: any(named: 'email'),
-              password: any(named: 'password'),
-            ),
-          ).thenThrow(Exception('oops'));
+          when(() => authenticationRepository.signUp(
+                email: any(named: 'email'),
+                password: any(named: 'password'),
+              )).thenThrow(Exception());
+          return RegisterCubit(authenticationRepository);
+        },
+        seed: () => RegisterState(
+          status: FormzStatus.valid,
+          email: validEmail,
+          password: validPassword,
+          confirmedPassword: validConfirmedPassword,
+        ),
+        act: (cubit) => cubit.registerFormSubmitted(),
+        expect: () => const <RegisterState>[
+          RegisterState(
+            status: FormzStatus.submissionInProgress,
+            email: validEmail,
+            password: validPassword,
+            confirmedPassword: validConfirmedPassword,
+          ),
+          RegisterState(
+            status: FormzStatus.submissionFailure,
+            email: validEmail,
+            password: validPassword,
+            confirmedPassword: validConfirmedPassword,
+          )
+        ],
+      );
+
+      blocTest<RegisterCubit, RegisterState>(
+        'emits [submissionInProgress, submissionFailure] '
+        'when sendVerifyEmail() throw Exception',
+        build: () {
+          when(() => authenticationRepository.sendVerifyEmail())
+              .thenThrow(Exception());
           return RegisterCubit(authenticationRepository);
         },
         seed: () => RegisterState(
