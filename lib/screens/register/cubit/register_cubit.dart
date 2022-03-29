@@ -57,6 +57,7 @@ class RegisterCubit extends Cubit<RegisterState> {
         email: state.email.value,
         password: state.password.value,
       );
+      await _authenRepository.sendVerifyEmail();
       emit(state.copyWith(status: FormzStatus.submissionSuccess));
     } on Exception {
       emit(state.copyWith(status: FormzStatus.submissionFailure));

@@ -28,6 +28,7 @@ class _PlanPageState extends State<Plan> {
         appBar: AppBar(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           elevation: 0,
+          automaticallyImplyLeading: false,
           title: Text("แผน",
               style: Theme.of(context)
                   .textTheme

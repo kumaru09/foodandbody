@@ -17,6 +17,7 @@ EventTransformer<Event> debounce<Event>(Duration duration) {
 class SearchBloc extends Bloc<SearchEvent, SearchState> {
   SearchBloc({required this.searchRepository}) : super(SearchState()) {
     on<TextChanged>(_onTextChanged, transformer: debounce(_duration));
+    on<ReFetched>(_onReFetched, transformer: debounce(_duration));
   }
 
   final SearchRepository searchRepository;
@@ -29,19 +30,19 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     TextChanged event,
     Emitter<SearchState> emit,
   ) async {
-    if (event.text == '' && event.selectFilter == []) {
+    if (event.text == '' && event.selectFilter.isEmpty) {
       text = '';
       filter = [];
       return emit(state.copyWith(status: SearchStatus.initial));
     }
     //ทำเมื่อ search คำใหม่ หรือ filter ใหม่ หรือ คำเดิม filter เดืมที่ยังแสดงไม่หมด
-    if (event.text != text ||
+    else if (event.text != text ||
         !ListEquality().equals(event.selectFilter, filter) ||
         state.hasReachedMax == false) {
       try {
         //ถ้าเป็นคำใหม่หรือ filter ใหม่จะกำหนด querypage 1 เก็บ keySearch ใหม่
         //ถ้าคำเดิมและ filter เดิมจะเพิ่ม querypage +1
-        if (event.text != text || event.selectFilter != filter) {
+        if (event.text != text || !ListEquality().equals(event.selectFilter, filter)) {
           numpage = 1;
           text = event.text;
           filter = List.from(event.selectFilter);
@@ -49,10 +50,11 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
           if (filter != []) for (var item in filter) filterText += 'c=$item&';
           keySearch = '$filterText${text != '' ? 'name=$text&' : ''}';
           emit(state.copyWith(status: SearchStatus.loading));
-        } else numpage += 1;
+        } else
+          numpage += 1;
         final results =
             await searchRepository.search('${keySearch}querypage=$numpage');
-        emit(
+        return emit(
           state.copyWith(
             status: SearchStatus.success,
             result: numpage == 1
@@ -63,8 +65,30 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         );
       } catch (error) {
         print('e: $error');
-        emit(state.copyWith(status: SearchStatus.failure));
+        return emit(state.copyWith(status: SearchStatus.failure));
       }
+    }
+  }
+
+  Future<void> _onReFetched(
+    ReFetched event,
+    Emitter<SearchState> emit,
+  ) async {
+    try {
+      numpage = 1;
+      emit(state.copyWith(status: SearchStatus.loading));
+      final results =
+          await searchRepository.search('${keySearch}querypage=$numpage');
+      return emit(
+        state.copyWith(
+          status: SearchStatus.success,
+          result: results,
+          hasReachedMax: results.length < 10 ? true : false,
+        ),
+      );
+    } catch (error) {
+      print('e: $error');
+      return emit(state.copyWith(status: SearchStatus.failure));
     }
   }
 }

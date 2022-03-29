@@ -7,6 +7,7 @@ import 'package:formz/formz.dart';
 void main() {
   const email = Email.dirty('email');
   const password = Password.dirty('password');
+  const errorMessage = 'errorMessage';
 
   group('LoginState', () {
     test('supports value comparisons', () {
@@ -35,6 +36,13 @@ void main() {
       expect(
         LoginState().copyWith(password: password),
         LoginState(password: password),
+      );
+    });
+
+    test('returns object with updated errorMessage when errorMessage is passed', () {
+      expect(
+        LoginState().copyWith(errorMessage: errorMessage),
+        LoginState(errorMessage: errorMessage),
       );
     });
   });

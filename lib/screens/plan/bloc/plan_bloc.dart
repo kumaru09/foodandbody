@@ -23,7 +23,7 @@ class PlanBloc extends Bloc<PlanEvent, PlanState> {
 
   Future<void> _fetchPlan(LoadPlan event, Emitter<PlanState> emit) async {
     try {
-      emit(state.copyWith(status: PlanStatus.loading));
+      if (!event.isRefresh) emit(state.copyWith(status: PlanStatus.loading));
       final plan = await _planRepository.getPlanById();
       emit(state.copyWith(status: PlanStatus.success, plan: plan));
     } catch (e) {
@@ -32,9 +32,9 @@ class PlanBloc extends Bloc<PlanEvent, PlanState> {
     }
   }
 
-  Future<void> deleteMenu(String name) async {
+  Future<void> deleteMenu(String name, double volume) async {
     try {
-      await _planRepository.deletePlan(name);
+      await _planRepository.deletePlan(name, volume);
     } catch (e) {
       print('DeleteMenu error: $e');
     }

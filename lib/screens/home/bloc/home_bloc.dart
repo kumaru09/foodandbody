@@ -44,7 +44,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   Future<void> _onFetchWater(LoadWater event, Emitter<HomeState> emit) async {
     try {
-      emit(state.copyWith(status: HomeStatus.loading));
+      if (!event.isRefresh) emit(state.copyWith(status: HomeStatus.loading));
       emit(state.copyWith(
           status: HomeStatus.success,
           water: await planRepository.getWaterPlan()));

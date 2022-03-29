@@ -7,7 +7,10 @@ abstract class PlanEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class LoadPlan extends PlanEvent {}
+class LoadPlan extends PlanEvent {
+  const LoadPlan({this.isRefresh = false});
+  final bool isRefresh;
+}
 
 class AddExercise extends PlanEvent {
   final String id;

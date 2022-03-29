@@ -48,7 +48,8 @@ class MenuCardBloc extends Bloc<MenuCardEvent, MenuCardState> {
     try {
       if (state.status != MenuCardStatus.initial)
         emit(state.copyWith(status: MenuCardStatus.initial));
-      List<MenuList> fav = await menuCardRepository.getMenuList(isMyFav: false, checkCache: true);
+      List<MenuList> fav = await menuCardRepository.getMenuList(
+          isMyFav: false, checkCache: true);
       if (state.status == MenuCardStatus.initial) {
         return emit(state.copyWith(
           status: MenuCardStatus.success,
@@ -68,7 +69,8 @@ class MenuCardBloc extends Bloc<MenuCardEvent, MenuCardState> {
     try {
       if (state.status != MenuCardStatus.initial)
         emit(state.copyWith(status: MenuCardStatus.initial));
-      List<MenuList> myFav = await menuCardRepository.getMenuList(isMyFav: true, checkCache: true);
+      List<MenuList> myFav =
+          await menuCardRepository.getMenuList(isMyFav: true, checkCache: true);
       if (state.status == MenuCardStatus.initial) {
         return emit(state.copyWith(
           status: MenuCardStatus.success,
@@ -86,15 +88,14 @@ class MenuCardBloc extends Bloc<MenuCardEvent, MenuCardState> {
     Emitter<MenuCardState> emit,
   ) async {
     try {
-      if (state.status != MenuCardStatus.initial)
+      if (!event.isRefresh && state.status != MenuCardStatus.initial)
         emit(state.copyWith(status: MenuCardStatus.initial));
-      List<MenuList> fav = await menuCardRepository.getMenuList(isMyFav: false, checkCache: false);
-      if (state.status == MenuCardStatus.initial) {
-        return emit(state.copyWith(
-          status: MenuCardStatus.success,
-          fav: fav,
-        ));
-      }
+      List<MenuList> fav = await menuCardRepository.getMenuList(
+          isMyFav: false, checkCache: false);
+      return emit(state.copyWith(
+        status: MenuCardStatus.success,
+        fav: fav,
+      ));
     } catch (e) {
       print('e: $e');
       emit(state.copyWith(status: MenuCardStatus.failure));
@@ -106,15 +107,14 @@ class MenuCardBloc extends Bloc<MenuCardEvent, MenuCardState> {
     Emitter<MenuCardState> emit,
   ) async {
     try {
-      if (state.status != MenuCardStatus.initial)
+      if (!event.isRefresh && state.status != MenuCardStatus.initial)
         emit(state.copyWith(status: MenuCardStatus.initial));
-      List<MenuList> myFav = await menuCardRepository.getMenuList(isMyFav: true, checkCache: false);
-      if (state.status == MenuCardStatus.initial) {
-        return emit(state.copyWith(
-          status: MenuCardStatus.success,
-          myFav: myFav,
-        ));
-      }
+      List<MenuList> myFav = await menuCardRepository.getMenuList(
+          isMyFav: true, checkCache: false);
+      return emit(state.copyWith(
+        status: MenuCardStatus.success,
+        myFav: myFav,
+      ));
     } catch (e) {
       print('e: $e');
       emit(state.copyWith(status: MenuCardStatus.failure));

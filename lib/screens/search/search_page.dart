@@ -5,10 +5,34 @@ import 'package:foodandbody/screens/search/search.dart';
 import 'package:foodandbody/widget/menu_card/bloc/menu_card_bloc.dart';
 import 'package:foodandbody/widget/menu_card/menu_card.dart';
 
-class SearchPage extends StatelessWidget {
+class SearchPage extends StatefulWidget {
   const SearchPage({Key? key}) : super(key: key);
 
   static Page page() => const MaterialPage<void>(child: SearchPage());
+
+  @override
+  State<SearchPage> createState() => _SearchPageState();
+}
+
+class _SearchPageState extends State<SearchPage> {
+  late MenuCardBloc _menuCardFavBloc;
+  late MenuCardBloc _menuCardMyFavBloc;
+  late MenuCardRepository _menuCardRepo;
+
+  @override
+  void initState() {
+    super.initState();
+    _menuCardRepo = context.read<MenuCardRepository>();
+    _menuCardFavBloc = MenuCardBloc(menuCardRepository: _menuCardRepo);
+    _menuCardMyFavBloc = MenuCardBloc(menuCardRepository: _menuCardRepo);
+  }
+
+  Future<void> _onRefresh() async {
+    await Future.delayed(Duration(seconds: 2));
+    _menuCardFavBloc.add(ReFetchedFavMenuCard(isRefresh: true));
+    _menuCardMyFavBloc.add(ReFetchedMyFavMenuCard(isRefresh: true));
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,49 +55,45 @@ class SearchPage extends StatelessWidget {
             icon: Icon(Icons.arrow_back, color: Colors.white)),
         actions: [
           IconButton(
-            icon: Icon(Icons.search, color: Colors.white),
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => Search(),
-              ),
-            ),
-          ),
+              icon: Icon(Icons.search, color: Colors.white),
+              onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => Search()),
+                  )),
         ],
       ),
-      body: SafeArea(
-        child: ListView(
-          children: <Widget>[
-            Container(
-              padding: EdgeInsets.fromLTRB(16, 16, 16, 5),
-              child: Text(
-                "เมนูยอดนิยม",
-                style: Theme.of(context).textTheme.bodyText1!.merge(
-                      TextStyle(color: Theme.of(context).primaryColor),
-                    ),
+      body: RefreshIndicator(
+        onRefresh: _onRefresh,
+        child: SafeArea(
+          child: ListView(
+            children: <Widget>[
+              Container(
+                padding: EdgeInsets.fromLTRB(16, 16, 16, 5),
+                child: Text(
+                  "เมนูยอดนิยม",
+                  style: Theme.of(context).textTheme.bodyText1!.merge(
+                        TextStyle(color: Theme.of(context).primaryColor),
+                      ),
+                ),
               ),
-            ),
-            BlocProvider(
-              create: (_) => MenuCardBloc(
-                menuCardRepository: context.read<MenuCardRepository>(),
-              )..add(FetchedFavMenuCard()),
-              child: MenuCard(isMyFav: false),
-            ),
-            Container(
-              padding: EdgeInsets.fromLTRB(16, 0, 16, 5),
-              child: Text(
-                "เมนูที่กินบ่อย",
-                style: Theme.of(context).textTheme.bodyText1!.merge(
-                      TextStyle(color: Theme.of(context).primaryColor),
-                    ),
+              BlocProvider(
+                create: (_) => _menuCardFavBloc..add(FetchedFavMenuCard()),
+                child: MenuCard(isMyFav: false),
               ),
-            ),
-            BlocProvider(
-              create: (_) => MenuCardBloc(
-                menuCardRepository: context.read<MenuCardRepository>(),
-              )..add(FetchedMyFavMenuCard()),
-              child: MenuCard(isMyFav: true),
-            ),
-          ],
+              Container(
+                padding: EdgeInsets.fromLTRB(16, 0, 16, 5),
+                child: Text(
+                  "เมนูที่กินบ่อย",
+                  style: Theme.of(context).textTheme.bodyText1!.merge(
+                        TextStyle(color: Theme.of(context).primaryColor),
+                      ),
+                ),
+              ),
+              BlocProvider(
+                create: (_) => _menuCardMyFavBloc..add(FetchedMyFavMenuCard()),
+                child: MenuCard(isMyFav: true),
+              ),
+            ],
+          ),
         ),
       ),
     );
