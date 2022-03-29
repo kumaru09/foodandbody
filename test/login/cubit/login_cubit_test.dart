@@ -7,8 +7,7 @@ import 'package:foodandbody/screens/login/cubit/login_cubit.dart';
 import 'package:formz/formz.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockAuthenticationRepository extends Mock
-    implements AuthenRepository {}
+class MockAuthenticationRepository extends Mock implements AuthenRepository {}
 
 void main() {
   const invalidEmailString = 'invalid';
@@ -149,16 +148,16 @@ void main() {
 
       blocTest<LoginCubit, LoginState>(
         'emits [submissionInProgress, submissionFailure] '
-        'when logInWithEmailAndPassword fails',
-        build: () {
+        'when logInWithEmailAndPassword throw Exception',
+        setUp: () {
           when(
             () => authenticationRepository.logInWithEmailAndPassword(
               email: any(named: 'email'),
               password: any(named: 'password'),
             ),
-          ).thenThrow(Exception('oops'));
-          return LoginCubit(authenticationRepository);
+          ).thenThrow(Exception());
         },
+        build: () => LoginCubit(authenticationRepository),
         seed: () => LoginState(
           status: FormzStatus.valid,
           email: validEmail,
@@ -175,6 +174,39 @@ void main() {
             status: FormzStatus.submissionFailure,
             email: validEmail,
             password: validPassword,
+          )
+        ],
+      );
+
+      blocTest<LoginCubit, LoginState>(
+        'emits [submissionInProgress, submissionFailure] '
+        'when logInWithEmailAndPassword throw LogInWithEmailAndPasswordFailure',
+        setUp: () {
+          when(
+            () => authenticationRepository.logInWithEmailAndPassword(
+              email: any(named: 'email'),
+              password: any(named: 'password'),
+            ),
+          ).thenThrow(LogInWithEmailAndPasswordFailure());
+        },
+        build: () => LoginCubit(authenticationRepository),
+        seed: () => LoginState(
+          status: FormzStatus.valid,
+          email: validEmail,
+          password: validPassword,
+        ),
+        act: (cubit) => cubit.logInWithCredentials(),
+        expect: () => const <LoginState>[
+          LoginState(
+            status: FormzStatus.submissionInProgress,
+            email: validEmail,
+            password: validPassword,
+          ),
+          LoginState(
+            status: FormzStatus.submissionFailure,
+            email: validEmail,
+            password: validPassword,
+            errorMessage: 'เกิดข้อผิดพลาดบางอย่าง กรุณาลองใหม่อีกครั้ง',
           )
         ],
       );
