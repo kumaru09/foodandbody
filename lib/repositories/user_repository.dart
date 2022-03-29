@@ -7,7 +7,6 @@ import 'package:foodandbody/models/info.dart';
 import 'package:foodandbody/models/info_entity.dart';
 import 'package:foodandbody/models/nutrient.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' as cloud_firestore;
-import 'package:foodandbody/repositories/i_user_repository.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:path/path.dart' as p;
 
@@ -32,7 +31,8 @@ class UpdatePasswordFaliure implements Exception {
 class UploadProfilePicFailure implements Exception {
   final message;
 
-  const UploadProfilePicFailure([this.message = 'อัปโหลดรูปภาพไม่สำเร็จ กรุณาลองใหม่']);
+  const UploadProfilePicFailure(
+      [this.message = 'อัปโหลดรูปภาพไม่สำเร็จ กรุณาลองใหม่']);
 
   factory UploadProfilePicFailure.fromCode(String code) {
     switch (code) {
@@ -49,7 +49,7 @@ class UpdateInfoFailure implements Exception {
   const UpdateInfoFailure([this.message = 'แก้ไขข้อมูลไม่สำเร็จ กรุณาลองใหม่']);
 }
 
-class UserRepository implements IUserRepository {
+class UserRepository {
   UserRepository(
       {firebase_auth.FirebaseAuth? firebaseAuth,
       firebase_storage.FirebaseStorage? firebaseStorage})
@@ -62,7 +62,6 @@ class UserRepository implements IUserRepository {
   final cloud_firestore.CollectionReference users =
       cloud_firestore.FirebaseFirestore.instance.collection('users');
 
-  @override
   Future<void> addUserInfo(Info info) async {
     final uid = _firebaseAuth.currentUser?.uid;
     final infoE = info.copyWith(
@@ -77,7 +76,6 @@ class UserRepository implements IUserRepository {
         .add({'weight': info.weight, "date": cloud_firestore.Timestamp.now()});
   }
 
-  @override
   Future<Info> getInfo() async {
     final data = await users.doc(_firebaseAuth.currentUser?.uid).get();
     if (data.exists) {
@@ -88,7 +86,6 @@ class UserRepository implements IUserRepository {
     }
   }
 
-  @override
   Future<void> updateInfo(Info newInfo) async {
     try {
       final info = users.doc(_firebaseAuth.currentUser?.uid);
