@@ -49,6 +49,25 @@ class UpdateInfoFailure implements Exception {
   const UpdateInfoFailure([this.message = 'แก้ไขข้อมูลไม่สำเร็จ กรุณาลองใหม่']);
 }
 
+class DeleteUserFailure implements Exception {
+  final message;
+  const DeleteUserFailure(
+      [this.message = 'ไม่สามารถลบบัญชีผู้ใช้ได้ กรุณาลองใหม่อีกครั้ง']);
+
+  factory DeleteUserFailure.fromCode(String code) {
+    switch (code) {
+      case 'invalid-email':
+        return DeleteUserFailure(
+            'ไม่สามารถลบบัญชีผู้ใช้ได้ รหัสผ่านไม่ถูกต้อง');
+      case 'wrong-password':
+        return DeleteUserFailure(
+            'ไม่สามารถลบบัญชีผู้ใช้ได้ รหัสผ่านไม่ถูกต้อง');
+      default:
+        return DeleteUserFailure();
+    }
+  }
+}
+
 class UserRepository {
   UserRepository(
       {firebase_auth.FirebaseAuth? firebaseAuth,
@@ -141,15 +160,11 @@ class UserRepository {
           firebase_auth.EmailAuthProvider.credential(
               email: user.email!, password: password);
       await user.reauthenticateWithCredential(credential);
-      final doc = await users.doc(user.uid).collection('foodhistories').get();
-      if (doc.docs.isNotEmpty) {
-        for (var item in doc.docs) {
-          item.reference.delete();
-        }
-      }
       await user.delete();
     } on firebase_auth.FirebaseAuthException catch (e) {
-      throw Exception();
+      throw DeleteUserFailure.fromCode(e.code);
+    } catch (e) {
+      throw DeleteUserFailure();
     }
   }
 
