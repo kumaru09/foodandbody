@@ -1,13 +1,11 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:foodandbody/models/user.dart';
 import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/screens/edit_profile/cubit/edit_profile_cubit.dart';
 import 'package:foodandbody/screens/edit_profile/edit_profile.dart';
 import 'package:foodandbody/screens/edit_profile/edit_password.dart';
+import 'package:foodandbody/screens/setting/delete_user.dart';
 
 class Setting extends StatefulWidget {
   const Setting({Key? key}) : super(key: key);
@@ -276,8 +274,11 @@ class _SettingState extends State<Setting> {
                         alignment: Alignment.topLeft,
                         constraints: BoxConstraints.tightFor(height: 45),
                         child: TextButton(
-                          onPressed: () {
-                            print("delete account");
+                          onPressed: () async {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => DeleteUser()));
                           },
                           style: TextButton.styleFrom(
                               padding: EdgeInsets.zero,

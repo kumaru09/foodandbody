@@ -18,7 +18,7 @@ class InfoBloc extends Bloc<InfoEvent, InfoState> {
 
   final UserRepository _userRepository;
 
-  Future<Info?> getInfo(LoadInfo event, Emitter<InfoState> emit) async {
+  Future<void> getInfo(LoadInfo event, Emitter<InfoState> emit) async {
     try {
       emit(state.copyWith(status: InfoStatus.loading));
       final info = await _userRepository.getInfo();
