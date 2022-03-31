@@ -68,6 +68,13 @@ class DeleteUserFailure implements Exception {
   }
 }
 
+class GetInitInfoFailure implements Exception {
+  @override
+  String toString() {
+    return 'no-init-info';
+  }
+}
+
 class UserRepository {
   UserRepository(
       {firebase_auth.FirebaseAuth? firebaseAuth,
@@ -96,12 +103,16 @@ class UserRepository {
   }
 
   Future<Info> getInfo() async {
-    final data = await users.doc(_firebaseAuth.currentUser?.uid).get();
-    if (data.exists) {
-      final info = Info.fromEntity(InfoEntity.fromSnapshot(data));
-      return info;
-    } else {
-      throw Exception('No Info data');
+    try {
+      final data = await users.doc(_firebaseAuth.currentUser?.uid).get();
+      if (data.exists) {
+        final info = Info.fromEntity(InfoEntity.fromSnapshot(data));
+        return info;
+      } else {
+        throw GetInitInfoFailure();
+      }
+    } catch (_) {
+      throw Exception();
     }
   }
 
