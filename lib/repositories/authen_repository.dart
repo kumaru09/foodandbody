@@ -47,13 +47,18 @@ class LogInWithEmailAndPasswordFailure implements Exception {
 class LogInWithEmailLinkFailure implements Exception {
   final String message;
 
-  const LogInWithEmailLinkFailure([this.message = 'เกิดข้อผิดพลาดบางอย่าง']);
+  const LogInWithEmailLinkFailure(
+      [this.message =
+          'เกิดข้อผิดพลาดบางอย่าง กรุณาล็อกอินเพื่อขอลิ้งใหม่อีกครั้ง']);
 
   factory LogInWithEmailLinkFailure.fromCode(String code) {
     switch (code) {
       case 'expired-action-code':
         return const LogInWithEmailLinkFailure(
-            'ลิ้งหมดอายุ กรุณาขอลิ้งใหม่อีกครั้ง');
+            'ลิ้งหมดอายุ กรุณาล็อกอินเพื่อขอลิ้งใหม่อีกครั้ง');
+      case 'invalid-action-code':
+        return const LogInWithEmailLinkFailure(
+            'ลิ้งหมดอายุ กรุณาล็อกอินเพื่อขอลิ้งใหม่อีกครั้ง');
       default:
         return const LogInWithEmailLinkFailure();
     }
@@ -71,7 +76,20 @@ class LogOutFailure implements Exception {}
 
 class LogInWithGoogleFailure implements Exception {}
 
-class LogInWithFacebookFailure implements Exception {}
+class LogInWithFacebookFailure implements Exception {
+  final String message;
+  const LogInWithFacebookFailure(
+      [this.message = 'เกิดข้อผิดพลาดบางอย่าง กรุณาลองใหม่อีกครั้ง']);
+  factory LogInWithFacebookFailure.fromCode(String code) {
+    switch (code) {
+      case 'not-verified':
+        return const LogInWithFacebookFailure(
+            'อีเมลยังไม่ได้รับการยีนยัน กดยืนยันผ่านอีเมลของคุณ');
+      default:
+        return const LogInWithFacebookFailure();
+    }
+  }
+}
 
 class AuthenRepository {
   AuthenRepository({
@@ -166,10 +184,16 @@ class AuthenRepository {
       final firebase_auth.OAuthCredential facebookAuthCredential =
           firebase_auth.FacebookAuthProvider.credential(
               loginResult.accessToken!.token);
-
       await _firebaseAuth.signInWithCredential(facebookAuthCredential);
+      final emailVerified =
+          firebase_auth.FirebaseAuth.instance.currentUser!.emailVerified;
+      if (!emailVerified) {
+        sendVerifyEmail();
+        await logOut();
+        throw NotVerified();
+      }
     } catch (_) {
-      throw LogInWithFacebookFailure();
+      throw LogInWithFacebookFailure.fromCode(_.toString());
     }
   }
 
