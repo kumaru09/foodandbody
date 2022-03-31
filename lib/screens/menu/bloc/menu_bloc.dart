@@ -204,9 +204,10 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
   Future<void> addMenu(
       {required String name,
       required bool isEatNow,
+      double? oldVolume,
       required double volumn}) async {
     try {
-      await planRepository.addPlanMenu(name, volumn, isEatNow);
+      await planRepository.addPlanMenu(name, oldVolume, volumn, isEatNow);
       if (isEatNow) {
         await favoriteRepository.addFavMenuById(name);
         await favoriteRepository.addFavMenuAll(name);

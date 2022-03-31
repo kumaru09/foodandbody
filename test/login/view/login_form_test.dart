@@ -34,6 +34,7 @@ void main() {
 
   const testEmail = 'test@gmail.com';
   const testPassword = 'testP@ssw0rd1';
+  const testErrorMessage = 'errorMessage';
 
   group('LoginForm', () {
     late LoginCubit loginCubit;
@@ -155,6 +156,29 @@ void main() {
         );
         await tester.pump();
         expect(find.text('Authentication Failure'), findsOneWidget);
+      });
+
+      testWidgets('AuthenticationFailure SnackBar with errormessage when submission fails and have errorMessage',
+          (tester) async {
+        whenListen(
+          loginCubit,
+          Stream.fromIterable(const <LoginState>[
+            LoginState(status: FormzStatus.submissionInProgress),
+            LoginState(status: FormzStatus.submissionFailure, errorMessage: testErrorMessage),
+          ]),
+        );
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: BlocProvider.value(
+                value: loginCubit,
+                child: const LoginForm(),
+              ),
+            ),
+          ),
+        );
+        await tester.pump();
+        expect(find.text(testErrorMessage), findsOneWidget);
       });
 
       testWidgets('invalid email error text when email is invalid',

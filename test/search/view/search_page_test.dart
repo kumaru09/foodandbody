@@ -14,6 +14,7 @@ class MockSearchRepository extends Mock implements SearchRepository {}
 
 void main() {
   const searchAppBar = Key('searchpage_appbar');
+
   group('SearchPage', () {
     test('has a page', () {
       expect(SearchPage.page(), isA<MaterialPage>());
@@ -28,6 +29,22 @@ void main() {
       expect(find.text('เมนูยอดนิยม'), findsOneWidget);
       expect(find.text('เมนูที่กินบ่อย'), findsOneWidget);
       expect(find.byType(MenuCard), findsNWidgets(2));
+    });
+
+    testWidgets("reder refresh progress indecator when drag screen down", (tester) async {
+      await tester.pumpWidget(RepositoryProvider<MenuCardRepository>(
+        create: (_) => MockMenuCardRepository(),
+        child: MaterialApp(
+          home: SearchPage(),
+        ),
+      ));
+      await tester.pumpAndSettle();
+      expect(find.byType(RefreshProgressIndicator), findsNothing);
+      await tester.dragFrom(Offset(0, 500), Offset(0, 100));
+      await tester.pump(Duration(seconds: 2));
+      expect(find.byType(RefreshProgressIndicator), findsOneWidget);
+      await tester.pumpAndSettle();
+      expect(find.byType(RefreshProgressIndicator), findsNothing);
     });
 
     testWidgets('navigate to Search when pressed search icon', (tester) async {

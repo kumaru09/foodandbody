@@ -178,9 +178,13 @@ class _RegisterButton extends StatelessWidget {
                     key: const Key('registerForm_continue_raisedButton'),
                     onPressed: state.status.isValidated
                         ? () {
-                            Navigator.push(context, MaterialPageRoute(
+                            context
+                                .read<RegisterCubit>()
+                                .registerFormSubmitted();
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
                                     builder: (context) => VerifyEmail()));
-                            // context.read<RegisterCubit>().registerFormSubmitted();
                           }
                         : null,
                     child: Text('ลงทะเบียน'),
