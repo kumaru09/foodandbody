@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
@@ -68,9 +66,10 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
       final menu = await _fetchMenus(path);
       final List<NearRestaurant> nearRestaurant = await _fetchRestaurant(path);
       return emit(state.copyWith(
-          status: MenuStatus.success,
-          menu: menu,
-          nearRestaurant: nearRestaurant));
+        status: MenuStatus.success,
+        menu: menu,
+        nearRestaurant: nearRestaurant,
+      ));
     } catch (e) {
       print(e);
       emit(state.copyWith(status: MenuStatus.failure));
@@ -135,6 +134,7 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
     }
 
     final _locationData = await _getLoaction(_location);
+    print('6 _getLoaction(_location): $_locationData');
     final result = await googlePlace.search.getNearBySearch(
         google_place.Location(
             lat: _locationData.latitude, lng: _locationData.longitude),
@@ -142,9 +142,10 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
         type: "restaurant",
         keyword: name);
     // print("${_locationData.latitude}, ${_locationData.longitude}");
-    print('6 _getLoaction(_location): $_locationData');
     print('7 googlePlace.search.getNearBySearch: $result');
     // print('  googlePlace.search.getNearBySearch: ${result!.results}');
+    // print('placeId : ${result!.results?.map((item) => item.placeId)}');
+    // inspect(result!.results?.first);
 
     if (result!.results!.isEmpty) return List.empty();
 

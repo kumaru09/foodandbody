@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:bloc_test/bloc_test.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:foodandbody/models/menu_show.dart';
 import 'package:foodandbody/models/near_restaurant.dart';
@@ -13,6 +14,14 @@ import 'package:mocktail/mocktail.dart';
 import 'package:http/http.dart' as http;
 
 class MockClient extends Mock implements http.Client {}
+
+class MockGooglePlace extends Mock implements google_place.GooglePlace {}
+
+class MockNearBySearchResponse extends Mock implements google_place.NearBySearchResponse {}
+
+class MockDio extends Mock implements Dio {}
+
+class MockLocation extends Mock implements Location {}
 
 class MockPlanRepository extends Mock implements PlanRepository {}
 
@@ -44,15 +53,20 @@ void main() {
         unit: "กรัม",
         imageUrl: "https://bnn.blob.core.windows.net/food/grilled-shrimp.jpg");
     const Map<String, dynamic> locationData = {
-      "latitude": "13.723345",
-      "longitude": "100.59974",
+      "latitude": 13.723345,
+      "longitude": 100.59974,
     };
+
+    // const google_place.NearBySearchResponse mockNearBySearchResponse = google_place.NearBySearchResponse.parseNearBySearchResult(responseBody)
 
     late http.Client httpClient;
     late google_place.GooglePlace googlePlace;
     late Location location;
+    late Dio dio;
     late PlanRepository planRepository;
+    late FavoriteRepository favoriteRepository;
     late MenuBloc menuBloc;
+    late google_place.NearBySearchResponse nearBySearchResponse; 
 
     setUpAll(() {
       registerFallbackValue(Uri());
@@ -62,15 +76,19 @@ void main() {
 
     setUp(() {
       httpClient = MockClient();
-      googlePlace =
-          google_place.GooglePlace("AIzaSyDpXYjDqWeb8vWEoUkbApUyQn3pQ42CbZE");
-      location = new Location();
+      googlePlace = MockGooglePlace();
+      location = MockLocation();
+      dio = MockDio();
       planRepository = MockPlanRepository();
+      favoriteRepository = MockFavoriteRepository();
+      nearBySearchResponse = MockNearBySearchResponse();
       menuBloc = MenuBloc(
         httpClient: httpClient,
         path: 'กุ้งเผา',
-        planRepository: MockPlanRepository(),
-        favoriteRepository: MockFavoriteRepository(),
+        planRepository: planRepository,
+        favoriteRepository: favoriteRepository,
+        location: location,
+        dio: dio,
       );
       when(() => httpClient.get(any())).thenAnswer((_) async {
         return http.Response(
@@ -82,28 +100,25 @@ void main() {
         );
       });
       when(() => location.serviceEnabled()).thenAnswer((_) async {
-        return true;
+        return false;
       });
-      // when(() => location.requestService()).thenAnswer((_) async {
-      //   return false;
+      when(() => location.requestService()).thenAnswer((_) async {
+        return false;
+      });
+      // when(() => location.hasPermission()).thenAnswer((_) async {
+      //   return PermissionStatus.granted;
       // });
-      when(() => location.hasPermission()).thenAnswer((_) async {
-        return PermissionStatus.granted;
-      });
-      // when(() => location.requestPermission()).thenAnswer((_) async {
-      //   return PermissionStatus.denied;
+      // when(() => location.getLocation()).thenAnswer((_) async {
+      //   return LocationData.fromMap(locationData);
       // });
-      when(() => location.getLocation()).thenAnswer((_) async {
-        return LocationData.fromMap(locationData);
-      });
-      when(() => googlePlace.search.getNearBySearch(
-        google_place.Location(
-            lat: LocationData.fromMap(locationData).latitude, lng: LocationData.fromMap(locationData).longitude),
-        2000,
-        type: "restaurant",
-        keyword: mockPath)).thenAnswer((_) async {
-        return google_place.NearBySearchResponse(results: []);
-      });
+      // when(() => googlePlace.search.getNearBySearch(
+      //       any(), 2000, type: "restaurant", keyword: mockPath,
+      //     )).thenAnswer((_) async {
+      //   return nearBySearchResponse;
+      // });
+
+      // nearBySearchResponse api doc มี json
+      // https://developers.google.com/maps/documentation/places/web-service/search-nearby#json
     });
 
     test('initial state is MenuState()', () {
@@ -136,23 +151,7 @@ void main() {
 
       blocTest<MenuBloc, MenuState>(
         'drops new events when processing current event',
-        setUp: () {
-          when(() => httpClient.get(any())).thenAnswer((_) async {
-            return http.Response(
-                '{"name":"กุ้งเผา","calories":96,"protein":18.7,"carb":0.3,"fat":0,"serve":100,"unit":"กรัม","imageUrl":"https://bnn.blob.core.windows.net/food/grilled-shrimp.jpg"}',
-                200,
-                headers: {
-                  HttpHeaders.contentTypeHeader:
-                      'application/json; charset=utf-8',
-                });
-          });
-        },
-        build: () => MenuBloc(
-          httpClient: httpClient,
-          path: 'กุ้งเผา',
-          planRepository: MockPlanRepository(),
-          favoriteRepository: MockFavoriteRepository(),
-        ),
+        build: () => menuBloc,
         act: (bloc) => bloc
           ..add(MenuFetched())
           ..add(MenuFetched()),
@@ -160,7 +159,7 @@ void main() {
           MenuState(
             status: MenuStatus.success,
             menu: mockMenu,
-            nearRestaurant: mockNearRestaurant,
+            nearRestaurant: [],
           )
         ],
         verify: (_) {
@@ -170,23 +169,7 @@ void main() {
 
       blocTest<MenuBloc, MenuState>(
         'throttles events',
-        setUp: () {
-          when(() => httpClient.get(any())).thenAnswer((_) async {
-            return http.Response(
-                '{"name":"กุ้งเผา","calories":96,"protein":18.7,"carb":0.3,"fat":0,"serve":100,"unit":"กรัม","imageUrl":"https://bnn.blob.core.windows.net/food/grilled-shrimp.jpg"}',
-                200,
-                headers: {
-                  HttpHeaders.contentTypeHeader:
-                      'application/json; charset=utf-8',
-                });
-          });
-        },
-        build: () => MenuBloc(
-          httpClient: httpClient,
-          path: 'กุ้งเผา',
-          planRepository: MockPlanRepository(),
-          favoriteRepository: MockFavoriteRepository(),
-        ),
+        build: () => menuBloc,
         act: (bloc) async {
           bloc.add(MenuFetched());
           await Future<void>.delayed(Duration.zero);
@@ -196,7 +179,7 @@ void main() {
           MenuState(
             status: MenuStatus.success,
             menu: mockMenu,
-            nearRestaurant: mockNearRestaurant,
+            nearRestaurant: [],
           )
         ],
         verify: (_) {
@@ -211,12 +194,7 @@ void main() {
             (_) async => http.Response('', 500),
           );
         },
-        build: () => MenuBloc(
-          httpClient: httpClient,
-          path: 'กุ้งเผา',
-          planRepository: MockPlanRepository(),
-          favoriteRepository: MockFavoriteRepository(),
-        ),
+        build: () => menuBloc,
         act: (bloc) => bloc.add(MenuFetched()),
         expect: () => <MenuState>[MenuState(status: MenuStatus.failure)],
         verify: (_) {
@@ -227,16 +205,11 @@ void main() {
 
     blocTest<MenuBloc, MenuState>(
       'addMenu can call planRepository',
-      build: () => MenuBloc(
-        httpClient: httpClient,
-        path: 'กุ้งเผา',
-        planRepository: MockPlanRepository(),
-        favoriteRepository: MockFavoriteRepository(),
-      ),
+      build: () => menuBloc,
       act: (bloc) =>
           bloc.addMenu(name: 'กุ้งเผา', isEatNow: false, volumn: 1.0),
       verify: (_) {
-        verify(() => planRepository.addPlanMenu('กุ้งเผา', 1.0, false))
+        verify(() => planRepository.addPlanMenu('กุ้งเผา', null, 1.0, false))
             .called(1);
       },
     );
