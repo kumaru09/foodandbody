@@ -44,8 +44,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       try {
         final info = await _userRepository.getInfo();
         emit(AppState.authenticated(event.user.copyWith(info: info)));
-      } catch (e) {
-        add(AddInfoRequested(_authenRepository.currentUser));
+      } on GetInitInfoFailure catch (_) {
+        if (_.toString() == 'no-init-info')
+          add(AddInfoRequested(_authenRepository.currentUser));
       }
     } else {
       emit(AppState.unauthenticated());
