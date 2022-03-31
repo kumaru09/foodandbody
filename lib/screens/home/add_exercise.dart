@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:foodandbody/screens/home/bloc/home_bloc.dart';
 import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
-import 'package:foodandbody/screens/setting/bloc/info_bloc.dart';
+import 'package:foodandbody/screens/main_screen/bloc/info_bloc.dart';
 import 'package:provider/src/provider.dart';
 
 class AddExerciseButton extends StatelessWidget {

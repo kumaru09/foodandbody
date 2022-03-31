@@ -17,7 +17,7 @@ import 'package:foodandbody/screens/home/home.dart';
 import 'package:foodandbody/screens/main_screen/bottom_appbar.dart';
 import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
 import 'package:foodandbody/screens/plan/plan.dart';
-import 'package:foodandbody/screens/setting/bloc/info_bloc.dart';
+import 'package:foodandbody/screens/main_screen/bloc/info_bloc.dart';
 import 'package:foodandbody/widget/menu_card/bloc/menu_card_bloc.dart';
 
 class MainScreen extends StatefulWidget {

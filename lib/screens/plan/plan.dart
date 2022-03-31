@@ -7,7 +7,7 @@ import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
 import 'package:foodandbody/screens/plan/widget/linear_nutrient_two_progress.dart';
 import 'package:foodandbody/screens/plan/widget/plan_menu_card_list.dart';
 import 'package:foodandbody/screens/search/search_page.dart';
-import 'package:foodandbody/screens/setting/bloc/info_bloc.dart';
+import 'package:foodandbody/screens/main_screen/bloc/info_bloc.dart';
 import 'package:formz/formz.dart';
 
 import 'widget/ate_menu_card_list.dart';

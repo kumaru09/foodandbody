@@ -9,7 +9,7 @@ import 'package:foodandbody/screens/home/circular_cal_indicator.dart';
 import 'package:foodandbody/screens/home/exercise_list.dart';
 import 'package:foodandbody/screens/search/search_page.dart';
 import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
-import 'package:foodandbody/screens/setting/bloc/info_bloc.dart';
+import 'package:foodandbody/screens/main_screen/bloc/info_bloc.dart';
 import 'package:foodandbody/screens/setting/setting.dart';
 import 'package:foodandbody/widget/menu_card/bloc/menu_card_bloc.dart';
 import 'package:foodandbody/widget/menu_card/menu_card.dart';

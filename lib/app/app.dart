@@ -14,7 +14,7 @@ import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:foodandbody/repositories/search_repository.dart';
 import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/screens/camera/bloc/camera_bloc.dart';
-import 'package:foodandbody/screens/setting/bloc/info_bloc.dart';
+import 'package:foodandbody/screens/main_screen/bloc/info_bloc.dart';
 import 'package:foodandbody/theme.dart';
 
 class App extends StatelessWidget {
