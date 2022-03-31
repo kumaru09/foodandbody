@@ -66,9 +66,10 @@ class _MainScreenState extends State<MainScreen> {
           body: MultiBlocProvider(
             providers: [
               BlocProvider(
-                  create: (_) =>
-                      PlanBloc(planRepository: context.read<PlanRepository>())
-                        ..add(LoadPlan())),
+                  create: (_) => PlanBloc(
+                      planRepository: context.read<PlanRepository>(),
+                      userRepository: context.read<UserRepository>())
+                    ..add(LoadPlan())),
               BlocProvider(
                   create: (_) => HistoryBloc(
                       historyRepository: context.read<HistoryRepository>(),
@@ -80,8 +81,10 @@ class _MainScreenState extends State<MainScreen> {
                       InfoBloc(userRepository: context.read<UserRepository>())
                         ..add(LoadInfo())),
               BlocProvider(
-                  create: (_) =>
-                      BodyCubit(bodyRepository: context.read<BodyRepository>(), userRepository: context.read<UserRepository>())..fetchBody()),
+                  create: (_) => BodyCubit(
+                      bodyRepository: context.read<BodyRepository>(),
+                      userRepository: context.read<UserRepository>())
+                    ..fetchBody()),
               BlocProvider(
                   create: (_) =>
                       HomeBloc(planRepository: context.read<PlanRepository>())

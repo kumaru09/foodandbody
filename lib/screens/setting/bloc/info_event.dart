@@ -9,12 +9,12 @@ abstract class InfoEvent extends Equatable {
 
 class LoadInfo extends InfoEvent {}
 
-class AddInfo extends InfoEvent {}
+// class AddInfo extends InfoEvent {}
 
-class UpdateGoal extends InfoEvent {
-  UpdateGoal({required this.goal});
-  final int goal;
-}
+// class UpdateGoal extends InfoEvent {
+//   UpdateGoal({required this.goal});
+//   final int goal;
+// }
 
 // class UpdateHeight extends InfoEvent {
 //   UpdateHeight({required this.height});
