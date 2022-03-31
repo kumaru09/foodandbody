@@ -33,7 +33,7 @@ class BodyCubit extends Cubit<BodyState> {
         waist: BodyFigure.dirty(body.waist.toString()),
         hip: BodyFigure.dirty(body.hip.toString()),
         bodyDate: body.date,
-        height: Height.dirty(info.height.toString()),
+        height: Height.dirty(info!.height.toString()),
       ));
     } on Exception {
       emit(state.copyWith(status: BodyStatus.failure));
@@ -42,7 +42,9 @@ class BodyCubit extends Cubit<BodyState> {
 
   Future<void> updateWeight(String value) async {
     try {
-      emit(state.copyWith(weightStatus: FormzStatus.submissionInProgress, isWeightUpdate: true));
+      emit(state.copyWith(
+          weightStatus: FormzStatus.submissionInProgress,
+          isWeightUpdate: true));
       await userRepository.updateWeightInfo(int.parse(value));
       final weightList = await bodyRepository.getWeightList();
       emit(state.copyWith(
@@ -63,12 +65,14 @@ class BodyCubit extends Cubit<BodyState> {
 
   Future<void> updateHeight(String value) async {
     try {
-      emit(state.copyWith(heightStatus: FormzStatus.submissionInProgress, isWeightUpdate: false));
+      emit(state.copyWith(
+          heightStatus: FormzStatus.submissionInProgress,
+          isWeightUpdate: false));
       await userRepository.updateHeightInfo(int.parse(value));
       final info = await userRepository.getInfo();
       emit(state.copyWith(
           heightStatus: FormzStatus.submissionSuccess,
-          height: Height.dirty(info.height.toString())));
+          height: Height.dirty(info!.height.toString())));
     } catch (e) {
       print('updateHeight: $e');
       emit(state.copyWith(heightStatus: FormzStatus.submissionFailure));

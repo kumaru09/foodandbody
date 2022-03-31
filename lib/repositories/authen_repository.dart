@@ -91,6 +91,28 @@ class LogInWithFacebookFailure implements Exception {
   }
 }
 
+class DeleteUserFailure implements Exception {
+  final message;
+  const DeleteUserFailure(
+      [this.message = 'ไม่สามารถลบบัญชีผู้ใช้ได้ กรุณาลองใหม่อีกครั้ง']);
+
+  factory DeleteUserFailure.fromCode(String code) {
+    switch (code) {
+      case 'invalid-email':
+        return DeleteUserFailure(
+            'ไม่สามารถลบบัญชีผู้ใช้ได้ รหัสผ่านไม่ถูกต้อง');
+      case 'wrong-password':
+        return DeleteUserFailure(
+            'ไม่สามารถลบบัญชีผู้ใช้ได้ รหัสผ่านไม่ถูกต้อง');
+      case 'requires-recent-login':
+        return DeleteUserFailure(
+            'ไม่สามารถลบบัญชีผู้ใช้ได้ กรุณาล็อกอินใหม่อีกครั้ง');
+      default:
+        return DeleteUserFailure();
+    }
+  }
+}
+
 class AuthenRepository {
   AuthenRepository({
     CacheClient? cache,
@@ -207,7 +229,7 @@ class AuthenRepository {
 
   Future<void> logOut() async {
     try {
-      await Future.wait([_firebaseAuth.signOut()]);
+      await Future.wait([_firebaseAuth.signOut(), _googleSignIn.signOut()]);
     } on Exception {
       throw LogOutFailure();
     }
@@ -232,6 +254,29 @@ class AuthenRepository {
       }
     } catch (e) {
       print('sendVerifyEmail error: $e');
+    }
+  }
+
+  Future<void> deleteUser(String password) async {
+    try {
+      firebase_auth.User? user = _firebaseAuth.currentUser;
+      if (_googleSignIn.currentUser != null) {
+        if (user != null) {
+          await user.delete();
+        }
+      } else {
+        if (user != null) {
+          firebase_auth.AuthCredential credential =
+              firebase_auth.EmailAuthProvider.credential(
+                  email: user.email!, password: password);
+          await user.reauthenticateWithCredential(credential);
+          await user.delete();
+        }
+      }
+    } on firebase_auth.FirebaseAuthException catch (e) {
+      throw DeleteUserFailure.fromCode(e.code);
+    } catch (_) {
+      throw DeleteUserFailure();
     }
   }
 }
