@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
+import 'package:foodandbody/repositories/authen_repository.dart';
 import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/screens/setting/cubit/delete_user_cubit.dart';
 import 'package:formz/formz.dart';
@@ -11,7 +12,7 @@ class DeleteUser extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-        create: (context) => DeleteUserCubit(context.read<UserRepository>()),
+        create: (context) => DeleteUserCubit(context.read<AuthenRepository>()),
         child: BlocListener<DeleteUserCubit, DeleteUserState>(
           listener: ((context, state) {
             if (state.status.isSubmissionFailure) {
@@ -22,8 +23,8 @@ class DeleteUser extends StatelessWidget {
                   SnackBar(content: Text('${state.errorMessage}')),
                 );
             } else if (state.status.isSubmissionSuccess) {
-              context.read<AppBloc>().add(AppLogoutRequested());
               Navigator.popUntil(context, (Route<dynamic> route) => false);
+              context.read<AuthenRepository>().logOut();
             }
           }),
           child: Scaffold(

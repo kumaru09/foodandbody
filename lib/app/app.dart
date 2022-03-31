@@ -34,7 +34,7 @@ class App extends StatelessWidget {
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider<AuthenRepository>(
-            create: (context) => AuthenRepository()),
+            create: (context) => _authenRepository),
         RepositoryProvider<UserRepository>(
             create: (context) => UserRepository()),
         RepositoryProvider<SearchRepository>(
@@ -47,7 +47,8 @@ class App extends StatelessWidget {
         RepositoryProvider<FavoriteRepository>(
             create: (context) => FavoriteRepository()),
         RepositoryProvider<MenuCardRepository>(
-            create: (context) => MenuCardRepository(MenuCardCache(), MenuCardClient())),
+            create: (context) =>
+                MenuCardRepository(MenuCardCache(), MenuCardClient())),
         RepositoryProvider<HistoryRepository>(
             create: (context) => HistoryRepository()),
         RepositoryProvider<CameraRepository>(
