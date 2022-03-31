@@ -60,6 +60,22 @@ class LoginCubit extends Cubit<LoginState> {
     try {
       await _authenRepository.logInWithFacebook();
       emit(state.copyWith(status: FormzStatus.submissionSuccess));
+    } on LogInWithFacebookFailure catch (e) {
+      emit(state.copyWith(
+          status: FormzStatus.submissionFailure, errorMessage: e.message));
+    } catch (_) {
+      emit(state.copyWith(status: FormzStatus.submissionFailure));
+    }
+  }
+
+  Future<void> logInWithEmailLink(String email, String emailLink) async {
+    emit(state.copyWith(status: FormzStatus.submissionInProgress));
+    try {
+      await _authenRepository.logInWithEmailLink(email, emailLink);
+      emit(state.copyWith(status: FormzStatus.submissionSuccess));
+    } on LogInWithEmailLinkFailure catch (e) {
+      emit(state.copyWith(
+          status: FormzStatus.submissionFailure, errorMessage: e.message));
     } catch (_) {
       emit(state.copyWith(status: FormzStatus.submissionFailure));
     }

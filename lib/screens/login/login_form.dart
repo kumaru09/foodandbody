@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/repositories/authen_repository.dart';
@@ -8,8 +10,56 @@ import 'package:foodandbody/screens/forgot_password/forgot_password.dart';
 import 'package:formz/formz.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-class LoginForm extends StatelessWidget {
+class LoginForm extends StatefulWidget {
   const LoginForm({Key? key}) : super(key: key);
+
+  @override
+  State<LoginForm> createState() => _LoginFormState();
+}
+
+class _LoginFormState extends State<LoginForm> {
+  @override
+  void initState() {
+    handleLink();
+    FirebaseDynamicLinks.instance.onLink.listen((event) {
+      print('get link');
+      final Uri deepLink = event.link;
+      final email = Uri.parse(deepLink.queryParameters['continueUrl']!)
+          .queryParameters['email'];
+      final emailLink = deepLink.toString();
+      if (FirebaseAuth.instance.isSignInWithEmailLink(emailLink) &&
+          email != null) {
+        print('signin: $emailLink');
+        try {
+          context.read<LoginCubit>().logInWithEmailLink(email, emailLink);
+        } catch (_) {
+          print('$_');
+        }
+      }
+    });
+    super.initState();
+  }
+
+  void handleLink() async {
+    final PendingDynamicLinkData? data =
+        await FirebaseDynamicLinks.instance.getInitialLink();
+    if (data?.link != null) {
+      print('get link');
+      final Uri deepLink = data!.link;
+      final email = Uri.parse(deepLink.queryParameters['continueUrl']!)
+          .queryParameters['email'];
+      final emailLink = deepLink.toString();
+      if (FirebaseAuth.instance.isSignInWithEmailLink(emailLink) &&
+          email != null) {
+        print('signin: $emailLink');
+        try {
+          context.read<LoginCubit>().logInWithEmailLink(email, emailLink);
+        } catch (_) {
+          print('$_');
+        }
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +72,7 @@ class LoginForm extends StatelessWidget {
             ..showSnackBar(
               SnackBar(
                   content: Text(
-                      '${state.errorMessage ?? 'Authentication Failure'}')),
+                      '${state.errorMessage ?? 'เกิดข้อผิดพลาดบางอย่าง กรุณาลองใหม่อีกครั้ง'}')),
             );
         }
       },
