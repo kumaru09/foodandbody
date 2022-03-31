@@ -29,12 +29,16 @@ EventTransformer<E> throttleDroppable<E>(Duration duration) {
 }
 
 class MenuBloc extends Bloc<MenuEvent, MenuState> {
-  MenuBloc(
-      {required this.httpClient,
-      required this.path,
-      required this.planRepository,
-      required this.favoriteRepository})
-      : super(MenuState()) {
+  MenuBloc({
+    required this.httpClient,
+    required this.path,
+    required this.planRepository,
+    required this.favoriteRepository,
+    Dio? dio,
+    Location? location,
+  })  : _dio = dio ?? Dio(),
+        _location = location ?? new Location(),
+        super(MenuState()) {
     on<MenuFetched>(
       _onMenuFetched,
       transformer: throttleDroppable(throttleDuration),
@@ -51,9 +55,8 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
   final FavoriteRepository favoriteRepository;
   final googlePlace =
       google_place.GooglePlace("AIzaSyAAw4dLXy4iLB73faed51VGnNumwkU7mFY");
-  final Dio dio = Dio();
-  // Location location = new Location();
-
+  final Dio _dio;
+  final Location _location;
 
   Future<void> _onMenuFetched(
     MenuFetched event,
@@ -105,34 +108,33 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
   }
 
   Future<List<NearRestaurant>> _fetchRestaurant(String name) async {
-    Location location = new Location();
+    // Location location = new Location();
     bool _serviceEnabled;
     PermissionStatus _permissionGranted;
 
     print('--------------------------- start ---------------------------');
 
-
-    _serviceEnabled = await location.serviceEnabled();
-    print('1 location.serviceEnabled(): $_serviceEnabled');
+    _serviceEnabled = await _location.serviceEnabled();
+    print('1 _location.serviceEnabled(): $_serviceEnabled');
     if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
-    print('2 location.requestService(): $_serviceEnabled');
+      _serviceEnabled = await _location.requestService();
+      print('2 _location.requestService(): $_serviceEnabled');
       if (!_serviceEnabled) {
         return List.empty();
       }
     }
 
-    _permissionGranted = await location.hasPermission();
-    print('3 location.hasPermission(): $_permissionGranted');
+    _permissionGranted = await _location.hasPermission();
+    print('3 _location.hasPermission(): $_permissionGranted');
     if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await location.requestPermission();
-    print('4 location.requestPermission(): $_permissionGranted');
+      _permissionGranted = await _location.requestPermission();
+      print('4 _location.requestPermission(): $_permissionGranted');
       if (_permissionGranted != PermissionStatus.granted) {
         return List.empty();
       }
     }
 
-    final _locationData = await _getLoaction(location);
+    final _locationData = await _getLoaction(_location);
     final result = await googlePlace.search.getNearBySearch(
         google_place.Location(
             lat: _locationData.latitude, lng: _locationData.longitude),
@@ -140,17 +142,16 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
         type: "restaurant",
         keyword: name);
     // print("${_locationData.latitude}, ${_locationData.longitude}");
-    print('6 _getLoaction(location): $_locationData');
+    print('6 _getLoaction(_location): $_locationData');
     print('7 googlePlace.search.getNearBySearch: $result');
     // print('  googlePlace.search.getNearBySearch: ${result!.results}');
-
 
     if (result!.results!.isEmpty) return List.empty();
 
     final restaurantList = result.results!.map((e) async {
       final detail = await googlePlace.details
           .get("${e.placeId}", fields: "photos,opening_hours/periods");
-    print('10 restaurantList: $detail');
+      print('10 restaurantList: $detail');
 
       return NearRestaurant(
           name: e.name,
@@ -169,14 +170,13 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
 
     print('11 restaurantList: $restaurantList');
 
-
     return Future.wait(restaurantList);
   }
 
   Future<LocationData> _getLoaction(Location location) async {
     try {
       final _locationData = await location.getLocation();
-    print('5 location.getLocation(): $_locationData');
+      print('5 location.getLocation(): $_locationData');
       return _locationData;
     } catch (e) {
       print('$e');
@@ -187,12 +187,12 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
   Future<String?> _getDistance(
       double desLat, double desLng, double oriLat, double oriLng) async {
     try {
-      final res = await dio.get(
+      final res = await _dio.get(
           "https://maps.googleapis.com/maps/api/distancematrix/json?destinations=$desLat,$desLng&origins=$oriLat,$oriLng&key=AIzaSyAAw4dLXy4iLB73faed51VGnNumwkU7mFY");
       // print(res.data);
       final distance = DistanceMatrix.fromJson(res.data);
-    print('8 dio.get(): $res');
-    print('9 DistanceMatrix.fromJson(res.data): $distance');
+      print('8 _dio.get(): $res');
+      print('9 DistanceMatrix.fromJson(res.data): $distance');
 
       return distance.elements.first.distance.text;
     } catch (e) {

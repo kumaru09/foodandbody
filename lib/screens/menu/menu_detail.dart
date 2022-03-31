@@ -251,8 +251,15 @@ class _NearRestaurantItem extends StatelessWidget {
       {Key? key, required this.item, required this.defaultUrl})
       : super(key: key);
 
-  String showTime(TimeOfDay time) {
-    return '${time.hour}:${time.minute == 0 ? '00' : time.minute}';
+  String _showTime(String? time) {
+    return time != null
+        ? '${time.substring(0, 2)}.${time.substring(2, 4)}'
+        : '';
+  }
+
+  String _distance(String? value) {
+    String distance = value ?? '- km';
+    return distance.split(' ')[0];
   }
 
   @override
@@ -279,10 +286,13 @@ class _NearRestaurantItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('${item.name}',
+                    maxLines: 1,
+                    softWrap: false,
+                    overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodyText2!.merge(
                         TextStyle(
                             color: Theme.of(context).colorScheme.secondary))),
-                Text('${item.distance} กิโลเมตร',
+                Text('${_distance(item.distance)} กิโลเมตร',
                     style: Theme.of(context).textTheme.caption!.merge(TextStyle(
                         color: Theme.of(context).colorScheme.secondary))),
                 RatingBarIndicator(
@@ -304,20 +314,13 @@ class _NearRestaurantItem extends StatelessWidget {
                   children: [
                     Icon(Icons.access_time,
                         color: Theme.of(context).colorScheme.secondary),
-                    item.open != null && item.close != null
-                        ? Text(
-                            ' ${item.open!.substring(0, 2)}.${item.open!.substring(2, 4)} - ${item.close!.substring(0, 2)}.${item.close!.substring(2, 4)}',
-                            style: Theme.of(context).textTheme.caption!.merge(
-                                TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .secondary)))
-                        : Text(" 00.00 - 00.00",
-                            style: Theme.of(context).textTheme.caption!.merge(
-                                TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .secondary))),
+                    Text(
+                      " ${_showTime(item.open)} - ${_showTime(item.close)}",
+                      style: Theme.of(context).textTheme.caption!.merge(
+                            TextStyle(
+                                color: Theme.of(context).colorScheme.secondary),
+                          ),
+                    ),
                   ],
                 ),
               ],
