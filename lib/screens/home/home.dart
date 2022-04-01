@@ -189,8 +189,8 @@ class _HomeState extends State<Home> {
                 ),
                 BlocBuilder<PlanBloc, PlanState>(
                   builder: (context, state) {
-                    switch (state.status) {
-                      case PlanStatus.success:
+                    switch (state.exerciseStatus) {
+                      case ExerciseStatus.success:
                         return Column(
                           children: [
                             Container(
@@ -206,7 +206,7 @@ class _HomeState extends State<Home> {
                             )
                           ],
                         );
-                      case PlanStatus.failure:
+                      case ExerciseStatus.failure:
                         return Center(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,

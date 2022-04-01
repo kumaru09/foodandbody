@@ -38,10 +38,12 @@ class PlanBloc extends Bloc<PlanEvent, PlanState> {
       final plan = await _planRepository.getPlanById();
       final info = await _userRepository.getInfo(true);
       emit(state.copyWith(
-          status: PlanStatus.success,
-          plan: plan,
-          info: info,
-          goal: Calory.dirty(info!.goal.toString()),));
+        status: PlanStatus.success,
+        plan: plan,
+        info: info,
+        goal: Calory.dirty(info!.goal.toString()),
+        exerciseStatus: ExerciseStatus.success,
+      ));
     } catch (e) {
       emit(state.copyWith(status: PlanStatus.failure));
       print('fetchPlan error: $e');
@@ -59,7 +61,7 @@ class PlanBloc extends Bloc<PlanEvent, PlanState> {
   Future<void> _onAddExercise(
       AddExercise event, Emitter<PlanState> emit) async {
     try {
-      emit(state.copyWith(status: PlanStatus.loading));
+      emit(state.copyWith(exerciseStatus: ExerciseStatus.loading));
       final data =
           exerciseDataList.where((element) => element['id'] == event.id).first;
       final calories = (data['MET'] * 3.5 * event.min * event.weight) / 200;
@@ -70,9 +72,9 @@ class PlanBloc extends Bloc<PlanEvent, PlanState> {
           calory: calories,
           timestamp: Timestamp.now()));
       final plan = await _planRepository.getPlanById();
-      emit(state.copyWith(status: PlanStatus.success, plan: plan));
+      emit(state.copyWith(exerciseStatus: ExerciseStatus.success, plan: plan));
     } catch (e) {
-      emit(state.copyWith(status: PlanStatus.failure));
+      emit(state.copyWith(exerciseStatus: ExerciseStatus.failure));
       print('onAddExercise error: $e');
     }
   }
@@ -80,12 +82,12 @@ class PlanBloc extends Bloc<PlanEvent, PlanState> {
   Future<void> _deleteExercies(
       DeleteExercise event, Emitter<PlanState> emit) async {
     try {
+      emit(state.copyWith(exerciseStatus: ExerciseStatus.loading));
       await _planRepository.deleteExercise(event.exerciseRepo);
-      emit(state.copyWith(status: PlanStatus.loading));
       final plan = await _planRepository.getPlanById();
-      emit(state.copyWith(status: PlanStatus.success, plan: plan));
+      emit(state.copyWith(exerciseStatus: ExerciseStatus.success, plan: plan));
     } catch (e) {
-      emit(state.copyWith(status: PlanStatus.failure));
+      emit(state.copyWith(exerciseStatus: ExerciseStatus.failure));
       print('_deleteExercise error: $e');
     }
   }
