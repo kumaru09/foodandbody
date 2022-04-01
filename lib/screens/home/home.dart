@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:foodandbody/app/bloc/app_bloc.dart';
-import 'package:foodandbody/models/history.dart';
-import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:foodandbody/screens/home/add_exercise.dart';
 import 'package:foodandbody/screens/home/bloc/home_bloc.dart';
 import 'package:foodandbody/screens/home/circular_cal_indicator.dart';
 import 'package:foodandbody/screens/home/exercise_list.dart';
 import 'package:foodandbody/screens/search/search_page.dart';
 import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
-import 'package:foodandbody/screens/main_screen/bloc/info_bloc.dart';
 import 'package:foodandbody/screens/setting/setting.dart';
 import 'package:foodandbody/widget/menu_card/bloc/menu_card_bloc.dart';
 import 'package:foodandbody/widget/menu_card/menu_card.dart';
@@ -82,7 +78,7 @@ class _HomeState extends State<Home> {
                       builder: (context, state) {
                         switch (state.status) {
                           case PlanStatus.success:
-                            return CircularCalIndicator(state.plan, state.info!);
+                            return CircularCalIndicator(state.plan, state.goal.value);
                           case PlanStatus.failure:
                             return Container(
                               height: 200,
