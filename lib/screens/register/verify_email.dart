@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:argon_buttons_flutter/argon_buttons_flutter.dart';
 
 class VerifyEmail extends StatelessWidget {
   const VerifyEmail({Key? key}) : super(key: key);
+
+  // static Page page() => const MaterialPage<void>(child: VerifyEmail());
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +51,49 @@ class VerifyEmail extends StatelessWidget {
                                     color: Theme.of(context)
                                         .colorScheme
                                         .secondary)),
+                          ),
+                          SizedBox(height: 16.0),
+                          Center(
+                            child: ArgonTimerButton(
+                              height: 40,
+                              width: MediaQuery.of(context).size.width,
+                              minWidth: 183,
+                              highlightColor: Colors.transparent,
+                              highlightElevation: 0,
+                              roundLoadingShape: false,
+                              onTap: (startTimer, btnState) {
+                                if (btnState == ButtonState.Idle) {
+                                  print('do something');
+                                  startTimer(10);
+                                }
+                                
+                              },
+                              child: Text("ส่งอีกครั้ง",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .button!
+                                      .merge(TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .secondary))),
+                              loader: (timeLeft) {
+                                return Text(
+                                  "รอสักครู่ | $timeLeft",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .button!
+                                      .merge(TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .secondary)),
+                                );
+                              },
+                              borderRadius: 50.0,
+                              color: Colors.transparent,
+                              elevation: 0,
+                              borderSide:
+                                  BorderSide(color: Colors.black26, width: 1.5),
+                            ),
                           ),
                           SizedBox(height: 16.0),
                         ],
