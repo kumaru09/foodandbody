@@ -58,10 +58,11 @@ class GetInitInfoFailure implements Exception {
 }
 
 class UserRepository {
-  UserRepository(
-      {firebase_auth.FirebaseAuth? firebaseAuth,
-      firebase_storage.FirebaseStorage? firebaseStorage})
-      : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
+  UserRepository({
+    firebase_auth.FirebaseAuth? firebaseAuth,
+    firebase_storage.FirebaseStorage? firebaseStorage,
+    required this.cache,
+  })  : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
         _firebaseStorage =
             firebaseStorage ?? firebase_storage.FirebaseStorage.instance;
 
@@ -69,6 +70,7 @@ class UserRepository {
   final firebase_storage.FirebaseStorage _firebaseStorage;
   final cloud_firestore.CollectionReference users =
       cloud_firestore.FirebaseFirestore.instance.collection('users');
+  final InfoCache cache;
 
   Future<void> addUserInfo(Info info) async {
     final uid = _firebaseAuth.currentUser?.uid;
@@ -82,13 +84,19 @@ class UserRepository {
         .doc(uid)
         .collection('weight')
         .add({'weight': info.weight, "date": cloud_firestore.Timestamp.now()});
+    cache.set(infoE);
   }
 
-  Future<Info?> getInfo() async {
+  Future<Info?> getInfo([bool isCache = false]) async {
     try {
+      if (isCache) {
+        final cachedResult = cache.get();
+        if (cachedResult != null) return cachedResult;
+      }
       final data = await users.doc(_firebaseAuth.currentUser?.uid).get();
       if (data.exists) {
         final info = Info.fromEntity(InfoEntity.fromSnapshot(data));
+        cache.set(info);
         return info;
       } else {
         return null;
@@ -176,4 +184,12 @@ class UserRepository {
       throw UploadProfilePicFailure();
     }
   }
+}
+
+class InfoCache {
+  late Info? _cache;
+
+  Info? get() => _cache;
+
+  void set(Info result) => _cache = result;
 }

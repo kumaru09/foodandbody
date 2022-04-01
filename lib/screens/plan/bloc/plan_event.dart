@@ -42,3 +42,29 @@ class DeleteExercise extends PlanEvent {
   @override
   List<Object> get props => [exerciseRepo];
 }
+
+class UpdateGoal extends PlanEvent {
+  const UpdateGoal({required this.goal});
+  final String goal;
+
+  @override
+  String toString() {
+    return 'goal {$goal}';
+  }
+
+  @override
+  List<Object> get props => [goal];
+}
+
+class GoalChange extends PlanEvent {
+  const GoalChange({required this.value});
+  final String value;
+
+  @override
+  String toString() {
+    return 'goal {$value}';
+  }
+
+  @override
+  List<Object> get props => [value];
+}

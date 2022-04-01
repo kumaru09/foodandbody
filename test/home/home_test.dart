@@ -14,7 +14,7 @@ import 'package:foodandbody/models/history.dart';
 import 'package:foodandbody/models/info.dart';
 import 'package:foodandbody/models/nutrient.dart';
 import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
-import 'package:foodandbody/screens/setting/bloc/info_bloc.dart';
+import 'package:foodandbody/screens/main_screen/bloc/info_bloc.dart';
 import 'package:foodandbody/screens/setting/setting.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:foodandbody/models/user.dart';
