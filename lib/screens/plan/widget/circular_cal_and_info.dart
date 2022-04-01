@@ -1,26 +1,22 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:foodandbody/models/history.dart';
-import 'package:foodandbody/models/info.dart';
-import 'package:foodandbody/models/user.dart';
-import 'package:foodandbody/screens/plan/plan.dart';
-import 'package:foodandbody/screens/setting/bloc/info_bloc.dart';
+import 'package:foodandbody/repositories/plan_repository.dart';
+import 'package:foodandbody/repositories/user_repository.dart';
+import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
+import 'package:formz/formz.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-import 'package:provider/src/provider.dart';
 
-// ignore: must_be_immutable
 class CircularCalAndInfo extends StatelessWidget {
-  CircularCalAndInfo(this._info, this._plan);
+  CircularCalAndInfo(this._plan, this._goal);
 
   final History _plan;
-  final Info _info;
+  final String _goal;
   late double planCal = _plan.menuList
       .map((value) => value.calories)
       .fold(0, (previous, current) => previous + current);
   late double totalCal = _plan.totalCal;
-  late double goalCal = _info.goal!.toDouble();
+  late double goalCal = int.parse(_goal).toDouble();
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +41,6 @@ class CircularCalAndInfo extends StatelessWidget {
   }
 }
 
-// ignore: must_be_immutable
 class _CircularCalTwoProgress extends StatelessWidget {
   _CircularCalTwoProgress(
       {required this.totalCal, required this.planCal, required this.goalCal});
@@ -148,7 +143,6 @@ class _CircularCalTwoProgress extends StatelessWidget {
   }
 }
 
-// ignore: unused_element
 class _PlanInfo extends StatelessWidget {
   const _PlanInfo(
       {required this.totalCal, required this.planCal, required this.goalCal});
@@ -187,13 +181,21 @@ class _PlanInfo extends StatelessWidget {
                           color: Theme.of(context).primaryColor,
                         ),
                         onPressed: () async {
-                          final value = await showDialog<int?>(
-                              context: context,
-                              builder: (BuildContext context) =>
-                                  EditGoalDialog());
-                          if (value != null) {
+                          final value = await showDialog<String>(
+                            context: context,
+                            builder: (BuildContext context) =>
+                                BlocProvider<PlanBloc>(
+                              create: (_) => PlanBloc(
+                                  planRepository:
+                                      context.read<PlanRepository>(),
+                                  userRepository:
+                                      context.read<UserRepository>()),
+                              child: _EditGoalDialog(),
+                            ),
+                          );
+                          if (value != 'cancel' && value != null) {
                             context
-                                .read<InfoBloc>()
+                                .read<PlanBloc>()
                                 .add(UpdateGoal(goal: value));
                           }
                         }))
@@ -203,13 +205,19 @@ class _PlanInfo extends StatelessWidget {
           Container(
             alignment: Alignment.topLeft,
             padding: EdgeInsets.only(left: 25, bottom: 15),
-            child: Text(
-              "${goalCal.round()}",
-              style: Theme.of(context)
-                  .textTheme
-                  .headline6!
-                  .merge(TextStyle(color: Theme.of(context).primaryColor)),
-            ),
+            child: BlocBuilder<PlanBloc, PlanState>(
+                buildWhen: (previous, current) =>
+                    previous.goalStatus != current.goalStatus,
+                builder: (context, state) {
+                  if (state.goalStatus == FormzStatus.submissionInProgress)
+                    return CircularProgressIndicator();
+                  else
+                    return Text(
+                      "${goalCal.round()}",
+                      style: Theme.of(context).textTheme.headline6!.merge(
+                          TextStyle(color: Theme.of(context).primaryColor)),
+                    );
+                }),
           ),
           Container(
             alignment: Alignment.topLeft,
@@ -259,14 +267,9 @@ class _PlanInfo extends StatelessWidget {
   }
 }
 
-// ignore: must_be_immutable
-class EditGoalDialog extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() => _EditGoalDialog();
-}
+class _EditGoalDialog extends StatelessWidget {
+  const _EditGoalDialog({Key? key}) : super(key: key);
 
-class _EditGoalDialog extends State<EditGoalDialog> {
-  String _currentGoal = '0';
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -274,32 +277,49 @@ class _EditGoalDialog extends State<EditGoalDialog> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       elevation: 0,
       backgroundColor: Colors.white,
-      title: Text(
-        "แก้ไขเป้าหมายแคลอรี่",
-        style: Theme.of(context)
-            .textTheme
-            .headline6!
-            .merge(TextStyle(color: Theme.of(context).primaryColor)),
-      ),
-      content: TextField(
-          keyboardType: TextInputType.number,
-          decoration: InputDecoration(hintText: "ตัวอย่าง 1600"),
-          onChanged: (goal) => setState(() {
-                _currentGoal = goal;
-              })),
+      title: Text("แก้ไขเป้าหมายแคลอรี่",
+          style: Theme.of(context)
+              .textTheme
+              .headline6!
+              .merge(TextStyle(color: Theme.of(context).primaryColor))),
+      content: BlocBuilder<PlanBloc, PlanState>(
+          buildWhen: (previous, current) => previous.goal != current.goal,
+          builder: (context, state) {
+            return TextFormField(
+              key: const Key("edit_goal_textFormField"),
+              onChanged: (goal) =>
+                  context.read<PlanBloc>().add(GoalChange(value: goal)),
+              keyboardType: TextInputType.number,
+              textInputAction: TextInputAction.next,
+              decoration: InputDecoration(
+                hintText: 'ตัวอย่าง 1600',
+                errorText:
+                    state.goal.invalid ? 'กรุณาระบุแคลอรีให้ถูกต้อง' : null,
+              ),
+            );
+          }),
       actions: <Widget>[
-        TextButton(
-            key: const Key("edit_button_in_edit_goal_dialog"),
-            onPressed: () => Navigator.pop(context, int.parse(_currentGoal)),
-            child: Text("ตกลง",
-                style: Theme.of(context)
-                    .textTheme
-                    .button!
-                    .merge(TextStyle(color: Theme.of(context).primaryColor)))),
+        BlocBuilder<PlanBloc, PlanState>(
+            buildWhen: (previous, current) => previous.goal != current.goal,
+            builder: (context, state) {
+              return TextButton(
+                key: const Key("edit_button_in_edit_goal_dialog"),
+                onPressed: state.goal.valid
+                    ? () => Navigator.pop(context, state.goal.value)
+                    : null,
+                child: Text("ตกลง"),
+                style: TextButton.styleFrom(
+                  primary: Theme.of(context).primaryColor,
+                  onSurface: Theme.of(context)
+                      .colorScheme
+                      .primaryVariant, // Disable color
+                ),
+              );
+            }),
         TextButton(
             key: const Key("cancel_button_in_edit_goal_dialog"),
             onPressed: () {
-              Navigator.of(context).pop();
+              Navigator.pop(context, 'cancel');
             },
             child: Text("ยกเลิก",
                 style: Theme.of(context)

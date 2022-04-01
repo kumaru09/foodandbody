@@ -37,11 +37,19 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
   void _userChanged(AppUserChanged event, Emitter<AppState> emit) async {
     if (event.user.isNotEmpty) {
+      if (!event.user.emailVerified!) {
+        print('not have verified yet');
+        return;
+      }
       try {
         final info = await _userRepository.getInfo();
+        if (info == null) {
+          add(AddInfoRequested(_authenRepository.currentUser));
+          return;
+        }
         emit(AppState.authenticated(event.user.copyWith(info: info)));
-      } catch (e) {
-        add(AddInfoRequested(_authenRepository.currentUser));
+      } catch (_) {
+        print('_userChanged error: $_');
       }
     } else {
       emit(AppState.unauthenticated());

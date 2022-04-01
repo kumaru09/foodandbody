@@ -14,7 +14,6 @@ import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:foodandbody/repositories/search_repository.dart';
 import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/screens/camera/bloc/camera_bloc.dart';
-import 'package:foodandbody/screens/setting/bloc/info_bloc.dart';
 import 'package:foodandbody/theme.dart';
 
 class App extends StatelessWidget {
@@ -34,9 +33,9 @@ class App extends StatelessWidget {
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider<AuthenRepository>(
-            create: (context) => AuthenRepository()),
+            create: (context) => _authenRepository),
         RepositoryProvider<UserRepository>(
-            create: (context) => UserRepository()),
+            create: (context) => UserRepository(cache: InfoCache())),
         RepositoryProvider<SearchRepository>(
             create: (context) =>
                 SearchRepository(SearchCache(), SearchClient())),
@@ -47,7 +46,8 @@ class App extends StatelessWidget {
         RepositoryProvider<FavoriteRepository>(
             create: (context) => FavoriteRepository()),
         RepositoryProvider<MenuCardRepository>(
-            create: (context) => MenuCardRepository(MenuCardCache(), MenuCardClient())),
+            create: (context) =>
+                MenuCardRepository(MenuCardCache(), MenuCardClient())),
         RepositoryProvider<HistoryRepository>(
             create: (context) => HistoryRepository()),
         RepositoryProvider<CameraRepository>(

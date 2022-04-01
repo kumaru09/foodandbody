@@ -389,8 +389,16 @@ class _EatNowButton extends StatelessWidget {
           MenuDialog(serve: volumn, unit: unit, isEatNow: true),
     );
     if (value != 'cancel' && value != null) {
-      await context.read<MenuBloc>().addMenu(
-          name: name, isEatNow: true, volumn: double.parse(value.toString()));
+      if (isPlanMenu) {
+        await context.read<MenuBloc>().addMenu(
+            name: name,
+            isEatNow: true,
+            oldVolume: volumn,
+            volumn: double.parse(value.toString()));
+      } else {
+        await context.read<MenuBloc>().addMenu(
+            name: name, isEatNow: true, volumn: double.parse(value.toString()));
+      }
 
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => MainScreen(index: 1)),

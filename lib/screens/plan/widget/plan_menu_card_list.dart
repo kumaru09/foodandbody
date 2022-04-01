@@ -81,7 +81,7 @@ class _PlanMenuCardListState extends State<PlanMenuCardList> {
             onPressed: () {
               context
                   .read<PlanBloc>()
-                  .deleteMenu(item.name)
+                  .deleteMenu(item.name, item.volumn)
                   .then((value) => context.read<PlanBloc>().add(LoadPlan()));
             },
           ),
