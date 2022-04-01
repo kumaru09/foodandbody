@@ -29,6 +29,32 @@ class AddExercise extends PlanEvent {
   List<Object> get props => [id, min, weight];
 }
 
+class ExerciseTypeChange extends PlanEvent {
+  const ExerciseTypeChange({required this.value});
+  final String value;
+
+  @override
+  String toString() {
+    return 'exerciseTypeChange {$value}';
+  }
+
+  @override
+  List<Object> get props => [value];
+}
+
+class ExerciseTimeChange extends PlanEvent {
+  const ExerciseTimeChange({required this.value});
+  final String value;
+
+  @override
+  String toString() {
+    return 'exerciseTimeChange {$value}';
+  }
+
+  @override
+  List<Object> get props => [value];
+}
+
 class DeleteExercise extends PlanEvent {
   final ExerciseRepo exerciseRepo;
 

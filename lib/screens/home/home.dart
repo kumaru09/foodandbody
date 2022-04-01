@@ -9,6 +9,7 @@ import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
 import 'package:foodandbody/screens/setting/setting.dart';
 import 'package:foodandbody/widget/menu_card/bloc/menu_card_bloc.dart';
 import 'package:foodandbody/widget/menu_card/menu_card.dart';
+import 'package:formz/formz.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -78,7 +79,8 @@ class _HomeState extends State<Home> {
                       builder: (context, state) {
                         switch (state.status) {
                           case PlanStatus.success:
-                            return CircularCalIndicator(state.plan, state.goal.value);
+                            return CircularCalIndicator(
+                                state.plan, state.goal.value);
                           case PlanStatus.failure:
                             return Container(
                               height: 200,
@@ -98,7 +100,8 @@ class _HomeState extends State<Home> {
                                                     .secondary))),
                                     OutlinedButton(
                                       child: Text('ลองอีกครั้ง'),
-                                      key: const Key('home_tryAgain_button_circle'),
+                                      key: const Key(
+                                          'home_tryAgain_button_circle'),
                                       style: OutlinedButton.styleFrom(
                                         primary: Theme.of(context)
                                             .colorScheme
@@ -190,23 +193,9 @@ class _HomeState extends State<Home> {
                 BlocBuilder<PlanBloc, PlanState>(
                   builder: (context, state) {
                     switch (state.exerciseStatus) {
-                      case ExerciseStatus.success:
-                        return Column(
-                          children: [
-                            Container(
-                              padding:
-                                  EdgeInsets.only(left: 16, top: 8, right: 15),
-                              child: ExerciseList(state.plan.exerciseList),
-                            ),
-                            Container(
-                              width: MediaQuery.of(context).size.width,
-                              padding: EdgeInsets.only(bottom: 100),
-                              alignment: Alignment.center,
-                              child: AddExerciseButton(),
-                            )
-                          ],
-                        );
-                      case ExerciseStatus.failure:
+                      case FormzStatus.submissionInProgress:
+                        return Center(child: CircularProgressIndicator());
+                      case FormzStatus.submissionFailure:
                         return Center(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -238,8 +227,24 @@ class _HomeState extends State<Home> {
                             ],
                           ),
                         );
+                      case FormzStatus.submissionSuccess:
+                        return Column(
+                          children: [
+                            Container(
+                              padding:
+                                  EdgeInsets.only(left: 16, top: 8, right: 15),
+                              child: ExerciseList(state.plan.exerciseList),
+                            ),
+                            Container(
+                              width: MediaQuery.of(context).size.width,
+                              padding: EdgeInsets.only(bottom: 100),
+                              alignment: Alignment.center,
+                              child: AddExerciseButton(),
+                            )
+                          ],
+                        );
                       default:
-                        return Center(child: CircularProgressIndicator());
+                        return Container();
                     }
                   },
                 ),

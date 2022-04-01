@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:foodandbody/models/calory.dart';
 import 'package:foodandbody/models/exercise_repo.dart';
+import 'package:foodandbody/models/exercise_time.dart';
+import 'package:foodandbody/models/exercise_type.dart';
 import 'package:foodandbody/models/history.dart';
 import 'package:foodandbody/models/info.dart';
 import 'package:foodandbody/repositories/plan_repository.dart';
@@ -24,6 +26,8 @@ class PlanBloc extends Bloc<PlanEvent, PlanState> {
         super(PlanState(plan: History(Timestamp.now()))) {
     on<LoadPlan>(_fetchPlan);
     on<AddExercise>(_onAddExercise);
+    on<ExerciseTypeChange>(_exerciseTypeChanged);
+    on<ExerciseTimeChange>(_exerciseTimeChanged);
     on<DeleteExercise>(_deleteExercies);
     on<UpdateGoal>(_updateGoal);
     on<GoalChange>(_goalChanged);
@@ -42,7 +46,7 @@ class PlanBloc extends Bloc<PlanEvent, PlanState> {
         plan: plan,
         info: info,
         goal: Calory.dirty(info!.goal.toString()),
-        exerciseStatus: ExerciseStatus.success,
+        exerciseStatus: FormzStatus.submissionSuccess,
       ));
     } catch (e) {
       emit(state.copyWith(status: PlanStatus.failure));
@@ -61,7 +65,7 @@ class PlanBloc extends Bloc<PlanEvent, PlanState> {
   Future<void> _onAddExercise(
       AddExercise event, Emitter<PlanState> emit) async {
     try {
-      emit(state.copyWith(exerciseStatus: ExerciseStatus.loading));
+      emit(state.copyWith(exerciseStatus: FormzStatus.submissionInProgress));
       final data =
           exerciseDataList.where((element) => element['id'] == event.id).first;
       final calories = (data['MET'] * 3.5 * event.min * event.weight) / 200;
@@ -72,22 +76,40 @@ class PlanBloc extends Bloc<PlanEvent, PlanState> {
           calory: calories,
           timestamp: Timestamp.now()));
       final plan = await _planRepository.getPlanById();
-      emit(state.copyWith(exerciseStatus: ExerciseStatus.success, plan: plan));
+      emit(state.copyWith(
+          exerciseStatus: FormzStatus.submissionSuccess, plan: plan));
     } catch (e) {
-      emit(state.copyWith(exerciseStatus: ExerciseStatus.failure));
+      emit(state.copyWith(exerciseStatus: FormzStatus.submissionFailure));
       print('onAddExercise error: $e');
     }
+  }
+
+  void _exerciseTypeChanged(ExerciseTypeChange event, Emitter<PlanState> emit) {
+    final type = ExerciseType.dirty(event.value);
+    emit(state.copyWith(
+      exerciseType: type,
+      exerciseStatus: Formz.validate([type, state.exerciseTime]),
+    ));
+  }
+
+  void _exerciseTimeChanged(ExerciseTimeChange event, Emitter<PlanState> emit) {
+    final time = ExerciseTime.dirty(event.value);
+    emit(state.copyWith(
+      exerciseTime: time,
+      exerciseStatus: Formz.validate([state.exerciseType, time]),
+    ));
   }
 
   Future<void> _deleteExercies(
       DeleteExercise event, Emitter<PlanState> emit) async {
     try {
-      emit(state.copyWith(exerciseStatus: ExerciseStatus.loading));
+      emit(state.copyWith(exerciseStatus: FormzStatus.submissionInProgress));
       await _planRepository.deleteExercise(event.exerciseRepo);
       final plan = await _planRepository.getPlanById();
-      emit(state.copyWith(exerciseStatus: ExerciseStatus.success, plan: plan));
+      emit(state.copyWith(
+          exerciseStatus: FormzStatus.submissionSuccess, plan: plan));
     } catch (e) {
-      emit(state.copyWith(exerciseStatus: ExerciseStatus.failure));
+      emit(state.copyWith(exerciseStatus: FormzStatus.submissionFailure));
       print('_deleteExercise error: $e');
     }
   }
