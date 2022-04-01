@@ -13,7 +13,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   final authenRepository = AuthenRepository();
-  final userRepository = UserRepository();
+  final userRepository = UserRepository(cache: InfoCache());
   await authenRepository.user.first;
   runApp(App(
     authenRepository: authenRepository,

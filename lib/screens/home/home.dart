@@ -82,7 +82,7 @@ class _HomeState extends State<Home> {
                       builder: (context, state) {
                         switch (state.status) {
                           case PlanStatus.success:
-                            return _buildCard(context, state.plan);
+                            return CircularCalIndicator(state.plan, state.info!);
                           case PlanStatus.failure:
                             return Container(
                               height: 200,
@@ -253,43 +253,6 @@ class _HomeState extends State<Home> {
         ),
       ),
     );
-  }
-
-  Widget _buildCard(BuildContext context, History plan) {
-    return BlocBuilder<InfoBloc, InfoState>(builder: (context, state) {
-      switch (state.status) {
-        case InfoStatus.success:
-          return CircularCalIndicator(plan, state.info!);
-        case InfoStatus.failure:
-          return Container(
-            height: 200,
-            child: Center(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('ไม่สามารถโหลดข้อมูลได้ในขณะนี้',
-                      style: Theme.of(context).textTheme.bodyText2!.merge(
-                          TextStyle(
-                              color: Theme.of(context).colorScheme.secondary))),
-                  OutlinedButton(
-                    child: Text('ลองอีกครั้ง'),
-                    style: OutlinedButton.styleFrom(
-                      primary: Theme.of(context).colorScheme.secondary,
-                      shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(50))),
-                    ),
-                    onPressed: () => context.read<InfoBloc>().add(LoadInfo()),
-                  ),
-                ],
-              ),
-            ),
-          );
-        default:
-          return Container(
-              height: 200, child: Center(child: CircularProgressIndicator()));
-      }
-    });
   }
 }
 

@@ -68,5 +68,3 @@ class GoalChange extends PlanEvent {
   @override
   List<Object> get props => [value];
 }
-
-class ReturnGoalStatus extends PlanEvent {}

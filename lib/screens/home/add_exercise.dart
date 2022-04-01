@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:foodandbody/screens/home/bloc/home_bloc.dart';
 import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
-import 'package:foodandbody/screens/main_screen/bloc/info_bloc.dart';
 import 'package:provider/src/provider.dart';
 
 class AddExerciseButton extends StatelessWidget {
@@ -19,7 +17,7 @@ class AddExerciseButton extends StatelessWidget {
           context.read<PlanBloc>().add(AddExercise(
               id: value['activity'],
               min: value['time'],
-              weight: context.read<InfoBloc>().state.info!.weight!));
+              weight: context.read<PlanBloc>().state.info!.weight!));
         }
       },
       style: ElevatedButton.styleFrom(

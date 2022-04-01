@@ -4,6 +4,7 @@ import 'package:equatable/equatable.dart';
 import 'package:foodandbody/models/calory.dart';
 import 'package:foodandbody/models/exercise_repo.dart';
 import 'package:foodandbody/models/history.dart';
+import 'package:foodandbody/models/info.dart';
 import 'package:foodandbody/repositories/plan_repository.dart';
 
 import 'dart:async';
@@ -26,7 +27,6 @@ class PlanBloc extends Bloc<PlanEvent, PlanState> {
     on<DeleteExercise>(_deleteExercies);
     on<UpdateGoal>(_updateGoal);
     on<GoalChange>(_goalChanged);
-    on<ReturnGoalStatus>(_returnGoalStatus);
   }
 
   final PlanRepository _planRepository;
@@ -36,11 +36,12 @@ class PlanBloc extends Bloc<PlanEvent, PlanState> {
     try {
       if (!event.isRefresh) emit(state.copyWith(status: PlanStatus.loading));
       final plan = await _planRepository.getPlanById();
-      final info = await _userRepository.getInfo();
+      final info = await _userRepository.getInfo(true);
       emit(state.copyWith(
           status: PlanStatus.success,
           plan: plan,
-          goal: Calory.dirty(info.goal.toString())));
+          info: info,
+          goal: Calory.dirty(info!.goal.toString()),));
     } catch (e) {
       emit(state.copyWith(status: PlanStatus.failure));
       print('fetchPlan error: $e');
@@ -96,7 +97,7 @@ class PlanBloc extends Bloc<PlanEvent, PlanState> {
       final info = await _userRepository.getInfo();
       emit(state.copyWith(
           goalStatus: FormzStatus.submissionSuccess,
-          goal: Calory.dirty(info.goal.toString())));
+          goal: Calory.dirty(info!.goal.toString())));
     } catch (e) {
       print('updateGoal: $e');
       emit(state.copyWith(goalStatus: FormzStatus.submissionFailure));
@@ -109,10 +110,6 @@ class PlanBloc extends Bloc<PlanEvent, PlanState> {
       goal: goal,
       goalStatus: Formz.validate([goal]),
     ));
-  }
-
-  void _returnGoalStatus(ReturnGoalStatus event, Emitter<PlanState> emit) {
-    emit(state.copyWith(goalStatus: FormzStatus.pure));
   }
 }
 
