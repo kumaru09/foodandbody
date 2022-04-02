@@ -19,7 +19,7 @@ class AddExerciseButton extends StatelessWidget {
                 create: (_) => PlanBloc(
                     planRepository: context.read<PlanRepository>(),
                     userRepository: context.read<UserRepository>()),
-                child: _AddExerciseDialog()));
+                child: AddExerciseDialog()));
         if (value != null) {
           context.read<PlanBloc>().add(AddExercise(
               id: value['activity'],
@@ -43,8 +43,8 @@ class AddExerciseButton extends StatelessWidget {
   }
 }
 
-class _AddExerciseDialog extends StatelessWidget {
-  const _AddExerciseDialog({Key? key}) : super(key: key);
+class AddExerciseDialog extends StatelessWidget {
+  const AddExerciseDialog({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -150,6 +150,7 @@ class __ExerciseTypeInputState extends State<_ExerciseTypeInput> {
           return DropdownButtonFormField<String>(
             key: const Key("activity_select_dropdown"),
             value: _type,
+            // isExpanded: true,
             decoration: InputDecoration(
               labelText: "กิจกรรม",
               border: OutlineInputBorder(borderSide: BorderSide()),
