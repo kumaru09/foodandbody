@@ -54,6 +54,7 @@ dependencies:
   firebase_dynamic_links: ^4.0.4
   firebase_storage: ^10.2.6
   path: ^1.8.0
+  argon_buttons_flutter: ^1.1.0
   
 
 dev_dependencies:
