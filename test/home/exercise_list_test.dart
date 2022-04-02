@@ -17,6 +17,7 @@ class FakePlanEvent extends Fake implements PlanEvent {}
 class FakePlanState extends Fake implements PlanState {}
 
 class MockPlanRepository extends Mock implements PlanRepository {}
+
 class MockUserRepository extends Mock implements UserRepository {}
 
 void main() {
@@ -43,14 +44,18 @@ void main() {
     planBloc = MockPlanBloc();
     planRepository = MockPlanRepository();
     userRepository = MockUserRepository();
-    planBloc = PlanBloc(planRepository: planRepository, userRepository: userRepository);
+    planBloc = PlanBloc(
+        planRepository: planRepository, userRepository: userRepository);
   });
 
   group('Exercise List', () {
     testWidgets('render 3 exercise list card when have 3 exercise data',
         (tester) async {
       await tester.pumpWidget(MaterialApp(
-        home: ExerciseList(mockExercise),
+        home: BlocProvider.value(
+          value: planBloc,
+          child: ExerciseList(mockExercise),
+        ),
       ));
       expect(find.byType(Card), findsNWidgets(3));
       expect(find.text('name1'), findsOneWidget);
@@ -63,14 +68,19 @@ void main() {
 
     testWidgets('render nothing when have 0 exercise data', (tester) async {
       await tester.pumpWidget(MaterialApp(
-        home: ExerciseList([]),
+        home: BlocProvider.value(
+          value: planBloc,
+          child: ExerciseList([]),
+        ),
       ));
       expect(find.byType(Card), findsNothing);
     });
 
     testWidgets('render delete dialog when slide card', (tester) async {
       await tester.pumpWidget(MaterialApp(
-        home: ExerciseList(mockExercise),
+        home: BlocProvider.value(
+          value: planBloc,
+          child: ExerciseList(mockExercise),),
       ));
       await tester.drag(find.byType(Card).first, Offset(-500, 0));
       await tester.pumpAndSettle();
@@ -83,7 +93,9 @@ void main() {
     testWidgets('pop dialog when pressed cancle in delete dialog',
         (tester) async {
       await tester.pumpWidget(MaterialApp(
-        home: ExerciseList(mockExercise),
+        home: BlocProvider.value(
+          value: planBloc,
+          child: ExerciseList(mockExercise),),
       ));
       await tester.drag(find.byType(Card).first, Offset(-500, 0));
       await tester.pumpAndSettle();
