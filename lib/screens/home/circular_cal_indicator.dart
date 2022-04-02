@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:foodandbody/models/history.dart';
-import 'package:foodandbody/models/info.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
 // ignore: must_be_immutable
 class CircularCalIndicator extends StatelessWidget {
-  CircularCalIndicator(this._plan, this._info);
+  CircularCalIndicator(this._plan, this._goal);
   final History _plan;
-  final Info _info;
+  final String _goal;
   late double _totalCal = _plan.totalCal;
-  late double _goalCal = _info.goal!.toDouble();
+  late double _goalCal = int.parse(_goal).toDouble();
   late double _exercise = _plan.totalBurn;
 
   @override

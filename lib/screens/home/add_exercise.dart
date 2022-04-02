@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodandbody/repositories/plan_repository.dart';
+import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
 import 'package:provider/src/provider.dart';
 
@@ -12,11 +15,15 @@ class AddExerciseButton extends StatelessWidget {
       onPressed: () async {
         final value = await showDialog(
             context: context,
-            builder: (BuildContext context) => _AddExerciseDialog());
+            builder: (BuildContext context) => BlocProvider<PlanBloc>(
+                create: (_) => PlanBloc(
+                    planRepository: context.read<PlanRepository>(),
+                    userRepository: context.read<UserRepository>()),
+                child: AddExerciseDialog()));
         if (value != null) {
           context.read<PlanBloc>().add(AddExercise(
               id: value['activity'],
-              min: value['time'],
+              min: int.parse(value['time']),
               weight: context.read<PlanBloc>().state.info!.weight!));
         }
       },
@@ -36,32 +43,8 @@ class AddExerciseButton extends StatelessWidget {
   }
 }
 
-class _AddExerciseDialog extends StatefulWidget {
-  const _AddExerciseDialog({Key? key}) : super(key: key);
-
-  @override
-  __AddExerciseDialogState createState() => __AddExerciseDialogState();
-}
-
-class __AddExerciseDialogState extends State<_AddExerciseDialog> {
-  String? _activity;
-  String? _time;
-  final _formKey = GlobalKey<FormState>();
-
-  List<DropdownMenuItem<String>> _dropdownItem = [
-    DropdownMenuItem(
-      child: Text("แอโรบิค"),
-      value: "0",
-    ),
-    DropdownMenuItem(
-      child: Text("ปั่นจักรยาน"),
-      value: "1",
-    ),
-    DropdownMenuItem(
-      child: Text("วิ่ง"),
-      value: "2",
-    ),
-  ];
+class AddExerciseDialog extends StatelessWidget {
+  const AddExerciseDialog({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -76,57 +59,38 @@ class __AddExerciseDialogState extends State<_AddExerciseDialog> {
               TextStyle(color: Theme.of(context).colorScheme.secondary),
             ),
       ),
-      content: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            DropdownButtonFormField<String>(
-              key: const Key("activity_select_dropdown"),
-              items: _dropdownItem,
-              value: _activity,
-              validator: (value) => value == null ? "กรุณาเลือกกิจกกรม" : null,
-              decoration: InputDecoration(
-                labelText: "กิจกรรม",
-                border: OutlineInputBorder(borderSide: BorderSide()),
-              ),
-              onChanged: (String? activity) {
-                setState(() {
-                  _activity = activity;
-                });
-              },
-            ),
-            SizedBox(height: 20),
-            TextFormField(
-              key: const Key("time_text_field"),
-              keyboardType: TextInputType.number,
-              textInputAction: TextInputAction.done,
-              validator: (value) =>
-                  (value == null || value.isEmpty) ? "กรุณากรอกเวลา" : null,
-              decoration: InputDecoration(
-                labelText: "เวลา (นาที)",
-                hintText: "ตัวอย่าง 30, 45, 60",
-                border: OutlineInputBorder(borderSide: BorderSide()),
-              ),
-              onChanged: (time) => setState(() {
-                _time = time;
-              }),
-            ),
-          ],
-        ),
+      content: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _ExerciseTypeInput(),
+          SizedBox(height: 20),
+          _ExerciseTimeInput(),
+        ],
       ),
       actions: <Widget>[
-        TextButton(
-          key: const Key("add_exercise_dialog_ok_button"),
-          onPressed: () => Navigator.pop(
-              context, {'activity': _activity, 'time': int.parse(_time!)}),
-          child: Text(
-            "ตกลง",
-            style: Theme.of(context).textTheme.button!.merge(
-                  TextStyle(color: Theme.of(context).primaryColor),
-                ),
-          ),
+        BlocBuilder<PlanBloc, PlanState>(
+          buildWhen: (previous, current) =>
+              previous.exerciseStatus != current.exerciseStatus,
+          builder: (context, state) {
+            return TextButton(
+              key: const Key("add_exercise_dialog_ok_button"),
+              onPressed: state.exerciseType.valid && state.exerciseTime.valid
+                  // state.exerciseStatus.isValidate
+                  ? () => Navigator.pop(context, {
+                        'activity': state.exerciseType.value,
+                        'time': state.exerciseTime.value,
+                      })
+                  : null,
+              child: Text("ตกลง"),
+              style: TextButton.styleFrom(
+                primary: Theme.of(context).primaryColor,
+                onSurface: Theme.of(context)
+                    .colorScheme
+                    .primaryVariant, // Disable color
+              ),
+            );
+          },
         ),
         TextButton(
           key: const Key("add_exercise_dialog_cancel_button"),
@@ -140,5 +104,80 @@ class __AddExerciseDialogState extends State<_AddExerciseDialog> {
         ),
       ],
     );
+  }
+}
+
+class _ExerciseTimeInput extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<PlanBloc, PlanState>(
+        buildWhen: (previous, current) =>
+            previous.exerciseTime != current.exerciseTime,
+        builder: (context, state) {
+          return TextFormField(
+            key: const Key("exercise_time_text_field"),
+            onChanged: (time) =>
+                context.read<PlanBloc>().add(ExerciseTimeChange(value: time)),
+            keyboardType: TextInputType.number,
+            textInputAction: TextInputAction.done,
+            decoration: InputDecoration(
+              labelText: "เวลา (นาที)",
+              hintText: "ตัวอย่าง 30, 45, 60",
+              border: OutlineInputBorder(borderSide: BorderSide()),
+              errorText:
+                  state.exerciseTime.invalid ? 'กรุณากรอกเวลาให้ถูกต้อง' : null,
+            ),
+          );
+        });
+  }
+}
+
+class _ExerciseTypeInput extends StatefulWidget {
+  const _ExerciseTypeInput({Key? key}) : super(key: key);
+
+  @override
+  __ExerciseTypeInputState createState() => __ExerciseTypeInputState();
+}
+
+class __ExerciseTypeInputState extends State<_ExerciseTypeInput> {
+  String? _type;
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<PlanBloc, PlanState>(
+        buildWhen: (previous, current) =>
+            previous.exerciseType != current.exerciseType,
+        builder: (context, state) {
+          return DropdownButtonFormField<String>(
+            key: const Key("activity_select_dropdown"),
+            value: _type,
+            // isExpanded: true,
+            decoration: InputDecoration(
+              labelText: "กิจกรรม",
+              border: OutlineInputBorder(borderSide: BorderSide()),
+              errorText:
+                  state.exerciseType.invalid ? 'กรุณาเลือกกิจกกรม' : null,
+            ),
+            items: [
+              DropdownMenuItem(
+                child: Text("แอโรบิค"),
+                value: "0",
+              ),
+              DropdownMenuItem(
+                child: Text("ปั่นจักรยาน"),
+                value: "1",
+              ),
+              DropdownMenuItem(
+                child: Text("วิ่ง"),
+                value: "2",
+              ),
+            ],
+            onChanged: (String? type) {
+              setState(() {
+                _type = type;
+              });
+              context.read<PlanBloc>().add(ExerciseTypeChange(value: type!));
+            },
+          );
+        });
   }
 }
