@@ -1,12 +1,13 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:foodandbody/models/calory.dart';
 import 'package:foodandbody/models/exercise_repo.dart';
 import 'package:foodandbody/models/menu_list.dart';
 import 'package:foodandbody/repositories/plan_repository.dart';
+import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/screens/home/bloc/home_bloc.dart';
 import 'package:foodandbody/screens/home/exercise_list.dart';
 import 'package:foodandbody/screens/search/search_page.dart';
@@ -14,13 +15,13 @@ import 'package:foodandbody/models/history.dart';
 import 'package:foodandbody/models/info.dart';
 import 'package:foodandbody/models/nutrient.dart';
 import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
-import 'package:foodandbody/screens/main_screen/bloc/info_bloc.dart';
 import 'package:foodandbody/screens/setting/setting.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:foodandbody/models/user.dart';
 import 'package:foodandbody/screens/home/home.dart';
 import 'package:foodandbody/widget/menu_card/bloc/menu_card_bloc.dart';
 import 'package:foodandbody/widget/menu_card/menu_card.dart';
+import 'package:formz/formz.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:mocktail_image_network/mocktail_image_network.dart';
 
@@ -49,12 +50,6 @@ class FakeMenuCardEvent extends Fake implements MenuCardEvent {}
 
 class FakeMenuCardState extends Fake implements MenuCardState {}
 
-class MockInfoBloc extends MockBloc<InfoEvent, InfoState> implements InfoBloc {}
-
-class FakeInfoEvent extends Fake implements InfoEvent {}
-
-class FakeInfoState extends Fake implements InfoState {}
-
 class MockHomeBloc extends MockBloc<HomeEvent, HomeState> implements HomeBloc {}
 
 class FakeHomeEvent extends Fake implements HomeEvent {}
@@ -62,6 +57,8 @@ class FakeHomeEvent extends Fake implements HomeEvent {}
 class FakeHomeState extends Fake implements HomeState {}
 
 class MockPlanRepository extends Mock implements PlanRepository {}
+
+class MockUserRepository extends Mock implements UserRepository {}
 
 void main() {
   //button
@@ -95,7 +92,8 @@ void main() {
       totalWater: 1,
       totalNutrientList: mockNutrientList,
       exerciseList: mockExerciseList);
-  final Info mockInfo = Info(name: 'user', goal: 1000);
+  final Info mockInfo = Info(name: 'user', goal: 1600);
+  final Calory mockGoal = Calory.dirty(mockInfo.goal.toString());
 
   group('Home Page', () {
     late AppBloc appBloc;
@@ -104,7 +102,6 @@ void main() {
     // late History plan;
     // late Info info;
     late MenuCardBloc menuCardBloc;
-    late InfoBloc infoBloc;
     late HomeBloc homeBloc;
     late PlanRepository planRepository;
 
@@ -115,8 +112,6 @@ void main() {
       registerFallbackValue<PlanState>(FakePlanState());
       registerFallbackValue<MenuCardEvent>(FakeMenuCardEvent());
       registerFallbackValue<MenuCardState>(FakeMenuCardState());
-      registerFallbackValue<InfoEvent>(FakeInfoEvent());
-      registerFallbackValue<InfoState>(FakeInfoState());
       registerFallbackValue<HomeEvent>(FakeHomeEvent());
       registerFallbackValue<HomeState>(FakeHomeState());
     });
@@ -125,14 +120,16 @@ void main() {
       planBloc = MockPlanBloc();
       appBloc = MockAppBloc();
       menuCardBloc = MockMenuCardBloc();
-      infoBloc = MockInfoBloc();
       homeBloc = MockHomeBloc();
       planRepository = MockPlanRepository();
       user = MockUser();
-      when(() => planBloc.state)
-          .thenReturn(PlanState(status: PlanStatus.success, plan: mockHistory));
-      when(() => infoBloc.state)
-          .thenReturn(InfoState(status: InfoStatus.success, info: mockInfo));
+      when(() => planBloc.state).thenReturn(PlanState(
+        status: PlanStatus.success,
+        plan: mockHistory,
+        info: mockInfo,
+        goal: mockGoal,
+        exerciseStatus: FormzStatus.submissionSuccess,
+      ));
       when(() => menuCardBloc.state).thenReturn(
           MenuCardState(status: MenuCardStatus.success, fav: mockMenuCard));
       when(() => homeBloc.state).thenReturn(HomeState(
@@ -173,7 +170,6 @@ void main() {
               providers: [
                 BlocProvider.value(value: planBloc),
                 BlocProvider.value(value: menuCardBloc),
-                BlocProvider.value(value: infoBloc),
                 BlocProvider.value(value: homeBloc),
               ],
               child: Home(),
@@ -184,16 +180,19 @@ void main() {
         });
       }); //"calories circular progress"
 
-      testWidgets("fail calories circular progress when plan status is failure", (tester) async {
+      testWidgets("fail calories circular progress when plan status is failure",
+          (tester) async {
         await mockNetworkImages(() async {
-          when(() => planBloc.state)
-          .thenReturn(PlanState(status: PlanStatus.failure, plan: mockHistory));
+          when(() => planBloc.state).thenReturn(PlanState(
+            status: PlanStatus.failure,
+            plan: mockHistory,
+            exerciseStatus: FormzStatus.submissionFailure,
+          ));
           await tester.pumpWidget(MaterialApp(
             home: MultiBlocProvider(
               providers: [
                 BlocProvider.value(value: planBloc),
                 BlocProvider.value(value: menuCardBloc),
-                BlocProvider.value(value: infoBloc),
                 BlocProvider.value(value: homeBloc),
               ],
               child: Home(),
@@ -206,29 +205,6 @@ void main() {
         });
       });
 
-      testWidgets("fail calories circular progress when info status is failure", (tester) async {
-        await mockNetworkImages(() async {
-          when(() => infoBloc.state)
-          .thenReturn(InfoState(status: InfoStatus.failure));
-          await tester.pumpWidget(MaterialApp(
-            home: MultiBlocProvider(
-              providers: [
-                BlocProvider.value(value: planBloc),
-                BlocProvider.value(value: menuCardBloc),
-                BlocProvider.value(value: infoBloc),
-                BlocProvider.value(value: homeBloc),
-              ],
-              child: Home(),
-            ),
-          ));
-          await tester.pumpAndSettle();
-          expect(find.text('แคลอรีวันนี้'), findsOneWidget);
-          expect(find.byKey(circularIndicatorKey), findsNothing);
-          expect(find.text('ไม่สามารถโหลดข้อมูลได้ในขณะนี้'), findsOneWidget);
-          expect(find.text('ลองอีกครั้ง'), findsOneWidget);
-        });
-      });
-
       testWidgets("menu card", (tester) async {
         await mockNetworkImages(() async {
           await tester.pumpWidget(MaterialApp(
@@ -237,7 +213,6 @@ void main() {
                 BlocProvider.value(value: planBloc),
                 BlocProvider.value(value: homeBloc),
                 BlocProvider.value(value: menuCardBloc),
-                BlocProvider.value(value: infoBloc),
               ],
               child: Home(),
             ),
@@ -257,7 +232,6 @@ void main() {
                 BlocProvider.value(value: planBloc),
                 BlocProvider.value(value: homeBloc),
                 BlocProvider.value(value: menuCardBloc),
-                BlocProvider.value(value: infoBloc),
               ],
               child: Home(),
             ),
@@ -274,6 +248,29 @@ void main() {
         });
       }); //"daily water card"
 
+      testWidgets("fail daily water card when home status is failure",
+          (tester) async {
+        await mockNetworkImages(() async {
+          when(() => homeBloc.state)
+              .thenReturn(HomeState(status: HomeStatus.failure));
+          await tester.pumpWidget(MaterialApp(
+            home: MultiBlocProvider(
+              providers: [
+                BlocProvider.value(value: planBloc),
+                BlocProvider.value(value: homeBloc),
+                BlocProvider.value(value: menuCardBloc),
+              ],
+              child: Home(),
+            ),
+          ));
+          await tester.dragFrom(Offset(0, 300), Offset(0, -300));
+          await tester.pumpAndSettle();
+          expect(find.text('น้ำวันนี้'), findsOneWidget);
+          expect(find.text('ไม่สามารถโหลดข้อมูลได้ในขณะนี้'), findsOneWidget);
+          expect(find.text('ลองอีกครั้ง'), findsOneWidget);
+        });
+      });
+
       testWidgets("exercise list", (tester) async {
         await mockNetworkImages(() async {
           await tester.pumpWidget(MaterialApp(
@@ -282,7 +279,6 @@ void main() {
                 BlocProvider.value(value: planBloc),
                 BlocProvider.value(value: homeBloc),
                 BlocProvider.value(value: menuCardBloc),
-                BlocProvider.value(value: infoBloc),
               ],
               child: Home(),
             ),
@@ -295,17 +291,18 @@ void main() {
         });
       });
 
-      testWidgets("fail exercise list when plan status is failure", (tester) async {
+      testWidgets("fail exercise list when exerciseStatus is failure",
+          (tester) async {
         await mockNetworkImages(() async {
-          when(() => planBloc.state)
-          .thenReturn(PlanState(status: PlanStatus.failure, plan: mockHistory));
+          when(() => planBloc.state).thenReturn(PlanState(
+              exerciseStatus: FormzStatus.submissionFailure,
+              plan: mockHistory));
           await tester.pumpWidget(MaterialApp(
             home: MultiBlocProvider(
               providers: [
                 BlocProvider.value(value: planBloc),
                 BlocProvider.value(value: homeBloc),
                 BlocProvider.value(value: menuCardBloc),
-                BlocProvider.value(value: infoBloc),
               ],
               child: Home(),
             ),
@@ -315,24 +312,31 @@ void main() {
           expect(find.text('เพิ่มการออกกำลังกาย'), findsNothing);
           expect(find.text('exerciseName'), findsNothing);
           expect(find.byType(ExerciseList), findsNothing);
-          expect(find.text('ไม่สามารถโหลดข้อมูลได้ในขณะนี้'), findsNWidgets(2));
-          expect(find.text('ลองอีกครั้ง'), findsNWidgets(2));
+          expect(find.text('ไม่สามารถโหลดข้อมูลได้ในขณะนี้'), findsOneWidget);
+          expect(find.text('ลองอีกครั้ง'), findsOneWidget);
         });
       });
 
-      testWidgets("dialog add exercise list when pressed add exercise icon", (tester) async {
+      testWidgets("dialog add exercise list when pressed add exercise icon",
+          (tester) async {
         await mockNetworkImages(() async {
-          await tester.pumpWidget(MaterialApp(
-            home: MultiBlocProvider(
+          await tester.pumpWidget(MultiRepositoryProvider(
               providers: [
-                BlocProvider.value(value: planBloc),
-                BlocProvider.value(value: homeBloc),
-                BlocProvider.value(value: menuCardBloc),
-                BlocProvider.value(value: infoBloc),
+                RepositoryProvider<PlanRepository>(
+                    create: (_) => MockPlanRepository()),
+                RepositoryProvider<UserRepository>(
+                    create: (_) => MockUserRepository()),
               ],
-              child: Home(),
-            ),
-          ));
+              child: MaterialApp(
+                home: MultiBlocProvider(
+                  providers: [
+                    BlocProvider.value(value: planBloc),
+                    BlocProvider.value(value: homeBloc),
+                    BlocProvider.value(value: menuCardBloc),
+                  ],
+                  child: Home(),
+                ),
+              )));
           await tester.dragFrom(Offset(0, 300), Offset(0, -300));
           expect(find.text('เพิ่มการออกกำลังกาย'), findsOneWidget);
           await tester.tap(find.text('เพิ่มการออกกำลังกาย'));
@@ -391,7 +395,6 @@ void main() {
                 BlocProvider.value(value: planBloc),
                 BlocProvider.value(value: homeBloc),
                 BlocProvider.value(value: menuCardBloc),
-                BlocProvider.value(value: infoBloc),
               ],
               child: Home(),
             ),
@@ -413,7 +416,6 @@ void main() {
                 BlocProvider.value(value: planBloc),
                 BlocProvider.value(value: homeBloc),
                 BlocProvider.value(value: menuCardBloc),
-                BlocProvider.value(value: infoBloc),
               ],
               child: Home(),
             ),
@@ -435,7 +437,6 @@ void main() {
                 BlocProvider.value(value: planBloc),
                 BlocProvider.value(value: homeBloc),
                 BlocProvider.value(value: menuCardBloc),
-                BlocProvider.value(value: infoBloc),
               ],
               child: Home(),
             ),
@@ -451,15 +452,14 @@ void main() {
       testWidgets("call plan bloc when pressed try again at circle indicator",
           (tester) async {
         await mockNetworkImages(() async {
-          when(() => planBloc.state)
-          .thenReturn(PlanState(status: PlanStatus.failure, plan: mockHistory));
+          when(() => planBloc.state).thenReturn(
+              PlanState(status: PlanStatus.failure, plan: mockHistory));
           await tester.pumpWidget(MaterialApp(
             home: MultiBlocProvider(
               providers: [
                 BlocProvider.value(value: planBloc),
                 BlocProvider.value(value: homeBloc),
                 BlocProvider.value(value: menuCardBloc),
-                BlocProvider.value(value: infoBloc),
               ],
               child: Home(),
             ),
@@ -470,47 +470,24 @@ void main() {
         });
       });
 
-      testWidgets("call info bloc when pressed try again at circle indicator",
-          (tester) async {
-        await mockNetworkImages(() async {
-          when(() => infoBloc.state)
-          .thenReturn(InfoState(status: InfoStatus.failure));
-          await tester.pumpWidget(MaterialApp(
-            home: MultiBlocProvider(
-              providers: [
-                BlocProvider.value(value: planBloc),
-                BlocProvider.value(value: homeBloc),
-                BlocProvider.value(value: menuCardBloc),
-                BlocProvider.value(value: infoBloc),
-              ],
-              child: Home(),
-            ),
-          ));
-          await tester.tap(find.text('ลองอีกครั้ง'));
-          await tester.pumpAndSettle();
-          verify(() => infoBloc.add(LoadInfo())).called(1);
-        });
-      });
-
       testWidgets("call plan bloc when pressed try again at exercise list",
           (tester) async {
         await mockNetworkImages(() async {
-          when(() => planBloc.state)
-          .thenReturn(PlanState(status: PlanStatus.failure, plan: mockHistory));
+          when(() => planBloc.state).thenReturn(PlanState(
+              exerciseStatus: FormzStatus.submissionFailure,
+              plan: mockHistory));
           await tester.pumpWidget(MaterialApp(
             home: MultiBlocProvider(
               providers: [
                 BlocProvider.value(value: planBloc),
                 BlocProvider.value(value: homeBloc),
                 BlocProvider.value(value: menuCardBloc),
-                BlocProvider.value(value: infoBloc),
               ],
               child: Home(),
             ),
           ));
           await tester.dragFrom(Offset(0, 300), Offset(0, -300));
           await tester.tap(find.byKey(Key('home_tryAgain_button_exercise')));
-          await tester.pumpAndSettle();
           verify(() => planBloc.add(LoadPlan())).called(1);
         });
       });

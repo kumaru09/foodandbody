@@ -49,7 +49,7 @@ class PlanBloc extends Bloc<PlanEvent, PlanState> {
         exerciseStatus: FormzStatus.submissionSuccess,
       ));
     } catch (e) {
-      emit(state.copyWith(status: PlanStatus.failure));
+      emit(state.copyWith(status: PlanStatus.failure, exerciseStatus: FormzStatus.submissionFailure));
       print('fetchPlan error: $e');
     }
   }
