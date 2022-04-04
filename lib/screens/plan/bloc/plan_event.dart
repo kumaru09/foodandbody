@@ -12,6 +12,21 @@ class LoadPlan extends PlanEvent {
   final bool isRefresh;
 }
 
+class DeleteMenu extends PlanEvent {
+  final String name;
+  final double volume;
+
+  const DeleteMenu({required this.name, required this.volume});
+
+  @override
+  String toString() {
+    return 'name: $name, volume: $volume';
+  }
+
+  @override
+  List<Object> get props => [name, volume];
+}
+
 class AddExercise extends PlanEvent {
   final String id;
   final int min;

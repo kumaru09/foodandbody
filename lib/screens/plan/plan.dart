@@ -19,10 +19,20 @@ class Plan extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocListener<PlanBloc, PlanState>(
+      listenWhen: (previous, current) =>
+          (previous.goalStatus != current.goalStatus &&
+              current.goalStatus == FormzStatus.submissionFailure) ||
+          (previous.deleteMenuStatus != current.deleteMenuStatus),
       listener: (context, state) {
-        if (state.goalStatus == FormzStatus.submissionFailure) {
-          _failUpdateGoal(context);
-        }
+        if (!state.isDeleteMenu &&
+            state.goalStatus == FormzStatus.submissionFailure)
+          _failAction(context, 'แก้ไขเป้าหมายแคลอรี');
+        else if (state.isDeleteMenu &&
+            state.deleteMenuStatus == DeleteMenuStatus.failure)
+          _failAction(context, 'ลบเมนู');
+        else if (state.isDeleteMenu &&
+            state.deleteMenuStatus == DeleteMenuStatus.success)
+          context.read<PlanBloc>().add(LoadPlan());
       },
       child: Scaffold(
         extendBody: true,
@@ -164,7 +174,7 @@ class Plan extends StatelessWidget {
     );
   }
 
-  void _failUpdateGoal(BuildContext context) {
+  void _failAction(BuildContext context, String action) {
     showDialog<String>(
         context: context,
         builder: (BuildContext context) {
@@ -177,7 +187,7 @@ class Plan extends StatelessWidget {
               children: [
                 Icon(Icons.report,
                     color: Theme.of(context).colorScheme.secondary, size: 80),
-                Text('กรอกข้อมูลไม่สำเร็จ',
+                Text('$actionไม่สำเร็จ',
                     style: Theme.of(context).textTheme.subtitle1!.merge(
                         TextStyle(
                             color: Theme.of(context).colorScheme.secondary))),

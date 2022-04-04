@@ -1,6 +1,7 @@
 part of 'plan_bloc.dart';
 
 enum PlanStatus { initial, loading, success, failure }
+enum DeleteMenuStatus { initial, loading, success, failure }
 
 class PlanState extends Equatable {
   final PlanStatus status;
@@ -8,6 +9,8 @@ class PlanState extends Equatable {
   final Info? info;
   final FormzStatus goalStatus;
   final Calory goal;
+  final DeleteMenuStatus deleteMenuStatus;
+  final bool isDeleteMenu;
   final FormzStatus exerciseStatus;
   final ExerciseType exerciseType;
   final ExerciseTime exerciseTime;
@@ -18,6 +21,8 @@ class PlanState extends Equatable {
     this.info,
     this.goalStatus = FormzStatus.pure,
     this.goal = const Calory.pure(),
+    this.deleteMenuStatus = DeleteMenuStatus.initial,
+    this.isDeleteMenu = true,
     this.exerciseStatus = FormzStatus.pure,
     this.exerciseType = const ExerciseType.pure(),
     this.exerciseTime = const ExerciseTime.pure(),
@@ -29,6 +34,8 @@ class PlanState extends Equatable {
     Info? info,
     FormzStatus? goalStatus,
     Calory? goal,
+    DeleteMenuStatus? deleteMenuStatus,
+    bool? isDeleteMenu,
     FormzStatus? exerciseStatus,
     ExerciseType? exerciseType,
     ExerciseTime? exerciseTime,
@@ -39,6 +46,8 @@ class PlanState extends Equatable {
       info: info ?? this.info,
       goalStatus: goalStatus ?? this.goalStatus,
       goal: goal ?? this.goal,
+      deleteMenuStatus: deleteMenuStatus ?? this.deleteMenuStatus,
+      isDeleteMenu: isDeleteMenu ?? this.isDeleteMenu,
       exerciseStatus: exerciseStatus ?? this.exerciseStatus,
       exerciseType: exerciseType ?? this.exerciseType,
       exerciseTime: exerciseTime ?? this.exerciseTime,
@@ -47,7 +56,7 @@ class PlanState extends Equatable {
 
   @override
   String toString() {
-    return 'PlanState {status: $status, plan: $plan, info: $info, goalStatus: $goalStatus, goal: $goal, exerciseStatus: $exerciseStatus, exerciseType: $exerciseType, exerciseTime: $exerciseTime }';
+    return 'PlanState {status: $status, plan: $plan, info: $info, goalStatus: $goalStatus, goal: $goal, deleteMenuStatus: $deleteMenuStatus, isDeleteMenu: $isDeleteMenu, exerciseStatus: $exerciseStatus, exerciseType: $exerciseType, exerciseTime: $exerciseTime }';
   }
 
   @override
@@ -57,6 +66,8 @@ class PlanState extends Equatable {
         info,
         goalStatus,
         goal,
+        deleteMenuStatus,
+        isDeleteMenu,
         exerciseStatus,
         exerciseType,
         exerciseTime
