@@ -98,7 +98,7 @@ class _HomeState extends State<Home> {
                         switch (state.status) {
                           case PlanStatus.success:
                             return CircularCalIndicator(
-                                state.plan, state.goal.value);
+                                state.plan!, state.goal.value);
                           case PlanStatus.failure:
                             return Container(
                               height: 200,
@@ -260,7 +260,7 @@ class _HomeState extends State<Home> {
                             Container(
                               padding:
                                   EdgeInsets.only(left: 16, top: 8, right: 15),
-                              child: ExerciseList(state.plan.exerciseList),
+                              child: ExerciseList(state.plan!.exerciseList),
                             ),
                             Container(
                               width: MediaQuery.of(context).size.width,

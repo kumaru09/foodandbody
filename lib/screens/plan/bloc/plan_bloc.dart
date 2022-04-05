@@ -23,8 +23,9 @@ class PlanBloc extends Bloc<PlanEvent, PlanState> {
     required UserRepository userRepository,
   })  : _planRepository = planRepository,
         _userRepository = userRepository,
-        super(PlanState(plan: History(Timestamp.now()))) {
+        super(PlanState()) {
     on<LoadPlan>(_fetchPlan);
+    on<DeleteMenu>(_deleteMenu);
     on<AddExercise>(_onAddExercise);
     on<ExerciseTypeChange>(_exerciseTypeChanged);
     on<ExerciseTimeChange>(_exerciseTimeChanged);
@@ -54,11 +55,14 @@ class PlanBloc extends Bloc<PlanEvent, PlanState> {
     }
   }
 
-  Future<void> deleteMenu(String name, double volume) async {
+  Future<void> _deleteMenu(DeleteMenu event, Emitter<PlanState> emit) async {
     try {
-      await _planRepository.deletePlan(name, volume);
+      emit(state.copyWith(deleteMenuStatus: DeleteMenuStatus.loading, isDeleteMenu: true));
+      await _planRepository.deletePlan(event.name, event.volume);
+      emit(state.copyWith(deleteMenuStatus: DeleteMenuStatus.success));
     } catch (e) {
       print('DeleteMenu error: $e');
+      emit(state.copyWith(deleteMenuStatus: DeleteMenuStatus.failure));
     }
   }
 
@@ -116,7 +120,7 @@ class PlanBloc extends Bloc<PlanEvent, PlanState> {
 
   Future<void> _updateGoal(UpdateGoal event, Emitter<PlanState> emit) async {
     try {
-      emit(state.copyWith(goalStatus: FormzStatus.submissionInProgress));
+      emit(state.copyWith(goalStatus: FormzStatus.submissionInProgress, isDeleteMenu: false));
       await _userRepository.updateGoalInfo(int.parse(event.goal));
       final info = await _userRepository.getInfo();
       emit(state.copyWith(
