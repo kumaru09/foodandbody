@@ -3,9 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodandbody/models/info.dart';
 import 'package:foodandbody/models/user.dart';
 import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/screens/edit_profile/cubit/edit_profile_cubit.dart';
+import 'package:foodandbody/screens/main_screen/bloc/info_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -21,19 +23,21 @@ class EditProfile extends StatelessWidget {
               ..showSnackBar(
                 SnackBar(content: Text('แก้ไขข้อมูลเรียบร้อยแล้ว')),
               );
-            final info = context.read<AppBloc>().state.user.info!.copyWith(
-                name: state.name.value,
-                photoUrl: state.photoUrl,
-                gender: state.gender.value);
-            context.read<AppBloc>().add(EditInfoRequested(
-                context.read<AppBloc>().state.user.copyWith(info: info)));
-            Navigator.of(context).pop();
+            context
+                .read<UserRepository>()
+                .getInfo()
+                .then((value) => Navigator.of(context).pop());
+            // final info = context.read<AppBloc>().state.user.info!.copyWith(
+            //     name: state.name.value,
+            //     photoUrl: state.photoUrl,
+            //     gender: state.gender.value);
+            // context.read<AppBloc>().add(EditInfoRequested(
+            //     context.read<AppBloc>().state.user.copyWith(info: info)));
           } else if (state.statusProfile.isSubmissionFailure) {
             FocusManager.instance.primaryFocus?.unfocus();
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
-              ..showSnackBar(SnackBar(
-                  content: Text('${state.errorMessage}')));
+              ..showSnackBar(SnackBar(content: Text('${state.errorMessage}')));
           }
         },
         child: Scaffold(
@@ -142,9 +146,9 @@ class __EditProfileImageState extends State<_EditProfileImage> {
     }
   }
 
-  String _getInitialImage(BuildContext context, User user) {
-    if (user.info!.photoUrl != "") {
-      final uri = user.info!.photoUrl.toString();
+  String _getInitialImage(BuildContext context, User user, Info info) {
+    if (info.photoUrl != "") {
+      final uri = info.photoUrl.toString();
       context.read<EditProfileCubit>().photoUrlChanged(uri);
       return uri;
     } else if (user.photoUrl != null)
@@ -156,8 +160,8 @@ class __EditProfileImageState extends State<_EditProfileImage> {
   @override
   Widget build(BuildContext context) {
     User _user = context.read<AppBloc>().state.user;
-    bool _hasProfileImage =
-        (_user.photoUrl != null) || (_user.info!.photoUrl != "");
+    Info _info = context.read<UserRepository>().cache.get()!;
+    bool _hasProfileImage = (_user.photoUrl != null) || (_info.photoUrl != "");
     return Stack(children: <Widget>[
       Container(
           child: CircleAvatar(
@@ -168,7 +172,7 @@ class __EditProfileImageState extends State<_EditProfileImage> {
                 foregroundImage: image != null
                     ? Image.file(image!).image
                     : _hasProfileImage
-                        ? NetworkImage(_getInitialImage(context, _user))
+                        ? NetworkImage(_getInitialImage(context, _user, _info))
                         : Image.asset("assets/default_profile_image.png").image,
                 backgroundColor: Colors.white,
                 radius: 74,
