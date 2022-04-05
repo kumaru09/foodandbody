@@ -16,13 +16,14 @@ void main() {
   final History mockPlan = History(mockDate, totalCal: 1000);
   final History mockPlanEqual = History(mockDate, totalCal: 2000);
   final History mockPlanGrater = History(mockDate, totalCal: 3000);
-  final Info mockUser = Info(name: 'user', goal: 2000);
+  // final Info mockUser = Info(name: 'user', goal: 2000);
+  final String mockGoal = "2000";
 
   group("Calories Circular Progress", () {
     testWidgets("can render", (tester) async {
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
-          body: CircularCalIndicator(mockPlan, mockUser),
+          body: CircularCalIndicator(mockPlan, mockGoal),
         ),
       ));
       expect(find.byKey(homeCaloriesCircularKey), findsOneWidget);
@@ -31,7 +32,7 @@ void main() {
     testWidgets("when total calories less than goal calories", (tester) async {
       await tester.pumpWidget(MaterialApp(
         theme: AppTheme.themeData,
-        home: Scaffold(body: CircularCalIndicator(mockPlan, mockUser)),
+        home: Scaffold(body: CircularCalIndicator(mockPlan, mockGoal)),
       ));
       var circularProgressFinder = find.byKey(homeCaloriesCircularKey);
       Column circularDataColumnFinder =
@@ -47,7 +48,7 @@ void main() {
       expect(
           tester.widget(circularProgressFinder),
           isA<CircularPercentIndicator>().having(
-              (t) => t.percent, "percent", mockPlan.totalCal / (mockUser.goal! + mockPlan.totalBurn)));
+              (t) => t.percent, "percent", mockPlan.totalCal / (int.parse(mockGoal).toDouble() + mockPlan.totalBurn)));
       expect(
           circularDataColumnFinder.children[0].toString(), contains("เหลือ"));
       expect(circularDataColumnFinder.children[1].toString(),
@@ -57,7 +58,7 @@ void main() {
     testWidgets("when total calories equals goal calories", (tester) async {
       await tester.pumpWidget(MaterialApp(
         theme: AppTheme.themeData,
-        home: Scaffold(body: CircularCalIndicator(mockPlanEqual, mockUser)),
+        home: Scaffold(body: CircularCalIndicator(mockPlanEqual, mockGoal)),
       ));
       var circularProgressFinder = find.byKey(homeCaloriesCircularKey);
       Column circularDataColumnFinder =
@@ -73,7 +74,7 @@ void main() {
       expect(
           tester.widget(circularProgressFinder),
           isA<CircularPercentIndicator>().having(
-              (t) => t.percent, "percent", mockPlanEqual.totalCal / (mockUser.goal! + mockPlanEqual.totalBurn)));
+              (t) => t.percent, "percent", mockPlanEqual.totalCal / (int.parse(mockGoal).toDouble() + mockPlanEqual.totalBurn)));
       expect(
           circularDataColumnFinder.children[0].toString(), contains("เหลือ"));
       expect(circularDataColumnFinder.children[1].toString(),
@@ -85,7 +86,7 @@ void main() {
       await tester.pumpWidget(MaterialApp(
         theme: AppTheme.themeData,
         home: Scaffold(
-          body: CircularCalIndicator(mockPlanGrater, mockUser)
+          body: CircularCalIndicator(mockPlanGrater, mockGoal)
         ),
       ));
       var circularProgressFinder = find.byKey(homeCaloriesCircularKey);
@@ -117,7 +118,7 @@ void main() {
       await tester.pumpWidget(MaterialApp(
         theme: AppTheme.themeData,
         home: Scaffold(
-          body: CircularCalIndicator(mockPlan, mockUser),
+          body: CircularCalIndicator(mockPlan, mockGoal),
         ),
       ));
       expect(find.byKey(homeUserCaloriesInfoKey), findsOneWidget);

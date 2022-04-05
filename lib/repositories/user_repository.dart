@@ -8,6 +8,7 @@ import 'package:foodandbody/models/info_entity.dart';
 import 'package:foodandbody/models/nutrient.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' as cloud_firestore;
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:path/path.dart' as p;
 
 class UpdatePasswordFaliure implements Exception {
@@ -49,25 +50,6 @@ class UpdateInfoFailure implements Exception {
   const UpdateInfoFailure([this.message = 'แก้ไขข้อมูลไม่สำเร็จ กรุณาลองใหม่']);
 }
 
-class DeleteUserFailure implements Exception {
-  final message;
-  const DeleteUserFailure(
-      [this.message = 'ไม่สามารถลบบัญชีผู้ใช้ได้ กรุณาลองใหม่อีกครั้ง']);
-
-  factory DeleteUserFailure.fromCode(String code) {
-    switch (code) {
-      case 'invalid-email':
-        return DeleteUserFailure(
-            'ไม่สามารถลบบัญชีผู้ใช้ได้ รหัสผ่านไม่ถูกต้อง');
-      case 'wrong-password':
-        return DeleteUserFailure(
-            'ไม่สามารถลบบัญชีผู้ใช้ได้ รหัสผ่านไม่ถูกต้อง');
-      default:
-        return DeleteUserFailure();
-    }
-  }
-}
-
 class GetInitInfoFailure implements Exception {
   @override
   String toString() {
@@ -76,10 +58,11 @@ class GetInitInfoFailure implements Exception {
 }
 
 class UserRepository {
-  UserRepository(
-      {firebase_auth.FirebaseAuth? firebaseAuth,
-      firebase_storage.FirebaseStorage? firebaseStorage})
-      : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
+  UserRepository({
+    firebase_auth.FirebaseAuth? firebaseAuth,
+    firebase_storage.FirebaseStorage? firebaseStorage,
+    required this.cache,
+  })  : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
         _firebaseStorage =
             firebaseStorage ?? firebase_storage.FirebaseStorage.instance;
 
@@ -87,6 +70,7 @@ class UserRepository {
   final firebase_storage.FirebaseStorage _firebaseStorage;
   final cloud_firestore.CollectionReference users =
       cloud_firestore.FirebaseFirestore.instance.collection('users');
+  final InfoCache cache;
 
   Future<void> addUserInfo(Info info) async {
     final uid = _firebaseAuth.currentUser?.uid;
@@ -100,16 +84,22 @@ class UserRepository {
         .doc(uid)
         .collection('weight')
         .add({'weight': info.weight, "date": cloud_firestore.Timestamp.now()});
+    cache.set(infoE);
   }
 
-  Future<Info> getInfo() async {
+  Future<Info?> getInfo([bool isCache = false]) async {
     try {
+      if (isCache) {
+        final cachedResult = cache.get();
+        if (cachedResult != null) return cachedResult;
+      }
       final data = await users.doc(_firebaseAuth.currentUser?.uid).get();
       if (data.exists) {
         final info = Info.fromEntity(InfoEntity.fromSnapshot(data));
+        cache.set(info);
         return info;
       } else {
-        throw GetInitInfoFailure();
+        return null;
       }
     } catch (_) {
       throw Exception();
@@ -164,21 +154,6 @@ class UserRepository {
     }
   }
 
-  Future<void> deleteUser(String password) async {
-    try {
-      final user = _firebaseAuth.currentUser!;
-      firebase_auth.AuthCredential credential =
-          firebase_auth.EmailAuthProvider.credential(
-              email: user.email!, password: password);
-      await user.reauthenticateWithCredential(credential);
-      await user.delete();
-    } on firebase_auth.FirebaseAuthException catch (e) {
-      throw DeleteUserFailure.fromCode(e.code);
-    } catch (e) {
-      throw DeleteUserFailure();
-    }
-  }
-
   Future<void> updatePassword(String newPassword, String oldPassword) async {
     try {
       final user = _firebaseAuth.currentUser!;
@@ -209,4 +184,12 @@ class UserRepository {
       throw UploadProfilePicFailure();
     }
   }
+}
+
+class InfoCache {
+  late Info? _cache;
+
+  Info? get() => _cache;
+
+  void set(Info result) => _cache = result;
 }

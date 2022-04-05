@@ -12,7 +12,7 @@ import 'package:foodandbody/screens/body/body.dart';
 import 'package:foodandbody/screens/body/body_figure_info.dart';
 import 'package:foodandbody/screens/body/cubit/body_cubit.dart';
 import 'package:foodandbody/screens/body/weight_and_height_info.dart';
-import 'package:foodandbody/screens/setting/bloc/info_bloc.dart';
+import 'package:foodandbody/screens/main_screen/bloc/info_bloc.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockBodyCubit extends MockCubit<BodyState> implements BodyCubit {}

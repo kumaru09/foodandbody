@@ -91,6 +91,28 @@ class LogInWithFacebookFailure implements Exception {
   }
 }
 
+class DeleteUserFailure implements Exception {
+  final message;
+  const DeleteUserFailure(
+      [this.message = 'ไม่สามารถลบบัญชีผู้ใช้ได้ กรุณาลองใหม่อีกครั้ง']);
+
+  factory DeleteUserFailure.fromCode(String code) {
+    switch (code) {
+      case 'invalid-email':
+        return DeleteUserFailure(
+            'ไม่สามารถลบบัญชีผู้ใช้ได้ รหัสผ่านไม่ถูกต้อง');
+      case 'wrong-password':
+        return DeleteUserFailure(
+            'ไม่สามารถลบบัญชีผู้ใช้ได้ รหัสผ่านไม่ถูกต้อง');
+      case 'requires-recent-login':
+        return DeleteUserFailure(
+            'ไม่สามารถลบบัญชีผู้ใช้ได้ กรุณาล็อกอินใหม่อีกครั้ง');
+      default:
+        return DeleteUserFailure();
+    }
+  }
+}
+
 class AuthenRepository {
   AuthenRepository({
     CacheClient? cache,
@@ -113,7 +135,6 @@ class AuthenRepository {
   Stream<User> get user {
     return _firebaseAuth.authStateChanges().map((firebaseUser) {
       final user = firebaseUser == null ? User.empty : firebaseUser.toUser;
-      log(user.toString());
       _cache.wirte(key: userCacheKey, value: user);
       return user;
     });
@@ -137,13 +158,13 @@ class AuthenRepository {
     try {
       await _firebaseAuth.signInWithEmailAndPassword(
           email: email, password: password);
-      final emailVerified =
-          firebase_auth.FirebaseAuth.instance.currentUser!.emailVerified;
-      if (!emailVerified) {
-        sendVerifyEmail();
-        await logOut();
-        throw NotVerified();
-      }
+      // final emailVerified =
+      //     firebase_auth.FirebaseAuth.instance.currentUser!.emailVerified;
+      // if (!emailVerified) {
+      //   sendVerifyEmail();
+      //   await logOut();
+      //   throw NotVerified();
+      // }
     } on firebase_auth.FirebaseAuthException catch (e) {
       throw LogInWithEmailAndPasswordFailure.fromCode(e.code);
     } catch (_) {
@@ -151,16 +172,16 @@ class AuthenRepository {
     }
   }
 
-  Future<void> logInWithEmailLink(String email, String emailLink) async {
-    try {
-      await _firebaseAuth.signInWithEmailLink(
-          email: email, emailLink: emailLink);
-    } on firebase_auth.FirebaseAuthException catch (e) {
-      throw LogInWithEmailLinkFailure.fromCode(e.code);
-    } catch (_) {
-      throw LogInWithEmailLinkFailure();
-    }
-  }
+  // Future<void> logInWithEmailLink(String email, String emailLink) async {
+  //   try {
+  //     await _firebaseAuth.signInWithEmailLink(
+  //         email: email, emailLink: emailLink);
+  //   } on firebase_auth.FirebaseAuthException catch (e) {
+  //     throw LogInWithEmailLinkFailure.fromCode(e.code);
+  //   } catch (_) {
+  //     throw LogInWithEmailLinkFailure();
+  //   }
+  // }
 
   Future<void> logInWithGoogle() async {
     try {
@@ -185,13 +206,6 @@ class AuthenRepository {
           firebase_auth.FacebookAuthProvider.credential(
               loginResult.accessToken!.token);
       await _firebaseAuth.signInWithCredential(facebookAuthCredential);
-      final emailVerified =
-          firebase_auth.FirebaseAuth.instance.currentUser!.emailVerified;
-      if (!emailVerified) {
-        sendVerifyEmail();
-        await logOut();
-        throw NotVerified();
-      }
     } catch (_) {
       throw LogInWithFacebookFailure.fromCode(_.toString());
     }
@@ -207,7 +221,7 @@ class AuthenRepository {
 
   Future<void> logOut() async {
     try {
-      await Future.wait([_firebaseAuth.signOut()]);
+      await Future.wait([_firebaseAuth.signOut(), _googleSignIn.signOut()]);
     } on Exception {
       throw LogOutFailure();
     }
@@ -226,12 +240,24 @@ class AuthenRepository {
           androidMinimumVersion: '21',
           handleCodeInApp: true,
         );
-        await _firebaseAuth.sendSignInLinkToEmail(
-            email: user.email!, actionCodeSettings: actionCodeSettings);
+        await user.sendEmailVerification(actionCodeSettings);
         print('send to ${user.email}');
       }
     } catch (e) {
       print('sendVerifyEmail error: $e');
+    }
+  }
+
+  Future<void> deleteUser(String password) async {
+    try {
+      firebase_auth.User? user = _firebaseAuth.currentUser;
+      if (user != null) {
+        await user.delete();
+      }
+    } on firebase_auth.FirebaseAuthException catch (e) {
+      throw DeleteUserFailure.fromCode(e.code);
+    } catch (_) {
+      throw DeleteUserFailure();
     }
   }
 }

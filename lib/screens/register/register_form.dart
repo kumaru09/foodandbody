@@ -181,10 +181,10 @@ class _RegisterButton extends StatelessWidget {
                             context
                                 .read<RegisterCubit>()
                                 .registerFormSubmitted();
-                            Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => VerifyEmail()));
+                            // Navigator.pushReplacement(
+                            //     context,
+                            //     MaterialPageRoute(
+                            //         builder: (context) => VerifyEmail()));
                           }
                         : null,
                     child: Text('ลงทะเบียน'),

@@ -1,4 +1,5 @@
 import 'package:bloc_test/bloc_test.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -18,15 +19,25 @@ class FakePlanEvent extends Fake implements PlanEvent {}
 class FakePlanState extends Fake implements PlanState {}
 
 void main() {
-  late History plan;
+  final Menu mockMenu = Menu(
+    name: 'อาหาร',
+    calories: 300,
+    protein: 30,
+    carb: 30,
+    fat: 10,
+    serve: 1,
+    volumn: 1,
+  );
+  final List<Menu> mockMenuList = [mockMenu];
+  final History plan = History(Timestamp.now(), menuList: mockMenuList);
+
   late PlanBloc planBloc;
 
   setUp(() {
     planBloc = MockPlanBloc();
-    plan = MockPlan();
-    when(() => plan.menuList)
-        .thenReturn(<Menu>[Menu(name: 'test', calories: 100)]);
-    when(() => planBloc.deleteMenu('test')).thenAnswer((_) async {});
+    when(() => planBloc
+            .add(DeleteMenu(name: mockMenu.name, volume: mockMenu.volumn)))
+        .thenAnswer((_) async {});
   });
 
   setUpAll(() {
@@ -43,16 +54,19 @@ void main() {
           body: planMenuCard,
         ),
       ));
-      expect(find.byType(SizeTransition),
-          findsNWidgets(planMenuCard.createState().planMenu.length));
+      expect(find.byType(ListView), findsOneWidget);
+      expect(find.text(mockMenu.name), findsOneWidget);
+      expect(find.byIcon(Icons.close), findsOneWidget);
     }); //test "can render"
 
-    testWidgets("when pressed delete icon", (tester) async {
+    testWidgets("render new plan menu list when pressed delete icon", (tester) async {
       final planMenuCard = PlanMenuCardList(plan);
       await tester.pumpWidget(MaterialApp(
           theme: AppTheme.themeData,
           home: BlocProvider.value(
-              value: planBloc, child: Scaffold(body: planMenuCard))));
+            value: planBloc,
+            child: Scaffold(body: planMenuCard),
+          )));
       final countCardList = planMenuCard.createState().planMenu.length;
       await tester.tap(find.byIcon(Icons.close).first);
       await tester.pumpAndSettle();
