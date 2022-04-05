@@ -1,22 +1,20 @@
 import 'package:bloc_test/bloc_test.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:foodandbody/app/bloc/app_bloc.dart';
+import 'package:foodandbody/models/calory.dart';
 import 'package:foodandbody/models/history.dart';
 import 'package:foodandbody/models/info.dart';
 import 'package:foodandbody/models/menu.dart';
 import 'package:foodandbody/models/nutrient.dart';
-import 'package:foodandbody/models/user.dart';
 import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
 import 'package:foodandbody/screens/plan/plan.dart';
+import 'package:foodandbody/screens/plan/widget/plan_menu_card_list.dart';
+import 'package:formz/formz.dart';
 import 'package:mocktail/mocktail.dart';
 
-/*
-  TODO: test "pressed add menu button"
-  TODO: test "pressed plan menu card" 
-*/
 class MockPlanBloc extends MockBloc<PlanEvent, PlanState> implements PlanBloc {}
 
 class FakePlanEvent extends Fake implements PlanEvent {}
@@ -27,106 +25,170 @@ class MockPlan extends Mock implements History {}
 
 class MockPlanRepository extends Mock implements PlanRepository {}
 
-class MockAppBloc extends MockBloc<AppEvent, AppState> implements AppBloc {}
-
-class FakeAppEvent extends Fake implements AppEvent {}
-
-class FakeAppState extends Fake implements AppState {}
-
-class MockUser extends Mock implements User {}
-
 void main() {
   //widget
   const circularCalAndInfoKey = Key("circular_cal_and_info");
   const nutrientInfoKey = Key("nutrient_info");
   const ateMenuCardListKey = Key("ate_menu_card_list");
-  const editGoalDialogKey = Key("edit_goal_dialog");
-
-  //button
-  const editGoalButtonKey = Key("edit_goal_button");
   const addMenuButtonKey = Key("add_menu_button");
 
+  const String name = 'อาหาร';
+  const int weight = 50;
+  const String goal = '1600';
+  const Calory validGoal = Calory.dirty(goal);
+  final List<Menu> mockMenuList = [
+    Menu(
+        name: name,
+        calories: 300,
+        protein: 30,
+        carb: 30,
+        fat: 10,
+        serve: 1,
+        volumn: 1)
+  ];
+  final History mockPlan = History(Timestamp.now(), menuList: mockMenuList);
+  const Nutrient mockNutrient = Nutrient(protein: 100, carb: 100, fat: 100);
+  final Info mockInfo = Info(
+      name: 'user',
+      goal: int.parse(goal),
+      weight: weight,
+      height: 160,
+      gender: 'F',
+      goalNutrient: mockNutrient);
+
   late PlanBloc planBloc;
-  late History plan;
-  late AppBloc appBloc;
-  late User user;
 
   setUpAll(() {
     registerFallbackValue<PlanEvent>(FakePlanEvent());
     registerFallbackValue<PlanState>(FakePlanState());
-    registerFallbackValue<AppEvent>(FakeAppEvent());
-    registerFallbackValue<AppState>(FakeAppState());
   });
 
   setUp(() {
     planBloc = MockPlanBloc();
-    appBloc = MockAppBloc();
-    plan = MockPlan();
-    user = MockUser();
-    when(() => planBloc.state).thenReturn(PlanLoaded(plan));
-    when(() => appBloc.state).thenReturn(AppState.authenticated(user));
-    when(() => plan.menuList)
-        .thenReturn(<Menu>[Menu(name: 'test', calories: 100)]);
-    when(() => plan.totalNutrientList)
-        .thenReturn(Nutrient().copyWith(protein: 120, carb: 80, fat: 30));
-    when(() => user.info).thenReturn(Info(
-        goalNutrient: Nutrient().copyWith(protein: 180, carb: 145, fat: 75),
-        goal: 2200));
-    when(() => plan.planNutrientList)
-        .thenReturn(Nutrient().copyWith(protein: 130, carb: 95, fat: 40));
-    when(() => plan.totalCal).thenReturn(1000);
+    when(() => planBloc.state).thenReturn(PlanState(
+        status: PlanStatus.success,
+        plan: mockPlan,
+        info: mockInfo,
+        goal: validGoal,
+        exerciseStatus: FormzStatus.submissionSuccess));
   });
   group("Plan Page", () {
-    group("can render", () {
-      testWidgets("calories and nutrient info card", (tester) async {
+    group("render", () {
+      testWidgets("calories and nutrient info card when PlanStatus is success",
+          (tester) async {
         await tester.pumpWidget(MaterialApp(
-            home: MultiBlocProvider(providers: [
-          BlocProvider.value(value: planBloc),
-          BlocProvider.value(value: appBloc)
-        ], child: Plan())));
+          home: BlocProvider.value(
+            value: planBloc,
+            child: Plan(),
+          ),
+        ));
         expect(find.byKey(circularCalAndInfoKey), findsOneWidget);
         expect(find.byKey(nutrientInfoKey), findsOneWidget);
       }); //test "calories and nutrient info card"
 
-      testWidgets("plan menu card", (tester) async {
+      testWidgets("plan menu card when PlanStatus is success", (tester) async {
         await tester.pumpWidget(MaterialApp(
-            home: MultiBlocProvider(providers: [
-          BlocProvider.value(value: planBloc),
-          BlocProvider.value(value: appBloc)
-        ], child: Plan())));
-        expect(find.byType(AnimatedList), findsOneWidget);
+          home: BlocProvider.value(
+            value: planBloc,
+            child: Plan(),
+          ),
+        ));
+        expect(find.byType(PlanMenuCardList), findsOneWidget);
       }); //test "plan menu card"
 
-      testWidgets("add menu button", (tester) async {
+      testWidgets("add menu button when PlanStatus is sucess", (tester) async {
         await tester.pumpWidget(MaterialApp(
-            home: MultiBlocProvider(providers: [
-          BlocProvider.value(value: planBloc),
-          BlocProvider.value(value: appBloc)
-        ], child: Plan())));
+          home: BlocProvider.value(
+            value: planBloc,
+            child: Plan(),
+          ),
+        ));
         expect(find.byKey(addMenuButtonKey), findsOneWidget);
       }); //test "add menu button"
 
-      testWidgets("ate menu card list", (tester) async {
+      testWidgets("ate menu card list when PlanStatus is success",
+          (tester) async {
         await tester.pumpWidget(MaterialApp(
-            home: MultiBlocProvider(providers: [
-          BlocProvider.value(value: planBloc),
-          BlocProvider.value(value: appBloc)
-        ], child: Plan())));
+          home: BlocProvider.value(
+            value: planBloc,
+            child: Plan(),
+          ),
+        ));
         expect(find.byKey(ateMenuCardListKey), findsOneWidget);
       }); //test "ate menu card list"
-    }); //group "can render"
 
-    group("when pressed", () {
-      testWidgets("edit goal button", (tester) async {
+      testWidgets("CircularProgressIndicator when PlanStatus is loading",
+          (tester) async {
+        when(() => planBloc.state)
+            .thenReturn(PlanState(status: PlanStatus.loading));
         await tester.pumpWidget(MaterialApp(
-            home: MultiBlocProvider(providers: [
-          BlocProvider.value(value: planBloc),
-          BlocProvider.value(value: appBloc)
-        ], child: Plan())));
-        await tester.tap(find.byKey(editGoalButtonKey));
-        await tester.pump();
-        expect(find.byKey(editGoalDialogKey), findsOneWidget);
-      }); //test "edit goal button"
-    }); //group "when pressed"
+          home: BlocProvider.value(
+            value: planBloc,
+            child: Plan(),
+          ),
+        ));
+        expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      });
+
+      testWidgets("failure widget when PlanStatus is failure", (tester) async {
+        when(() => planBloc.state)
+            .thenReturn(PlanState(status: PlanStatus.failure));
+        await tester.pumpWidget(MaterialApp(
+          home: BlocProvider.value(
+            value: planBloc,
+            child: Plan(),
+          ),
+        ));
+        expect(find.byType(Image), findsOneWidget);
+        expect(find.text('ไม่สามารถโหลดข้อมูลได้ในขณะนี้'), findsOneWidget);
+        expect(find.text('ลองอีกครั้ง'), findsOneWidget);
+      });
+
+      // testWidgets("AlertDialog when goalStatus is failure", (tester) async {
+      //   when(() => planBloc.state).thenReturn(PlanState(
+      //     goalStatus: FormzStatus.submissionFailure,
+      //     isDeleteMenu: false,
+      //     status: PlanStatus.success,
+      //     plan: mockPlan,
+      //     info: mockInfo,
+      //     goal: validGoal,
+      //     exerciseStatus: FormzStatus.submissionSuccess,
+      //   ));
+      //   await tester.pumpWidget(MaterialApp(
+      //     home: BlocProvider.value(
+      //       value: planBloc,
+      //       child: Plan(),
+      //     ),
+      //   ));
+      //   await tester.pump();
+      //   expect(find.byType(AlertDialog), findsOneWidget);
+      //   expect(find.byIcon(Icons.report), findsOneWidget);
+      //   expect(find.text('แก้ไขเป้าหมายแคลอรีไม่สำเร็จ'), findsOneWidget);
+      //   expect(find.text('กรุณาลองอีกครั้ง'), findsOneWidget);
+      // });
+
+      // testWidgets("AlertDialog when deleteMenuStatus is failure", (tester) async {
+      //   when(() => planBloc.state).thenReturn(PlanState(
+      //     deleteMenuStatus: DeleteMenuStatus.failure,
+      //     isDeleteMenu: true,
+      //     status: PlanStatus.success,
+      //     plan: mockPlan,
+      //     info: mockInfo,
+      //     goal: validGoal,
+      //     exerciseStatus: FormzStatus.submissionSuccess,
+      //   ));
+      //   await tester.pumpWidget(MaterialApp(
+      //     home: BlocProvider.value(
+      //       value: planBloc,
+      //       child: Plan(),
+      //     ),
+      //   ));
+      //   await tester.pump();
+      //   expect(find.byType(AlertDialog), findsOneWidget);
+      //   expect(find.byIcon(Icons.report), findsOneWidget);
+      //   expect(find.text('ลบเมนูไม่สำเร็จ'), findsOneWidget);
+      //   expect(find.text('กรุณาลองอีกครั้ง'), findsOneWidget);
+      // });
+    }); //group "render"
   }); //group "Plan Page"
 }
