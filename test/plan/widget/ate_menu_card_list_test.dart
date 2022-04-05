@@ -28,6 +28,11 @@ void main() {
         Menu(
             name: menu,
             calories: calories,
+            protein: 30,
+            carb: 30,
+            fat: 30,
+            serve: 1,
+            volumn: 1,
             timestamp: Timestamp.fromDate(DateTime.now()))
       ];
       await tester.pumpWidget(MaterialApp(
