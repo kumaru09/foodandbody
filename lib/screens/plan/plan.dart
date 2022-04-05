@@ -87,8 +87,8 @@ class Plan extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                CircularCalAndInfo(state.plan, state.goal.value),
-                LinearNutrientTwoProgress(state.info!, state.plan)
+                CircularCalAndInfo(state.plan!, state.goal.value),
+                LinearNutrientTwoProgress(state.info!, state.plan!)
               ],
             ),
           ),
@@ -103,7 +103,7 @@ class Plan extends StatelessWidget {
         ),
         Container(
           margin: EdgeInsets.only(left: 16, top: 8, right: 15),
-          child: PlanMenuCardList(state.plan),
+          child: PlanMenuCardList(state.plan!),
         ),
         Container(
           width: MediaQuery.of(context).size.width,
@@ -142,7 +142,7 @@ class Plan extends StatelessWidget {
         ),
         Container(
           padding: EdgeInsets.only(left: 16, right: 16, bottom: 100, top: 8),
-          child: AteMenuCardList(state.plan),
+          child: AteMenuCardList(state.plan!),
         )
       ],
     );

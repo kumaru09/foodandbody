@@ -5,7 +5,7 @@ enum DeleteMenuStatus { initial, loading, success, failure }
 
 class PlanState extends Equatable {
   final PlanStatus status;
-  final History plan;
+  final History? plan;
   final Info? info;
   final FormzStatus goalStatus;
   final Calory goal;
@@ -17,7 +17,7 @@ class PlanState extends Equatable {
 
   PlanState({
     this.status = PlanStatus.initial,
-    required this.plan,
+    this.plan,
     this.info,
     this.goalStatus = FormzStatus.pure,
     this.goal = const Calory.pure(),

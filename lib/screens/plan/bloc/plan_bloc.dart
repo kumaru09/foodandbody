@@ -23,7 +23,7 @@ class PlanBloc extends Bloc<PlanEvent, PlanState> {
     required UserRepository userRepository,
   })  : _planRepository = planRepository,
         _userRepository = userRepository,
-        super(PlanState(plan: History(Timestamp.now()))) {
+        super(PlanState()) {
     on<LoadPlan>(_fetchPlan);
     on<DeleteMenu>(_deleteMenu);
     on<AddExercise>(_onAddExercise);
