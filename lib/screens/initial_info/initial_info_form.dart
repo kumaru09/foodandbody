@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:foodandbody/screens/initial_info/cubit/initial_info_cubit.dart';
+import 'package:foodandbody/screens/main_screen/bloc/info_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:intl/intl.dart';
 
@@ -13,7 +14,8 @@ class InitialInfoForm extends StatelessWidget {
     return BlocListener<InitialInfoCubit, InitialInfoState>(
         listener: (context, state) {
           if (state.status.isSubmissionSuccess) {
-            Navigator.of(context).pop();
+            context.read<InfoBloc>().add(LoadInfo());
+            // Navigator.of(context).pop();
           } else if (state.status.isSubmissionFailure) {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
@@ -244,32 +246,32 @@ class __GenderInputState extends State<_GenderInput> {
     return BlocBuilder<InitialInfoCubit, InitialInfoState>(
         buildWhen: (previous, current) => previous.gender != current.gender,
         builder: (context, state) {
-      return DropdownButtonFormField<String>(
-        key: const Key('initialInfoForm_genderInput_textField'),
-        value: _gender,
-        decoration: InputDecoration(
-          labelText: 'เพศ',
-          border: OutlineInputBorder(borderSide: BorderSide()),
-          errorText: state.gender.invalid ? 'กรุณาระบุเพศของคุณ' : null,
-        ),
-        items: [
-          DropdownMenuItem<String>(
-            child: Text('ชาย'),
-            value: 'M',
-          ),
-          DropdownMenuItem<String>(
-            child: Text('หญิง'),
-            value: 'F',
-          )
-        ],
-        onChanged: (String? gender) {
-          setState(() {
-            _gender = gender;
-          });
-          context.read<InitialInfoCubit>().genderChanged(gender!);
-        },
-      );
-    });
+          return DropdownButtonFormField<String>(
+            key: const Key('initialInfoForm_genderInput_textField'),
+            value: _gender,
+            decoration: InputDecoration(
+              labelText: 'เพศ',
+              border: OutlineInputBorder(borderSide: BorderSide()),
+              errorText: state.gender.invalid ? 'กรุณาระบุเพศของคุณ' : null,
+            ),
+            items: [
+              DropdownMenuItem<String>(
+                child: Text('ชาย'),
+                value: 'M',
+              ),
+              DropdownMenuItem<String>(
+                child: Text('หญิง'),
+                value: 'F',
+              )
+            ],
+            onChanged: (String? gender) {
+              setState(() {
+                _gender = gender;
+              });
+              context.read<InitialInfoCubit>().genderChanged(gender!);
+            },
+          );
+        });
   }
 }
 
@@ -287,46 +289,47 @@ class __ExerciseInputState extends State<_ExerciseInput> {
     return BlocBuilder<InitialInfoCubit, InitialInfoState>(
         buildWhen: (previous, current) => previous.exercise != current.exercise,
         builder: (context, state) {
-      return DropdownButtonFormField<String>(
-        key: const Key('initialInfoForm_exerciseInput_textField'),
-        value: _exercise,
-        isExpanded: true,
-        decoration: InputDecoration(
-          labelText: 'การออกกำลังกาย',
-          border: OutlineInputBorder(borderSide: BorderSide()),
-          errorText:
-              state.exercise.invalid ? 'กรุณาระบุการออกกำลังกายของคุณ' : null,
-        ),
-        items: [
-          DropdownMenuItem<String>(
-            child: Text('ไม่ได้ออกกำลังกาย'),
-            value: '1.2',
-          ),
-          DropdownMenuItem<String>(
-            child: Text('ออกกำลังกายเบา 1-3 วันต่อสัปดาห์'),
-            value: '1.375',
-          ),
-          DropdownMenuItem<String>(
-            child: Text('ออกกำลังกายกลาง 3-5 วันต่อสัปดาห์'),
-            value: '1.55',
-          ),
-          DropdownMenuItem<String>(
-            child: Text('ออกกำลังกายหนัก 6-7 วันต่อสัปดาห์'),
-            value: '1.725',
-          ),
-          DropdownMenuItem<String>(
-            child: Text('ออกกำลังกายหนักวันละ 2 ครั้ง'),
-            value: '1.9',
-          ),
-        ],
-        onChanged: (String? exercise) {
-          setState(() {
-            _exercise = exercise;
-          });
-          context.read<InitialInfoCubit>().exerciseChanged(exercise!);
-        },
-      );
-    });
+          return DropdownButtonFormField<String>(
+            key: const Key('initialInfoForm_exerciseInput_textField'),
+            value: _exercise,
+            isExpanded: true,
+            decoration: InputDecoration(
+              labelText: 'การออกกำลังกาย',
+              border: OutlineInputBorder(borderSide: BorderSide()),
+              errorText: state.exercise.invalid
+                  ? 'กรุณาระบุการออกกำลังกายของคุณ'
+                  : null,
+            ),
+            items: [
+              DropdownMenuItem<String>(
+                child: Text('ไม่ได้ออกกำลังกาย'),
+                value: '1.2',
+              ),
+              DropdownMenuItem<String>(
+                child: Text('ออกกำลังกายเบา 1-3 วันต่อสัปดาห์'),
+                value: '1.375',
+              ),
+              DropdownMenuItem<String>(
+                child: Text('ออกกำลังกายกลาง 3-5 วันต่อสัปดาห์'),
+                value: '1.55',
+              ),
+              DropdownMenuItem<String>(
+                child: Text('ออกกำลังกายหนัก 6-7 วันต่อสัปดาห์'),
+                value: '1.725',
+              ),
+              DropdownMenuItem<String>(
+                child: Text('ออกกำลังกายหนักวันละ 2 ครั้ง'),
+                value: '1.9',
+              ),
+            ],
+            onChanged: (String? exercise) {
+              setState(() {
+                _exercise = exercise;
+              });
+              context.read<InitialInfoCubit>().exerciseChanged(exercise!);
+            },
+          );
+        });
   }
 }
 
@@ -347,8 +350,8 @@ class _InitialInfoButton extends StatelessWidget {
                             await context
                                 .read<InitialInfoCubit>()
                                 .initialInfoFormSubmitted();
-                            context.read<AppBloc>().add(AppUserChanged(
-                                context.read<AppBloc>().state.user));
+                            // context.read<AppBloc>().add(AppUserChanged(
+                            //     context.read<AppBloc>().state.user));
                           }
                         : null,
                     child: Text('บันทึก'),

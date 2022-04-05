@@ -1,10 +1,87 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:argon_buttons_flutter/argon_buttons_flutter.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodandbody/app/bloc/app_bloc.dart';
+import 'package:foodandbody/repositories/authen_repository.dart';
 
-class VerifyEmail extends StatelessWidget {
+class VerifyEmail extends StatefulWidget {
   const VerifyEmail({Key? key}) : super(key: key);
 
-  // static Page page() => const MaterialPage<void>(child: VerifyEmail());
+  static Page page() => const MaterialPage<void>(child: VerifyEmail());
+
+  @override
+  State<VerifyEmail> createState() => _VerifyEmailState();
+}
+
+class _VerifyEmailState extends State<VerifyEmail> {
+  @override
+  void initState() {
+    handleLink();
+    FirebaseDynamicLinks.instance.onLink.listen((event) {
+      print('get link');
+      final Uri deepLink = event.link;
+      print(deepLink);
+      final actionCode = deepLink.queryParameters['oobCode'];
+      if (actionCode != null) verifedCode(actionCode);
+      // final email = Uri.parse(deepLink.queryParameters['continueUrl']!)
+      //     .queryParameters['email'];
+      // final emailLink = deepLink.toString();
+      // if (FirebaseAuth.instance.isSignInWithEmailLink(emailLink) &&
+      //     email != null) {
+      //   print('signin: $emailLink');
+      //   try {
+      //     context.read<LoginCubit>().logInWithEmailLink(email, emailLink);
+      //   } catch (_) {
+      //     print('$_');
+      //   }
+      // }
+    });
+    super.initState();
+  }
+
+  void handleLink() async {
+    final PendingDynamicLinkData? data =
+        await FirebaseDynamicLinks.instance.getInitialLink();
+    if (data?.link != null) {
+      print('get link');
+      final Uri deepLink = data!.link;
+      print(deepLink);
+      final actionCode = deepLink.queryParameters['oobCode'];
+      if (actionCode != null) verifedCode(actionCode);
+    }
+  }
+
+  void verifedCode(String code) async {
+    final auth = FirebaseAuth.instance;
+    try {
+      await auth.checkActionCode(code);
+      await auth.applyActionCode(code);
+
+      await auth.currentUser!.reload();
+      context.read<AppBloc>().add(
+          AppUserChanged(await context.read<AuthenRepository>().user.first));
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'expired-action-code' || e.code == 'invalid-action-code') {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+                content: Text(
+                    'ลิงค์หมดอายุหรือถูกใช้ไปแล้ว โปรดขอลิงค์ใหม่อีกครั้ง')),
+          );
+      }
+    } catch (_) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+              content:
+                  Text('ลิงค์หมดอายุหรือถูกใช้ไปแล้ว โปรดขอลิงค์ใหม่อีกครั้ง')),
+        );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,10 +140,11 @@ class VerifyEmail extends StatelessWidget {
                               roundLoadingShape: false,
                               onTap: (startTimer, btnState) {
                                 if (btnState == ButtonState.Idle) {
-                                  print('do something');
-                                  startTimer(10);
+                                  context
+                                      .read<AuthenRepository>()
+                                      .sendVerifyEmail();
+                                  startTimer(30);
                                 }
-                                
                               },
                               child: Text("ส่งอีกครั้ง",
                                   style: Theme.of(context)

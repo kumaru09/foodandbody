@@ -1,10 +1,6 @@
 part of 'app_bloc.dart';
 
-enum AppStatus {
-  authenticated,
-  unauthenticated,
-  initialize,
-}
+enum AppStatus { authenticated, unauthenticated, initialize, notverified }
 
 class AppState extends Equatable {
   const AppState._({
@@ -19,6 +15,9 @@ class AppState extends Equatable {
 
   const AppState.initialize(User user)
       : this._(status: AppStatus.initialize, user: user);
+
+  const AppState.notverified(User user)
+      : this._(status: AppStatus.notverified, user: user);
 
   final AppStatus status;
   final User user;

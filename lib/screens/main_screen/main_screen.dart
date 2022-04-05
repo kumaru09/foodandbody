@@ -14,6 +14,7 @@ import 'package:foodandbody/screens/history/bloc/history_bloc.dart';
 import 'package:foodandbody/screens/history/history.dart';
 import 'package:foodandbody/screens/home/bloc/home_bloc.dart';
 import 'package:foodandbody/screens/home/home.dart';
+import 'package:foodandbody/screens/initial_info/initial_info.dart';
 import 'package:foodandbody/screens/main_screen/bottom_appbar.dart';
 import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
 import 'package:foodandbody/screens/plan/plan.dart';
@@ -72,60 +73,74 @@ class _MainScreenState extends State<MainScreen> {
                     backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                     body: _failureWidget(context));
               case InfoStatus.success:
-                return Scaffold(
-                  extendBody: true,
-                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                  body: MultiBlocProvider(
-                    providers: [
-                      BlocProvider(
-                          create: (_) => PlanBloc(
-                              planRepository: context.read<PlanRepository>(),
-                              userRepository: context.read<UserRepository>())
-                            ..add(LoadPlan())),
-                      BlocProvider(
-                          create: (_) => HistoryBloc(
-                              historyRepository:
-                                  context.read<HistoryRepository>(),
-                              bodyRepository: context.read<BodyRepository>())
-                            ..add(LoadHistory())
-                            ..add(LoadMenuList(dateTime: DateTime.now()))),
-                      BlocProvider(
-                          create: (_) => BodyCubit(
-                              bodyRepository: context.read<BodyRepository>(),
-                              userRepository: context.read<UserRepository>())
-                            ..fetchBody()),
-                      BlocProvider(
-                          create: (_) => HomeBloc(
-                              planRepository: context.read<PlanRepository>())
-                            ..add(LoadWater())),
-                      BlocProvider(
-                          create: (_) => MenuCardBloc(
-                              menuCardRepository:
-                                  context.read<MenuCardRepository>())
-                            ..add(FetchedFavMenuCard())),
-                    ],
-                    child: _getPage(_currentIndex),
-                  ),
-                  floatingActionButtonLocation:
-                      FloatingActionButtonLocation.centerDocked,
-                  floatingActionButton: Visibility(
-                      visible: isKeyboardOpen,
-                      child: FloatingActionButton(
-                        key: const Key('camera_floating_button'),
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => Camera()));
-                        },
-                        elevation: 0.4,
-                        child: Icon(Icons.photo_camera),
+                return state.info != null
+                    ? Scaffold(
+                        extendBody: true,
                         backgroundColor:
-                            Theme.of(context).colorScheme.secondary,
-                      )),
-                  bottomNavigationBar: BottomNavigation(
-                      index: _currentIndex, onChangedTab: _onChangedTab),
-                );
+                            Theme.of(context).scaffoldBackgroundColor,
+                        body: MultiBlocProvider(
+                          providers: [
+                            BlocProvider(
+                                create: (_) => PlanBloc(
+                                    planRepository:
+                                        context.read<PlanRepository>(),
+                                    userRepository:
+                                        context.read<UserRepository>())
+                                  ..add(LoadPlan())),
+                            BlocProvider(
+                                create: (_) => HistoryBloc(
+                                    historyRepository:
+                                        context.read<HistoryRepository>(),
+                                    bodyRepository:
+                                        context.read<BodyRepository>())
+                                  ..add(LoadHistory())
+                                  ..add(
+                                      LoadMenuList(dateTime: DateTime.now()))),
+                            BlocProvider(
+                                create: (_) => BodyCubit(
+                                    bodyRepository:
+                                        context.read<BodyRepository>(),
+                                    userRepository:
+                                        context.read<UserRepository>())
+                                  ..fetchBody()),
+                            BlocProvider(
+                                create: (_) => HomeBloc(
+                                    planRepository:
+                                        context.read<PlanRepository>())
+                                  ..add(LoadWater())),
+                            BlocProvider(
+                                create: (_) => MenuCardBloc(
+                                    menuCardRepository:
+                                        context.read<MenuCardRepository>())
+                                  ..add(FetchedFavMenuCard())),
+                          ],
+                          child: _getPage(_currentIndex),
+                        ),
+                        floatingActionButtonLocation:
+                            FloatingActionButtonLocation.centerDocked,
+                        floatingActionButton: Visibility(
+                            visible: isKeyboardOpen,
+                            child: FloatingActionButton(
+                              key: const Key('camera_floating_button'),
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => Camera()));
+                              },
+                              elevation: 0.4,
+                              child: Icon(Icons.photo_camera),
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.secondary,
+                            )),
+                        bottomNavigationBar: BottomNavigation(
+                            index: _currentIndex, onChangedTab: _onChangedTab),
+                      )
+                    : Scaffold(
+                        extendBody: true,
+                        backgroundColor:
+                            Theme.of(context).scaffoldBackgroundColor,
+                        body: InitialInfo());
               default:
                 return Scaffold(
                     extendBody: true,
