@@ -2,10 +2,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class FavoriteRepository {
+  FavoriteRepository(
+      {FirebaseFirestore? firebaseFirestore, FirebaseAuth? firebaseAuth})
+      : _firebaseFirestore = firebaseFirestore ?? FirebaseFirestore.instance,
+        _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
+
+  final FirebaseFirestore _firebaseFirestore;
+  final FirebaseAuth _firebaseAuth;
+
   Future<void> addFavMenuById(String name) async {
-    final CollectionReference favorite = FirebaseFirestore.instance
+    final CollectionReference favorite = _firebaseFirestore
         .collection('users')
-        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .doc(_firebaseAuth.currentUser?.uid)
         .collection('favorites');
     final menu = await favorite.where('menu', isEqualTo: name).get();
     if (menu.docs.isNotEmpty) {
@@ -21,7 +29,7 @@ class FavoriteRepository {
 
   Future<void> addFavMenuAll(String name) async {
     final CollectionReference favorite =
-        FirebaseFirestore.instance.collection('favorites');
+        _firebaseFirestore.collection('favorites');
     final menu = await favorite.where('menu', isEqualTo: name).get();
     if (menu.docs.isNotEmpty) {
       await menu.docs.first.reference
