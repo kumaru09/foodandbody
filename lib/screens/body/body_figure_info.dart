@@ -1,22 +1,28 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/models/body.dart';
+import 'package:foodandbody/repositories/body_repository.dart';
+import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/screens/body/cubit/body_cubit.dart';
 import 'package:foodandbody/screens/body/edit_body_figure.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/src/provider.dart';
 
-// ignore: must_be_immutable
 class BodyFigureInfo extends StatelessWidget {
-  BodyFigureInfo(this.body);
+  BodyFigureInfo({
+    required this.shoulder,
+    required this.chest,
+    required this.waist,
+    required this.hip,
+    required this.date,
+  });
 
-  final Body body;
-
-  late int shoulder = body.shoulder;
-  late int chest = body.chest;
-  late int waist = body.waist;
-  late int hip = body.hip;
-  late String date = DateFormat("dd/MM/yyyy HH:mm").format(body.date.toDate());
+  final int shoulder;
+  final int chest;
+  final int waist;
+  final int hip;
+  final String date;
 
   @override
   Widget build(BuildContext context) {
@@ -142,14 +148,27 @@ class BodyFigureInfo extends StatelessWidget {
                 child: Text("แก้ไข",
                     style: Theme.of(context).textTheme.button!.merge(TextStyle(
                         color: Theme.of(context).colorScheme.secondary))),
-                onPressed: () async {
-                  final value = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => EditBodyFigure(body: body)));
-                  await context.read<BodyCubit>().updateBody(value['shoulder'],
-                      value['chest'], value['waist'], value['hip']);
-                },
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => BlocProvider<BodyCubit>(
+                      create: (_) => BodyCubit(
+                          bodyRepository: context.read<BodyRepository>(),
+                          userRepository: context.read<UserRepository>())
+                        ..initBodyFigure(
+                            shoulder: shoulder.toString(),
+                            chest: chest.toString(),
+                            waist: waist.toString(),
+                            hip: hip.toString()),
+                      child: EditBodyFigure(
+                        shoulder: shoulder,
+                        chest: chest,
+                        waist: waist,
+                        hip: hip,
+                      ),
+                    ),
+                  ),
+                ),
               )
             ],
           )

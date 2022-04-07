@@ -30,20 +30,28 @@ class MenuDetail extends StatefulWidget {
 }
 
 class _MenuDetailState extends State<MenuDetail> {
+  late MenuBloc _menuBloc;
+
   @override
   void initState() {
     super.initState();
-    context.read<MenuBloc>().add(MenuFetched());
+    _menuBloc = context.read<MenuBloc>();
   }
 
-  String toRound(double value) {
+  Future _onRefresh() async {
+    await Future.delayed(Duration(seconds: 2));
+    _menuBloc.add(MenuReFetched());
+    setState(() {});
+  }
+
+  String _toRound(double value) {
     if (value - value.toInt() == 0.0)
       return value.toInt().toString();
     else
       return value.toString();
   }
 
-  Widget displayButton(String name, double serve, String unit) {
+  Widget _displayButton(String name, double serve, String unit) {
     if (widget.isPlanMenu) {
       return Row(
         children: [
@@ -71,52 +79,70 @@ class _MenuDetailState extends State<MenuDetail> {
     }
   }
 
-  // List<NearRestaurant> items = [
-  //   NearRestaurant(
-  //     name: 'ร้านกุ้งยุดยา',
-  //     imageUrl: 'https://bnn.blob.core.windows.net/food/shrimp-fried-rice.jpg',
-  //     distance: 2.0,
-  //     rating: 3.2,
-  //     open: TimeOfDay(hour: 8, minute: 0),
-  //     close: TimeOfDay(hour: 20, minute: 0),
-  //   ),
-  //   NearRestaurant(
-  //     name: 'สมปองการกุ้ง',
-  //     imageUrl: 'https://bnn.blob.core.windows.net/food/shrimp-fried-rice.jpg',
-  //     distance: 4.5,
-  //     rating: 4.5,
-  //     open: TimeOfDay(hour: 12, minute: 0),
-  //     close: TimeOfDay(hour: 22, minute: 0),
-  //   ),
-  // ];
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<MenuBloc, MenuState>(
       builder: (context, state) {
         switch (state.status) {
           case MenuStatus.failure:
-            return const Center(child: Text('failed to fetch menu'));
+            return Center(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image(image: AssetImage('assets/error.png')),
+                  SizedBox(height: 10),
+                  Text('ไม่สามารถโหลดข้อมูลได้ในขณะนี้',
+                      style: Theme.of(context).textTheme.bodyText2!.merge(
+                          TextStyle(
+                              color: Theme.of(context).colorScheme.secondary))),
+                  OutlinedButton(
+                    child: Text('ลองอีกครั้ง'),
+                    style: OutlinedButton.styleFrom(
+                      primary: Theme.of(context).colorScheme.secondary,
+                      shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(50))),
+                    ),
+                    onPressed: () => _menuBloc.add(MenuFetched()),
+                  ),
+                ],
+              ),
+            );
           case MenuStatus.success:
-            return Column(
-              children: <Widget>[
-                Expanded(
-                  child: ListView(
-                    children: <Widget>[
-                      Image.network(
-                        state.menu.imageUrl,
-                        alignment: Alignment.center,
-                        height: 300,
-                        fit: BoxFit.cover,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: Column(
-                          children: <Widget>[
-                            Row(
-                              children: <Widget>[
-                                Expanded(
-                                  child: Text('แคลอรีรวม',
+            return RefreshIndicator(
+              onRefresh: _onRefresh,
+              child: Column(
+                key: Key('menu_column'),
+                children: <Widget>[
+                  Expanded(
+                    child: ListView(
+                      children: <Widget>[
+                        Image.network(
+                          state.menu.imageUrl,
+                          alignment: Alignment.center,
+                          height: 300,
+                          fit: BoxFit.cover,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: Column(
+                            children: <Widget>[
+                              Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Text('แคลอรีรวม',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline5!
+                                            .merge(TextStyle(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .secondary))),
+                                  ),
+                                  Text(
+                                      widget.isPlanMenu
+                                          ? '${widget.menu.calories.round()} แคล'
+                                          : '${state.menu.calory.round()} แคล',
                                       style: Theme.of(context)
                                           .textTheme
                                           .headline5!
@@ -124,61 +150,49 @@ class _MenuDetailState extends State<MenuDetail> {
                                               color: Theme.of(context)
                                                   .colorScheme
                                                   .secondary))),
-                                ),
-                                Text(
-                                    widget.isPlanMenu
-                                        ? '${widget.menu.calories.round()} แคล'
-                                        : '${state.menu.calory.round()} แคล',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headline5!
-                                        .merge(TextStyle(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .secondary))),
-                              ],
-                            ),
-                            SizedBox(height: 16.0),
-                            NutrientDetail(
-                              label: 'หน่วยบริโภค',
-                              value:
-                                  '${widget.isPlanMenu ? toRound(widget.menu.volumn) : toRound(state.menu.serve)} ${state.menu.unit}',
-                            ),
-                            SizedBox(height: 7.0),
-                            NutrientDetail(
-                              label: 'โปรตีน',
-                              value:
-                                  '${widget.isPlanMenu ? toRound(widget.menu.protein) : toRound(state.menu.protein)} กรัม',
-                            ),
-                            SizedBox(height: 7.0),
-                            NutrientDetail(
-                              label: 'คาร์โบไฮเดรต',
-                              value:
-                                  '${widget.isPlanMenu ? toRound(widget.menu.carb) : toRound(state.menu.carb)} กรัม',
-                            ),
-                            SizedBox(height: 7.0),
-                            NutrientDetail(
-                              label: 'ไขมัน',
-                              value:
-                                  '${widget.isPlanMenu ? toRound(widget.menu.fat) : toRound(state.menu.fat)} กรัม',
-                            ),
-                            if (state.nearRestaurant.isNotEmpty)
+                                ],
+                              ),
+                              SizedBox(height: 16.0),
+                              NutrientDetail(
+                                label: 'หน่วยบริโภค',
+                                value:
+                                    '${widget.isPlanMenu ? _toRound(widget.menu.volumn) : _toRound(state.menu.serve)} ${state.menu.unit}',
+                              ),
+                              SizedBox(height: 7.0),
+                              NutrientDetail(
+                                label: 'โปรตีน',
+                                value:
+                                    '${widget.isPlanMenu ? _toRound(widget.menu.protein) : _toRound(state.menu.protein)} กรัม',
+                              ),
+                              SizedBox(height: 7.0),
+                              NutrientDetail(
+                                label: 'คาร์โบไฮเดรต',
+                                value:
+                                    '${widget.isPlanMenu ? _toRound(widget.menu.carb) : _toRound(state.menu.carb)} กรัม',
+                              ),
+                              SizedBox(height: 7.0),
+                              NutrientDetail(
+                                label: 'ไขมัน',
+                                value:
+                                    '${widget.isPlanMenu ? _toRound(widget.menu.fat) : _toRound(state.menu.fat)} กรัม',
+                              ),
                               _NearRestaurant(
                                 items: state.nearRestaurant,
                                 defaultUrl: state.menu.imageUrl,
                               ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: displayButton(
-                      state.menu.name, state.menu.serve, state.menu.unit),
-                ),
-              ],
+                  Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: _displayButton(
+                        state.menu.name, state.menu.serve, state.menu.unit),
+                  ),
+                ],
+              ),
             );
           default:
             return const Center(child: CircularProgressIndicator());
@@ -200,22 +214,31 @@ class _NearRestaurant extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('สถานที่ใกล้คุณ',
+        SizedBox(height: 10),
+        Text('ร้านใกล้คุณ',
             style: Theme.of(context).textTheme.subtitle1!.merge(
                 TextStyle(color: Theme.of(context).colorScheme.secondary))),
-        ListView.builder(
-          itemBuilder: (BuildContext context, int index) {
-            return _NearRestaurantItem(
-              item: items[index],
-              defaultUrl: defaultUrl,
-            );
-          },
-          itemCount: items.length,
-          scrollDirection: Axis.vertical,
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          padding: EdgeInsets.symmetric(vertical: 10),
-        ),
+        items.isEmpty
+            ? Center(
+                heightFactor: 2,
+                child: Text('ไม่มีร้านใกล้คุณในขณะนี้',
+                    style: Theme.of(context).textTheme.bodyText2!.merge(
+                        TextStyle(
+                            color: Theme.of(context).colorScheme.secondary))),
+              )
+            : ListView.builder(
+                itemBuilder: (BuildContext context, int index) {
+                  return _NearRestaurantItem(
+                    item: items[index],
+                    defaultUrl: defaultUrl,
+                  );
+                },
+                itemCount: items.length,
+                scrollDirection: Axis.vertical,
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                padding: EdgeInsets.symmetric(vertical: 10),
+              ),
       ],
     );
   }
@@ -242,6 +265,7 @@ class _NearRestaurantItem extends StatelessWidget {
             borderRadius: BorderRadius.all(Radius.circular(15)),
             child: Image.network(
               item.imageUrl == null ? defaultUrl : item.imageUrl!,
+              key: const Key('nearRestaurant_image'),
               width: 100,
               height: 100,
               alignment: Alignment.center,
@@ -262,7 +286,7 @@ class _NearRestaurantItem extends StatelessWidget {
                     style: Theme.of(context).textTheme.caption!.merge(TextStyle(
                         color: Theme.of(context).colorScheme.secondary))),
                 RatingBarIndicator(
-                  rating: item.rating!,
+                  rating: item.rating ?? 0.0,
                   itemBuilder: (context, index) => Icon(
                     Icons.star,
                     color: Theme.of(context).primaryColor,
@@ -334,9 +358,10 @@ class _AddToPlanButton extends StatelessWidget {
                 name: name,
                 isEatNow: false,
                 volumn: double.parse(value.toString()));
-            Navigator.of(context).pushReplacement(MaterialPageRoute(
-              builder: (context) => MainScreen(index: 1),
-            ));
+
+            Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => MainScreen(index: 1)),
+                (Route<dynamic> route) => route.isFirst);
           }
         },
       ),
@@ -364,11 +389,21 @@ class _EatNowButton extends StatelessWidget {
           MenuDialog(serve: volumn, unit: unit, isEatNow: true),
     );
     if (value != 'cancel' && value != null) {
-      await context.read<MenuBloc>().addMenu(
-          name: name, isEatNow: true, volumn: double.parse(value.toString()));
-      Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) => MainScreen(index: 1),
-      ));
+      if (isPlanMenu) {
+        await context.read<MenuBloc>().addMenu(
+            name: name,
+            isEatNow: true,
+            oldVolume: volumn,
+            volumn: double.parse(value.toString()));
+      } else {
+        await context.read<MenuBloc>().addMenu(
+            name: name, isEatNow: true, volumn: double.parse(value.toString()));
+      }
+
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => MainScreen(index: 1)),
+        (Route<dynamic> route) => route.isFirst,
+      );
     }
   }
 

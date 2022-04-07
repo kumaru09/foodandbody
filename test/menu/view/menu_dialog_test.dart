@@ -7,7 +7,6 @@ import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:foodandbody/screens/menu/bloc/menu_bloc.dart';
 import 'package:foodandbody/screens/menu/menu_detail.dart';
 import 'package:foodandbody/screens/menu/menu_dialog.dart';
-import 'package:foodandbody/screens/plan/plan.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:network_image_mock/network_image_mock.dart';
 
@@ -25,7 +24,6 @@ void main() {
   const okButtonKey = Key('menu_dialog_ok_button');
 
   late MenuBloc menuBloc;
-
   const mockMenu = MenuShow(
       name: "กุ้งเผา",
       calory: 96,
@@ -47,7 +45,7 @@ void main() {
 
   group('MenuDialog', () {
     testWidgets('renders dialog correctly', (tester) async {
-      when(() => menuBloc.state).thenReturn(const MenuState(
+      when(() => menuBloc.state).thenReturn(MenuState(
         status: MenuStatus.success,
         menu: mockMenu,
       ));
@@ -55,8 +53,7 @@ void main() {
         MaterialApp(
           home: BlocProvider.value(
             value: menuBloc,
-            child: MenuDialog(
-                name: "กุ้งเผา", serve: 100, unit: "กรัม", isEatNow: false),
+            child: MenuDialog(serve: 100, unit: "กรัม", isEatNow: false),
           ),
         ),
       );
@@ -68,7 +65,7 @@ void main() {
     });
 
     testWidgets('renders serve depend on slider value', (tester) async {
-      when(() => menuBloc.state).thenReturn(const MenuState(
+      when(() => menuBloc.state).thenReturn(MenuState(
         status: MenuStatus.success,
         menu: mockMenu,
       ));
@@ -76,8 +73,7 @@ void main() {
         MaterialApp(
           home: BlocProvider.value(
             value: menuBloc,
-            child: MenuDialog(
-                name: "กุ้งเผา", serve: 100, unit: "กรัม", isEatNow: false),
+            child: MenuDialog(serve: 100, unit: "กรัม", isEatNow: false),
           ),
         ),
       );
@@ -87,7 +83,7 @@ void main() {
     });
 
     testWidgets('renders ok button disable when serve is 0', (tester) async {
-      when(() => menuBloc.state).thenReturn(const MenuState(
+      when(() => menuBloc.state).thenReturn(MenuState(
         status: MenuStatus.success,
         menu: mockMenu,
       ));
@@ -95,8 +91,7 @@ void main() {
         MaterialApp(
           home: BlocProvider.value(
             value: menuBloc,
-            child: MenuDialog(
-                name: "กุ้งเผา", serve: 100, unit: "กรัม", isEatNow: false),
+            child: MenuDialog(serve: 100, unit: "กรัม", isEatNow: false),
           ),
         ),
       );
@@ -106,39 +101,41 @@ void main() {
       expect(textButton.enabled, isFalse);
     });
 
-    testWidgets('call addMenu and render plan when ok button is pressed',
-        (tester) async {
-      when(() => menuBloc.state).thenReturn(const MenuState(
-        status: MenuStatus.success,
-        menu: mockMenu,
-      ));
-      when(() =>
+    testWidgets('close dialog and MenuDetail when ok is pressed', (tester) async {
+      mockNetworkImagesFor(() async {
+        when(() => menuBloc.state).thenReturn(MenuState(
+          status: MenuStatus.success,
+          menu: mockMenu,
+        ));
+        when(() =>
               menuBloc.addMenu(name: "กุ้งเผา", isEatNow: false, volumn: 100))
           .thenAnswer((_) async {});
-      await tester.pumpWidget(
-        RepositoryProvider<PlanRepository>(
-          create: (_) => MockPlanRepository(),
-          child: MaterialApp(
-            home: BlocProvider.value(
-              value: menuBloc,
-              child: MenuDialog(
-                  name: "กุ้งเผา", serve: 100, unit: "กรัม", isEatNow: false),
+        await tester.pumpWidget(
+          RepositoryProvider<PlanRepository>(
+            create: (_) => MockPlanRepository(),
+            child: MaterialApp(
+              home: BlocProvider.value(
+                value: menuBloc,
+                child: MenuDetail(isPlanMenu: false),
+              ),
             ),
           ),
-        ),
-      );
-      expect(find.byKey(okButtonKey), findsOneWidget);
-      await tester.tap(find.byKey(okButtonKey));
-      await tester.pumpAndSettle();
-      expect(find.byType(Plan), findsOneWidget);
-      verify(() =>
-              menuBloc.addMenu(name: "กุ้งเผา", isEatNow: false, volumn: 100))
-          .called(1);
+        );
+        expect(find.byType(MenuDetail), findsOneWidget);
+        await tester.tap(find.byKey(addToPlanButtonKey));
+        await tester.pumpAndSettle();
+        expect(find.byType(MenuDialog), findsOneWidget);
+        expect(find.byKey(okButtonKey), findsOneWidget);
+        await tester.tap(find.byKey(okButtonKey));
+        await tester.pumpAndSettle();
+        expect(find.byType(MenuDetail), findsNothing);
+        expect(find.byType(MenuDialog), findsNothing);
+      });
     });
 
-    testWidgets('close dialog when cancle is pressed', (tester) async {
+    testWidgets('close dialog and back to MenuDetail when cancle is pressed', (tester) async {
       mockNetworkImagesFor(() async {
-        when(() => menuBloc.state).thenReturn(const MenuState(
+        when(() => menuBloc.state).thenReturn(MenuState(
           status: MenuStatus.success,
           menu: mockMenu,
         ));
@@ -159,6 +156,7 @@ void main() {
         await tester.tap(find.text('ยกเลิก'));
         await tester.pumpAndSettle();
         expect(find.byType(MenuDetail), findsOneWidget);
+        expect(find.byType(MenuDialog), findsNothing);
       });
     });
   });

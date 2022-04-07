@@ -7,14 +7,14 @@ import 'package:foodandbody/models/info.dart';
 import 'package:foodandbody/models/info_entity.dart';
 import 'package:foodandbody/models/nutrient.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' as cloud_firestore;
-import 'package:foodandbody/repositories/i_user_repository.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:path/path.dart' as p;
 
 class UpdatePasswordFaliure implements Exception {
   final message;
 
-  const UpdatePasswordFaliure([this.message = 'เกิดข้อผิดพลาดบางอย่าง']);
+  const UpdatePasswordFaliure([this.message = 'เกิดข้อผิดพลาด กรุณาลองใหม่']);
 
   factory UpdatePasswordFaliure.fromCode(String code) {
     switch (code) {
@@ -32,7 +32,8 @@ class UpdatePasswordFaliure implements Exception {
 class UploadProfilePicFailure implements Exception {
   final message;
 
-  const UploadProfilePicFailure([this.message = 'เกิดข้อผิดพลาดบางอย่าง']);
+  const UploadProfilePicFailure(
+      [this.message = 'อัปโหลดรูปภาพไม่สำเร็จ กรุณาลองใหม่']);
 
   factory UploadProfilePicFailure.fromCode(String code) {
     switch (code) {
@@ -46,14 +47,22 @@ class UploadProfilePicFailure implements Exception {
 
 class UpdateInfoFailure implements Exception {
   final message;
-  const UpdateInfoFailure([this.message = 'เกิดข้อผิดพลาดบางอย่าง']);
+  const UpdateInfoFailure([this.message = 'แก้ไขข้อมูลไม่สำเร็จ กรุณาลองใหม่']);
 }
 
-class UserRepository implements IUserRepository {
-  UserRepository(
-      {firebase_auth.FirebaseAuth? firebaseAuth,
-      firebase_storage.FirebaseStorage? firebaseStorage})
-      : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
+class GetInitInfoFailure implements Exception {
+  @override
+  String toString() {
+    return 'no-init-info';
+  }
+}
+
+class UserRepository {
+  UserRepository({
+    firebase_auth.FirebaseAuth? firebaseAuth,
+    firebase_storage.FirebaseStorage? firebaseStorage,
+    required this.cache,
+  })  : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
         _firebaseStorage =
             firebaseStorage ?? firebase_storage.FirebaseStorage.instance;
 
@@ -61,8 +70,8 @@ class UserRepository implements IUserRepository {
   final firebase_storage.FirebaseStorage _firebaseStorage;
   final cloud_firestore.CollectionReference users =
       cloud_firestore.FirebaseFirestore.instance.collection('users');
+  final InfoCache cache;
 
-  @override
   Future<void> addUserInfo(Info info) async {
     final uid = _firebaseAuth.currentUser?.uid;
     final infoE = info.copyWith(
@@ -75,20 +84,28 @@ class UserRepository implements IUserRepository {
         .doc(uid)
         .collection('weight')
         .add({'weight': info.weight, "date": cloud_firestore.Timestamp.now()});
+    cache.set(infoE);
   }
 
-  @override
-  Future<Info> getInfo() async {
-    final data = await users.doc(_firebaseAuth.currentUser?.uid).get();
-    if (data.exists) {
-      final info = Info.fromEntity(InfoEntity.fromSnapshot(data));
-      return info;
-    } else {
-      throw Exception('No Info data');
+  Future<Info?> getInfo([bool isCache = false]) async {
+    try {
+      if (isCache) {
+        final cachedResult = cache.get();
+        if (cachedResult != null) return cachedResult;
+      }
+      final data = await users.doc(_firebaseAuth.currentUser?.uid).get();
+      if (data.exists) {
+        final info = Info.fromEntity(InfoEntity.fromSnapshot(data));
+        cache.set(info);
+        return info;
+      } else {
+        return null;
+      }
+    } catch (_) {
+      throw Exception();
     }
   }
 
-  @override
   Future<void> updateInfo(Info newInfo) async {
     try {
       final info = users.doc(_firebaseAuth.currentUser?.uid);
@@ -167,4 +184,12 @@ class UserRepository implements IUserRepository {
       throw UploadProfilePicFailure();
     }
   }
+}
+
+class InfoCache {
+  late Info? _cache;
+
+  Info? get() => _cache;
+
+  void set(Info result) => _cache = result;
 }

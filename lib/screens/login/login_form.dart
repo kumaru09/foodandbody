@@ -1,23 +1,98 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodandbody/repositories/authen_repository.dart';
+import 'package:foodandbody/screens/forgot_password/cubit/forgot_password_cubit.dart';
 import 'package:foodandbody/screens/login/cubit/login_cubit.dart';
 import 'package:foodandbody/screens/register/register.dart';
 import 'package:foodandbody/screens/forgot_password/forgot_password.dart';
 import 'package:formz/formz.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-class LoginForm extends StatelessWidget {
+class LoginForm extends StatefulWidget {
   const LoginForm({Key? key}) : super(key: key);
+
+  @override
+  State<LoginForm> createState() => _LoginFormState();
+}
+
+class _LoginFormState extends State<LoginForm> {
+  // @override
+  // void initState() {
+  //   handleLink();
+  //   FirebaseDynamicLinks.instance.onLink.listen((event) {
+  //     print('get link');
+  //     final Uri deepLink = event.link;
+  //     final actionCode = deepLink.queryParameters['oobCode'];
+  //     if (actionCode != null) verifedCode(actionCode);
+  //     // final email = Uri.parse(deepLink.queryParameters['continueUrl']!)
+  //     //     .queryParameters['email'];
+  //     // final emailLink = deepLink.toString();
+  //     // if (FirebaseAuth.instance.isSignInWithEmailLink(emailLink) &&
+  //     //     email != null) {
+  //     //   print('signin: $emailLink');
+  //     //   try {
+  //     //     context.read<LoginCubit>().logInWithEmailLink(email, emailLink);
+  //     //   } catch (_) {
+  //     //     print('$_');
+  //     //   }
+  //     // }
+  //   });
+  //   super.initState();
+  // }
+
+  // void handleLink() async {
+  //   final PendingDynamicLinkData? data =
+  //       await FirebaseDynamicLinks.instance.getInitialLink();
+  //   if (data?.link != null) {
+  //     print('get link');
+  //     final Uri deepLink = data!.link;
+  //     final actionCode = deepLink.queryParameters['oobCode'];
+  //     if (actionCode != null) verifedCode(actionCode);
+  //   }
+  // }
+
+  // void verifedCode(String code) async {
+  //   final auth = FirebaseAuth.instance;
+  //   try {
+  //     await auth.checkActionCode(code);
+  //     await auth.applyActionCode(code);
+
+  //     auth.currentUser!.reload();
+  //   } on FirebaseAuthException catch (e) {
+  //     if (e.code == 'expired-action-code' || e.code == 'invalid-action-code') {
+  //       ScaffoldMessenger.of(context)
+  //         ..hideCurrentSnackBar()
+  //         ..showSnackBar(
+  //           SnackBar(
+  //               content: Text(
+  //                   'ลิงค์หมดอายุหรือถูกใช้ไปแล้ว โปรดขอลิงค์ใหม่อีกครั้ง')),
+  //         );
+  //     }
+  //   } catch (_) {
+  //     ScaffoldMessenger.of(context)
+  //       ..hideCurrentSnackBar()
+  //       ..showSnackBar(
+  //         SnackBar(
+  //             content:
+  //                 Text('ลิงค์หมดอายุหรือถูกใช้ไปแล้ว โปรดขอลิงค์ใหม่อีกครั้ง')),
+  //       );
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
     return BlocListener<LoginCubit, LoginState>(
       listener: (context, state) {
         if (state.status.isSubmissionFailure) {
+          // print(state.errorMessage);
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
             ..showSnackBar(
-              const SnackBar(content: Text('Authentication Failure')),
+              SnackBar(
+                  content: Text(
+                      '${state.errorMessage ?? 'เกิดข้อผิดพลาดบางอย่าง กรุณาลองใหม่อีกครั้ง'}')),
             );
         }
       },
@@ -64,7 +139,11 @@ class LoginForm extends StatelessWidget {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => ForgotPassword()),
+                                        builder: (context) => BlocProvider(
+                                            create: (context) =>
+                                                ForgotPasswordCubit(context
+                                                    .read<AuthenRepository>()),
+                                            child: ForgotPassword())),
                                   );
                                 },
                               ),

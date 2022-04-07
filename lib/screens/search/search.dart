@@ -18,10 +18,14 @@ class _SearchState extends State<Search> {
     return BlocProvider(
       create: (_) =>
           SearchBloc(searchRepository: context.read<SearchRepository>()),
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: SearchAppBar(),
-        body: SearchBody(),
+      child: GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: Scaffold(
+          resizeToAvoidBottomInset: false,
+          backgroundColor: Colors.white,
+          appBar: SearchAppBar(),
+          body: SearchBody(),
+        ),
       ),
     );
   }
@@ -68,8 +72,7 @@ class _SearchAppBarState extends State<SearchAppBar> {
     for (var i = 0; i < _isChecked.length; i++) {
       if (_isChecked[i] == true && !_selectFilter.contains(_filterList[i]))
         _selectFilter.add(_filterList[i]);
-      else if (_isChecked[i] == false &&
-          _selectFilter.contains(_filterList[i]))
+      else if (_isChecked[i] == false && _selectFilter.contains(_filterList[i]))
         _selectFilter.remove(_filterList[i]);
     }
   }
@@ -85,7 +88,8 @@ class _SearchAppBarState extends State<SearchAppBar> {
         onChanged: (text) {
           if (_lastText != text) {
             _lastText = text;
-            _searchBloc.add(TextChanged(text: text, selectFilter: _selectFilter));
+            _searchBloc
+                .add(TextChanged(text: text, selectFilter: _selectFilter));
           }
         },
         style: Theme.of(context)
@@ -109,6 +113,7 @@ class _SearchAppBarState extends State<SearchAppBar> {
         IconButton(
           onPressed: () => showModalBottomSheet(
             context: context,
+            isDismissible: false,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(15.0),
@@ -169,9 +174,11 @@ class _SearchAppBarState extends State<SearchAppBar> {
                           fixedSize: Size(182, 39),
                         ),
                         onPressed: () {
-                          _mapIndexFilter();  
-                          _searchBloc.add(TextChanged(text: _lastText, selectFilter: _selectFilter));
+                          _mapIndexFilter();
+                          _searchBloc.add(TextChanged(
+                              text: _lastText, selectFilter: _selectFilter));
                           Navigator.pop(context);
+                          FocusManager.instance.primaryFocus?.unfocus();
                         },
                         child: Text(
                           "ค้นหา",
@@ -228,7 +235,9 @@ class _SearchBodyState extends State<SearchBody> {
   }
 
   void _onScroll() {
-    if (_isBottom) _searchBloc.add(TextChanged(text: _searchBloc.text, selectFilter: _searchBloc.filter));
+    if (_isBottom)
+      _searchBloc.add(TextChanged(
+          text: _searchBloc.text, selectFilter: _searchBloc.filter));
   }
 
   bool get _isBottom {
@@ -246,9 +255,30 @@ class _SearchBodyState extends State<SearchBody> {
           return Center(child: const CircularProgressIndicator());
         case SearchStatus.failure:
           return Center(
-              child: Text('failed to fetch menu',
-                  style: Theme.of(context).textTheme.subtitle1!.merge(TextStyle(
-                      color: Theme.of(context).colorScheme.secondary))));
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image(image: AssetImage('assets/error.png')),
+                SizedBox(height: 10),
+                Text('ไม่สามารถโหลดข้อมูลได้ในขณะนี้',
+                    style: Theme.of(context).textTheme.bodyText2!.merge(
+                        TextStyle(
+                            color: Theme.of(context).colorScheme.secondary))),
+                OutlinedButton(
+                  child: Text('ลองอีกครั้ง'),
+                  style: OutlinedButton.styleFrom(
+                    primary: Theme.of(context).colorScheme.secondary,
+                    shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(50))),
+                  ),
+                  onPressed: () {
+                    _searchBloc.add(ReFetched());
+                  },
+                ),
+              ],
+            ),
+          );
         case SearchStatus.success:
           return state.result.isEmpty
               ? Center(
@@ -302,31 +332,35 @@ class _SearchResultItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        ListTile(
-          minVerticalPadding: 16,
-          title: Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Expanded(
-                child: Text('${item.name}',
-                    style: Theme.of(context).textTheme.subtitle1!.merge(
+        Material(
+          child: ListTile(
+            minVerticalPadding: 16,
+            title: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: Text('${item.name}',
+                      style: Theme.of(context).textTheme.subtitle1!.merge(
+                          TextStyle(
+                              color: Theme.of(context).colorScheme.secondary))),
+                ),
+                Text('${item.calory} ',
+                    style: Theme.of(context).textTheme.headline6!.merge(
                         TextStyle(
                             color: Theme.of(context).colorScheme.secondary))),
-              ),
-              Text('${item.calory} ',
-                  style: Theme.of(context).textTheme.headline6!.merge(TextStyle(
-                      color: Theme.of(context).colorScheme.secondary))),
-              Text('แคล',
-                  style: Theme.of(context).textTheme.caption!.merge(TextStyle(
-                      color: Theme.of(context).colorScheme.secondary))),
-            ],
+                Text('แคล',
+                    style: Theme.of(context).textTheme.caption!.merge(TextStyle(
+                        color: Theme.of(context).colorScheme.secondary))),
+              ],
+            ),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          MenuPage.menu(menuName: item.name)));
+            },
           ),
-          onTap: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => MenuPage.menu(menuName: item.name)));
-          },
         ),
         const Divider(
           height: 2,
