@@ -210,6 +210,40 @@ void main() {
       });
     });
 
+    // testWidgets('renders fail addMenu widget when AddMenuStatus failure',
+    //     (tester) async {
+    //   mockNetworkImagesFor(() async {
+    //     when(()=> menuBloc.state).thenReturn(MenuState());
+    //     whenListen(menuBloc, Stream.fromIterable(<MenuState>[
+    //       MenuState(
+    //         status: MenuStatus.success,
+    //         menu: mockMenu,
+    //         nearRestaurant: nearRestaurant,
+    //         addMenuStatus: AddMenuStatus.initial,
+    //       ),
+    //       MenuState(
+    //         status: MenuStatus.success,
+    //         menu: mockMenu,
+    //         nearRestaurant: nearRestaurant,
+    //         addMenuStatus: AddMenuStatus.failure,
+    //       ),
+    //     ]));
+    //     await tester.pumpWidget(
+    //       MaterialApp(
+    //         home: BlocProvider.value(
+    //           value: menuBloc,
+    //           child: MenuDetail(isPlanMenu: false),
+    //         ),
+    //       ),
+    //     );
+    //     await tester.pumpAndSettle(Duration(seconds: 2));
+    //     expect(find.byType(AlertDialog), findsOneWidget);
+    //     expect(find.byIcon(Icons.report), findsOneWidget);
+    //     expect(find.text('เพิ่มเมนูไม่สำเร็จ'), findsOneWidget);
+    //     expect(find.text('กรุณาลองอีกครั้ง'), findsOneWidget);
+    //   });
+    // });
+
     group('Menu', () {
       testWidgets(
           'renders addToPlan button and eatNow button when isPlanMenu is false',
@@ -262,10 +296,11 @@ void main() {
             status: MenuStatus.success,
             menu: mockMenu,
           ));
-          when(() => menuBloc.addMenu(
-              name: "กุ้งเผา",
-              isEatNow: false,
-              volumn: 100)).thenAnswer((_) async {});
+          when(() => menuBloc.add(AddMenu(
+                name: "กุ้งเผา",
+                isEatNow: false,
+                volumn: 100,
+              ))).thenAnswer((_) async {});
           await tester.pumpWidget(
             RepositoryProvider<PlanRepository>(
               create: (_) => MockPlanRepository(),
@@ -282,8 +317,11 @@ void main() {
           expect(find.byType(MenuDialog), findsOneWidget);
           await tester.tap(find.byKey(dialogOkButtonKey));
           await tester.pumpAndSettle();
-          verify(() => menuBloc.addMenu(
-              name: "กุ้งเผา", isEatNow: false, volumn: 100)).called(1);
+          verify(() => menuBloc.add(AddMenu(
+                name: "กุ้งเผา",
+                isEatNow: false,
+                volumn: 100,
+              ))).called(1);
         });
       });
 
@@ -317,10 +355,11 @@ void main() {
             status: MenuStatus.success,
             menu: mockMenu,
           ));
-          when(() => menuBloc.addMenu(
-              name: "กุ้งเผา",
-              isEatNow: true,
-              volumn: 100)).thenAnswer((_) async {});
+          when(() => menuBloc.add(AddMenu(
+                name: "กุ้งเผา",
+                isEatNow: true,
+                volumn: 100,
+              ))).thenAnswer((_) async {});
           await tester.pumpWidget(
             RepositoryProvider<PlanRepository>(
               create: (_) => MockPlanRepository(),
@@ -337,8 +376,11 @@ void main() {
           expect(find.byType(MenuDialog), findsOneWidget);
           await tester.tap(find.byKey(dialogOkButtonKey));
           await tester.pump();
-          verify(() => menuBloc.addMenu(
-              name: "กุ้งเผา", isEatNow: true, volumn: 100)).called(1);
+          verify(() => menuBloc.add(AddMenu(
+                name: "กุ้งเผา",
+                isEatNow: true,
+                volumn: 100,
+              ))).called(1);
         });
       });
     });
@@ -395,10 +437,12 @@ void main() {
             status: MenuStatus.success,
             menu: mockMenu,
           ));
-          when(() => menuBloc.addMenu(
-              name: "กุ้งเผา",
-              isEatNow: true,
-              volumn: 100)).thenAnswer((_) async {});
+          when(() => menuBloc.add(AddMenu(
+                name: "กุ้งเผา",
+                isEatNow: true,
+                volumn: 100,
+                oldVolume: 100,
+              ))).thenAnswer((_) async {});
           await tester.pumpWidget(
             RepositoryProvider<PlanRepository>(
               create: (_) => MockPlanRepository(),
@@ -415,8 +459,12 @@ void main() {
           expect(find.byType(MenuDialog), findsOneWidget);
           await tester.tap(find.byKey(dialogOkButtonKey));
           await tester.pump();
-          verify(() => menuBloc.addMenu(
-              name: "กุ้งเผา", isEatNow: true, volumn: 100)).called(1);
+          verify(() => menuBloc.add(AddMenu(
+                name: "กุ้งเผา",
+                isEatNow: true,
+                volumn: 100,
+                oldVolume: 100,
+              ))).called(1);
         });
       });
 

@@ -108,7 +108,7 @@ void main() {
           menu: mockMenu,
         ));
         when(() =>
-              menuBloc.addMenu(name: "กุ้งเผา", isEatNow: false, volumn: 100))
+              menuBloc.add(AddMenu(name: "กุ้งเผา", isEatNow: false, volumn: 100)))
           .thenAnswer((_) async {});
         await tester.pumpWidget(
           RepositoryProvider<PlanRepository>(
@@ -121,14 +121,12 @@ void main() {
             ),
           ),
         );
-        expect(find.byType(MenuDetail), findsOneWidget);
         await tester.tap(find.byKey(addToPlanButtonKey));
         await tester.pumpAndSettle();
         expect(find.byType(MenuDialog), findsOneWidget);
         expect(find.byKey(okButtonKey), findsOneWidget);
         await tester.tap(find.byKey(okButtonKey));
         await tester.pumpAndSettle();
-        expect(find.byType(MenuDetail), findsNothing);
         expect(find.byType(MenuDialog), findsNothing);
       });
     });

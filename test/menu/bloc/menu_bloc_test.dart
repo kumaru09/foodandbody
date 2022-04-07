@@ -17,7 +17,8 @@ class MockClient extends Mock implements http.Client {}
 
 class MockGooglePlace extends Mock implements google_place.GooglePlace {}
 
-class MockNearBySearchResponse extends Mock implements google_place.NearBySearchResponse {}
+class MockNearBySearchResponse extends Mock
+    implements google_place.NearBySearchResponse {}
 
 class MockDio extends Mock implements Dio {}
 
@@ -66,7 +67,7 @@ void main() {
     late PlanRepository planRepository;
     late FavoriteRepository favoriteRepository;
     late MenuBloc menuBloc;
-    late google_place.NearBySearchResponse nearBySearchResponse; 
+    late google_place.NearBySearchResponse nearBySearchResponse;
 
     setUpAll(() {
       registerFallbackValue(Uri());
@@ -203,15 +204,120 @@ void main() {
       );
     });
 
-    blocTest<MenuBloc, MenuState>(
-      'addMenu can call planRepository',
-      build: () => menuBloc,
-      act: (bloc) =>
-          bloc.addMenu(name: 'กุ้งเผา', isEatNow: false, volumn: 1.0),
-      verify: (_) {
-        verify(() => planRepository.addPlanMenu('กุ้งเผา', null, 1.0, false))
-            .called(1);
-      },
-    );
+    group('AddMenu', () {
+      blocTest<MenuBloc, MenuState>(
+        'addMenu can call planRepository',
+        setUp: () =>
+            when(() => planRepository.addPlanMenu('กุ้งเผา', null, 1.0, false))
+                .thenAnswer((_) async {}),
+        build: () => menuBloc,
+        act: (bloc) =>
+            bloc.add(AddMenu(name: 'กุ้งเผา', isEatNow: false, volumn: 1.0)),
+        verify: (_) {
+          verify(() => planRepository.addPlanMenu('กุ้งเผา', null, 1.0, false))
+              .called(1);
+        },
+      );
+
+      blocTest<MenuBloc, MenuState>(
+        'addMenu isEatNow is true can call favoriteRepository',
+        setUp: () {
+          when(() => planRepository.addPlanMenu('กุ้งเผา', null, 1.0, true))
+              .thenAnswer((_) async {});
+          when(() => favoriteRepository.addFavMenuById('กุ้งเผา'))
+              .thenAnswer((_) async {});
+          when(() => favoriteRepository.addFavMenuAll('กุ้งเผา'))
+              .thenAnswer((_) async {});
+        },
+        build: () => menuBloc,
+        act: (bloc) =>
+            bloc.add(AddMenu(name: 'กุ้งเผา', isEatNow: true, volumn: 1.0)),
+        verify: (_) {
+          verify(() => planRepository.addPlanMenu('กุ้งเผา', null, 1.0, true))
+              .called(1);
+          verify(() => favoriteRepository.addFavMenuById('กุ้งเผา')).called(1);
+          verify(() => favoriteRepository.addFavMenuAll('กุ้งเผา')).called(1);
+        },
+      );
+
+      blocTest<MenuBloc, MenuState>(
+        'emits success addMenuStatus when add menu success',
+        setUp: () {
+          when(() => planRepository.addPlanMenu('กุ้งเผา', null, 1.0, true))
+              .thenAnswer((_) async {});
+          when(() => favoriteRepository.addFavMenuById('กุ้งเผา'))
+              .thenAnswer((_) async {});
+          when(() => favoriteRepository.addFavMenuAll('กุ้งเผา'))
+              .thenAnswer((_) async {});
+        },
+        build: () => menuBloc,
+        act: (bloc) =>
+            bloc.add(AddMenu(name: 'กุ้งเผา', isEatNow: true, volumn: 1.0)),
+        expect: () => <MenuState>[MenuState(addMenuStatus: AddMenuStatus.success)],
+        verify: (_) {
+          verify(() => planRepository.addPlanMenu('กุ้งเผา', null, 1.0, true))
+              .called(1);
+          verify(() => favoriteRepository.addFavMenuById('กุ้งเผา')).called(1);
+          verify(() => favoriteRepository.addFavMenuAll('กุ้งเผา')).called(1);
+        },
+      );
+
+      blocTest<MenuBloc, MenuState>(
+        'emits failure addMenuStatus when addPlanMenu throw exception',
+        setUp: () =>
+            when(() => planRepository.addPlanMenu('กุ้งเผา', null, 1.0, false))
+                .thenAnswer((_) => throw Exception()),
+        build: () => menuBloc,
+        act: (bloc) => bloc.add(AddMenu(name: 'กุ้งเผา', isEatNow: false, volumn: 1.0)),
+        expect: () => <MenuState>[MenuState(addMenuStatus: AddMenuStatus.failure)],
+        verify: (_) {
+          verify(() => planRepository.addPlanMenu('กุ้งเผา', null, 1.0, false)).called(1);
+        },
+      );
+
+      blocTest<MenuBloc, MenuState>(
+        'emits failure addMenuStatus when addFavMenuById throw exception',
+        setUp: () {
+          when(() => planRepository.addPlanMenu('กุ้งเผา', null, 1.0, true))
+              .thenAnswer((_) async {});
+          when(() => favoriteRepository.addFavMenuById('กุ้งเผา'))
+              .thenAnswer((_) => throw Exception());
+          when(() => favoriteRepository.addFavMenuAll('กุ้งเผา'))
+              .thenAnswer((_) async {});
+        },
+        build: () => menuBloc,
+        act: (bloc) =>
+            bloc.add(AddMenu(name: 'กุ้งเผา', isEatNow: true, volumn: 1.0)),
+        expect: () => <MenuState>[MenuState(addMenuStatus: AddMenuStatus.failure)],
+        verify: (_) {
+          verify(() => planRepository.addPlanMenu('กุ้งเผา', null, 1.0, true))
+              .called(1);
+          verify(() => favoriteRepository.addFavMenuById('กุ้งเผา')).called(1);
+          verifyNever(() => favoriteRepository.addFavMenuAll('กุ้งเผา'));
+        },
+      );
+
+      blocTest<MenuBloc, MenuState>(
+        'emits failure addMenuStatus when addFavMenuAll throw exception',
+        setUp: () {
+          when(() => planRepository.addPlanMenu('กุ้งเผา', null, 1.0, true))
+              .thenAnswer((_) async {});
+          when(() => favoriteRepository.addFavMenuById('กุ้งเผา'))
+              .thenAnswer((_) async {});
+          when(() => favoriteRepository.addFavMenuAll('กุ้งเผา'))
+              .thenAnswer((_) => throw Exception());
+        },
+        build: () => menuBloc,
+        act: (bloc) =>
+            bloc.add(AddMenu(name: 'กุ้งเผา', isEatNow: true, volumn: 1.0)),
+        expect: () => <MenuState>[MenuState(addMenuStatus: AddMenuStatus.failure)],
+        verify: (_) {
+          verify(() => planRepository.addPlanMenu('กุ้งเผา', null, 1.0, true))
+              .called(1);
+          verify(() => favoriteRepository.addFavMenuById('กุ้งเผา')).called(1);
+          verify(() => favoriteRepository.addFavMenuAll('กุ้งเผา')).called(1);
+        },
+      );
+    });
   });
 }
