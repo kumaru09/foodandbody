@@ -5,6 +5,7 @@ import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/screens/edit_profile/cubit/edit_profile_cubit.dart';
 import 'package:foodandbody/screens/edit_profile/edit_profile.dart';
 import 'package:foodandbody/screens/edit_profile/edit_password.dart';
+import 'package:foodandbody/screens/main_screen/bloc/info_bloc.dart';
 import 'package:foodandbody/screens/setting/delete_user.dart';
 
 class Setting extends StatefulWidget {
@@ -17,13 +18,14 @@ class _SettingState extends State<Setting> {
   @override
   Widget build(BuildContext context) {
     final _user = context.read<AppBloc>().state.user;
+    final _info = context.read<UserRepository>().cache.get();
     final bool hasPhotoUrl;
     final String photoUrl;
 
-    if (_user.info != null) {
-      if (_user.info!.photoUrl != "") {
+    if (_info != null) {
+      if (_info.photoUrl != "") {
         hasPhotoUrl = true;
-        photoUrl = _user.info!.photoUrl.toString();
+        photoUrl = _info.photoUrl.toString();
       } else if (_user.photoUrl != null) {
         hasPhotoUrl = true;
         photoUrl = _user.photoUrl.toString();
@@ -82,7 +84,7 @@ class _SettingState extends State<Setting> {
                 width: MediaQuery.of(context).size.width,
                 alignment: Alignment.center,
                 child: Text(
-                  _user.info != null ? _user.info!.name.toString() : "",
+                  _info != null ? _info.name.toString() : "",
                   style: Theme.of(context).textTheme.headline6!.merge(TextStyle(
                       color: Theme.of(context).colorScheme.secondary)),
                 ),
@@ -92,7 +94,7 @@ class _SettingState extends State<Setting> {
                 width: MediaQuery.of(context).size.width,
                 alignment: Alignment.center,
                 child: Text(
-                  _user.info != null ? _user.email.toString() : "",
+                  _info != null ? _user.email.toString() : "",
                   style: Theme.of(context).textTheme.bodyText2!.merge(TextStyle(
                       color: Theme.of(context).colorScheme.secondary)),
                 ),
@@ -137,18 +139,8 @@ class _SettingState extends State<Setting> {
                                           create: (context) => EditProfileCubit(
                                               context.read<UserRepository>())
                                             ..initProfile(
-                                              name: context
-                                                  .read<AppBloc>()
-                                                  .state
-                                                  .user
-                                                  .info!
-                                                  .name!,
-                                              gender: context
-                                                  .read<AppBloc>()
-                                                  .state
-                                                  .user
-                                                  .info!
-                                                  .gender!,
+                                              name: _info!.name!,
+                                              gender: _info.gender!,
                                               photoUrl: photoUrl,
                                             ),
                                           child: EditProfile(),

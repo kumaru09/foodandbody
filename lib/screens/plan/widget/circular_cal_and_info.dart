@@ -190,7 +190,7 @@ class _PlanInfo extends StatelessWidget {
                                       context.read<PlanRepository>(),
                                   userRepository:
                                       context.read<UserRepository>()),
-                              child: _EditGoalDialog(),
+                              child: EditGoalDialog(),
                             ),
                           );
                           if (value != 'cancel' && value != null) {
@@ -267,8 +267,8 @@ class _PlanInfo extends StatelessWidget {
   }
 }
 
-class _EditGoalDialog extends StatelessWidget {
-  const _EditGoalDialog({Key? key}) : super(key: key);
+class EditGoalDialog extends StatelessWidget {
+  const EditGoalDialog({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

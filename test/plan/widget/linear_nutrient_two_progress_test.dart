@@ -1,17 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:foodandbody/models/history.dart';
 import 'package:foodandbody/models/info.dart';
+import 'package:foodandbody/models/menu.dart';
 import 'package:foodandbody/models/nutrient.dart';
-import 'package:foodandbody/models/user.dart';
 import 'package:foodandbody/screens/plan/widget/linear_nutrient_two_progress.dart';
 import 'package:foodandbody/theme.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
-
-class MockUser extends Mock implements User {}
-
-class MockPlan extends Mock implements History {}
 
 void main() {
   //widget
@@ -19,18 +15,19 @@ void main() {
   const carbLinearKey = Key("plan_carb_linear");
   const fatLinearKey = Key("plan_fat_linear");
 
-  late User user;
-  late History plan;
-  setUp(() {
-    user = MockUser();
-    plan = MockPlan();
-    when(() => plan.totalNutrientList)
-        .thenReturn(Nutrient().copyWith(protein: 120, carb: 80, fat: 30));
-    when(() => user.info).thenReturn(Info(
-        goalNutrient: Nutrient().copyWith(protein: 180, carb: 145, fat: 75)));
-    when(() => plan.planNutrientList)
-        .thenReturn(Nutrient().copyWith(protein: 130, carb: 95, fat: 40));
-  });
+final Nutrient goalNutrient = Nutrient(protein: 180, carb: 145, fat: 75);
+  final Info info = Info(name: 'info', goal: 1600, goalNutrient: goalNutrient);
+  final List<Menu> mockMenuList = [
+    Menu(
+        name: 'อาหาร',
+        calories: 300,
+        protein: 30,
+        carb: 30,
+        fat: 10,
+        serve: 1,
+        volumn: 1)
+  ];
+  final History plan = History(Timestamp.now(), menuList: mockMenuList);
 
   group("Nutrient Progress", () {
     group("can render", () {
@@ -38,7 +35,7 @@ void main() {
         await tester.pumpWidget(MaterialApp(
           theme: AppTheme.themeData,
           home: Scaffold(
-            body: LinearNutrientTwoProgress(user, plan),
+            body: LinearNutrientTwoProgress(info, plan),
           ),
         ));
         expect(find.byKey(proteinLinearKey), findsOneWidget);
@@ -49,7 +46,7 @@ void main() {
         await tester.pumpWidget(MaterialApp(
           theme: AppTheme.themeData,
           home: Scaffold(
-            body: LinearNutrientTwoProgress(user, plan),
+            body: LinearNutrientTwoProgress(info, plan),
           ),
         ));
         expect(find.byKey(carbLinearKey), findsOneWidget);
@@ -60,7 +57,7 @@ void main() {
         await tester.pumpWidget(MaterialApp(
           theme: AppTheme.themeData,
           home: Scaffold(
-            body: LinearNutrientTwoProgress(user, plan),
+            body: LinearNutrientTwoProgress(info, plan),
           ),
         ));
         expect(find.byKey(fatLinearKey), findsOneWidget);
@@ -70,7 +67,7 @@ void main() {
 
     group("when total less than goal", () {
       testWidgets(": protein linear", (tester) async {
-        final linearProgress = LinearNutrientTwoProgress(user, plan);
+        final linearProgress = LinearNutrientTwoProgress(info, plan);
         final double proteinPlan = 80.0;
         final double proteinTotal = 50.5;
         final double proteinGoal = 100.2;
@@ -111,7 +108,7 @@ void main() {
       }); //test ": protein linear"
 
       testWidgets(": carb linear", (tester) async {
-        final linearProgress = LinearNutrientTwoProgress(user, plan);
+        final linearProgress = LinearNutrientTwoProgress(info, plan);
         final double carbPlan = 180.0;
         final double carbTotal = 160.3;
         final double carbGoal = 220.5;
@@ -152,7 +149,7 @@ void main() {
       }); //test ": carb linear"
 
       testWidgets(": fat linear", (tester) async {
-        final linearProgress = LinearNutrientTwoProgress(user, plan);
+        final linearProgress = LinearNutrientTwoProgress(info, plan);
         final double fatPlan = 50.0;
         final double fatTotal = 25.9;
         final double fatGoal = 60.8;
@@ -195,7 +192,7 @@ void main() {
 
     group("when plan greater than goal but total less than goal", () {
       testWidgets(": protein linear", (tester) async {
-        final linearProgress = LinearNutrientTwoProgress(user, plan);
+        final linearProgress = LinearNutrientTwoProgress(info, plan);
         final double proteinPlan = 110.0;
         final double proteinTotal = 50.5;
         final double proteinGoal = 100.2;
@@ -236,7 +233,7 @@ void main() {
       }); //test ": protein linear"
 
       testWidgets(": carb linear", (tester) async {
-        final linearProgress = LinearNutrientTwoProgress(user, plan);
+        final linearProgress = LinearNutrientTwoProgress(info, plan);
         final double carbPlan = 225.3;
         final double carbTotal = 160.3;
         final double carbGoal = 220.5;
@@ -277,7 +274,7 @@ void main() {
       }); //test ": carb linear"
 
       testWidgets(": fat linear", (tester) async {
-        final linearProgress = LinearNutrientTwoProgress(user, plan);
+        final linearProgress = LinearNutrientTwoProgress(info, plan);
         final double fatPlan = 70.2;
         final double fatTotal = 25.9;
         final double fatGoal = 60.8;
@@ -319,7 +316,7 @@ void main() {
 
     group("when total greater than goal", () {
       testWidgets(": protein linear", (tester) async {
-        final linearProgress = LinearNutrientTwoProgress(user, plan);
+        final linearProgress = LinearNutrientTwoProgress(info, plan);
         final double proteinPlan = 80.2;
         final double proteinTotal = 120.3;
         final double proteinGoal = 100.2;
@@ -364,7 +361,7 @@ void main() {
       }); //test ": protein linear"
 
       testWidgets(": carb linear", (tester) async {
-        final linearProgress = LinearNutrientTwoProgress(user, plan);
+        final linearProgress = LinearNutrientTwoProgress(info, plan);
         final double carbPlan = 180.0;
         final double carbTotal = 225.0;
         final double carbGoal = 220.5;
@@ -409,7 +406,7 @@ void main() {
       }); //test ": carb linear"
 
       testWidgets(": fat linear", (tester) async {
-        final linearProgress = LinearNutrientTwoProgress(user, plan);
+        final linearProgress = LinearNutrientTwoProgress(info, plan);
         final double fatPlan = 45.3;
         final double fatTotal = 75.0;
         final double fatGoal = 60.8;

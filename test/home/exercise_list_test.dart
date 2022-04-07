@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:foodandbody/models/exercise_repo.dart';
 import 'package:foodandbody/repositories/plan_repository.dart';
+import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/screens/home/exercise_list.dart';
 import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
 import 'package:mocktail/mocktail.dart';
@@ -16,6 +17,8 @@ class FakePlanEvent extends Fake implements PlanEvent {}
 class FakePlanState extends Fake implements PlanState {}
 
 class MockPlanRepository extends Mock implements PlanRepository {}
+
+class MockUserRepository extends Mock implements UserRepository {}
 
 void main() {
   final Timestamp mockDate = Timestamp.fromDate(DateTime.now());
@@ -30,6 +33,7 @@ void main() {
 
   late PlanBloc planBloc;
   late PlanRepository planRepository;
+  late UserRepository userRepository;
 
   setUpAll(() {
     registerFallbackValue<PlanEvent>(FakePlanEvent());
@@ -39,14 +43,19 @@ void main() {
   setUp(() async {
     planBloc = MockPlanBloc();
     planRepository = MockPlanRepository();
-    planBloc = PlanBloc(planRepository: planRepository);
+    userRepository = MockUserRepository();
+    planBloc = PlanBloc(
+        planRepository: planRepository, userRepository: userRepository);
   });
 
   group('Exercise List', () {
     testWidgets('render 3 exercise list card when have 3 exercise data',
         (tester) async {
       await tester.pumpWidget(MaterialApp(
-        home: ExerciseList(mockExercise),
+        home: BlocProvider.value(
+          value: planBloc,
+          child: ExerciseList(mockExercise),
+        ),
       ));
       expect(find.byType(Card), findsNWidgets(3));
       expect(find.text('name1'), findsOneWidget);
@@ -59,14 +68,19 @@ void main() {
 
     testWidgets('render nothing when have 0 exercise data', (tester) async {
       await tester.pumpWidget(MaterialApp(
-        home: ExerciseList([]),
+        home: BlocProvider.value(
+          value: planBloc,
+          child: ExerciseList([]),
+        ),
       ));
       expect(find.byType(Card), findsNothing);
     });
 
     testWidgets('render delete dialog when slide card', (tester) async {
       await tester.pumpWidget(MaterialApp(
-        home: ExerciseList(mockExercise),
+        home: BlocProvider.value(
+          value: planBloc,
+          child: ExerciseList(mockExercise),),
       ));
       await tester.drag(find.byType(Card).first, Offset(-500, 0));
       await tester.pumpAndSettle();
@@ -79,7 +93,9 @@ void main() {
     testWidgets('pop dialog when pressed cancle in delete dialog',
         (tester) async {
       await tester.pumpWidget(MaterialApp(
-        home: ExerciseList(mockExercise),
+        home: BlocProvider.value(
+          value: planBloc,
+          child: ExerciseList(mockExercise),),
       ));
       await tester.drag(find.byType(Card).first, Offset(-500, 0));
       await tester.pumpAndSettle();
