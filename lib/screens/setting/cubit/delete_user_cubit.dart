@@ -19,7 +19,7 @@ class DeleteUserCubit extends Cubit<DeleteUserState> {
     } catch (_) {
       emit(state.copyWith(
           status: DeleteUserStatus.failure,
-          errorMessage: 'เกิดข้อผิดพลาดบางอย่าง'));
+          errorMessage: 'ดำเนินการไม่สำเร็จ กรุณาลองใหม่'));
     }
   }
 }
