@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -31,6 +33,7 @@ class MenuDetail extends StatefulWidget {
 
 class _MenuDetailState extends State<MenuDetail> {
   late MenuBloc _menuBloc;
+  late Timer _timer;
 
   @override
   void initState() {
@@ -79,58 +82,119 @@ class _MenuDetailState extends State<MenuDetail> {
     }
   }
 
+  void _failAddMenu(BuildContext context) {
+    showDialog<String>(
+        context: context,
+        builder: (BuildContext context) {
+          _timer = Timer(Duration(seconds: 2), () {
+            Navigator.of(context).pop();
+          });
+          return AlertDialog(
+            content: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.report,
+                    color: Theme.of(context).colorScheme.secondary, size: 80),
+                Text('เพิ่มเมนูไม่สำเร็จ',
+                    style: Theme.of(context).textTheme.subtitle1!.merge(
+                        TextStyle(
+                            color: Theme.of(context).colorScheme.secondary))),
+                Text('กรุณาลองอีกครั้ง',
+                    style: Theme.of(context).textTheme.subtitle1!.merge(
+                        TextStyle(
+                            color: Theme.of(context).colorScheme.secondary))),
+              ],
+            ),
+          );
+        }).then((val) {
+      if (_timer.isActive) {
+        _timer.cancel();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<MenuBloc, MenuState>(
-      builder: (context, state) {
-        switch (state.status) {
-          case MenuStatus.failure:
-            return Center(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image(image: AssetImage('assets/error.png')),
-                  SizedBox(height: 10),
-                  Text('ไม่สามารถโหลดข้อมูลได้ในขณะนี้',
-                      style: Theme.of(context).textTheme.bodyText2!.merge(
-                          TextStyle(
-                              color: Theme.of(context).colorScheme.secondary))),
-                  OutlinedButton(
-                    child: Text('ลองอีกครั้ง'),
-                    style: OutlinedButton.styleFrom(
-                      primary: Theme.of(context).colorScheme.secondary,
-                      shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(50))),
+    return BlocListener<MenuBloc, MenuState>(
+      listenWhen: (previous, current) =>
+          previous.addMenuStatus != current.addMenuStatus,
+      listener: (context, state) {
+        switch (state.addMenuStatus) {
+          case AddMenuStatus.success:
+            Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => MainScreen(index: 1)),
+                (Route<dynamic> route) => route.isFirst);
+            return;
+          case AddMenuStatus.failure:
+            return _failAddMenu(context);
+          default:
+        }
+      },
+      child: BlocBuilder<MenuBloc, MenuState>(
+        builder: (context, state) {
+          switch (state.status) {
+            case MenuStatus.failure:
+              return Center(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image(image: AssetImage('assets/error.png')),
+                    SizedBox(height: 10),
+                    Text('ไม่สามารถโหลดข้อมูลได้ในขณะนี้',
+                        style: Theme.of(context).textTheme.bodyText2!.merge(
+                            TextStyle(
+                                color:
+                                    Theme.of(context).colorScheme.secondary))),
+                    OutlinedButton(
+                      child: Text('ลองอีกครั้ง'),
+                      style: OutlinedButton.styleFrom(
+                        primary: Theme.of(context).colorScheme.secondary,
+                        shape: const RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(50))),
+                      ),
+                      onPressed: () => _menuBloc.add(MenuFetched()),
                     ),
-                    onPressed: () => _menuBloc.add(MenuFetched()),
-                  ),
-                ],
-              ),
-            );
-          case MenuStatus.success:
-            return RefreshIndicator(
-              onRefresh: _onRefresh,
-              child: Column(
-                key: Key('menu_column'),
-                children: <Widget>[
-                  Expanded(
-                    child: ListView(
-                      children: <Widget>[
-                        Image.network(
-                          state.menu.imageUrl,
-                          alignment: Alignment.center,
-                          height: 300,
-                          fit: BoxFit.cover,
-                        ),
-                        Padding(
-                          padding: EdgeInsets.all(16.0),
-                          child: Column(
-                            children: <Widget>[
-                              Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: Text('แคลอรีรวม',
+                  ],
+                ),
+              );
+            case MenuStatus.success:
+              return RefreshIndicator(
+                onRefresh: _onRefresh,
+                child: Column(
+                  key: Key('menu_column'),
+                  children: <Widget>[
+                    Expanded(
+                      child: ListView(
+                        children: <Widget>[
+                          Image.network(
+                            state.menu.imageUrl,
+                            alignment: Alignment.center,
+                            height: 300,
+                            fit: BoxFit.cover,
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: Column(
+                              children: <Widget>[
+                                Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: Text('แคลอรีรวม',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline5!
+                                              .merge(TextStyle(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .secondary))),
+                                    ),
+                                    Text(
+                                        widget.isPlanMenu
+                                            ? '${widget.menu.calories.round()} แคล'
+                                            : '${state.menu.calory.round()} แคล',
                                         style: Theme.of(context)
                                             .textTheme
                                             .headline5!
@@ -138,66 +202,55 @@ class _MenuDetailState extends State<MenuDetail> {
                                                 color: Theme.of(context)
                                                     .colorScheme
                                                     .secondary))),
-                                  ),
-                                  Text(
-                                      widget.isPlanMenu
-                                          ? '${widget.menu.calories.round()} แคล'
-                                          : '${state.menu.calory.round()} แคล',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headline5!
-                                          .merge(TextStyle(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .secondary))),
-                                ],
-                              ),
-                              SizedBox(height: 16.0),
-                              NutrientDetail(
-                                label: 'หน่วยบริโภค',
-                                value:
-                                    '${widget.isPlanMenu ? _toRound(widget.menu.volumn) : _toRound(state.menu.serve)} ${state.menu.unit}',
-                              ),
-                              SizedBox(height: 7.0),
-                              NutrientDetail(
-                                label: 'โปรตีน',
-                                value:
-                                    '${widget.isPlanMenu ? _toRound(widget.menu.protein) : _toRound(state.menu.protein)} กรัม',
-                              ),
-                              SizedBox(height: 7.0),
-                              NutrientDetail(
-                                label: 'คาร์โบไฮเดรต',
-                                value:
-                                    '${widget.isPlanMenu ? _toRound(widget.menu.carb) : _toRound(state.menu.carb)} กรัม',
-                              ),
-                              SizedBox(height: 7.0),
-                              NutrientDetail(
-                                label: 'ไขมัน',
-                                value:
-                                    '${widget.isPlanMenu ? _toRound(widget.menu.fat) : _toRound(state.menu.fat)} กรัม',
-                              ),
-                              _NearRestaurant(
-                                items: state.nearRestaurant,
-                                defaultUrl: state.menu.imageUrl,
-                              ),
-                            ],
+                                  ],
+                                ),
+                                SizedBox(height: 16.0),
+                                NutrientDetail(
+                                  label: 'หน่วยบริโภค',
+                                  value:
+                                      '${widget.isPlanMenu ? _toRound(widget.menu.volumn) : _toRound(state.menu.serve)} ${state.menu.unit}',
+                                ),
+                                SizedBox(height: 7.0),
+                                NutrientDetail(
+                                  label: 'โปรตีน',
+                                  value:
+                                      '${widget.isPlanMenu ? _toRound(widget.menu.protein) : _toRound(state.menu.protein)} กรัม',
+                                ),
+                                SizedBox(height: 7.0),
+                                NutrientDetail(
+                                  label: 'คาร์โบไฮเดรต',
+                                  value:
+                                      '${widget.isPlanMenu ? _toRound(widget.menu.carb) : _toRound(state.menu.carb)} กรัม',
+                                ),
+                                SizedBox(height: 7.0),
+                                NutrientDetail(
+                                  label: 'ไขมัน',
+                                  value:
+                                      '${widget.isPlanMenu ? _toRound(widget.menu.fat) : _toRound(state.menu.fat)} กรัม',
+                                ),
+                                _NearRestaurant(
+                                  items: state.nearRestaurant,
+                                  defaultUrl: state.menu.imageUrl,
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: _displayButton(
-                        state.menu.name, state.menu.serve, state.menu.unit),
-                  ),
-                ],
-              ),
-            );
-          default:
-            return const Center(child: CircularProgressIndicator());
-        }
-      },
+                    Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: _displayButton(
+                          state.menu.name, state.menu.serve, state.menu.unit),
+                    ),
+                  ],
+                ),
+              );
+            default:
+              return const Center(child: CircularProgressIndicator());
+          }
+        },
+      ),
     );
   }
 }
@@ -251,8 +304,15 @@ class _NearRestaurantItem extends StatelessWidget {
       {Key? key, required this.item, required this.defaultUrl})
       : super(key: key);
 
-  String showTime(TimeOfDay time) {
-    return '${time.hour}:${time.minute == 0 ? '00' : time.minute}';
+  String _showTime(String? time) {
+    return time != null
+        ? '${time.substring(0, 2)}.${time.substring(2, 4)}'
+        : '';
+  }
+
+  String _distance(String? value) {
+    String distance = value ?? '- km';
+    return distance.split(' ')[0];
   }
 
   @override
@@ -279,10 +339,13 @@ class _NearRestaurantItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('${item.name}',
+                    maxLines: 1,
+                    softWrap: false,
+                    overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodyText2!.merge(
                         TextStyle(
                             color: Theme.of(context).colorScheme.secondary))),
-                Text('${item.distance} กิโลเมตร',
+                Text('${_distance(item.distance)} กิโลเมตร',
                     style: Theme.of(context).textTheme.caption!.merge(TextStyle(
                         color: Theme.of(context).colorScheme.secondary))),
                 RatingBarIndicator(
@@ -304,20 +367,13 @@ class _NearRestaurantItem extends StatelessWidget {
                   children: [
                     Icon(Icons.access_time,
                         color: Theme.of(context).colorScheme.secondary),
-                    item.open != null && item.close != null
-                        ? Text(
-                            ' ${item.open!.substring(0, 2)}.${item.open!.substring(2, 4)} - ${item.close!.substring(0, 2)}.${item.close!.substring(2, 4)}',
-                            style: Theme.of(context).textTheme.caption!.merge(
-                                TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .secondary)))
-                        : Text(" 00.00 - 00.00",
-                            style: Theme.of(context).textTheme.caption!.merge(
-                                TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .secondary))),
+                    Text(
+                      " ${_showTime(item.open)} - ${_showTime(item.close)}",
+                      style: Theme.of(context).textTheme.caption!.merge(
+                            TextStyle(
+                                color: Theme.of(context).colorScheme.secondary),
+                          ),
+                    ),
                   ],
                 ),
               ],
@@ -354,14 +410,13 @@ class _AddToPlanButton extends StatelessWidget {
                 MenuDialog(serve: serve, unit: unit, isEatNow: false),
           );
           if (value != 'cancel' && value != null) {
-            await context.read<MenuBloc>().addMenu(
-                name: name,
-                isEatNow: false,
-                volumn: double.parse(value.toString()));
-
-            Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => MainScreen(index: 1)),
-                (Route<dynamic> route) => route.isFirst);
+            context.read<MenuBloc>().add(
+                  AddMenu(
+                    name: name,
+                    isEatNow: false,
+                    volumn: double.parse(value.toString()),
+                  ),
+                );
           }
         },
       ),
@@ -390,20 +445,17 @@ class _EatNowButton extends StatelessWidget {
     );
     if (value != 'cancel' && value != null) {
       if (isPlanMenu) {
-        await context.read<MenuBloc>().addMenu(
+        context.read<MenuBloc>().add(AddMenu(
             name: name,
             isEatNow: true,
             oldVolume: volumn,
-            volumn: double.parse(value.toString()));
+            volumn: double.parse(value.toString())));
       } else {
-        await context.read<MenuBloc>().addMenu(
-            name: name, isEatNow: true, volumn: double.parse(value.toString()));
+        context.read<MenuBloc>().add(AddMenu(
+            name: name,
+            isEatNow: true,
+            volumn: double.parse(value.toString())));
       }
-
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => MainScreen(index: 1)),
-        (Route<dynamic> route) => route.isFirst,
-      );
     }
   }
 
