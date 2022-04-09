@@ -1,23 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodandbody/repositories/authen_repository.dart';
 import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/screens/edit_profile/cubit/edit_profile_cubit.dart';
 import 'package:foodandbody/screens/edit_profile/edit_profile.dart';
 import 'package:foodandbody/screens/edit_profile/edit_password.dart';
-import 'package:foodandbody/screens/main_screen/bloc/info_bloc.dart';
-import 'package:foodandbody/screens/setting/delete_user.dart';
+import 'package:foodandbody/screens/setting/cubit/delete_user_cubit.dart';
 
-class Setting extends StatefulWidget {
+class Setting extends StatelessWidget {
   const Setting({Key? key}) : super(key: key);
+
   @override
-  State<StatefulWidget> createState() => _SettingState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+        backgroundColor: Theme.of(context).primaryColor,
+        body: SafeArea(
+          child: BlocProvider(
+            create: (context) =>
+                DeleteUserCubit(context.read<AuthenRepository>()),
+            child: SettingPage(),
+          ),
+        ));
+  }
 }
 
-class _SettingState extends State<Setting> {
+class SettingPage extends StatefulWidget {
+  const SettingPage({Key? key}) : super(key: key);
+  @override
+  State<StatefulWidget> createState() => _SettingPageState();
+}
+
+class _SettingPageState extends State<SettingPage> {
   @override
   Widget build(BuildContext context) {
     final _user = context.read<AppBloc>().state.user;
+    final _account =
+        context.read<AuthenRepository>().providerData.first.providerId;
     final _info = context.read<UserRepository>().cache.get();
     final bool hasPhotoUrl;
     final String photoUrl;
@@ -38,7 +57,22 @@ class _SettingState extends State<Setting> {
       photoUrl = "";
     }
 
-    return Scaffold(
+    return BlocListener<DeleteUserCubit, DeleteUserState>(
+      listenWhen: (previous, current) => previous.status != current.status,
+      listener: ((context, state) {
+        if (state.status == DeleteUserStatus.failure) {
+          FocusManager.instance.primaryFocus?.unfocus();
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(content: Text('${state.errorMessage}')),
+            );
+        } else if (state.status == DeleteUserStatus.success) {
+          Navigator.popUntil(context, (Route<dynamic> route) => false);
+          context.read<AuthenRepository>().logOut();
+        }
+      }),
+      child: Scaffold(
         extendBody: true,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
@@ -161,36 +195,39 @@ class _SettingState extends State<Setting> {
                           ),
                         ),
                       ),
-                      Container(
-                        constraints: BoxConstraints.tightFor(height: 45),
-                        padding: EdgeInsets.only(left: 17),
-                        alignment: Alignment.topLeft,
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => BlocProvider<
-                                            EditProfileCubit>(
-                                        create: (context) => EditProfileCubit(
-                                            context.read<UserRepository>()),
-                                        child: EditPassword())));
-                          },
-                          style: TextButton.styleFrom(
-                              minimumSize: Size.zero,
-                              alignment: Alignment.topLeft,
-                              padding: EdgeInsets.zero),
-                          child: Text(
-                            "แก้ไขรหัสผ่าน",
-                            style: Theme.of(context).textTheme.bodyText1!.merge(
-                                  TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .secondary),
-                                ),
+                      if (_account != 'google.com' &&
+                          _account != 'facebook.com')
+                        Container(
+                          constraints: BoxConstraints.tightFor(height: 45),
+                          padding: EdgeInsets.only(left: 17),
+                          alignment: Alignment.topLeft,
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => BlocProvider<
+                                              EditProfileCubit>(
+                                          create: (context) => EditProfileCubit(
+                                              context.read<UserRepository>()),
+                                          child: EditPassword())));
+                            },
+                            style: TextButton.styleFrom(
+                                minimumSize: Size.zero,
+                                alignment: Alignment.topLeft,
+                                padding: EdgeInsets.zero),
+                            child: Text(
+                              "แก้ไขรหัสผ่าน",
+                              style:
+                                  Theme.of(context).textTheme.bodyText1!.merge(
+                                        TextStyle(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .secondary),
+                                      ),
+                            ),
                           ),
                         ),
-                      ),
                       Container(
                         width: MediaQuery.of(context).size.width,
                         constraints: BoxConstraints.tightFor(height: 10),
@@ -257,12 +294,6 @@ class _SettingState extends State<Setting> {
                         alignment: Alignment.topLeft,
                         constraints: BoxConstraints.tightFor(height: 45),
                         child: TextButton(
-                          onPressed: () async {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => DeleteUser()));
-                          },
                           style: TextButton.styleFrom(
                               padding: EdgeInsets.zero,
                               alignment: Alignment.topLeft,
@@ -274,6 +305,51 @@ class _SettingState extends State<Setting> {
                                 .bodyText1!
                                 .merge(TextStyle(color: Color(0xFFFF0000))),
                           ),
+                          onPressed: () async {
+                            final value = await showDialog<String>(
+                              context: context,
+                              builder: (BuildContext context) => AlertDialog(
+                                content: Text('ลบบัญชีและข้อมูลทั้งหมดในบัญชี',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .subtitle1!
+                                        .merge(TextStyle(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .secondary))),
+                                actions: <Widget>[
+                                  TextButton(
+                                      key: const Key(
+                                          "setting_deleteAccount_dialog_ok_button"),
+                                      onPressed: () =>
+                                          Navigator.pop(context, 'ok'),
+                                      child: Text("ตกลง",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .button!
+                                              .merge(TextStyle(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .secondary)))),
+                                  TextButton(
+                                      key: const Key(
+                                          "setting_deleteAccount_dialog_cancel_button"),
+                                      onPressed: () =>
+                                          Navigator.pop(context, 'cancel'),
+                                      child: Text("ยกเลิก",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .button!
+                                              .merge(TextStyle(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .secondary))))
+                                ],
+                              ),
+                            );
+                            if (value == 'ok')
+                              context.read<DeleteUserCubit>().deleteUser();
+                          },
                         ),
                       )
                     ],
@@ -282,6 +358,8 @@ class _SettingState extends State<Setting> {
               )
             ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 }
