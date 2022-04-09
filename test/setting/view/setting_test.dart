@@ -11,8 +11,6 @@ import 'package:foodandbody/models/username.dart';
 import 'package:foodandbody/repositories/authen_repository.dart';
 import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/screens/edit_profile/cubit/edit_profile_cubit.dart';
-import 'package:foodandbody/screens/edit_profile/edit_password.dart';
-import 'package:foodandbody/screens/edit_profile/edit_profile.dart';
 import 'package:foodandbody/screens/setting/cubit/delete_user_cubit.dart';
 import 'package:foodandbody/screens/setting/setting.dart';
 import 'package:mocktail/mocktail.dart';
@@ -85,6 +83,7 @@ void main() {
       when(() => appBloc.state).thenReturn(AppState.authenticated(mockUser));
       deleteUserCubit = MockDeleteUserCubit();
       when(() => deleteUserCubit.state).thenReturn(DeleteUserState());
+      when(() => deleteUserCubit.deleteUser()).thenAnswer((_) async {});
       editProfileCubit = MockEditProfileCubit();
       when(() => editProfileCubit.state).thenReturn(const EditProfileState(
           name: validUsername, gender: validGender, photoUrl: mockImgUrl));
@@ -225,7 +224,6 @@ void main() {
     testWidgets('render deleteAccount dialog when pressed deleteAccount button',
         (tester) async {
       mockNetworkImagesFor(() async {
-        when(() => deleteUserCubit.deleteUser()).thenAnswer((_) async {});
         await tester.pumpWidget(
           MultiRepositoryProvider(
             providers: [
@@ -256,7 +254,6 @@ void main() {
         'close deleteAccount dialog and do nothing when pressed deleteAccount dialog cancel button',
         (tester) async {
       mockNetworkImagesFor(() async {
-        when(() => deleteUserCubit.deleteUser()).thenAnswer((_) async {});
         await tester.pumpWidget(
           MultiRepositoryProvider(
             providers: [
@@ -281,6 +278,40 @@ void main() {
         await tester.pumpAndSettle();
         expect(find.byType(AlertDialog), findsNothing);
         verifyNever(() => deleteUserCubit.deleteUser());
+      });
+    });
+
+    testWidgets('render SnackBar when status is failure', (tester) async {
+      mockNetworkImagesFor(() async {
+        whenListen(
+          deleteUserCubit,
+          Stream.fromIterable(const <DeleteUserState>[
+            DeleteUserState(status: DeleteUserStatus.initial),
+            DeleteUserState(
+                status: DeleteUserStatus.failure,
+                errorMessage: 'ดำเนินการไม่สำเร็จ กรุณาลองใหม่'),
+          ]),
+        );
+        await tester.pumpWidget(
+          MultiRepositoryProvider(
+            providers: [
+              RepositoryProvider.value(value: authenRepository),
+              RepositoryProvider.value(value: userRepository),
+            ],
+            child: BlocProvider.value(
+              value: appBloc,
+              child: MaterialApp(
+                home: BlocProvider.value(
+                  value: deleteUserCubit,
+                  child: SettingPage(),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pump();
+        expect(find.byType(SnackBar), findsOneWidget);
+        expect(find.text('ดำเนินการไม่สำเร็จ กรุณาลองใหม่'), findsOneWidget);
       });
     });
 
@@ -360,7 +391,6 @@ void main() {
         'call deleteUserCubit deleteUser when pressed deleteAccount dialog ok button',
         (tester) async {
       mockNetworkImagesFor(() async {
-        when(() => deleteUserCubit.deleteUser()).thenAnswer((_) async {});
         await tester.pumpWidget(
           MultiRepositoryProvider(
             providers: [

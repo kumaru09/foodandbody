@@ -11,6 +11,7 @@ class DeleteUserCubit extends Cubit<DeleteUserState> {
 
   Future<void> deleteUser() async {
     try {
+      emit(state.copyWith(status: DeleteUserStatus.initial));
       await _authenRepository.deleteUser();
       emit(state.copyWith(status: DeleteUserStatus.success));
     } on DeleteUserFailure catch (e) {

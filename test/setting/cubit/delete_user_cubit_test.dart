@@ -25,6 +25,7 @@ void main() {
       build: () => DeleteUserCubit(authenRepository),
       act: (cubit) => cubit.deleteUser(),
       expect: () => const <DeleteUserState>[
+        DeleteUserState(status: DeleteUserStatus.initial),
         DeleteUserState(status: DeleteUserStatus.success)
       ],
       verify: (_) => verify(() => authenRepository.deleteUser()).called(1),
@@ -37,6 +38,7 @@ void main() {
       build: () => DeleteUserCubit(authenRepository),
       act: (cubit) => cubit.deleteUser(),
       expect: () => const <DeleteUserState>[
+        DeleteUserState(status: DeleteUserStatus.initial),
         DeleteUserState(
           status: DeleteUserStatus.failure,
           errorMessage: 'ดำเนินการไม่สำเร็จ กรุณาลองใหม่',
@@ -52,6 +54,7 @@ void main() {
       build: () => DeleteUserCubit(authenRepository),
       act: (cubit) => cubit.deleteUser(),
       expect: () => const <DeleteUserState>[
+        DeleteUserState(status: DeleteUserStatus.initial),
         DeleteUserState(
           status: DeleteUserStatus.failure,
           errorMessage: 'ไม่สามารถลบบัญชีผู้ใช้ได้ กรุณาลองใหม่อีกครั้ง',
