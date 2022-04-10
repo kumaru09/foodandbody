@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
-import 'package:provider/src/provider.dart';
 
 class AddExerciseButton extends StatelessWidget {
   const AddExerciseButton({Key? key}) : super(key: key);
@@ -24,7 +23,7 @@ class AddExerciseButton extends StatelessWidget {
           context.read<PlanBloc>().add(AddExercise(
               id: value['activity'],
               min: int.parse(value['time']),
-              weight: context.read<PlanBloc>().state.info!.weight!));
+              weight: context.read<UserRepository>().cache.get()!.weight!));
         }
       },
       style: ElevatedButton.styleFrom(
