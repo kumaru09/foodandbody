@@ -7,10 +7,12 @@ import 'package:foodandbody/models/gender.dart';
 import 'package:foodandbody/models/info.dart';
 import 'package:foodandbody/models/user.dart';
 import 'package:foodandbody/models/username.dart';
+import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/screens/edit_profile/cubit/edit_profile_cubit.dart';
 import 'package:foodandbody/screens/edit_profile/edit_profile.dart';
 import 'package:formz/formz.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:network_image_mock/network_image_mock.dart';
 
 class MockEditProfileCubit extends MockCubit<EditProfileState>
     implements EditProfileCubit {}
@@ -27,11 +29,15 @@ class MockUsername extends Mock implements Username {}
 
 class MockGender extends Mock implements Gender {}
 
+class MockUserRepository extends Mock implements UserRepository {}
+
+class MockInfoCache extends Mock implements InfoCache {}
+
 void main() {
   const usernameInputKey = Key('editProfile_username');
   const genderInputKey = Key('editProfile_gender');
   const image = Key('editProfile_image');
-  const editImageButton = Key('editProfile_editImageButton');
+  // const editImageButton = Key('editProfile_editImageButton');
   const saveButton = Key('editProfile_saveButton');
   const backButton = Key('editProfile_backButton');
 
@@ -52,14 +58,17 @@ void main() {
   const mockImgUrl = 'imgurl';
   const mockErrorMessage = 'แก้ไขข้อมูลไม่สำเร็จ กรุณาลองใหม่';
 
-  final Info mockInfo =
-      Info(name: validUsernameString, gender: validGenderString, photoUrl: '');
-  final User mockUser =
-      User(uid: mockUid, name: validUsernameString, info: mockInfo);
+  final Info mockInfo = Info(
+      name: validUsernameString,
+      gender: validGenderString,
+      photoUrl: mockImgUrl);
+  final User mockUser = User(uid: mockUid, name: validUsernameString);
 
   group('EditProfile', () {
     late EditProfileCubit editProfileCubit;
     late AppBloc appBloc;
+    late UserRepository userRepository;
+    late InfoCache infoCache;
 
     setUpAll(() {
       registerFallbackValue<AppEvent>(FakeAppEvent());
@@ -70,53 +79,69 @@ void main() {
     setUp(() {
       appBloc = MockAppBloc();
       editProfileCubit = MockEditProfileCubit();
+      userRepository = MockUserRepository();
+      infoCache = MockInfoCache();
       when(() => editProfileCubit.state).thenReturn(const EditProfileState(
           name: validUsername, gender: validGender, photoUrl: mockImgUrl));
       when(() => editProfileCubit.editProfileSubmitted())
           .thenAnswer((_) async {});
       when(() => appBloc.state).thenReturn(AppState.authenticated(mockUser));
+      when(() => userRepository.getInfo()).thenAnswer((_) async {});
+      when(() => userRepository.cache).thenReturn(infoCache);
+      when(() => infoCache.get()).thenReturn(mockInfo);
     });
 
     testWidgets('renders all widget right at initial', (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: BlocProvider.value(
-              value: appBloc,
-              child: BlocProvider.value(
-                value: editProfileCubit,
-                child: EditProfile(),
-              ),
-            ),
-          ),
-        ),
-      );
-      expect(find.byType(AppBar), findsOneWidget);
-      expect(find.text('แก้ไขโปรไฟล์'), findsOneWidget);
-      expect(find.byKey(saveButton), findsOneWidget);
-      expect(find.byKey(backButton), findsOneWidget);
-      expect(find.byKey(usernameInputKey), findsOneWidget);
-      expect(find.byKey(genderInputKey), findsOneWidget);
-      expect(find.byKey(image), findsOneWidget);
-    });
-
-    group('calls', () {
-      testWidgets('usernameChanged when username changes', (tester) async {
+      mockNetworkImagesFor(() async {
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: BlocProvider.value(
-                value: appBloc,
-                child: BlocProvider.value(
-                  value: editProfileCubit,
+          RepositoryProvider.value(
+            value: userRepository,
+            child: MaterialApp(
+              home: Scaffold(
+                body: MultiBlocProvider(
+                  providers: [
+                    BlocProvider.value(value: appBloc),
+                    BlocProvider.value(value: editProfileCubit),
+                  ],
                   child: EditProfile(),
                 ),
               ),
             ),
           ),
         );
-        await tester.enterText(find.byKey(usernameInputKey), testUsername);
-        verify(() => editProfileCubit.usernameChanged(testUsername)).called(1);
+        expect(find.byType(AppBar), findsOneWidget);
+        expect(find.text('แก้ไขโปรไฟล์'), findsOneWidget);
+        expect(find.byKey(saveButton), findsOneWidget);
+        expect(find.byKey(backButton), findsOneWidget);
+        expect(find.byKey(usernameInputKey), findsOneWidget);
+        expect(find.byKey(genderInputKey), findsOneWidget);
+        expect(find.byKey(image), findsOneWidget);
+      });
+    });
+
+    group('calls', () {
+      testWidgets('usernameChanged when username changes', (tester) async {
+        mockNetworkImagesFor(() async {
+          await tester.pumpWidget(
+            RepositoryProvider.value(
+              value: userRepository,
+              child: MaterialApp(
+                home: Scaffold(
+                  body: MultiBlocProvider(
+                    providers: [
+                      BlocProvider.value(value: appBloc),
+                      BlocProvider.value(value: editProfileCubit),
+                    ],
+                    child: EditProfile(),
+                  ),
+                ),
+              ),
+            ),
+          );
+          await tester.enterText(find.byKey(usernameInputKey), testUsername);
+          verify(() => editProfileCubit.usernameChanged(testUsername))
+              .called(1);
+        });
       });
 
       // testWidgets('photoUrlChanged when photoUrl changes', (tester) async {
@@ -141,29 +166,34 @@ void main() {
       // });
 
       testWidgets('genderChanged when gender changes', (tester) async {
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: BlocProvider.value(
-                value: appBloc,
-                child: BlocProvider.value(
-                  value: editProfileCubit,
-                  child: EditProfile(),
+        mockNetworkImagesFor(() async {
+          await tester.pumpWidget(
+            RepositoryProvider.value(
+              value: userRepository,
+              child: MaterialApp(
+                home: Scaffold(
+                  body: MultiBlocProvider(
+                    providers: [
+                      BlocProvider.value(value: appBloc),
+                      BlocProvider.value(value: editProfileCubit),
+                    ],
+                    child: EditProfile(),
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-        var input1 = tester.widget<DropdownButtonFormField<String>>(
-            find.byKey(genderInputKey));
-        expect(input1.initialValue, 'M');
+          );
+          var input1 = tester.widget<DropdownButtonFormField<String>>(
+              find.byKey(genderInputKey));
+          expect(input1.initialValue, 'M');
 
-        await tester.tap(find.byKey(genderInputKey));
-        await tester.pumpAndSettle();
-        await tester.tap(find.text(testGender).last);
-        await tester.pumpAndSettle();
+          await tester.tap(find.byKey(genderInputKey));
+          await tester.pumpAndSettle();
+          await tester.tap(find.text(testGender).last);
+          await tester.pumpAndSettle();
 
-        verify(() => editProfileCubit.genderChanged('F')).called(1);
+          verify(() => editProfileCubit.genderChanged('F')).called(1);
+        });
       });
 
       testWidgets('editProfileSubmitted when save button is pressed',
@@ -173,27 +203,31 @@ void main() {
             gender: validGender,
             photoUrl: mockImgUrl,
             statusProfile: FormzStatus.valid));
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: BlocProvider.value(
-                value: appBloc,
-                child: BlocProvider.value(
-                  value: editProfileCubit,
-                  child: EditProfile(),
+        mockNetworkImagesFor(() async {
+          await tester.pumpWidget(
+            RepositoryProvider.value(
+              value: userRepository,
+              child: MaterialApp(
+                home: Scaffold(
+                  body: MultiBlocProvider(
+                    providers: [
+                      BlocProvider.value(value: appBloc),
+                      BlocProvider.value(value: editProfileCubit),
+                    ],
+                    child: EditProfile(),
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-        await tester.tap(find.byKey(saveButton));
-        verify(() => editProfileCubit.editProfileSubmitted()).called(1);
+          );
+          await tester.tap(find.byKey(saveButton));
+          verify(() => editProfileCubit.editProfileSubmitted()).called(1);
+        });
       });
     });
 
-    group('after edit renders', () {
-      testWidgets('EditProfile Failure SnackBar when submission fails',
-          (tester) async {
+    group('renders', () {
+      testWidgets('failure SnackBar when submission fails', (tester) async {
         whenListen(
           editProfileCubit,
           Stream.fromIterable(const <EditProfileState>[
@@ -203,25 +237,30 @@ void main() {
                 errorMessage: mockErrorMessage),
           ]),
         );
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: BlocProvider.value(
-                value: appBloc,
-                child: BlocProvider.value(
-                  value: editProfileCubit,
-                  child: EditProfile(),
+        mockNetworkImagesFor(() async {
+          await tester.pumpWidget(
+            RepositoryProvider.value(
+              value: userRepository,
+              child: MaterialApp(
+                home: Scaffold(
+                  body: MultiBlocProvider(
+                    providers: [
+                      BlocProvider.value(value: appBloc),
+                      BlocProvider.value(value: editProfileCubit),
+                    ],
+                    child: EditProfile(),
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-        await tester.pump();
-        expect(find.text('แก้ไขข้อมูลไม่สำเร็จ กรุณาลองใหม่'), findsOneWidget);
+          );
+          await tester.pump();
+          expect(
+              find.text('แก้ไขข้อมูลไม่สำเร็จ กรุณาลองใหม่'), findsOneWidget);
+        });
       });
 
-      testWidgets('EditProfile success SnackBar when submission success',
-          (tester) async {
+      testWidgets('success SnackBar when submission success', (tester) async {
         whenListen(
           editProfileCubit,
           Stream.fromIterable(const <EditProfileState>[
@@ -229,21 +268,26 @@ void main() {
             EditProfileState(statusProfile: FormzStatus.submissionSuccess),
           ]),
         );
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: BlocProvider.value(
-                value: appBloc,
-                child: BlocProvider.value(
-                  value: editProfileCubit,
-                  child: EditProfile(),
+        mockNetworkImagesFor(() async {
+          await tester.pumpWidget(
+            RepositoryProvider.value(
+              value: userRepository,
+              child: MaterialApp(
+                home: Scaffold(
+                  body: MultiBlocProvider(
+                    providers: [
+                      BlocProvider.value(value: appBloc),
+                      BlocProvider.value(value: editProfileCubit),
+                    ],
+                    child: EditProfile(),
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-        await tester.pump();
-        expect(find.text('แก้ไขข้อมูลเรียบร้อยแล้ว'), findsOneWidget);
+          );
+          await tester.pump();
+          expect(find.text('แก้ไขข้อมูลเรียบร้อยแล้ว'), findsOneWidget);
+        });
       });
 
       testWidgets('invalid username error text when username is invalid',
@@ -252,20 +296,25 @@ void main() {
         when(() => username.invalid).thenReturn(true);
         when(() => editProfileCubit.state).thenReturn(EditProfileState(
             name: invalidUsername, gender: validGender, photoUrl: mockImgUrl));
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: BlocProvider.value(
-                value: appBloc,
-                child: BlocProvider.value(
-                  value: editProfileCubit,
-                  child: EditProfile(),
+        mockNetworkImagesFor(() async {
+          await tester.pumpWidget(
+            RepositoryProvider.value(
+              value: userRepository,
+              child: MaterialApp(
+                home: Scaffold(
+                  body: MultiBlocProvider(
+                    providers: [
+                      BlocProvider.value(value: appBloc),
+                      BlocProvider.value(value: editProfileCubit),
+                    ],
+                    child: EditProfile(),
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-        expect(find.text('กรุณาระบุชื่อผู้ใช้งาน'), findsOneWidget);
+          );
+          expect(find.text('กรุณาระบุชื่อผู้ใช้งาน'), findsOneWidget);
+        });
       });
 
       testWidgets("disabled save button when status is not validated",
@@ -275,21 +324,26 @@ void main() {
             name: validUsername,
             gender: validGender,
             photoUrl: mockImgUrl));
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: BlocProvider.value(
-                value: appBloc,
-                child: BlocProvider.value(
-                  value: editProfileCubit,
-                  child: EditProfile(),
+        mockNetworkImagesFor(() async {
+          await tester.pumpWidget(
+            RepositoryProvider.value(
+              value: userRepository,
+              child: MaterialApp(
+                home: Scaffold(
+                  body: MultiBlocProvider(
+                    providers: [
+                      BlocProvider.value(value: appBloc),
+                      BlocProvider.value(value: editProfileCubit),
+                    ],
+                    child: EditProfile(),
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-        final TextButton button = tester.widget(find.byKey(saveButton));
-        expect(button.enabled, isFalse);
+          );
+          final TextButton button = tester.widget(find.byKey(saveButton));
+          expect(button.enabled, isFalse);
+        });
       });
 
       testWidgets("enabled save button when status is validated",
@@ -299,21 +353,26 @@ void main() {
             name: validUsername,
             gender: validGender,
             photoUrl: mockImgUrl));
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: BlocProvider.value(
-                value: appBloc,
-                child: BlocProvider.value(
-                  value: editProfileCubit,
-                  child: EditProfile(),
+        mockNetworkImagesFor(() async {
+          await tester.pumpWidget(
+            RepositoryProvider.value(
+              value: userRepository,
+              child: MaterialApp(
+                home: Scaffold(
+                  body: MultiBlocProvider(
+                    providers: [
+                      BlocProvider.value(value: appBloc),
+                      BlocProvider.value(value: editProfileCubit),
+                    ],
+                    child: EditProfile(),
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-        final TextButton button = tester.widget(find.byKey(saveButton));
-        expect(button.enabled, isTrue);
+          );
+          final TextButton button = tester.widget(find.byKey(saveButton));
+          expect(button.enabled, isTrue);
+        });
       });
     });
   });

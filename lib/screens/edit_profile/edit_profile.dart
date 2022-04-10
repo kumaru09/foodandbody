@@ -7,7 +7,6 @@ import 'package:foodandbody/models/info.dart';
 import 'package:foodandbody/models/user.dart';
 import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/screens/edit_profile/cubit/edit_profile_cubit.dart';
-import 'package:foodandbody/screens/main_screen/bloc/info_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -27,12 +26,6 @@ class EditProfile extends StatelessWidget {
                 .read<UserRepository>()
                 .getInfo()
                 .then((value) => Navigator.of(context).pop());
-            // final info = context.read<AppBloc>().state.user.info!.copyWith(
-            //     name: state.name.value,
-            //     photoUrl: state.photoUrl,
-            //     gender: state.gender.value);
-            // context.read<AppBloc>().add(EditInfoRequested(
-            //     context.read<AppBloc>().state.user.copyWith(info: info)));
           } else if (state.statusProfile.isSubmissionFailure) {
             FocusManager.instance.primaryFocus?.unfocus();
             ScaffoldMessenger.of(context)
@@ -270,6 +263,7 @@ class __EditGenderState extends State<_EditGender> {
             decoration: InputDecoration(
               labelText: "เพศ",
               border: OutlineInputBorder(borderSide: BorderSide()),
+              errorText: state.gender.invalid ? 'กรุณาระบุเพศของคุณ' : null,
             ),
             items: [
               DropdownMenuItem<String>(

@@ -17,7 +17,6 @@ void main() {
   const String mockErrorMessage = 'เกิดข้อผิดพลาด กรุณาลองใหม่';
 
   group('EditProfileState', () {
-
     test('supports value comparisons', () {
       expect(EditProfileState(), EditProfileState());
     });
@@ -26,7 +25,9 @@ void main() {
       expect(EditProfileState().copyWith(), EditProfileState());
     });
 
-    test('returns object with updated statusProfile when status is passed', () {
+    test(
+        'returns object with updated statusProfile when statusProfile is passed',
+        () {
       expect(
         EditProfileState().copyWith(statusProfile: FormzStatus.pure),
         EditProfileState(),
@@ -54,14 +55,17 @@ void main() {
       );
     });
 
-    test('returns object with updated statusPassword when status is passed', () {
+    test(
+        'returns object with updated statusPassword when statusPassword is passed',
+        () {
       expect(
         EditProfileState().copyWith(statusPassword: FormzStatus.pure),
         EditProfileState(),
       );
     });
 
-    test('returns object with updated oldPassword when oldPassword is passed', () {
+    test('returns object with updated oldPassword when oldPassword is passed',
+        () {
       expect(
         EditProfileState().copyWith(password: mockOldPassword),
         EditProfileState(password: mockOldPassword),
@@ -84,8 +88,7 @@ void main() {
       );
     });
 
-    test(
-        'returns object with updated errorMessage when errorMessage is passed',
+    test('returns object with updated errorMessage when errorMessage is passed',
         () {
       expect(
         EditProfileState().copyWith(errorMessage: mockErrorMessage),
