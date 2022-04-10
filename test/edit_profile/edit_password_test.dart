@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:foodandbody/app/bloc/app_bloc.dart';
 import 'package:foodandbody/models/confirm_password.dart';
-import 'package:foodandbody/models/info.dart';
 import 'package:foodandbody/models/password.dart';
 import 'package:foodandbody/models/user.dart';
 import 'package:foodandbody/screens/edit_profile/cubit/edit_profile_cubit.dart';
@@ -33,7 +32,6 @@ void main() {
 
   const mockUid = 's1uskWSx4NeSECk8gs2R9bofrG23';
   const mockName = 'user';
-  const mockGender = 'M';
 
   const invalidPasswordString = '';
   const invalidPassword = Password.dirty(invalidPasswordString);
@@ -57,10 +55,9 @@ void main() {
 
   const mockErrorMessage = 'เกิดข้อผิดพลาด กรุณาลองใหม่';
 
-  final Info mockInfo = Info(name: mockName, gender: mockGender, photoUrl: '');
-  final User mockUser = User(uid: mockUid, name: mockName, info: mockInfo);
+  final User mockUser = User(uid: mockUid, name: mockName);
 
-  group('EditProfile', () {
+  group('EditPassword', () {
     late EditProfileCubit editProfileCubit;
     late AppBloc appBloc;
 
@@ -192,9 +189,8 @@ void main() {
       });
     });
 
-    group('after edit renders', () {
-      testWidgets('EditPassword Failure SnackBar when submission fails',
-          (tester) async {
+    group('renders', () {
+      testWidgets('Failure SnackBar when submission fails', (tester) async {
         whenListen(
           editProfileCubit,
           Stream.fromIterable(const <EditProfileState>[
@@ -221,8 +217,7 @@ void main() {
         expect(find.text('เกิดข้อผิดพลาด กรุณาลองใหม่'), findsOneWidget);
       });
 
-      testWidgets('EditPassword success SnackBar when submission success',
-          (tester) async {
+      testWidgets('success SnackBar when submission success', (tester) async {
         whenListen(
           editProfileCubit,
           Stream.fromIterable(const <EditProfileState>[
@@ -338,8 +333,8 @@ void main() {
 
       testWidgets("disabled save button when status is not validated",
           (tester) async {
-        when(() => editProfileCubit.state).thenReturn(EditProfileState(
-            statusPassword: FormzStatus.invalid));
+        when(() => editProfileCubit.state)
+            .thenReturn(EditProfileState(statusPassword: FormzStatus.invalid));
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
@@ -353,15 +348,14 @@ void main() {
             ),
           ),
         );
-        final TextButton button =
-            tester.widget(find.byKey(saveButton));
+        final TextButton button = tester.widget(find.byKey(saveButton));
         expect(button.enabled, isFalse);
       });
 
       testWidgets("enabled save button when status is validated",
           (tester) async {
-        when(() => editProfileCubit.state).thenReturn(EditProfileState(
-            statusPassword: FormzStatus.valid));
+        when(() => editProfileCubit.state)
+            .thenReturn(EditProfileState(statusPassword: FormzStatus.valid));
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
@@ -375,8 +369,7 @@ void main() {
             ),
           ),
         );
-        final TextButton button =
-            tester.widget(find.byKey(saveButton));
+        final TextButton button = tester.widget(find.byKey(saveButton));
         expect(button.enabled, isTrue);
       });
     });
