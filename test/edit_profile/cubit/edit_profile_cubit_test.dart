@@ -171,7 +171,7 @@ void main() {
       );
 
       blocTest<EditProfileCubit, EditProfileState>(
-        'emits [valid] when password are valid',
+        'emits [valid] when oldPassword are valid',
         build: () => EditProfileCubit(userRepository),
         seed: () => EditProfileState(
           password: validPassword,
@@ -284,7 +284,7 @@ void main() {
       );
 
       blocTest<EditProfileCubit, EditProfileState>(
-        'emit submissionSuccess when call updateInfo then throw Exception()',
+        'emit submissionFailure when call updateInfo then throw Exception',
         setUp: () => when(() => userRepository.updateInfo(Info(
             name: validUsernameString,
             gender: validGenderString,
