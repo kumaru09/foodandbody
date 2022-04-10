@@ -144,6 +144,10 @@ class AuthenRepository {
     return _cache.read(key: userCacheKey) ?? User.empty;
   }
 
+  List<firebase_auth.UserInfo> get providerData {
+    return _firebaseAuth.currentUser!.providerData;
+  }
+
   Future<void> signUp({required String email, required String password}) async {
     try {
       await _firebaseAuth.createUserWithEmailAndPassword(
@@ -248,7 +252,7 @@ class AuthenRepository {
     }
   }
 
-  Future<void> deleteUser(String password) async {
+  Future<void> deleteUser() async {
     try {
       firebase_auth.User? user = _firebaseAuth.currentUser;
       if (user != null) {
