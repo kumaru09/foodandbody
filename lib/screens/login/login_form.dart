@@ -1,5 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/repositories/authen_repository.dart';
@@ -92,7 +90,7 @@ class _LoginFormState extends State<LoginForm> {
             ..showSnackBar(
               SnackBar(
                   content: Text(
-                      '${state.errorMessage ?? 'เกิดข้อผิดพลาดบางอย่าง กรุณาลองใหม่อีกครั้ง'}')),
+                      '${state.errorMessage ?? 'ดำเนินการไม่สำเร็จ กรุณาลองใหม่อีกครั้ง'}')),
             );
         }
       },
