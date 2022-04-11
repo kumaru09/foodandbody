@@ -55,7 +55,7 @@ void main() {
 
     group('emailChanged', () {
       blocTest<RegisterCubit, RegisterState>(
-        'emits [invalid] when email/password/confirmedPassword are invalid',
+        'emits [invalid] when email is invalid',
         build: () => RegisterCubit(authenticationRepository),
         act: (cubit) => cubit.emailChanged(invalidEmailString),
         expect: () => const <RegisterState>[
@@ -84,7 +84,7 @@ void main() {
 
     group('passwordChanged', () {
       blocTest<RegisterCubit, RegisterState>(
-        'emits [invalid] when email/password/confirmedPassword are invalid',
+        'emits [invalid] when password are invalid',
         build: () => RegisterCubit(authenticationRepository),
         act: (cubit) => cubit.passwordChanged(invalidPasswordString),
         expect: () => const <RegisterState>[
@@ -144,7 +144,7 @@ void main() {
 
     group('confirmedPasswordChanged', () {
       blocTest<RegisterCubit, RegisterState>(
-        'emits [invalid] when email/password/confirmedPassword are invalid',
+        'emits [invalid] when confirmedPassword is invalid',
         build: () => RegisterCubit(authenticationRepository),
         act: (cubit) =>
             cubit.confirmedPasswordChanged(invalidConfirmedPasswordString),
@@ -211,7 +211,7 @@ void main() {
       );
 
       blocTest<RegisterCubit, RegisterState>(
-        'calls register with correct email/password/confirmedPassword',
+        'calls authenticationRepository signUp with correct email/password/confirmedPassword',
         build: () => RegisterCubit(authenticationRepository),
         seed: () => RegisterState(
           status: FormzStatus.valid,
@@ -232,7 +232,7 @@ void main() {
 
       blocTest<RegisterCubit, RegisterState>(
         'emits [submissionInProgress, submissionSuccess] '
-        'when register succeeds',
+        'when authenticationRepository signUp succeeds',
         build: () => RegisterCubit(authenticationRepository),
         seed: () => RegisterState(
           status: FormzStatus.valid,
@@ -259,7 +259,7 @@ void main() {
 
       blocTest<RegisterCubit, RegisterState>(
         'emits [submissionInProgress, submissionFailure] '
-        'when signUp() throw Exception',
+        'when authenticationRepository signUp throw Exception',
         build: () {
           when(() => authenticationRepository.signUp(
                 email: any(named: 'email'),
@@ -292,7 +292,7 @@ void main() {
 
       blocTest<RegisterCubit, RegisterState>(
         'emits [submissionInProgress, submissionFailure] '
-        'when sendVerifyEmail() throw Exception',
+        'when authenticationRepository sendVerifyEmail throw Exception',
         build: () {
           when(() => authenticationRepository.sendVerifyEmail())
               .thenThrow(Exception());
