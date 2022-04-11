@@ -3,19 +3,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:foodandbody/models/calory.dart';
 import 'package:foodandbody/models/exercise_repo.dart';
 import 'package:foodandbody/models/exercise_time.dart';
 import 'package:foodandbody/models/exercise_type.dart';
 import 'package:foodandbody/models/history.dart';
-import 'package:foodandbody/models/info.dart';
-import 'package:foodandbody/models/menu_list.dart';
 import 'package:foodandbody/models/nutrient.dart';
 import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/screens/home/add_exercise.dart';
 import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
-import 'package:formz/formz.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockPlanBloc extends MockBloc<PlanEvent, PlanState> implements PlanBloc {}
@@ -41,10 +37,19 @@ void main() {
   const addExerciseDialogCancelButtonKey =
       Key("add_exercise_dialog_cancel_button");
 
+  const invalidExerciseTimeString = '';
+  const invalidExerciseTime = ExerciseTime.dirty(invalidExerciseTimeString);
+
+  const validExerciseTimeString = '30';
+  const validExerciseTime = ExerciseTime.dirty(validExerciseTimeString);
+
+  const invalidExerciseTypeString = '';
+  const invalidExerciseType = ExerciseType.dirty(invalidExerciseTypeString);
+
+  const validExerciseTypeString = '1';
+  const validExerciseType = ExerciseType.dirty(validExerciseTypeString);
+
   final DateTime mockDate = DateTime.now();
-  final List<MenuList> mockMenuCard = [
-    MenuList(name: 'อาหาร1', calory: 100, imageUrl: 'imageUrl1')
-  ];
   final List<ExerciseRepo> mockExerciseList = [
     ExerciseRepo(
       id: 'id',
@@ -61,15 +66,11 @@ void main() {
       totalWater: 1,
       totalNutrientList: mockNutrientList,
       exerciseList: mockExerciseList);
-  final Info mockInfo = Info(name: 'user', goal: 1600);
-  final Calory mockGoal = Calory.dirty(mockInfo.goal.toString());
 
   const testType = 'แอโรบิค';
   const testTime = '30';
 
   late PlanBloc planBloc;
-  // late PlanRepository planRepository;
-  // late UserRepository userRepository;
 
   setUpAll(() {
     registerFallbackValue<PlanEvent>(FakePlanEvent());
@@ -78,15 +79,11 @@ void main() {
 
   setUp(() async {
     planBloc = MockPlanBloc();
-    // planRepository = MockPlanRepository();
-    // userRepository = MockUserRepository();
-    // planBloc = PlanBloc(
-    //     planRepository: planRepository, userRepository: userRepository);
     when(() => planBloc.state).thenReturn(PlanState(plan: mockHistory));
   });
 
-  group('Add Exercise Button', () {
-    group('can render', () {
+  group('AddExerciseButton', () {
+    group('render', () {
       testWidgets("add exercise button", (tester) async {
         await tester.pumpWidget(MaterialApp(
           home: AddExerciseButton(),
@@ -146,8 +143,8 @@ void main() {
       });
     });
 
-    group('Add Exercise Dialog', () {
-      group('can render', () {
+    group('AddExerciseDialog widget', () {
+      group('render', () {
         testWidgets("add exercise dialog element", (tester) async {
           await tester.pumpWidget(
             MultiRepositoryProvider(
@@ -171,39 +168,35 @@ void main() {
           expect(find.byKey(addExerciseDialogCancelButtonKey), findsOneWidget);
         });
 
-        // testWidgets(
-        //     'invalid exerciseType error text when exerciseType is invalid',
-        //     (tester) async {
-        //   final item = MockExerciseType();
-        //   when(() => item.invalid).thenReturn(true);
-        //   when(() => planBloc.state)
-        //       .thenReturn(PlanState(plan: mockHistory, exerciseType: item));
-        //   await tester.pumpWidget(
-        //     MultiRepositoryProvider(
-        //       providers: [
-        //         RepositoryProvider<PlanRepository>(
-        //             create: (_) => MockPlanRepository()),
-        //         RepositoryProvider<UserRepository>(
-        //             create: (_) => MockUserRepository()),
-        //       ],
-        //       child: MaterialApp(
-        //         home: BlocProvider.value(
-        //           value: planBloc,
-        //           child: AddExerciseDialog(),
-        //         ),
-        //       ),
-        //     ),
-        //   );
-        //   expect(find.text('กรุณาเลือกกิจกกรม'), findsOneWidget);
-        // });
+        testWidgets(
+            'invalid exerciseType error text when exerciseType is invalid',
+            (tester) async {
+          when(() => planBloc.state).thenReturn(
+              PlanState(plan: mockHistory, exerciseType: invalidExerciseType));
+          await tester.pumpWidget(
+            MultiRepositoryProvider(
+              providers: [
+                RepositoryProvider<PlanRepository>(
+                    create: (_) => MockPlanRepository()),
+                RepositoryProvider<UserRepository>(
+                    create: (_) => MockUserRepository()),
+              ],
+              child: MaterialApp(
+                home: BlocProvider.value(
+                  value: planBloc,
+                  child: AddExerciseDialog(),
+                ),
+              ),
+            ),
+          );
+          expect(find.text('กรุณาเลือกกิจกกรม'), findsOneWidget);
+        });
 
         testWidgets(
             'invalid exerciseTime error text when exerciseTime is invalid',
             (tester) async {
-          final time = MockExerciseTime();
-          when(() => time.invalid).thenReturn(true);
-          when(() => planBloc.state)
-              .thenReturn(PlanState(plan: mockHistory, exerciseTime: time));
+          when(() => planBloc.state).thenReturn(
+              PlanState(plan: mockHistory, exerciseTime: invalidExerciseTime));
           await tester.pumpWidget(
             MultiRepositoryProvider(
               providers: [
@@ -221,6 +214,64 @@ void main() {
             ),
           );
           expect(find.text('กรุณากรอกเวลาให้ถูกต้อง'), findsOneWidget);
+        });
+
+        testWidgets(
+            'disable add exercise dialog ok button when exerciseTime or exerciseType are invalid',
+            (tester) async {
+          when(() => planBloc.state).thenReturn(PlanState(
+              plan: mockHistory,
+              exerciseTime: invalidExerciseTime,
+              exerciseType: invalidExerciseType));
+          await tester.pumpWidget(
+            MultiRepositoryProvider(
+              providers: [
+                RepositoryProvider<PlanRepository>(
+                    create: (_) => MockPlanRepository()),
+                RepositoryProvider<UserRepository>(
+                    create: (_) => MockUserRepository()),
+              ],
+              child: MaterialApp(
+                home: BlocProvider.value(
+                  value: planBloc,
+                  child: AddExerciseDialog(),
+                ),
+              ),
+            ),
+          );
+          final button = tester.widget<TextButton>(
+            find.byKey(addExerciseDialogOkButtonKey),
+          );
+          expect(button.enabled, isFalse);
+        });
+
+        testWidgets(
+            'enable add exercise dialog ok button when exerciseTime and exerciseType are valid',
+            (tester) async {
+          when(() => planBloc.state).thenReturn(PlanState(
+              plan: mockHistory,
+              exerciseTime: validExerciseTime,
+              exerciseType: validExerciseType));
+          await tester.pumpWidget(
+            MultiRepositoryProvider(
+              providers: [
+                RepositoryProvider<PlanRepository>(
+                    create: (_) => MockPlanRepository()),
+                RepositoryProvider<UserRepository>(
+                    create: (_) => MockUserRepository()),
+              ],
+              child: MaterialApp(
+                home: BlocProvider.value(
+                  value: planBloc,
+                  child: AddExerciseDialog(),
+                ),
+              ),
+            ),
+          );
+          final button = tester.widget<TextButton>(
+            find.byKey(addExerciseDialogOkButtonKey),
+          );
+          expect(button.enabled, isTrue);
         });
       });
 
