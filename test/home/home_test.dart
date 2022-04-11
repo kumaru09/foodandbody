@@ -62,8 +62,6 @@ class MockUserRepository extends Mock implements UserRepository {}
 
 void main() {
   //button
-  const settingButtonKey = Key('setting_button');
-  const menuAllButtonKey = Key('menu_all_button');
   const removeWaterButtonKey = Key('remove_water_button');
   const addWaterButtonKey = Key('add_water_button');
 
@@ -99,11 +97,8 @@ void main() {
     late AppBloc appBloc;
     late User user;
     late PlanBloc planBloc;
-    // late History plan;
-    // late Info info;
     late MenuCardBloc menuCardBloc;
     late HomeBloc homeBloc;
-    late PlanRepository planRepository;
 
     setUpAll(() {
       registerFallbackValue<AppEvent>(FakeAppEvent());
@@ -121,7 +116,6 @@ void main() {
       appBloc = MockAppBloc();
       menuCardBloc = MockMenuCardBloc();
       homeBloc = MockHomeBloc();
-      planRepository = MockPlanRepository();
       user = MockUser();
       when(() => planBloc.state).thenReturn(PlanState(
         status: PlanStatus.success,
@@ -138,29 +132,7 @@ void main() {
           exerciseList: mockExerciseList));
       when(() => user.email).thenReturn('test@gmail.com');
       when(() => appBloc.state).thenReturn(AppState.authenticated(user));
-      // when(() => plan.totalNutrientList)
-      //     .thenReturn(Nutrient().copyWith(protein: 120, carb: 80, fat: 30));
-      when(() => user.info).thenReturn(Info(
-          goalNutrient: Nutrient().copyWith(protein: 180, carb: 145, fat: 75),
-          goal: 2200));
-      // when(() => plan.totalCal).thenReturn(1000);
     });
-
-    // group("calls", () {
-    //   testWidgets("AppLogoutRequested when logout out is pressed",
-    //       (tester) async {
-    //     await mockNetworkImages(() async {
-    //       await tester.pumpWidget(BlocProvider.value(
-    //         value: appBloc,
-    //         child: const MaterialApp(
-    //           home: Home(),
-    //         ),
-    //       ));
-    //       await tester.tap(find.byKey(logoutButtonKey));
-    //       verify(() => appBloc.add(AppLogoutRequested())).called(1);
-    //     });
-    //   }); //"AppLogoutRequested when logout out is pressed"
-    // }); //group "calls"
 
     group("render", () {
       testWidgets("calories circular progress", (tester) async {
@@ -347,46 +319,7 @@ void main() {
     }); //group "render"
 
     group("action", () {
-      // testWidgets("when pressed setting icon", (tester) async {
-      //   await mockNetworkImages(() async {
-      //     await tester.pumpWidget(MaterialApp(
-      //       home: MultiBlocProvider(
-      //         providers: [
-      //           BlocProvider.value(value: planBloc),
-      //           BlocProvider.value(value: homeBloc),
-      //           BlocProvider.value(value: appBloc),
-      //           BlocProvider.value(value: menuCardBloc),
-      //           BlocProvider.value(value: infoBloc),
-      //         ],
-      //         child: Home(),
-      //       ),
-      //     ));
-      //     await tester.tap(find.byKey(settingButtonKey));
-      //     await tester.pumpAndSettle();
-      //     expect(find.byType(Setting), findsOneWidget);
-      //   });
-      // }); //"when pressed setting icon"
-
-      // testWidgets("when pressed ดูทั้งหมด button", (tester) async {
-      //   await mockNetworkImages(() async {
-      //     await tester.pumpWidget(MaterialApp(
-      //       home: MultiBlocProvider(
-      //         providers: [
-      //           BlocProvider.value(value: planBloc),
-      //           BlocProvider.value(value: homeBloc),
-      //           BlocProvider.value(value: menuCardBloc),
-      //           BlocProvider.value(value: infoBloc),
-      //         ],
-      //         child: Home(),
-      //       ),
-      //     ));
-      //     await tester.tap(find.byKey(menuAllButtonKey));
-      //     await tester.pumpAndSettle();
-      //     expect(find.byType(SearchPage), findsOneWidget);
-      //   });
-      // }); //"when pressed ดูทั้งหมด button"
-
-      testWidgets("call home bloc function when pressed remove button",
+      testWidgets("call DecreaseWaterEvent when pressed remove button",
           (tester) async {
         await mockNetworkImages(() async {
           await tester.pumpWidget(MaterialApp(
@@ -407,7 +340,7 @@ void main() {
         });
       }); //"when pressed remove button"
 
-      testWidgets("call home bloc function when pressed add button",
+      testWidgets("call IncreaseWaterEvent when pressed add button",
           (tester) async {
         await mockNetworkImages(() async {
           await tester.pumpWidget(MaterialApp(
@@ -449,7 +382,7 @@ void main() {
         });
       });
 
-      testWidgets("call plan bloc when pressed try again at circle indicator",
+      testWidgets("call LoadPlan when pressed try again at circle indicator",
           (tester) async {
         await mockNetworkImages(() async {
           when(() => planBloc.state).thenReturn(
@@ -470,7 +403,7 @@ void main() {
         });
       });
 
-      testWidgets("call plan bloc when pressed try again at exercise list",
+      testWidgets("call LoadPlan when pressed try again at exercise list",
           (tester) async {
         await mockNetworkImages(() async {
           when(() => planBloc.state).thenReturn(PlanState(
