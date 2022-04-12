@@ -1,23 +1,20 @@
 part of 'delete_user_cubit.dart';
 
+enum DeleteUserStatus { initial, success, failure }
+
 class DeleteUserState extends Equatable {
   const DeleteUserState(
-      {this.password = const Password.pure(),
-      this.status = FormzStatus.pure,
-      this.errorMessage = ''});
+      {this.status = DeleteUserStatus.initial, this.errorMessage = ''});
 
-  final FormzStatus status;
-  final Password password;
+  final DeleteUserStatus status;
   final String errorMessage;
 
-  DeleteUserState copyWith(
-      {FormzStatus? status, Password? password, String? errorMessage}) {
+  DeleteUserState copyWith({DeleteUserStatus? status, String? errorMessage}) {
     return DeleteUserState(
-        password: password ?? this.password,
         status: status ?? this.status,
         errorMessage: errorMessage ?? this.errorMessage);
   }
 
   @override
-  List<Object> get props => [status, password, errorMessage];
+  List<Object> get props => [status, errorMessage];
 }

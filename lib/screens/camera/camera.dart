@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -7,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/repositories/camera_repository.dart';
 import 'package:foodandbody/screens/camera/ar_camera.dart';
 import 'package:foodandbody/screens/camera/bloc/camera_bloc.dart';
-import 'package:foodandbody/screens/help/help.dart';
 import 'package:foodandbody/screens/camera/show_body_result.dart';
 import 'package:foodandbody/screens/camera/show_food_result.dart';
 import 'package:foodandbody/services/arcore_service.dart';
@@ -20,19 +17,16 @@ class Camera extends StatefulWidget {
 class _CameraState extends State<Camera> with WidgetsBindingObserver {
   List<CameraDescription> _cameras = [];
   CameraController? _controller;
-  int _selected = 0;
 
-  bool _isFoodCamera = true;
-  bool _isFlashModeOff = true;
-  bool? _isSupportAR;
-  FlashMode? _currentFlashMode;
   String errorMessage = '';
+  int _selected = 1;
+  bool _isFoodCamera = false;
 
   @override
   void initState() {
-    super.initState();
     setupCamera();
     WidgetsBinding.instance?.addObserver(this);
+    super.initState();
   }
 
   @override
@@ -56,15 +50,13 @@ class _CameraState extends State<Camera> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    final deviceRatio =
-        MediaQuery.of(context).size.width / MediaQuery.of(context).size.height;
     final CameraController? cameraController = _controller;
 
     return Scaffold(
       extendBody: true,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Color(0xDD000000),
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.close, color: Colors.white),
@@ -95,39 +87,23 @@ class _CameraState extends State<Camera> with WidgetsBindingObserver {
               icon: Text('AR')),
           IconButton(
             onPressed: () {
-              setState(() {
-                _isFoodCamera = !_isFoodCamera;
-              });
+              if (_cameras.length > 1) {
+                setState(() {
+                  _isFoodCamera = !_isFoodCamera;
+                  _selected = _selected == 0 ? 1 : 0;
+                  selectCamera(_selected);
+                });
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง",
+                      style: TextStyle(color: Colors.white)),
+                  backgroundColor: Color(0x99000000),
+                  duration: Duration(seconds: 2),
+                ));
+              }
             },
             icon: Icon(
               _isFoodCamera ? Icons.fastfood : Icons.accessibility,
-              color: Colors.white,
-            ),
-          ),
-          IconButton(
-            onPressed: () {
-              setState(() {
-                if (_currentFlashMode == FlashMode.auto) {
-                  _controller!.setFlashMode(FlashMode.off);
-                } else if (_currentFlashMode == FlashMode.off) {
-                  _controller!.setFlashMode(FlashMode.auto);
-                }
-                _currentFlashMode = _controller!.value.flashMode;
-                _isFlashModeOff = !_isFlashModeOff;
-              });
-            },
-            icon: Icon(
-              _isFlashModeOff ? Icons.flash_off : Icons.flash_on,
-              color: Colors.white,
-            ),
-          ),
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => Help()));
-            },
-            icon: Icon(
-              Icons.help_outline,
               color: Colors.white,
             ),
           ),
@@ -135,14 +111,8 @@ class _CameraState extends State<Camera> with WidgetsBindingObserver {
       ),
       body: (cameraController == null || !cameraController.value.isInitialized)
           ? Center(child: CircularProgressIndicator())
-          : Transform.scale(
-              scale: cameraController.value.aspectRatio / deviceRatio,
-              child: Center(
-                child: AspectRatio(
-                  aspectRatio: cameraController.value.aspectRatio,
-                  child: CameraPreview(cameraController),
-                ),
-              ),
+          : Center(
+              child: cameraController.buildPreview(),
             ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
@@ -168,24 +138,21 @@ class _CameraState extends State<Camera> with WidgetsBindingObserver {
   Future<void> setupCamera() async {
     try {
       _cameras = await availableCameras();
-      CameraController controller = await selectCamera();
+      CameraController controller = await selectCamera(_selected);
       setState(() {
         _controller = controller;
-        _controller!.setFlashMode(FlashMode.off);
-        _currentFlashMode = _controller!.value.flashMode;
-        _isFlashModeOff = _currentFlashMode == FlashMode.off;
-        // print("controller: ${_controller!.value.flashMode}");
-        // print("mode: $_currentFlashMode");
       });
+      print("cameras list: $_cameras");
     } on CameraException catch (e) {
       print("error in fetching the camera: $e");
     }
   }
 
-  selectCamera() async {
+  selectCamera(int index) async {
     try {
-      CameraController controller =
-          CameraController(_cameras[_selected], ResolutionPreset.high);
+      CameraController controller = CameraController(
+          _cameras[index], ResolutionPreset.high,
+          imageFormatGroup: ImageFormatGroup.jpeg);
       await controller.initialize();
       return controller;
     } on CameraException catch (e) {
@@ -197,7 +164,7 @@ class _CameraState extends State<Camera> with WidgetsBindingObserver {
     int newSelected = (_selected + 1) % _cameras.length;
     _selected = newSelected;
 
-    CameraController controller = await selectCamera();
+    CameraController controller = await selectCamera(_selected);
     setState(() {
       _controller = controller;
     });

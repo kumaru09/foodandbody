@@ -4,20 +4,30 @@ import 'package:foodandbody/models/near_restaurant.dart';
 import 'package:foodandbody/screens/menu/bloc/menu_bloc.dart';
 
 void main() {
-  final List<NearRestaurant> mockNearRestaurant = [NearRestaurant(name: 'ร้านอาหาร1')];
-  final MenuShow mockMenu = MenuShow(name: "อาหาร", calory: 300, protein: 30, carb: 20, fat: 10, serve: 1, unit: "จาน");
+  final List<NearRestaurant> mockNearRestaurant = [
+    NearRestaurant(name: 'ร้านอาหาร1')
+  ];
+  final MenuShow mockMenu = MenuShow(
+      name: "อาหาร",
+      calory: 300,
+      protein: 30,
+      carb: 20,
+      fat: 10,
+      serve: 1,
+      unit: "จาน");
 
   group('MenuState', () {
-
     MenuState createSubject({
       MenuStatus status = MenuStatus.initial,
       MenuShow? menu,
       List<NearRestaurant>? nearRestaurant,
+      AddMenuStatus addMenuStatus = AddMenuStatus.initial,
     }) {
       return MenuState(
         status: status,
         menu: menu ?? mockMenu,
         nearRestaurant: nearRestaurant ?? mockNearRestaurant,
+        addMenuStatus: addMenuStatus,
       );
     }
 
@@ -42,11 +52,13 @@ void main() {
           status: MenuStatus.initial,
           menu: mockMenu,
           nearRestaurant: mockNearRestaurant,
+          addMenuStatus: AddMenuStatus.initial,
         ).props,
         equals(<Object?>[
           MenuStatus.initial, // status
           mockMenu, // menu
-          mockNearRestaurant, // nearRestaurant
+          mockNearRestaurant,
+          AddMenuStatus.initial, // nearRestaurant
         ]),
       );
     });
@@ -65,6 +77,7 @@ void main() {
             status: null,
             nearRestaurant: null,
             menu: null,
+            addMenuStatus: null,
           ),
           equals(createSubject()),
         );
@@ -76,12 +89,14 @@ void main() {
             status: MenuStatus.success,
             menu: mockMenu,
             nearRestaurant: [],
+            addMenuStatus: AddMenuStatus.success,
           ),
           equals(
             createSubject(
               status: MenuStatus.success,
               menu: mockMenu,
               nearRestaurant: [],
+              addMenuStatus: AddMenuStatus.success,
             ),
           ),
         );
