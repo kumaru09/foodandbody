@@ -207,8 +207,7 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
     Emitter<MenuState> emit,
   ) async {
     try {
-      if (state.addMenuStatus != AddMenuStatus.initial)
-        emit(state.copyWith(addMenuStatus: AddMenuStatus.initial));
+      emit(state.copyWith(addMenuStatus: AddMenuStatus.initial));
       await planRepository.addPlanMenu(
           event.name, event.oldVolume, event.volumn, event.isEatNow);
       if (event.isEatNow) {
