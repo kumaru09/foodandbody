@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/repositories/camera_repository.dart';
+import 'package:foodandbody/screens/camera/ar_camera.dart';
 import 'package:foodandbody/screens/camera/bloc/camera_bloc.dart';
 import 'package:foodandbody/screens/help/help.dart';
 import 'package:foodandbody/screens/camera/show_body_result.dart';
 import 'package:foodandbody/screens/camera/show_food_result.dart';
+import 'package:foodandbody/services/arcore_service.dart';
 
 class Camera extends StatefulWidget {
   @override
@@ -22,7 +24,9 @@ class _CameraState extends State<Camera> with WidgetsBindingObserver {
 
   bool _isFoodCamera = true;
   bool _isFlashModeOff = true;
+  bool? _isSupportAR;
   FlashMode? _currentFlashMode;
+  String errorMessage = '';
 
   @override
   void initState() {
@@ -69,6 +73,26 @@ class _CameraState extends State<Camera> with WidgetsBindingObserver {
           },
         ),
         actions: [
+          IconButton(
+              onPressed: () async {
+                if (context.read<ARCoreService>().isSupportDepth ==
+                    ARStatus.initial)
+                  await context.read<ARCoreService>().isARCoreSupported();
+                if (context.read<ARCoreService>().isSupportDepth ==
+                    ARStatus.support) {
+                  Navigator.of(context).pushReplacement((MaterialPageRoute(
+                      builder: (context) => ARCamera(
+                          arCoreService: context.read<ARCoreService>()))));
+                } else {
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(SnackBar(
+                      content:
+                          Text('${context.read<ARCoreService>().errorMessage}'),
+                    ));
+                }
+              },
+              icon: Text('AR')),
           IconButton(
             onPressed: () {
               setState(() {
@@ -123,12 +147,14 @@ class _CameraState extends State<Camera> with WidgetsBindingObserver {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          try {
-            final image = await cameraController?.takePicture();
-            context.read<CameraBloc>().add(GetPredicton(file: image!));
-            _showResult(isFoodCamera: _isFoodCamera, imagePath: image.path);
-          } catch (e) {
-            print("Take a photo failed: $e");
+          if (_isFoodCamera) {
+            try {
+              final image = await cameraController?.takePicture();
+              context.read<CameraBloc>().add(GetPredicton(file: image!));
+              _showResult(isFoodCamera: _isFoodCamera, imagePath: image.path);
+            } catch (e) {
+              print("Take a photo failed: $e");
+            }
           }
         },
         elevation: 2,

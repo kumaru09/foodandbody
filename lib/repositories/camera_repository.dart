@@ -57,35 +57,43 @@ class CameraRepository {
     }
   }
 
-  Future<List<Predict>> getPredictionFoodWithDepth(
+  Future<List<PredictResult>> getPredictionFoodWithDepth(
       XFile file, Depth depth) async {
     try {
-      // final url = await uploadFoodPic(file);
-      // print(url);
+      final url = await uploadFoodPic(file);
+      print(url);
       final fromData = FormData.fromMap({
         "image": await MultipartFile.fromFile(file.path),
         "depth": depth.depth,
         "fovW": depth.fovW,
         "fovH": depth.fovH
       });
-      final response =
-          await dio.post("http://192.168.1.44:5000/api/depth/", data: fromData);
+      final response = await dio.post(
+        "http://kumaru.trueddns.com:50310/api/depth/",
+        data: fromData,
+      );
       if (response.statusCode == 200) {
         print("res: ${response.data}");
         final List<Predict> predictData = response.data['predict']
             .map<Predict>((e) => Predict.fromJson(e))
             .toList();
-        List<Map> predictMap = predictData.map((e) => e.toJson()).toList();
-        // if (predictData.isNotEmpty) {
-        //   print(predictData);
-        //   await predict.add({
-        //     "predict": predictMap,
-        //     "photo": url,
-        //     "cr": response.data['cr'],
-        //     "date": Timestamp.now()
-        //   });
-        //   return predictData;
-        // }
+        if (predictData.isNotEmpty) {
+          List<PredictResult> results = [];
+          List<Map> predictMap = predictData.map((e) => e.toJson()).toList();
+          print(predictData);
+          await predict.add(
+              {"predict": predictMap, "photo": url, "date": Timestamp.now()});
+          for (var i in predictData) {
+            final res = await http.get(Uri.parse(
+                "https://foodandbody-api.azurewebsites.net/api/Menu/name?name=${i.name}"));
+            if (res.statusCode == 200) {
+              results.add(PredictResult(
+                  predict: i,
+                  menuShow: MenuShow.fromJson(json.decode(res.body))));
+            }
+          }
+          return results;
+        }
       }
       return List.empty();
     } catch (e) {

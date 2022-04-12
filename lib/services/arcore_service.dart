@@ -6,11 +6,33 @@ import 'package:flutter/services.dart';
 import 'package:foodandbody/models/depth.dart';
 import 'package:path_provider/path_provider.dart';
 
+enum ARStatus { initial, support, notsupport, notinstall, needcamera }
+
 class ARCoreService {
   MethodChannel channel = const MethodChannel('ar.core.platform');
+  ARStatus isSupportDepth = ARStatus.initial;
+  String errorMessage = '';
 
-  Future<bool?> isARCoreSupported() async {
-    return await channel.invokeMethod<bool>('isARCoreSupported');
+  Future<void> isARCoreSupported() async {
+    try {
+      final res = await channel.invokeMethod<String>('isARCoreSupported');
+      if (res == "notInstall") {
+        isSupportDepth = ARStatus.notinstall;
+        errorMessage =
+            'กรุณาติดตั้ง Google Play Services for AR แล้วลองอีกครั้ง';
+      } else if (res == "support")
+        isSupportDepth = ARStatus.support;
+      else if (res == "needCamera") {
+        isSupportDepth = ARStatus.needcamera;
+        errorMessage = 'กรุณาอณุญาตการใช้งานกล้องให้กับแอปพลิเคขันก่อนใช้งาน';
+      } else {
+        isSupportDepth = ARStatus.notsupport;
+        errorMessage = 'อุปกรณ์ของคุณไม่รองรับกล้องประมาณแคลอรี';
+      }
+    } catch (_) {
+      print('isARCoreSupported error: $_');
+      throw Exception();
+    }
   }
 
   Future<bool?> createSession() async {
@@ -19,6 +41,7 @@ class ARCoreService {
       return await channel.invokeMethod<bool>('trackingPlane');
     } catch (e) {
       print('createSession error: $e');
+      throw Exception();
     }
   }
 
@@ -40,6 +63,7 @@ class ARCoreService {
       throw Exception('error getting depth');
     } catch (e) {
       print('getDepth error: $e');
+      throw Exception();
     }
   }
 
@@ -50,6 +74,7 @@ class ARCoreService {
       throw Exception('error taking picture');
     } catch (e) {
       print('takePicture error: $e');
+      throw Exception();
     }
   }
 }

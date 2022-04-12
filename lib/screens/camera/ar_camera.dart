@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:foodandbody/screens/camera/bloc/camera_bloc.dart';
+import 'package:foodandbody/screens/camera/camera.dart';
 import 'package:foodandbody/screens/camera/show_food_result.dart';
 import 'package:foodandbody/screens/camera/show_predict_result.dart';
 import 'package:foodandbody/screens/help/help.dart';
@@ -29,11 +30,10 @@ class _State extends State<ARCamera> with WidgetsBindingObserver {
   final _streamSubscription = <StreamSubscription<dynamic>>[];
   final _trackingStream = const EventChannel("ar.core.platform/tracking");
   bool? hasPlane = false;
+  bool _isFoodCamera = true;
 
   void onPlatformViewCreated(int id) async {
     print('onPlatform');
-    // hasPlane = await widget.arCoreService.createSession();
-    // context.read<CameraBloc>().add(SetHasPlane(hasPlane: hasPlane!));
     _streamSubscription
         .add(_trackingStream.receiveBroadcastStream().listen((event) {
       if (event && !context.read<CameraBloc>().state.hasPlane) {
@@ -65,21 +65,14 @@ class _State extends State<ARCamera> with WidgetsBindingObserver {
     _streamSubscription.add(accelerometerEvents.listen((event) {
       final norm = sqrt(pow(event.x, 2) + pow(event.y, 2) + pow(event.z, 2));
       final inclination = (acos(event.z / norm) * (180 / pi)).round();
-      // print(inclination);
       if (inclination < 1 || inclination > 179) {
         if (context.read<CameraBloc>().state.isFlat > inclination) {
           context.read<CameraBloc>().add(SetIsFlat(isFlat: inclination));
         }
       } else {
-        // if (context.read<CameraBloc>().state.isFlat < inclination) {
-        //   context.read<CameraBloc>().add(SetIsFlat(isFlat: inclination));
-        // }
         if (inclination < 10 || inclination > 170) {
           context.read<CameraBloc>().add(SetIsFlat(isFlat: inclination));
         }
-        // if (inclination == 10 || inclination == 170) {
-        //   context.read<CameraBloc>().add(SetIsFlat(isFlat: inclination));
-        // }
       }
     }));
   }
@@ -90,7 +83,6 @@ class _State extends State<ARCamera> with WidgetsBindingObserver {
     _streamSubscription.forEach((subscription) {
       subscription.cancel();
     });
-    print('dispose');
     super.dispose();
   }
 
@@ -100,12 +92,11 @@ class _State extends State<ARCamera> with WidgetsBindingObserver {
     // final deviceRatio =
     //     MediaQuery.of(context).size.width / MediaQuery.of(context).size.height;
     // return Container();
-    return LoaderOverlay(
-        child: Scaffold(
+    return Scaffold(
       extendBody: true,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.black,
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.close, color: Colors.white),
@@ -114,32 +105,13 @@ class _State extends State<ARCamera> with WidgetsBindingObserver {
           },
         ),
         actions: [
-          // IconButton(
-          //   onPressed: () {
-          //     setState(() {
-          //       _isFoodCamera = !_isFoodCamera;
-          //     });
-          //   },
-          //   icon: Icon(
-          //     _isFoodCamera ? Icons.fastfood : Icons.accessibility,
-          //     color: Colors.white,
-          //   ),
-          // ),
           IconButton(
             onPressed: () {
-              // setState(() {
-              //   if (_currentFlashMode == FlashMode.auto) {
-              //     _controller!.setFlashMode(FlashMode.off);
-              //   } else if (_currentFlashMode == FlashMode.off) {
-              //     _controller!.setFlashMode(FlashMode.auto);
-              //   }
-              //   _currentFlashMode = _controller!.value.flashMode;
-              //   _isFlashModeOff = !_isFlashModeOff;
-              // });
+              Navigator.of(context).pushReplacement(
+                  (MaterialPageRoute(builder: (context) => Camera())));
             },
             icon: Icon(
-              Icons.flash_off,
-              // _isFlashModeOff ? Icons.flash_off : Icons.flash_on,
+              Icons.accessibility,
               color: Colors.white,
             ),
           ),
@@ -176,22 +148,10 @@ class _State extends State<ARCamera> with WidgetsBindingObserver {
                   })))
         ],
       ),
-      // body: (cameraController == null || !cameraController.value.isInitialized)
-      //     ? Center(child: CircularProgressIndicator())
-      //     : Transform.scale(
-      //         scale: cameraController.value.aspectRatio / deviceRatio,
-      //         child: Center(
-      //           child: AspectRatio(
-      //             aspectRatio: cameraController.value.aspectRatio,
-      //             child: CameraPreview(cameraController),
-      //           ),
-      //         ),
-      //       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           try {
-            // context.loaderOverlay.show();
             final depth = await widget.arCoreService.getDepth();
             final image = await widget.arCoreService.takePicture();
             if (image != null && depth != null) {
@@ -202,13 +162,9 @@ class _State extends State<ARCamera> with WidgetsBindingObserver {
               context
                   .read<CameraBloc>()
                   .add(GetPredictonWithDepth(file: image, depth: depth));
-              // Navigator.of(context).pushReplacement((MaterialPageRoute(
-              //     builder: (context) => ShowPredictResult())));
+              Navigator.of(context).pushReplacement((MaterialPageRoute(
+                  builder: (context) => ShowPredictResult())));
             }
-            // final image = await cameraController?.takePicture();
-            // _showResult(isFoodCamera: _isFoodCamera, imagePath: image.path);
-            // await widget.arCoreService.getDepth();
-            // Navigator.of(context).pop(image);
           } catch (e) {
             print("Take a photo failed: $e");
           }
@@ -218,6 +174,6 @@ class _State extends State<ARCamera> with WidgetsBindingObserver {
         shape: CircleBorder(
             side: BorderSide(width: 6, color: Colors.grey.withOpacity(0.5))),
       ),
-    ));
+    );
   }
 }

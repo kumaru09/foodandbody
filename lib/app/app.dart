@@ -22,12 +22,15 @@ class App extends StatelessWidget {
     Key? key,
     required AuthenRepository authenRepository,
     required UserRepository userRepository,
+    required ARCoreService arCoreService,
   })  : _authenRepository = authenRepository,
         _userRepository = userRepository,
+        _arCoreService = arCoreService,
         super(key: key);
 
   final AuthenRepository _authenRepository;
   final UserRepository _userRepository;
+  final ARCoreService _arCoreService;
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +56,7 @@ class App extends StatelessWidget {
             create: (context) => HistoryRepository()),
         RepositoryProvider<CameraRepository>(
             create: (context) => CameraRepository()),
-        RepositoryProvider<ARCoreService>(create: (context) => ARCoreService())
+        RepositoryProvider<ARCoreService>(create: (context) => _arCoreService)
       ],
       child: MultiBlocProvider(
         providers: [
