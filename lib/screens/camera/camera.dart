@@ -1,10 +1,7 @@
-import 'dart:io';
-
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:foodandbody/repositories/camera_repository.dart';
 import 'package:foodandbody/screens/camera/bloc/camera_bloc.dart';
 import 'package:foodandbody/screens/help/help.dart';
 import 'package:foodandbody/screens/camera/show_body_result.dart';
@@ -52,15 +49,13 @@ class _CameraState extends State<Camera> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    final deviceRatio =
-        MediaQuery.of(context).size.width / MediaQuery.of(context).size.height;
     final CameraController? cameraController = _controller;
 
     return Scaffold(
       extendBody: true,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Color(0xDD000000),
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.close, color: Colors.white),
@@ -97,35 +92,19 @@ class _CameraState extends State<Camera> with WidgetsBindingObserver {
               color: Colors.white,
             ),
           ),
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => Help()));
-            },
-            icon: Icon(
-              Icons.help_outline,
-              color: Colors.white,
-            ),
-          ),
         ],
       ),
       body: (cameraController == null || !cameraController.value.isInitialized)
           ? Center(child: CircularProgressIndicator())
-          : Transform.scale(
-              scale: cameraController.value.aspectRatio / deviceRatio,
-              child: Center(
-                child: AspectRatio(
-                  aspectRatio: cameraController.value.aspectRatio,
-                  child: CameraPreview(cameraController),
-                ),
-              ),
+          : Center(
+              child: cameraController.buildPreview(),
             ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           try {
-            final image = await cameraController?.takePicture();
-            context.read<CameraBloc>().add(GetPredicton(file: image!));
+            final image = await cameraController!.takePicture();
+            context.read<CameraBloc>().add(GetPredicton(file: image));
             _showResult(isFoodCamera: _isFoodCamera, imagePath: image.path);
           } catch (e) {
             print("Take a photo failed: $e");
@@ -158,8 +137,9 @@ class _CameraState extends State<Camera> with WidgetsBindingObserver {
 
   selectCamera() async {
     try {
-      CameraController controller =
-          CameraController(_cameras[_selected], ResolutionPreset.high);
+      CameraController controller = CameraController(
+          _cameras[_selected], ResolutionPreset.high,
+          imageFormatGroup: ImageFormatGroup.yuv420);
       await controller.initialize();
       return controller;
     } on CameraException catch (e) {
