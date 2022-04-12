@@ -125,22 +125,6 @@ class ShowBodyResult extends StatelessWidget {
             _SaveButton()
           ],
         ),
-        Positioned(
-          bottom: MediaQuery.of(context).size.height * 0.41,
-          child: Container(
-            padding: EdgeInsets.only(left: 16, bottom: 23),
-            constraints: BoxConstraints(maxHeight: 168, maxWidth: 168),
-            child: Card(
-              elevation: 6,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  side: BorderSide(color: Colors.white, width: 3)),
-              child: ClipRRect(
-                  borderRadius: BorderRadius.all(Radius.circular(15)),
-                  child: Image.file(File(imagePath), fit: BoxFit.cover)),
-            ),
-          ),
-        )
       ],
     );
   }
