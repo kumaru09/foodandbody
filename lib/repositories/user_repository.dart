@@ -61,16 +61,26 @@ class UserRepository {
   UserRepository({
     firebase_auth.FirebaseAuth? firebaseAuth,
     firebase_storage.FirebaseStorage? firebaseStorage,
+    cloud_firestore.FirebaseFirestore? firebaseFirestore,
+    AuthProviderManager? authProviderManager,
+    UploadManager? uploadManager,
     required this.cache,
   })  : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
         _firebaseStorage =
-            firebaseStorage ?? firebase_storage.FirebaseStorage.instance;
+            firebaseStorage ?? firebase_storage.FirebaseStorage.instance,
+        _firebaseFirestore =
+            firebaseFirestore ?? cloud_firestore.FirebaseFirestore.instance,
+        _authProviderManager = authProviderManager ?? AuthProviderManager(),
+        _uploadManager = uploadManager ?? UploadManager();
 
   final firebase_auth.FirebaseAuth _firebaseAuth;
   final firebase_storage.FirebaseStorage _firebaseStorage;
-  final cloud_firestore.CollectionReference users =
-      cloud_firestore.FirebaseFirestore.instance.collection('users');
+  final cloud_firestore.FirebaseFirestore _firebaseFirestore;
+  final AuthProviderManager _authProviderManager;
+  late final cloud_firestore.CollectionReference users =
+      _firebaseFirestore.collection('users');
   final InfoCache cache;
+  final UploadManager _uploadManager;
 
   Future<void> addUserInfo(Info info) async {
     final uid = _firebaseAuth.currentUser?.uid;
@@ -157,11 +167,9 @@ class UserRepository {
   Future<void> updatePassword(String newPassword, String oldPassword) async {
     try {
       final user = _firebaseAuth.currentUser!;
-      firebase_auth.AuthCredential credential =
-          firebase_auth.EmailAuthProvider.credential(
-              email: user.email!, password: oldPassword);
-      await firebase_auth.FirebaseAuth.instance.currentUser!
-          .reauthenticateWithCredential(credential);
+      firebase_auth.AuthCredential credential = _authProviderManager.credential(
+          email: user.email!, oldPassword: oldPassword);
+      await _firebaseAuth.currentUser!.reauthenticateWithCredential(credential);
       await user.updatePassword(newPassword);
     } on firebase_auth.FirebaseAuthException catch (e) {
       throw UpdatePasswordFaliure.fromCode(e.code);
@@ -176,7 +184,7 @@ class UserRepository {
       final uploadTask = await _firebaseStorage
           .ref('users/profile/${Timestamp.now().seconds}$ext')
           .putFile(file);
-      final uri = await uploadTask.ref.getDownloadURL();
+      final uri = await _uploadManager.getDownloadURL(uploadTask);
       return Uri.parse(uri);
     } on firebase_auth.FirebaseAuthException catch (e) {
       throw UploadProfilePicFailure.fromCode(e.code);
@@ -192,4 +200,21 @@ class InfoCache {
   Info? get() => _cache;
 
   void set(Info result) => _cache = result;
+}
+
+class UploadManager {
+  const UploadManager();
+  Future<String> getDownloadURL(
+      firebase_storage.TaskSnapshot uploadTask) async {
+    return await uploadTask.ref.getDownloadURL();
+  }
+}
+
+class AuthProviderManager {
+  const AuthProviderManager();
+  firebase_auth.AuthCredential credential(
+      {required String email, required String oldPassword}) {
+    return firebase_auth.EmailAuthProvider.credential(
+        email: email, password: oldPassword);
+  }
 }
