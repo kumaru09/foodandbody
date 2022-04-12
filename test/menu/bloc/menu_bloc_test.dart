@@ -206,21 +206,7 @@ void main() {
 
     group('AddMenu', () {
       blocTest<MenuBloc, MenuState>(
-        'addMenu can call planRepository',
-        setUp: () =>
-            when(() => planRepository.addPlanMenu('กุ้งเผา', null, 1.0, false))
-                .thenAnswer((_) async {}),
-        build: () => menuBloc,
-        act: (bloc) =>
-            bloc.add(AddMenu(name: 'กุ้งเผา', isEatNow: false, volumn: 1.0)),
-        verify: (_) {
-          verify(() => planRepository.addPlanMenu('กุ้งเผา', null, 1.0, false))
-              .called(1);
-        },
-      );
-
-      blocTest<MenuBloc, MenuState>(
-        'addMenu isEatNow is true can call favoriteRepository',
+        'can call planRepository',
         setUp: () {
           when(() => planRepository.addPlanMenu('กุ้งเผา', null, 1.0, true))
               .thenAnswer((_) async {});
@@ -253,7 +239,35 @@ void main() {
         build: () => menuBloc,
         act: (bloc) =>
             bloc.add(AddMenu(name: 'กุ้งเผา', isEatNow: true, volumn: 1.0)),
-        expect: () => <MenuState>[MenuState(addMenuStatus: AddMenuStatus.success)],
+        expect: () => <MenuState>[
+          MenuState(addMenuStatus: AddMenuStatus.initial),
+          MenuState(addMenuStatus: AddMenuStatus.success)
+        ],
+        verify: (_) {
+          verify(() => planRepository.addPlanMenu('กุ้งเผา', null, 1.0, true))
+              .called(1);
+          verify(() => favoriteRepository.addFavMenuById('กุ้งเผา')).called(1);
+          verify(() => favoriteRepository.addFavMenuAll('กุ้งเผา')).called(1);
+        },
+      );
+
+      blocTest<MenuBloc, MenuState>(
+        'emits initial addMenuStatus when during process',
+        setUp: () {
+          when(() => planRepository.addPlanMenu('กุ้งเผา', null, 1.0, true))
+              .thenAnswer((_) async {});
+          when(() => favoriteRepository.addFavMenuById('กุ้งเผา'))
+              .thenAnswer((_) async {});
+          when(() => favoriteRepository.addFavMenuAll('กุ้งเผา'))
+              .thenAnswer((_) async {});
+        },
+        build: () => menuBloc,
+        act: (bloc) =>
+            bloc.add(AddMenu(name: 'กุ้งเผา', isEatNow: true, volumn: 1.0)),
+        expect: () => <MenuState>[
+          MenuState(addMenuStatus: AddMenuStatus.initial),
+          MenuState(addMenuStatus: AddMenuStatus.success)
+        ],
         verify: (_) {
           verify(() => planRepository.addPlanMenu('กุ้งเผา', null, 1.0, true))
               .called(1);
@@ -268,10 +282,15 @@ void main() {
             when(() => planRepository.addPlanMenu('กุ้งเผา', null, 1.0, false))
                 .thenAnswer((_) => throw Exception()),
         build: () => menuBloc,
-        act: (bloc) => bloc.add(AddMenu(name: 'กุ้งเผา', isEatNow: false, volumn: 1.0)),
-        expect: () => <MenuState>[MenuState(addMenuStatus: AddMenuStatus.failure)],
+        act: (bloc) =>
+            bloc.add(AddMenu(name: 'กุ้งเผา', isEatNow: false, volumn: 1.0)),
+        expect: () => <MenuState>[
+          MenuState(addMenuStatus: AddMenuStatus.initial),
+          MenuState(addMenuStatus: AddMenuStatus.failure)
+        ],
         verify: (_) {
-          verify(() => planRepository.addPlanMenu('กุ้งเผา', null, 1.0, false)).called(1);
+          verify(() => planRepository.addPlanMenu('กุ้งเผา', null, 1.0, false))
+              .called(1);
         },
       );
 
@@ -288,7 +307,10 @@ void main() {
         build: () => menuBloc,
         act: (bloc) =>
             bloc.add(AddMenu(name: 'กุ้งเผา', isEatNow: true, volumn: 1.0)),
-        expect: () => <MenuState>[MenuState(addMenuStatus: AddMenuStatus.failure)],
+        expect: () => <MenuState>[
+          MenuState(addMenuStatus: AddMenuStatus.initial),
+          MenuState(addMenuStatus: AddMenuStatus.failure)
+        ],
         verify: (_) {
           verify(() => planRepository.addPlanMenu('กุ้งเผา', null, 1.0, true))
               .called(1);
@@ -310,7 +332,10 @@ void main() {
         build: () => menuBloc,
         act: (bloc) =>
             bloc.add(AddMenu(name: 'กุ้งเผา', isEatNow: true, volumn: 1.0)),
-        expect: () => <MenuState>[MenuState(addMenuStatus: AddMenuStatus.failure)],
+        expect: () => <MenuState>[
+          MenuState(addMenuStatus: AddMenuStatus.initial),
+          MenuState(addMenuStatus: AddMenuStatus.failure)
+        ],
         verify: (_) {
           verify(() => planRepository.addPlanMenu('กุ้งเผา', null, 1.0, true))
               .called(1);
