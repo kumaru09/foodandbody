@@ -1,11 +1,7 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 
 class ShowBodyResult extends StatelessWidget {
-  ShowBodyResult({required this.imagePath});
-
-  final String imagePath;
+  ShowBodyResult();
 
   int _shoulder = 50;
   int _chest = 80;
