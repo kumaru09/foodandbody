@@ -1,6 +1,5 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/screens/camera/bloc/camera_bloc.dart';
 import 'package:foodandbody/screens/camera/show_body_result.dart';
@@ -11,42 +10,54 @@ class Camera extends StatefulWidget {
   _CameraState createState() => _CameraState();
 }
 
-class _CameraState extends State<Camera> with WidgetsBindingObserver {
-  List<CameraDescription> _cameras = [];
-  CameraController? _controller;
-  int _selected = 1;
-  bool _isFoodCamera = false;
-
+class _CameraState extends State<Camera> {
   @override
   void initState() {
-    setupCamera();
-    WidgetsBinding.instance?.addObserver(this);
+    _initializeCamera(_selectedCamera);
     super.initState();
+  }
+
+  late List<CameraDescription> _cameras;
+  late CameraController _controller;
+  late Future<void> _initializeControllerFuture;
+  int _selectedCamera = 1;
+  bool _isBodyCamera = true;
+  List<XFile> _bodyImage = [];
+
+  Future<void> _initializeCamera(int cameraIndex) async {
+    try {
+      _cameras = await availableCameras();
+      setState(() {
+        _controller = CameraController(
+            _cameras[cameraIndex], ResolutionPreset.high,
+            imageFormatGroup: ImageFormatGroup.jpeg);
+        _initializeControllerFuture = _controller.initialize();
+      });
+    } on CameraException catch (e) {
+      print("Error initializing camera: $e");
+    }
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance?.removeObserver(this);
-    _controller?.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
   void didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (_controller == null || !_controller!.value.isInitialized) {
+    if (!_controller.value.isInitialized) {
       return;
     }
 
     if (state == AppLifecycleState.inactive) {
-      _controller?.dispose();
+      _controller.dispose();
     } else if (state == AppLifecycleState.resumed) {
-      setupCamera();
+      _initializeCamera(_selectedCamera);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final CameraController? cameraController = _controller;
-
     return Scaffold(
       extendBody: true,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -64,40 +75,64 @@ class _CameraState extends State<Camera> with WidgetsBindingObserver {
             onPressed: () {
               if (_cameras.length > 1) {
                 setState(() {
-                  _isFoodCamera = !_isFoodCamera;
-                  _selected = _selected == 0 ? 1 : 0;
-                  selectCamera(_selected);
+                  _isBodyCamera = !_isBodyCamera;
+                  _selectedCamera = _selectedCamera == 1 ? 0 : 1;
+                  _initializeCamera(_selectedCamera);
                 });
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   content: Text("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง",
-                      style: TextStyle(color: Colors.white)),
-                  backgroundColor: Color(0x99000000),
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyText1!
+                          .merge(TextStyle(color: Colors.white))),
+                  backgroundColor: Color(0x77000000),
                   duration: Duration(seconds: 2),
                 ));
               }
             },
             icon: Icon(
-              _isFoodCamera ? Icons.fastfood : Icons.accessibility,
+              _isBodyCamera ? Icons.accessibility : Icons.fastfood,
               color: Colors.white,
             ),
           ),
         ],
       ),
-      body: (cameraController == null || !cameraController.value.isInitialized)
-          ? Center(child: CircularProgressIndicator())
-          : Center(
-              child: cameraController.buildPreview(),
-            ),
+      body: Stack(
+        alignment: Alignment.topCenter,
+        children: [
+          FutureBuilder<void>(
+            future: _initializeControllerFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                return _controller.buildPreview();
+              } else {
+                return Center(child: CircularProgressIndicator());
+              }
+            },
+          ),
+          // _isBodyCamera
+          //     ? Container(
+          //         alignment: Alignment.topRight,
+          //         padding: EdgeInsets.only(right: 10),
+          //         child: Text(
+          //           "$seconds",
+          //           style: TextStyle(
+          //               color: Colors.white,
+          //               fontWeight: FontWeight.bold,
+          //               fontSize: 60),
+          //         ),
+          //       )
+          //     : Container()
+        ],
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          try {
-            final image = await cameraController!.takePicture();
-            context.read<CameraBloc>().add(GetPredicton(file: image));
-            _showResult(isFoodCamera: _isFoodCamera, imagePath: image.path);
-          } catch (e) {
-            print("Take a photo failed: $e");
+        onPressed: () {
+          if (_isBodyCamera) {
+            _takeBodyPhoto();
+          } else {
+            _takeFoodPhoto();
           }
         },
         elevation: 2,
@@ -108,52 +143,45 @@ class _CameraState extends State<Camera> with WidgetsBindingObserver {
     );
   }
 
-  Future<void> setupCamera() async {
+  void _takeFoodPhoto() async {
     try {
-      _cameras = await availableCameras();
-      CameraController controller = await selectCamera(_selected);
-      setState(() {
-        _controller = controller;
+      final image = await _controller.takePicture();
+      context.read<CameraBloc>().add(GetPredicton(file: image));
+      _showResult(isBodyCamera: _isBodyCamera);
+    } catch (e) {
+      print("Take a photo failed: $e");
+    }
+  }
+
+  void _takeBodyPhoto() async {
+    XFile _image;
+    try {
+      await Future.delayed(Duration(seconds: 5), () async {
+        _image = await _controller.takePicture();
+        _bodyImage.add(_image);
       });
-      print("cameras list: $_cameras");
-    } on CameraException catch (e) {
-      print("error in fetching the camera: $e");
+      await Future.delayed(Duration(seconds: 5), () async {
+        _image = await _controller.takePicture();
+        _bodyImage.add(_image);
+      });
+      _showResult(isBodyCamera: _isBodyCamera);
+      _bodyImage.clear();
+    } catch (e) {
+      print("Take a photo failed: $e");
     }
   }
 
-  selectCamera(int index) async {
-    try {
-      CameraController controller = CameraController(
-          _cameras[index], ResolutionPreset.high,
-          imageFormatGroup: ImageFormatGroup.jpeg);
-      await controller.initialize();
-      return controller;
-    } on CameraException catch (e) {
-      print("Error initializing camera: $e");
-    }
-  }
-
-  toggleCamera() async {
-    int newSelected = (_selected + 1) % _cameras.length;
-    _selected = newSelected;
-
-    CameraController controller = await selectCamera(_selected);
-    setState(() {
-      _controller = controller;
-    });
-  }
-
-  _showResult({required bool isFoodCamera, String? imagePath}) {
-    return _isFoodCamera
-        ? Navigator.push(
-            context, MaterialPageRoute(builder: (context) => ShowFoodResult()))
-        : showModalBottomSheet(
+  _showResult({required bool isBodyCamera}) {
+    return _isBodyCamera
+        ? showModalBottomSheet(
             context: context,
             elevation: 6,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
             builder: (context) {
-              return ShowBodyResult(imagePath: imagePath!);
-            });
+              return ShowBodyResult();
+            })
+        : Navigator.push(
+            context, MaterialPageRoute(builder: (context) => ShowFoodResult()));
   }
 }
