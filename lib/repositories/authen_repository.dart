@@ -114,20 +114,23 @@ class DeleteUserFailure implements Exception {
 }
 
 class AuthenRepository {
-  AuthenRepository({
-    CacheClient? cache,
-    firebase_auth.FirebaseAuth? firebaseAuth,
-    GoogleSignIn? googleSignIn,
-    FacebookAuth? facebookAuth,
-  })  : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
+  AuthenRepository(
+      {CacheClient? cache,
+      firebase_auth.FirebaseAuth? firebaseAuth,
+      GoogleSignIn? googleSignIn,
+      FacebookAuth? facebookAuth,
+      AuthProviderManager? authProviderManager})
+      : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
         _cache = cache ?? CacheClient(),
         _googleSignIn = googleSignIn ?? GoogleSignIn.standard(),
-        _facebookAuth = facebookAuth ?? FacebookAuth.instance;
+        _facebookAuth = facebookAuth ?? FacebookAuth.instance,
+        _authProviderManager = authProviderManager ?? AuthProviderManager();
 
   final firebase_auth.FirebaseAuth _firebaseAuth;
   final CacheClient _cache;
   final GoogleSignIn _googleSignIn;
   final FacebookAuth _facebookAuth;
+  final AuthProviderManager _authProviderManager;
 
   @visibleForTesting
   static const userCacheKey = '__user_cache_key__';
@@ -207,8 +210,8 @@ class AuthenRepository {
     try {
       final LoginResult loginResult = await _facebookAuth.login();
       final firebase_auth.OAuthCredential facebookAuthCredential =
-          firebase_auth.FacebookAuthProvider.credential(
-              loginResult.accessToken!.token);
+          _authProviderManager
+              .getFacebookOAuthCredential(loginResult.accessToken!.token);
       await _firebaseAuth.signInWithCredential(facebookAuthCredential);
     } catch (_) {
       throw LogInWithFacebookFailure.fromCode(_.toString());
@@ -249,6 +252,7 @@ class AuthenRepository {
       }
     } catch (e) {
       print('sendVerifyEmail error: $e');
+      throw (Exception());
     }
   }
 
@@ -274,5 +278,12 @@ extension on firebase_auth.User {
         name: displayName,
         photoUrl: photoURL,
         emailVerified: emailVerified);
+  }
+}
+
+class AuthProviderManager {
+  const AuthProviderManager();
+  firebase_auth.OAuthCredential getFacebookOAuthCredential(String accessToken) {
+    return firebase_auth.FacebookAuthProvider.credential(accessToken);
   }
 }
