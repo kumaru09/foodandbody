@@ -27,15 +27,17 @@ EventTransformer<E> throttleDroppable<E>(Duration duration) {
 }
 
 class MenuBloc extends Bloc<MenuEvent, MenuState> {
-  MenuBloc({
-    required this.httpClient,
-    required this.path,
-    required this.planRepository,
-    required this.favoriteRepository,
-    Dio? dio,
-    Location? location,
-  })  : _dio = dio ?? Dio(),
+  MenuBloc(
+      {required this.httpClient,
+      required this.path,
+      required this.planRepository,
+      required this.favoriteRepository,
+      Dio? dio,
+      Location? location,
+      GooglePlaceManager? googlePlaceManager})
+      : _dio = dio ?? Dio(),
         _location = location ?? new Location(),
+        _googlePlaceManager = googlePlaceManager ?? GooglePlaceManager(),
         super(MenuState()) {
     on<MenuFetched>(
       _onMenuFetched,
@@ -52,10 +54,9 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
   final String path;
   final PlanRepository planRepository;
   final FavoriteRepository favoriteRepository;
-  final googlePlace =
-      google_place.GooglePlace("AIzaSyAAw4dLXy4iLB73faed51VGnNumwkU7mFY");
   final Dio _dio;
   final Location _location;
+  final GooglePlaceManager _googlePlaceManager;
 
   Future<void> _onMenuFetched(
     MenuFetched event,
@@ -85,6 +86,7 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
       if (state.status != MenuStatus.success) return;
       final menu = await _fetchMenus(path);
       final List<NearRestaurant> nearRestaurant = await _fetchRestaurant(path);
+      print(nearRestaurant);
       return emit(state.copyWith(
           status: MenuStatus.success,
           menu: menu,
@@ -111,48 +113,34 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
     bool _serviceEnabled;
     PermissionStatus _permissionGranted;
 
-    // print('--------------------------- start ---------------------------');
-
     _serviceEnabled = await _location.serviceEnabled();
-    // print('1 _location.serviceEnabled(): $_serviceEnabled');
+
     if (!_serviceEnabled) {
       _serviceEnabled = await _location.requestService();
-      // print('2 _location.requestService(): $_serviceEnabled');
       if (!_serviceEnabled) {
         return List.empty();
       }
     }
 
     _permissionGranted = await _location.hasPermission();
-    // print('3 _location.hasPermission(): $_permissionGranted');
+
     if (_permissionGranted == PermissionStatus.denied) {
       _permissionGranted = await _location.requestPermission();
-      // print('4 _location.requestPermission(): $_permissionGranted');
+
       if (_permissionGranted != PermissionStatus.granted) {
         return List.empty();
       }
     }
 
     final _locationData = await _getLoaction(_location);
-    // print('6 _getLoaction(_location): $_locationData');
-    final result = await googlePlace.search.getNearBySearch(
-        google_place.Location(
-            lat: _locationData.latitude, lng: _locationData.longitude),
-        2000,
-        type: "restaurant",
-        keyword: name);
-    // print("${_locationData.latitude}, ${_locationData.longitude}");
-    // print('7 googlePlace.search.getNearBySearch: $result');
-    // print('  googlePlace.search.getNearBySearch: ${result!.results}');
-    // print('placeId : ${result!.results?.map((item) => item.placeId)}');
-    // inspect(result!.results?.first);
+
+    final result =
+        await _googlePlaceManager.getNearBySearch(_locationData, name);
 
     if (result!.results!.isEmpty) return List.empty();
 
     final restaurantList = result.results!.map((e) async {
-      final detail = await googlePlace.details
-          .get("${e.placeId}", fields: "photos,opening_hours/periods");
-      // print('10 restaurantList: $detail');
+      final detail = await _googlePlaceManager.get(e.placeId!);
 
       return NearRestaurant(
           name: e.name,
@@ -169,15 +157,12 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
           close: detail.result?.openingHours?.periods?.first.close?.time);
     }).toList();
 
-    // print('11 restaurantList: $restaurantList');
-
     return Future.wait(restaurantList);
   }
 
   Future<LocationData> _getLoaction(Location location) async {
     try {
       final _locationData = await location.getLocation();
-      // print('5 location.getLocation(): $_locationData');
       return _locationData;
     } catch (e) {
       print('$e');
@@ -190,10 +175,7 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
     try {
       final res = await _dio.get(
           "https://maps.googleapis.com/maps/api/distancematrix/json?destinations=$desLat,$desLng&origins=$oriLat,$oriLng&key=AIzaSyAAw4dLXy4iLB73faed51VGnNumwkU7mFY");
-      // print(res.data);
       final distance = DistanceMatrix.fromJson(res.data);
-      // print('8 _dio.get(): $res');
-      // print('9 DistanceMatrix.fromJson(res.data): $distance');
 
       return distance.elements.first.distance.text;
     } catch (e) {
@@ -219,5 +201,25 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
       print('onAddMenu: $e');
       emit(state.copyWith(addMenuStatus: AddMenuStatus.failure));
     }
+  }
+}
+
+class GooglePlaceManager {
+  GooglePlaceManager();
+  final google_place.GooglePlace _googlePlace =
+      google_place.GooglePlace("AIzaSyAAw4dLXy4iLB73faed51VGnNumwkU7mFY");
+
+  Future<google_place.NearBySearchResponse?> getNearBySearch(
+      LocationData locationData, String name) {
+    return _googlePlace.search.getNearBySearch(
+        google_place.Location(
+            lat: locationData.latitude, lng: locationData.longitude),
+        2000,
+        type: "restaurant",
+        keyword: name);
+  }
+
+  Future<google_place.DetailsResponse?> get(String id) {
+    return _googlePlace.details.get(id, fields: "photos,opening_hours/periods");
   }
 }
