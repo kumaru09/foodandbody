@@ -11,3 +11,8 @@ class GetPredicton extends CameraEvent {
   const GetPredicton({required this.file});
   final XFile file;
 }
+
+class CalChanged extends CameraEvent {
+  const CalChanged({required this.value});
+  final String value;
+}

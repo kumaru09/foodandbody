@@ -125,8 +125,8 @@ class _CameraState extends State<Camera> with WidgetsBindingObserver {
         onPressed: () async {
           try {
             final image = await cameraController?.takePicture();
-            context.read<CameraBloc>().add(GetPredicton(file: image!));
-            _showResult(isFoodCamera: _isFoodCamera, imagePath: image.path);
+            // context.read<CameraBloc>().add(GetPredicton(file: image!));
+            _showResult(isFoodCamera: _isFoodCamera, image: image!);
           } catch (e) {
             print("Take a photo failed: $e");
           }
@@ -177,17 +177,23 @@ class _CameraState extends State<Camera> with WidgetsBindingObserver {
     });
   }
 
-  _showResult({required bool isFoodCamera, String? imagePath}) {
+  _showResult({required bool isFoodCamera, required XFile image}) {
     return _isFoodCamera
         ? Navigator.push(
-            context, MaterialPageRoute(builder: (context) => ShowFoodResult()))
+            context,
+            MaterialPageRoute(
+                builder: (context) => BlocProvider<CameraBloc>(
+                    create: (_) => CameraBloc(
+                        cameraRepository: context.read<CameraRepository>())
+                      ..add(GetPredicton(file: image)),
+                    child: const ShowFoodResult())))
         : showModalBottomSheet(
             context: context,
             elevation: 6,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
             builder: (context) {
-              return ShowBodyResult(imagePath: imagePath!);
+              return ShowBodyResult(imagePath: image.path);
             });
   }
 }
