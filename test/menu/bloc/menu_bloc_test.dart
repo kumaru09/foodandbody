@@ -3,22 +3,19 @@ import 'dart:io';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:foodandbody/models/distance_matrix.dart';
 import 'package:foodandbody/models/menu_show.dart';
 import 'package:foodandbody/models/near_restaurant.dart';
 import 'package:foodandbody/repositories/favor_repository.dart';
 import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:foodandbody/screens/menu/bloc/menu_bloc.dart';
 import 'package:google_place/google_place.dart' as google_place;
+import 'package:http_mock_adapter/http_mock_adapter.dart';
 import 'package:location/location.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:http/http.dart' as http;
 
 class MockClient extends Mock implements http.Client {}
-
-class MockGooglePlace extends Mock implements google_place.GooglePlace {}
-
-class MockNearBySearchResponse extends Mock
-    implements google_place.NearBySearchResponse {}
 
 class MockDio extends Mock implements Dio {}
 
@@ -34,6 +31,8 @@ class FakeMenuEvent extends Fake implements MenuEvent {}
 
 class MockMenuBloc extends MockBloc<MenuEvent, MenuState> implements MenuBloc {}
 
+class MockGooglePlaceManager extends Mock implements GooglePlaceManager {}
+
 Uri _menuUrl({required String path}) {
   return Uri.https('foodandbody-api.azurewebsites.net', '/api/menu/$path');
 }
@@ -41,9 +40,14 @@ Uri _menuUrl({required String path}) {
 void main() {
   group('MenuBloc', () {
     const List<NearRestaurant> mockNearRestaurant = [
-      NearRestaurant(name: 'ร้านอาหาร1')
+      NearRestaurant(
+          name: 'ร้านอาหาร1',
+          distance: '228 mi',
+          rating: 5.0,
+          open: '0900',
+          close: '1700')
     ];
-    const mockPath = 'กุ้งเผา';
+    const mockPath = "กุ้งเผา";
     const mockMenu = MenuShow(
         name: "กุ้งเผา",
         calory: 96,
@@ -58,16 +62,16 @@ void main() {
       "longitude": 100.59974,
     };
 
-    // const google_place.NearBySearchResponse mockNearBySearchResponse = google_place.NearBySearchResponse.parseNearBySearchResult(responseBody)
-
     late http.Client httpClient;
-    late google_place.GooglePlace googlePlace;
     late Location location;
     late Dio dio;
     late PlanRepository planRepository;
     late FavoriteRepository favoriteRepository;
     late MenuBloc menuBloc;
     late google_place.NearBySearchResponse nearBySearchResponse;
+    late DioAdapter dioAdapter;
+    late google_place.DetailsResponse detailsResponse;
+    late GooglePlaceManager googlePlaceManager;
 
     setUpAll(() {
       registerFallbackValue(Uri());
@@ -77,20 +81,56 @@ void main() {
 
     setUp(() {
       httpClient = MockClient();
-      googlePlace = MockGooglePlace();
       location = MockLocation();
-      dio = MockDio();
+      dio = Dio();
+      dioAdapter = DioAdapter(dio: dio);
+      dio.httpClientAdapter = dioAdapter;
       planRepository = MockPlanRepository();
       favoriteRepository = MockFavoriteRepository();
-      nearBySearchResponse = MockNearBySearchResponse();
+      googlePlaceManager = MockGooglePlaceManager();
+      detailsResponse = google_place.DetailsResponse.fromJson({
+        "html_attributions": [],
+        "result": {
+          "geometry": {
+            "location": {"lat": -33.866489, "lng": 151.1958561},
+          },
+          "name": "ร้านอาหาร1",
+          "opening_hours": {
+            "open_now": false,
+            "periods": [
+              {
+                "close": {"day": 1, "time": "1700"},
+                "open": {"day": 1, "time": "0900"},
+              },
+            ],
+          },
+          "place_id": "id",
+          "rating": 5.0,
+        },
+        "status": "OK",
+      });
+      nearBySearchResponse = google_place.NearBySearchResponse(results: [
+        google_place.SearchResult(
+          name: 'ร้านอาหาร1',
+          placeId: "id",
+          geometry: google_place.Geometry(
+              location: google_place.Location(lat: 1, lng: 1)),
+          rating: 5.0,
+          openingHours: google_place.OpeningHours(periods: [
+            google_place.Period(
+                open: google_place.Open(time: '12.00'),
+                close: google_place.Close(time: '20.00'))
+          ]),
+        )
+      ]);
       menuBloc = MenuBloc(
-        httpClient: httpClient,
-        path: 'กุ้งเผา',
-        planRepository: planRepository,
-        favoriteRepository: favoriteRepository,
-        location: location,
-        dio: dio,
-      );
+          httpClient: httpClient,
+          path: 'กุ้งเผา',
+          planRepository: planRepository,
+          favoriteRepository: favoriteRepository,
+          location: location,
+          dio: dio,
+          googlePlaceManager: googlePlaceManager);
       when(() => httpClient.get(any())).thenAnswer((_) async {
         return http.Response(
           '{"name":"กุ้งเผา","calories":96,"protein":18.7,"carb":0.3,"fat":0,"serve":100,"unit":"กรัม","imageUrl":"https://bnn.blob.core.windows.net/food/grilled-shrimp.jpg"}',
@@ -101,22 +141,39 @@ void main() {
         );
       });
       when(() => location.serviceEnabled()).thenAnswer((_) async {
-        return false;
+        return true;
       });
-      when(() => location.requestService()).thenAnswer((_) async {
-        return false;
+      // when(() => location.requestService()).thenAnswer((_) async {
+      //   return false;
+      // });
+      when(() => location.hasPermission()).thenAnswer((_) async {
+        return PermissionStatus.granted;
       });
-      // when(() => location.hasPermission()).thenAnswer((_) async {
-      //   return PermissionStatus.granted;
-      // });
-      // when(() => location.getLocation()).thenAnswer((_) async {
-      //   return LocationData.fromMap(locationData);
-      // });
-      // when(() => googlePlace.search.getNearBySearch(
-      //       any(), 2000, type: "restaurant", keyword: mockPath,
-      //     )).thenAnswer((_) async {
-      //   return nearBySearchResponse;
-      // });
+      when(() => location.getLocation()).thenAnswer((_) async {
+        return LocationData.fromMap(locationData);
+      });
+      when(() => googlePlaceManager.getNearBySearch(
+              LocationData.fromMap(locationData), mockPath))
+          .thenAnswer((invocation) async => nearBySearchResponse);
+      dioAdapter.onGet(
+          "https://maps.googleapis.com/maps/api/distancematrix/json?destinations=1.0,1.0&origins=13.723345,100.59974&key=AIzaSyAAw4dLXy4iLB73faed51VGnNumwkU7mFY",
+          (server) {
+        server.reply(200, {
+          "rows": [
+            {
+              "elements": [
+                {
+                  "distance": {"text": "228 mi", "value": 367439},
+                  "duration": {"text": "3 hours 53 mins", "value": 14003},
+                  "status": "OK",
+                },
+              ]
+            }
+          ]
+        });
+      });
+      when(() => googlePlaceManager.get(any()))
+          .thenAnswer((invocation) async => detailsResponse);
 
       // nearBySearchResponse api doc มี json
       // https://developers.google.com/maps/documentation/places/web-service/search-nearby#json
@@ -138,11 +195,12 @@ void main() {
         'emits successful status when http fetches initial menu',
         build: () => menuBloc,
         act: (bloc) => bloc.add(MenuFetched()),
+        wait: const Duration(milliseconds: 1000),
         expect: () => <MenuState>[
           MenuState(
             status: MenuStatus.success,
             menu: mockMenu,
-            nearRestaurant: [],
+            nearRestaurant: mockNearRestaurant,
           )
         ],
         verify: (_) {
@@ -156,11 +214,12 @@ void main() {
         act: (bloc) => bloc
           ..add(MenuFetched())
           ..add(MenuFetched()),
+        wait: const Duration(milliseconds: 1000),
         expect: () => <MenuState>[
           MenuState(
             status: MenuStatus.success,
             menu: mockMenu,
-            nearRestaurant: [],
+            nearRestaurant: mockNearRestaurant,
           )
         ],
         verify: (_) {
@@ -176,11 +235,12 @@ void main() {
           await Future<void>.delayed(Duration.zero);
           bloc.add(MenuFetched());
         },
+        wait: const Duration(milliseconds: 1000),
         expect: () => <MenuState>[
           MenuState(
             status: MenuStatus.success,
             menu: mockMenu,
-            nearRestaurant: [],
+            nearRestaurant: mockNearRestaurant,
           )
         ],
         verify: (_) {
