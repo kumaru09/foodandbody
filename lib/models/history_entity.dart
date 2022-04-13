@@ -30,7 +30,7 @@ class HistoryEntity extends Equatable {
   Map<String, Object?> toJson() {
     return {
       'date': date,
-      'menuList': menuList,
+      'menuList': menuList.map((e) => e.toJson()).toList(),
       'exerciseList': exerciseList,
       'totalCal': totalCal,
       'totalBurn': totalBurn,
