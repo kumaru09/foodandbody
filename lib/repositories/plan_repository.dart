@@ -9,6 +9,7 @@ import 'package:foodandbody/models/history.dart';
 import 'package:foodandbody/models/history_entity.dart';
 import 'package:foodandbody/models/menu.dart';
 import 'package:foodandbody/models/menu_show.dart';
+import 'package:foodandbody/models/predict.dart';
 import 'package:foodandbody/repositories/i_plan_repository.dart';
 import 'package:http/http.dart' as http;
 
@@ -107,6 +108,60 @@ class PlanRepository implements IPlanRepository {
       }
     } else {
       throw Exception('error fetching menu');
+    }
+  }
+
+  Future<void> addPlanCamera(Predict predict) async {
+    final CollectionReference foodHistories = _firebaseFirestore
+        .collection('users')
+        .doc(_firebaseAuth.currentUser?.uid)
+        .collection('foodhistories');
+    final plan =
+        await foodHistories.orderBy('date', descending: true).limit(1).get();
+    if (plan.docs.isNotEmpty) {
+      List<Menu> menuList = plan.docs.first
+          .get('menuList')
+          .map<Menu>((menu) => Menu.fromJson(menu))
+          .toList();
+      menuList.add(Menu(
+          name: predict.name,
+          calories: predict.calory,
+          serve: 1,
+          protein: predict.protein,
+          fat: predict.fat,
+          carb: predict.carb,
+          volumn: 1,
+          timestamp: Timestamp.now()));
+      List<Map> menuListMap = menuList.map((e) => e.toJson()).toList();
+      await plan.docs.first.reference.update({'menuList': menuListMap});
+      await updatePlanCamera(predict);
+    } else {
+      throw Exception();
+    }
+  }
+
+  Future<void> updatePlanCamera(Predict predict) async {
+    final CollectionReference foodHistories = _firebaseFirestore
+        .collection('users')
+        .doc(_firebaseAuth.currentUser?.uid)
+        .collection('foodhistories');
+    final plan =
+        await foodHistories.orderBy('date', descending: true).limit(1).get();
+    if (plan.docs.isNotEmpty) {
+      final data =
+          History.fromEntity(HistoryEntity.fromSnapshot(plan.docs.first));
+      await plan.docs.first.reference.update({
+        'totalCal': data.totalCal + predict.calory,
+        'totalNutrient': data.totalNutrientList
+            .copyWith(
+              protein: data.totalNutrientList.protein + predict.protein,
+              fat: data.totalNutrientList.fat + predict.fat,
+              carb: data.totalNutrientList.carb + predict.carb,
+            )
+            .toJson(),
+      });
+    } else {
+      throw Exception();
     }
   }
 
