@@ -27,3 +27,8 @@ class SetHasPlane extends CameraEvent {
   final bool hasPlane;
   SetHasPlane({required this.hasPlane});
 }
+
+class CalChanged extends CameraEvent {
+  const CalChanged({required this.value});
+  final String value;
+}

@@ -9,6 +9,7 @@ class CameraState extends Equatable {
   final int isFlat;
   final bool hasPlane;
   final bool? isSupportAR;
+  final FoodCalory cal;
 
   CameraState(
       {this.status = CameraStatus.initial,
@@ -16,6 +17,7 @@ class CameraState extends Equatable {
       List<PredictResult>? predicts,
       this.isFlat = 75,
       this.hasPlane = false,
+      this.cal = const FoodCalory.pure(),
       this.isSupportAR})
       : this.results = results ?? [],
         this.predicts = predicts ?? [];
@@ -26,22 +28,25 @@ class CameraState extends Equatable {
       List<PredictResult>? predicts,
       int? isFlat,
       bool? hasPlane,
-      bool? isSupportAR}) {
+      bool? isSupportARm,
+      FoodCalory? cal}) {
     return CameraState(
-        status: status ?? this.status,
-        results: results ?? this.results,
-        predicts: predicts ?? this.predicts,
-        isFlat: isFlat ?? this.isFlat,
-        hasPlane: hasPlane ?? this.hasPlane,
-        isSupportAR: isSupportAR ?? this.isSupportAR);
+      status: status ?? this.status,
+      results: results ?? this.results,
+      predicts: predicts ?? this.predicts,
+      isFlat: isFlat ?? this.isFlat,
+      hasPlane: hasPlane ?? this.hasPlane,
+      isSupportAR: isSupportAR ?? this.isSupportAR,
+      cal: cal ?? this.cal,
+    );
   }
 
   @override
   String toString() {
-    return "CameraState { status: $status, results: $results, predicts: $predicts isFlat: $isFlat, hasPlane: $hasPlane, isSupportAR: $isSupportAR }";
+    return "CameraState { status: $status, results: $results, predicts: $predicts isFlat: $isFlat, hasPlane: $hasPlane, isSupportAR: $isSupportAR, cal: $cal }";
   }
 
   @override
   List<Object?> get props =>
-      [status, results, predicts, isFlat, hasPlane, isSupportAR];
+      [status, results, predicts, isFlat, hasPlane, isSupportAR, cal];
 }
