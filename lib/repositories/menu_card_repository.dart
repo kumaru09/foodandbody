@@ -24,13 +24,13 @@ class MenuCardRepository {
     }
     List<MenuList> menu = [];
     List<String> nameList =
-        isMyFav ? await _getNameMenuListById() : await _getNameMenuListAll();
+        isMyFav ? await getNameMenuListById() : await getNameMenuListAll();
     for (var name in nameList) menu.add(await client.fetchMenu(name));
     cache.set(isMyFav, menu);
     return menu;
   }
 
-  Future<List<String>> _getNameMenuListById() async {
+  Future<List<String>> getNameMenuListById() async {
     final CollectionReference favorite = _firebaseFirestore
         .collection('users')
         .doc(_firebaseAuth.currentUser?.uid)
@@ -49,7 +49,7 @@ class MenuCardRepository {
     }
   }
 
-  Future<List<String>> _getNameMenuListAll() async {
+  Future<List<String>> getNameMenuListAll() async {
     final CollectionReference favorite =
         _firebaseFirestore.collection('favorites');
     try {
