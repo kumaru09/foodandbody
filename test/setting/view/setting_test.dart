@@ -54,14 +54,6 @@ void main() {
       Info(name: mockUsername, gender: validGenderString, photoUrl: mockImgUrl);
   final User mockUser = User(
       uid: mockUid, email: mockEmail, name: mockUsername, photoUrl: mockImgUrl);
-  final Map<String, String> mockUserInfo = {
-    'displayName': mockUsername,
-    'email': mockEmail,
-    'photoURL': mockImgUrl,
-    'providerId': 'email.com',
-    'uid': mockUid
-  };
-  final List<item.UserInfo> mockAccountType = [item.UserInfo(mockUserInfo)];
 
   group('Setting', () {
     late AppBloc appBloc;
@@ -82,20 +74,19 @@ void main() {
       appBloc = MockAppBloc();
       when(() => appBloc.state).thenReturn(AppState.authenticated(mockUser));
       deleteUserCubit = MockDeleteUserCubit();
-      when(() => deleteUserCubit.state).thenReturn(DeleteUserState());
+      when(() => deleteUserCubit.state).thenReturn(DeleteUserState(status: SettingStatus.success, accountType: 'email.com'));
       when(() => deleteUserCubit.deleteUser()).thenAnswer((_) async {});
       editProfileCubit = MockEditProfileCubit();
       when(() => editProfileCubit.state).thenReturn(const EditProfileState(
           name: validUsername, gender: validGender, photoUrl: mockImgUrl));
       authenRepository = MockAuthenRepository();
-      when(() => authenRepository.providerData).thenReturn(mockAccountType);
       userRepository = MockUserRepository();
       infoCache = MockInfoCache();
       when(() => userRepository.cache).thenReturn(infoCache);
       when(() => infoCache.get()).thenReturn(mockInfo);
     });
 
-    testWidgets('render all widget correct', (tester) async {
+    testWidgets('render all widget correct when status is success', (tester) async {
       mockNetworkImagesFor(() async {
         await tester.pumpWidget(
           MultiRepositoryProvider(
@@ -129,9 +120,60 @@ void main() {
       });
     });
 
+    testWidgets('render CircularProgressIndicator when status is initial', (tester) async {
+      mockNetworkImagesFor(() async {
+      when(() => deleteUserCubit.state).thenReturn(DeleteUserState(status: SettingStatus.initial));
+        await tester.pumpWidget(
+          MultiRepositoryProvider(
+            providers: [
+              RepositoryProvider.value(value: authenRepository),
+              RepositoryProvider.value(value: userRepository),
+            ],
+            child: BlocProvider.value(
+              value: appBloc,
+              child: MaterialApp(
+                home: BlocProvider.value(
+                  value: deleteUserCubit,
+                  child: SettingPage(),
+                ),
+              ),
+            ),
+          ),
+        );
+        expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      });
+    });
+
+    testWidgets('render failure widget when status is failure', (tester) async {
+      mockNetworkImagesFor(() async {
+      when(() => deleteUserCubit.state).thenReturn(DeleteUserState(status: SettingStatus.failure));
+        await tester.pumpWidget(
+          MultiRepositoryProvider(
+            providers: [
+              RepositoryProvider.value(value: authenRepository),
+              RepositoryProvider.value(value: userRepository),
+            ],
+            child: BlocProvider.value(
+              value: appBloc,
+              child: MaterialApp(
+                home: BlocProvider.value(
+                  value: deleteUserCubit,
+                  child: SettingPage(),
+                ),
+              ),
+            ),
+          ),
+        );
+        expect(find.byType(Image), findsOneWidget);
+        expect(find.text('ไม่สามารถโหลดข้อมูลได้ในขณะนี้'), findsOneWidget);
+        expect(find.text('ลองอีกครั้ง'), findsOneWidget);
+      });
+    });
+
     testWidgets('not render editPasswordButton when providerId is google.com',
         (tester) async {
       mockNetworkImagesFor(() async {
+      when(() => deleteUserCubit.state).thenReturn(DeleteUserState(status: SettingStatus.success, accountType: 'google.com'));
         final Map<String, String> mockUserInfo = {
           'displayName': mockUsername,
           'email': mockEmail,
@@ -178,6 +220,7 @@ void main() {
     testWidgets('not render editPasswordButton when providerId is facebook.com',
         (tester) async {
       mockNetworkImagesFor(() async {
+      when(() => deleteUserCubit.state).thenReturn(DeleteUserState(status: SettingStatus.success, accountType: 'facebook.com'));
         final Map<String, String> mockUserInfo = {
           'displayName': mockUsername,
           'email': mockEmail,
@@ -281,14 +324,14 @@ void main() {
       });
     });
 
-    testWidgets('render SnackBar when status is failure', (tester) async {
+    testWidgets('render SnackBar when deleteStatus is failure', (tester) async {
       mockNetworkImagesFor(() async {
         whenListen(
           deleteUserCubit,
           Stream.fromIterable(const <DeleteUserState>[
-            DeleteUserState(status: DeleteUserStatus.initial),
+            DeleteUserState(deleteStatus: DeleteUserStatus.initial),
             DeleteUserState(
-                status: DeleteUserStatus.failure,
+                deleteStatus: DeleteUserStatus.failure,
                 errorMessage: 'ดำเนินการไม่สำเร็จ กรุณาลองใหม่'),
           ]),
         );

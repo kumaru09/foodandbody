@@ -4,13 +4,18 @@ import 'package:foodandbody/screens/setting/cubit/delete_user_cubit.dart';
 void main() {
   group('DeleteUserState', () {
     final mockErrorMessage = 'ดำเนินการไม่สำเร็จ กรุณาลองใหม่';
+    final mockAccountType = 'google.com';
 
     DeleteUserState createSubject({
-      DeleteUserStatus status = DeleteUserStatus.initial,
+      SettingStatus status = SettingStatus.initial,
+      String accountType = '',
+      DeleteUserStatus deleteStatus = DeleteUserStatus.initial,
       String errorMessage = '',
     }) {
       return DeleteUserState(
         status: status,
+        accountType: accountType,
+        deleteStatus: deleteStatus,
         errorMessage: errorMessage,
       );
     }
@@ -33,10 +38,14 @@ void main() {
     test('props are correct', () {
       expect(
         createSubject(
-          status: DeleteUserStatus.initial,
+          status: SettingStatus.initial,
+          accountType: mockAccountType,
+          deleteStatus: DeleteUserStatus.initial,
           errorMessage: mockErrorMessage,
         ).props,
         equals(<Object?>[
+          SettingStatus.initial,
+          mockAccountType,
           DeleteUserStatus.initial,
           mockErrorMessage,
         ]),
@@ -55,6 +64,8 @@ void main() {
         expect(
           createSubject().copyWith(
             status: null,
+            accountType: null,
+            deleteStatus: null,
             errorMessage: null,
           ),
           equals(createSubject()),
@@ -64,12 +75,16 @@ void main() {
       test('replaces every non-null parameter', () {
         expect(
           createSubject().copyWith(
-            status: DeleteUserStatus.success,
+            status: SettingStatus.success,
+            accountType: mockAccountType,
+            deleteStatus: DeleteUserStatus.success,
             errorMessage: mockErrorMessage,
           ),
           equals(
             createSubject(
-              status: DeleteUserStatus.success,
+              status: SettingStatus.success,
+              accountType: mockAccountType,
+              deleteStatus: DeleteUserStatus.success,
               errorMessage: mockErrorMessage,
             ),
           ),

@@ -141,7 +141,7 @@ void main() {
           loginCubit,
           Stream.fromIterable(const <LoginState>[
             LoginState(status: FormzStatus.submissionInProgress),
-            LoginState(status: FormzStatus.submissionFailure),
+            LoginState(status: FormzStatus.submissionFailure), 
           ]),
         );
         await tester.pumpWidget(
@@ -155,7 +155,7 @@ void main() {
           ),
         );
         await tester.pump();
-        expect(find.text('Authentication Failure'), findsOneWidget);
+        expect(find.text('ดำเนินการไม่สำเร็จ กรุณาลองใหม่อีกครั้ง'), findsOneWidget);
       });
 
       testWidgets('AuthenticationFailure SnackBar with errormessage when submission fails and have errorMessage',
