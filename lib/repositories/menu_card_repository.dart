@@ -6,28 +6,34 @@ import 'package:foodandbody/models/menu_list.dart';
 import 'package:http/http.dart' as http;
 
 class MenuCardRepository {
-  const MenuCardRepository(this.cache, this.client);
+  MenuCardRepository(this.cache, this.client,
+      {FirebaseFirestore? firebaseFirestore, FirebaseAuth? firebaseAuth})
+      : _firebaseFirestore = firebaseFirestore ?? FirebaseFirestore.instance,
+        _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
 
   final MenuCardCache cache;
   final MenuCardClient client;
+  final FirebaseFirestore _firebaseFirestore;
+  final FirebaseAuth _firebaseAuth;
 
-  Future<List<MenuList>> getMenuList({ required bool isMyFav, required bool checkCache}) async {
+  Future<List<MenuList>> getMenuList(
+      {required bool isMyFav, required bool checkCache}) async {
     if (checkCache) {
       final cachedResult = cache.get(isMyFav);
       if (cachedResult != null) return cachedResult;
     }
     List<MenuList> menu = [];
     List<String> nameList =
-        isMyFav ? await _getNameMenuListById() : await _getNameMenuListAll();
+        isMyFav ? await getNameMenuListById() : await getNameMenuListAll();
     for (var name in nameList) menu.add(await client.fetchMenu(name));
     cache.set(isMyFav, menu);
     return menu;
   }
 
-  Future<List<String>> _getNameMenuListById() async {
-    final CollectionReference favorite = FirebaseFirestore.instance
+  Future<List<String>> getNameMenuListById() async {
+    final CollectionReference favorite = _firebaseFirestore
         .collection('users')
-        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .doc(_firebaseAuth.currentUser?.uid)
         .collection('favorites');
     try {
       final data =
@@ -43,9 +49,9 @@ class MenuCardRepository {
     }
   }
 
-  Future<List<String>> _getNameMenuListAll() async {
+  Future<List<String>> getNameMenuListAll() async {
     final CollectionReference favorite =
-        FirebaseFirestore.instance.collection('favorites');
+        _firebaseFirestore.collection('favorites');
     try {
       final data =
           await favorite.orderBy('count', descending: true).limit(10).get();

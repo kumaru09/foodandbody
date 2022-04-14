@@ -2,6 +2,7 @@ import 'package:camera/camera.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodandbody/repositories/camera_repository.dart';
 import 'package:foodandbody/screens/camera/bloc/camera_bloc.dart';
 import 'package:foodandbody/screens/camera/show_body_result.dart';
 import 'package:foodandbody/screens/camera/show_food_result.dart';

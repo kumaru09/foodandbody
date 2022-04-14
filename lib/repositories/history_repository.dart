@@ -6,10 +6,18 @@ import 'package:foodandbody/models/history_entity.dart';
 import 'package:foodandbody/models/menu.dart';
 
 class HistoryRepository {
+  HistoryRepository(
+      {FirebaseFirestore? firebaseFirestore, FirebaseAuth? firebaseAuth})
+      : _firebaseFirestore = firebaseFirestore ?? FirebaseFirestore.instance,
+        _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
+
+  final FirebaseFirestore _firebaseFirestore;
+  final FirebaseAuth _firebaseAuth;
+
   Future<List<History>> getHistory() async {
-    final CollectionReference foodHistories = FirebaseFirestore.instance
+    final CollectionReference foodHistories = _firebaseFirestore
         .collection('users')
-        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .doc(_firebaseAuth.currentUser?.uid)
         .collection('foodhistories');
     final history =
         await foodHistories.orderBy('date', descending: true).limit(10).get();
@@ -25,9 +33,9 @@ class HistoryRepository {
 
   Future<List<Menu>> getMenuListByDate(
       Timestamp stateTime, Timestamp endTime) async {
-    final CollectionReference foodHistories = FirebaseFirestore.instance
+    final CollectionReference foodHistories = _firebaseFirestore
         .collection('users')
-        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .doc(_firebaseAuth.currentUser?.uid)
         .collection('foodhistories');
     final history = await foodHistories
         .where('date', isGreaterThanOrEqualTo: stateTime)
