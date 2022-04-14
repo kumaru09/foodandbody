@@ -1,4 +1,5 @@
 import 'package:camera/camera.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/screens/camera/bloc/camera_bloc.dart';
@@ -14,12 +15,14 @@ class _CameraState extends State<Camera> {
   @override
   void initState() {
     _initializeCamera(_selectedCamera);
+    _audioPlayer = AudioPlayer();
     super.initState();
   }
 
   late List<CameraDescription> _cameras;
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
+  late AudioPlayer _audioPlayer;
   int _selectedCamera = 1;
   bool _isBodyCamera = true;
   List<XFile> _bodyImage = [];
@@ -41,6 +44,7 @@ class _CameraState extends State<Camera> {
   @override
   void dispose() {
     _controller.dispose();
+    _audioPlayer.dispose();
     super.dispose();
   }
 
@@ -98,33 +102,15 @@ class _CameraState extends State<Camera> {
           ),
         ],
       ),
-      body: Stack(
-        alignment: Alignment.topCenter,
-        children: [
-          FutureBuilder<void>(
-            future: _initializeControllerFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                return _controller.buildPreview();
-              } else {
-                return Center(child: CircularProgressIndicator());
-              }
-            },
-          ),
-          // _isBodyCamera
-          //     ? Container(
-          //         alignment: Alignment.topRight,
-          //         padding: EdgeInsets.only(right: 10),
-          //         child: Text(
-          //           "$seconds",
-          //           style: TextStyle(
-          //               color: Colors.white,
-          //               fontWeight: FontWeight.bold,
-          //               fontSize: 60),
-          //         ),
-          //       )
-          //     : Container()
-        ],
+      body: FutureBuilder<void>(
+        future: _initializeControllerFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            return _controller.buildPreview();
+          } else {
+            return Center(child: CircularProgressIndicator());
+          }
+        },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
@@ -156,13 +142,16 @@ class _CameraState extends State<Camera> {
   void _takeBodyPhoto() async {
     XFile _image;
     try {
+      await _playSignal();
       await Future.delayed(Duration(seconds: 5), () async {
         _image = await _controller.takePicture();
         _bodyImage.add(_image);
+        await _playSignal();
       });
       await Future.delayed(Duration(seconds: 5), () async {
         _image = await _controller.takePicture();
         _bodyImage.add(_image);
+        await _playSignal();
       });
       _showResult(isBodyCamera: _isBodyCamera);
       _bodyImage.clear();
@@ -183,5 +172,10 @@ class _CameraState extends State<Camera> {
             })
         : Navigator.push(
             context, MaterialPageRoute(builder: (context) => ShowFoodResult()));
+  }
+
+  _playSignal() async {
+    await _audioPlayer.setAsset('assets/beep-sound.mp3');
+    _audioPlayer.play();
   }
 }
