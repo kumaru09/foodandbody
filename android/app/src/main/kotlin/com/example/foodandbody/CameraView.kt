@@ -27,7 +27,6 @@ import androidx.lifecycle.LifecycleOwner
 import com.google.ar.core.*
 import com.google.ar.core.exceptions.CameraNotAvailableException
 import com.google.ar.core.exceptions.NotYetAvailableException
-import com.google.ar.core.exceptions.UnavailableException
 import io.flutter.embedding.engine.dart.DartExecutor
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
@@ -44,7 +43,7 @@ import kotlin.collections.ArrayList
 import kotlin.math.atan
 
 
-class CameraView(val activity: Activity, dartExecutor: DartExecutor) : DefaultLifecycleObserver, PlatformView, ImageReader.OnImageAvailableListener, MethodChannel.MethodCallHandler, EventChannel.StreamHandler, SurfaceTexture.OnFrameAvailableListener, GLSurfaceView.Renderer {
+class CameraView(private val activity: Activity, dartExecutor: DartExecutor) : DefaultLifecycleObserver, PlatformView, ImageReader.OnImageAvailableListener, MethodChannel.MethodCallHandler, EventChannel.StreamHandler, SurfaceTexture.OnFrameAvailableListener, GLSurfaceView.Renderer {
     private val channel = MethodChannel(dartExecutor, "ar.core.platform/depth")
     private val eventChanel = EventChannel(dartExecutor, "ar.core.platform/tracking")
     private val frameLayout: FrameLayout
@@ -52,8 +51,8 @@ class CameraView(val activity: Activity, dartExecutor: DartExecutor) : DefaultLi
     private val backgroundRenderer = BackgroundRenderer()
     private val depthRenderer = DepthRenderer()
     private val displayRotationHelper = DisplayRotationHelper(activity)
-    private val pointCloudRenderer = PointCloudRenderer()
-    private val planeRenderer = PlaneRenderer()
+//    private val pointCloudRenderer = PointCloudRenderer()
+//    private val planeRenderer = PlaneRenderer()
     private var session: Session? = null
     private lateinit var sharedCamera: SharedCamera
     private lateinit var cameraId: String
@@ -69,20 +68,18 @@ class CameraView(val activity: Activity, dartExecutor: DartExecutor) : DefaultLi
     private var errorCreatingSession = false
     private var shouldUpdateSurfaceTexture = AtomicBoolean(false)
     private var arcoreActive = false
-    private var isSupported = false
-    private var installRequested = false
-    private var depthReceived = false
+//    private var isSupported = false
+//    private var installRequested = false
+//    private var depthReceived = false
     private var isGetDepth = false
-    private var capturePicture = false
+//    private var capturePicture = false
     private var mWidth = 0
     private var mHeight = 0
     private lateinit var captureFile: File
     private lateinit var flutterResult: MethodChannel.Result
     private var isTakePic = false
-    private var trackingPlane = false
-    private var event: EventChannel.EventSink? = null;
 
-    private var sensor: Sensor? = null
+    private var event: EventChannel.EventSink? = null;
 
     private val frameInUseLock = Object()
     private var depthTimestamp: Long = -1
@@ -90,13 +87,13 @@ class CameraView(val activity: Activity, dartExecutor: DartExecutor) : DefaultLi
 
     //    private val renderer = Renderer()
     private var surfaceCreated = false
-    private var captureSessionChangesPossible = true
+//    private var captureSessionChangesPossible = true
     private lateinit var imageTextLinearLayout: LinearLayout
     private var hasSetTextureNames = false
-    private lateinit var depthData: ArrayList<ArrayList<String>>
+//    private lateinit var depthData: ArrayList<ArrayList<String>>
 
     //    private var depth: ((ArrayList<ArrayList<String>>) -> Unit)? = null
-    private var depth: ((ShortArray) -> Unit)? = null
+//    private var depth: ((ShortArray) -> Unit)? = null
     private lateinit var array: ShortArray
 
     init {
@@ -550,15 +547,6 @@ class CameraView(val activity: Activity, dartExecutor: DartExecutor) : DefaultLi
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when {
-            call.method.equals("isARCoreSupported") -> {
-                isSupported = isARCoreSupportedAndUpToDate()
-                Log.d("isARCoreSupported", "" + isSupported)
-                result.success(isSupported)
-            }
-            call.method.equals("trackingPlane") -> {
-//                trackingPlane = true
-//                flutterResult = result
-            }
             call.method.equals("getDepth") -> {
                 try {
                     isGetDepth = true
@@ -613,34 +601,6 @@ class CameraView(val activity: Activity, dartExecutor: DartExecutor) : DefaultLi
             } catch (e: InterruptedException) {
                 Log.e("ARCore", "Unable to wait for a safe time to make changes to the capture session", e)
             }
-        }
-    }
-
-//    private fun generateFilename(): String? {
-//        val date = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(Date())
-//        return Environment.getExternalStoragePublicDirectory(
-//                Environment.DIRECTORY_PICTURES).toString() + File.separator + "Sceneform/" + date + "_screenshot.jpg"
-//    }
-
-    private fun isARCoreSupportedAndUpToDate(): Boolean {
-        return when (ArCoreApk.getInstance().checkAvailability(activity)) {
-            ArCoreApk.Availability.SUPPORTED_INSTALLED -> true
-            ArCoreApk.Availability.SUPPORTED_APK_TOO_OLD, ArCoreApk.Availability.SUPPORTED_NOT_INSTALLED -> {
-                try {
-                    when (ArCoreApk.getInstance().requestInstall(activity, true)) {
-                        ArCoreApk.InstallStatus.INSTALL_REQUESTED -> {
-                            io.flutter.Log.d("ARCore:", "ARCore installation requested.")
-                            false
-                        }
-                        ArCoreApk.InstallStatus.INSTALLED -> true
-                    }
-                } catch (e: UnavailableException) {
-                    io.flutter.Log.d("ARCore:", "ARCore not installed", e)
-                    false
-                }
-            }
-            ArCoreApk.Availability.UNSUPPORTED_DEVICE_NOT_CAPABLE -> false
-            ArCoreApk.Availability.UNKNOWN_CHECKING, ArCoreApk.Availability.UNKNOWN_ERROR, ArCoreApk.Availability.UNKNOWN_TIMED_OUT -> false
         }
     }
 
@@ -739,9 +699,9 @@ class CameraView(val activity: Activity, dartExecutor: DartExecutor) : DefaultLi
 //                    buffer.asShortBuffer().get(array)
 //                    Log.d("ARCore", "${array.toCollection(ArrayList())}")
 //                }
-                activity.runOnUiThread {
-                    if (event != null) event!!.success(true)
-                }
+//                activity.runOnUiThread {
+//                    if (event != null) event!!.success(true)
+//                }
             }
         } catch (e: NotYetAvailableException) {
             activity.runOnUiThread { if (event != null) event!!.success(false) }
@@ -750,6 +710,10 @@ class CameraView(val activity: Activity, dartExecutor: DartExecutor) : DefaultLi
 
         val points = DepthData.create(frame, session!!.createAnchor(camera.pose))
                 ?: return
+
+        activity.runOnUiThread {
+            if (event != null) event!!.success(true)
+        }
 
         if (isGetDepth) {
             Log.d("ARCore", "getting depth")

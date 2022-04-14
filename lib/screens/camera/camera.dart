@@ -8,6 +8,7 @@ import 'package:foodandbody/screens/camera/bloc/camera_bloc.dart';
 import 'package:foodandbody/screens/camera/show_body_result.dart';
 import 'package:foodandbody/screens/camera/show_food_result.dart';
 import 'package:foodandbody/services/arcore_service.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 
 class Camera extends StatefulWidget {
   @override
@@ -52,85 +53,97 @@ class _CameraState extends State<Camera> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     final CameraController? cameraController = _controller;
 
-    return Scaffold(
-      extendBody: true,
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: Color(0xDD000000),
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.close, color: Colors.white),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        actions: [
-          IconButton(
-              onPressed: () async {
-                if (context.read<ARCoreService>().isSupportDepth ==
-                    ARStatus.initial)
-                  await context.read<ARCoreService>().isARCoreSupported();
-                if (context.read<ARCoreService>().isSupportDepth ==
-                    ARStatus.support) {
-                  Navigator.of(context).pushReplacement((MaterialPageRoute(
-                      builder: (context) => ARCamera(
-                          arCoreService: context.read<ARCoreService>()))));
-                } else {
-                  ScaffoldMessenger.of(context)
-                    ..hideCurrentSnackBar()
-                    ..showSnackBar(SnackBar(
-                      content:
-                          Text('${context.read<ARCoreService>().errorMessage}'),
-                    ));
-                }
+    return LoaderOverlay(
+        disableBackButton: false,
+        child: Scaffold(
+          extendBody: true,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          appBar: AppBar(
+            backgroundColor: Color(0xDD000000),
+            elevation: 0,
+            leading: IconButton(
+              icon: Icon(Icons.close, color: Colors.white),
+              onPressed: () {
+                Navigator.pop(context);
               },
-              icon: Text('AR')),
-          IconButton(
-            onPressed: () {
-              if (_cameras.length > 1) {
-                setState(() {
-                  _isFoodCamera = !_isFoodCamera;
-                  _selected = _selected == 0 ? 1 : 0;
-                  selectCamera(_selected);
-                });
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง",
-                      style: TextStyle(color: Colors.white)),
-                  backgroundColor: Color(0x99000000),
-                  duration: Duration(seconds: 2),
-                ));
+            ),
+            actions: [
+              IconButton(
+                  onPressed: () async {
+                    context.loaderOverlay.show();
+                    if (context.read<ARCoreService>().isSupportDepth ==
+                        ARStatus.initial)
+                      await context.read<ARCoreService>().isARCoreSupported();
+                    if (context.read<ARCoreService>().isSupportDepth ==
+                        ARStatus.support) {
+                      Future.delayed(Duration(seconds: 1), () {
+                        context.loaderOverlay.hide();
+                        Navigator.of(context).pushReplacement(
+                            (MaterialPageRoute(
+                                builder: (context) => ARCamera(
+                                    arCoreService:
+                                        context.read<ARCoreService>()))));
+                      });
+                    } else {
+                      context.loaderOverlay.hide();
+                      ScaffoldMessenger.of(context)
+                        ..hideCurrentSnackBar()
+                        ..showSnackBar(SnackBar(
+                          content: Text(
+                              '${context.read<ARCoreService>().errorMessage}'),
+                        ));
+                    }
+                  },
+                  icon: Text('AR')),
+              IconButton(
+                onPressed: () {
+                  if (_cameras.length > 1) {
+                    setState(() {
+                      _isFoodCamera = !_isFoodCamera;
+                      _selected = _selected == 0 ? 1 : 0;
+                      selectCamera(_selected);
+                    });
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง",
+                          style: TextStyle(color: Colors.white)),
+                      backgroundColor: Color(0x99000000),
+                      duration: Duration(seconds: 2),
+                    ));
+                  }
+                },
+                icon: Icon(
+                  _isFoodCamera ? Icons.fastfood : Icons.accessibility,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+          body: (cameraController == null ||
+                  !cameraController.value.isInitialized)
+              ? Center(child: CircularProgressIndicator())
+              : Center(
+                  child: cameraController.buildPreview(),
+                ),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerFloat,
+          floatingActionButton: FloatingActionButton(
+            onPressed: () async {
+              try {
+                final image = await cameraController!.takePicture();
+                // context.read<CameraBloc>().add(GetPredicton(file: image!));
+                _showResult(isFoodCamera: _isFoodCamera, image: image);
+              } catch (e) {
+                print("Take a photo failed: $e");
               }
             },
-            icon: Icon(
-              _isFoodCamera ? Icons.fastfood : Icons.accessibility,
-              color: Colors.white,
-            ),
+            elevation: 2,
+            backgroundColor: Colors.white,
+            shape: CircleBorder(
+                side:
+                    BorderSide(width: 6, color: Colors.grey.withOpacity(0.5))),
           ),
-        ],
-      ),
-      body: (cameraController == null || !cameraController.value.isInitialized)
-          ? Center(child: CircularProgressIndicator())
-          : Center(
-              child: cameraController.buildPreview(),
-            ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          try {
-            final image = await cameraController!.takePicture();
-            // context.read<CameraBloc>().add(GetPredicton(file: image!));
-            _showResult(isFoodCamera: _isFoodCamera, image: image);
-          } catch (e) {
-            print("Take a photo failed: $e");
-          }
-        },
-        elevation: 2,
-        backgroundColor: Colors.white,
-        shape: CircleBorder(
-            side: BorderSide(width: 6, color: Colors.grey.withOpacity(0.5))),
-      ),
-    );
+        ));
   }
 
   Future<void> setupCamera() async {

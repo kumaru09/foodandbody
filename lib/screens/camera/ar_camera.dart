@@ -65,7 +65,7 @@ class _State extends State<ARCamera> with WidgetsBindingObserver {
     _streamSubscription.add(accelerometerEvents.listen((event) {
       final norm = sqrt(pow(event.x, 2) + pow(event.y, 2) + pow(event.z, 2));
       final inclination = (acos(event.z / norm) * (180 / pi)).round();
-      if (inclination < 1 || inclination > 179) {
+      if (inclination < 2 || inclination > 178) {
         if (context.read<CameraBloc>().state.isFlat > inclination) {
           context.read<CameraBloc>().add(SetIsFlat(isFlat: inclination));
         }
@@ -128,24 +128,48 @@ class _State extends State<ARCamera> with WidgetsBindingObserver {
         ],
       ),
       body: Stack(
+        alignment: Alignment.center,
         children: <Widget>[
           visibilityDetector,
           Positioned.fill(
+              bottom: MediaQuery.of(context).size.height * 0.12,
               child: Align(
                   alignment: Alignment.bottomCenter,
-                  child: BlocBuilder<CameraBloc, CameraState>(
-                      builder: (context, state) {
-                    if (!state.hasPlane) {
-                      return Text('Searching Surface');
-                    }
-                    if (state.hasPlane &&
-                        state.isFlat > 1 &&
-                        state.isFlat < 179) {
-                      return Text('Device is not flat: ${state.isFlat}');
-                    } else {
-                      return Text('Ready for take photo');
-                    }
-                  })))
+                  child: FittedBox(
+                      fit: BoxFit.fill,
+                      child: Container(
+                        padding: EdgeInsets.only(left: 16, right: 16),
+                        height: 32,
+                        child: Center(child:
+                            BlocBuilder<CameraBloc, CameraState>(
+                                builder: (context, state) {
+                          if (!state.hasPlane) {
+                            return Text(
+                              'กรุณาขยับกล้องขึ้นลงให้จุดสีเขียวขึ้นบนอาหาร',
+                              style: TextStyle(
+                                  color: Color(0xFFFFFFFF), fontSize: 12),
+                            );
+                          }
+                          if (state.hasPlane &&
+                              state.isFlat > 2 &&
+                              state.isFlat < 178) {
+                            return Text(
+                              'กรุณาขยับกล้องให้ขนานกับพื้น: ${state.isFlat}',
+                              style: TextStyle(
+                                  color: Color(0xFFFFFFFF), fontSize: 12),
+                            );
+                          } else {
+                            return Text(
+                              'พร้อมสำหรับถ่ายรูป',
+                              style: TextStyle(
+                                  color: Color(0xFFFFFFFF), fontSize: 12),
+                            );
+                          }
+                        })),
+                        decoration: BoxDecoration(
+                            color: const Color(0xff232F34),
+                            borderRadius: BorderRadius.circular(10)),
+                      ))))
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
