@@ -102,20 +102,37 @@ class _CameraState extends State<Camera> {
           ),
         ],
       ),
-      body: FutureBuilder<void>(
-        future: _initializeControllerFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return _controller.buildPreview();
-          } else {
-            return Center(child: CircularProgressIndicator());
-          }
-        },
+      body: Stack(
+        alignment: Alignment.center,
+        children: [
+          FutureBuilder<void>(
+            future: _initializeControllerFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                return _controller.buildPreview();
+              } else {
+                return Center(child: CircularProgressIndicator());
+              }
+            },
+          ),
+          _isBodyCamera
+              ? Container(
+                  margin: EdgeInsets.all(20),
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  height: MediaQuery.of(context).size.height * 0.8,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                        width: 5, color: Theme.of(context).primaryColor),
+                  ),
+                )
+              : Container()
+        ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
+        onPressed: () async {
           if (_isBodyCamera) {
+            await _playSignal();
             _takeBodyPhoto();
           } else {
             _takeFoodPhoto();
@@ -142,7 +159,7 @@ class _CameraState extends State<Camera> {
   void _takeBodyPhoto() async {
     XFile _image;
     try {
-      await _playSignal();
+      // await _playSignal();
       await Future.delayed(Duration(seconds: 5), () async {
         _image = await _controller.takePicture();
         _bodyImage.add(_image);
