@@ -97,7 +97,8 @@ void main() {
             ),
           ),
         );
-        await tester.enterText(find.byKey(confirmedPasswordInputKey), testConfirmedPassword);
+        await tester.enterText(
+            find.byKey(confirmedPasswordInputKey), testConfirmedPassword);
         verify(() =>
                 registerCubit.confirmedPasswordChanged(testConfirmedPassword))
             .called(1);
@@ -124,7 +125,7 @@ void main() {
     });
 
     group('renders', () {
-      testWidgets('Sign Up Failure SnackBar when submission fails',
+      testWidgets('failure SnackBar when submission status is fails',
           (tester) async {
         whenListen(
           registerCubit,
@@ -246,7 +247,7 @@ void main() {
         expect(registerButton.enabled, isTrue);
       });
 
-      testWidgets('password visible when visibility icon is pressed',
+      testWidgets('password visible when password visibility icon is pressed',
           (tester) async {
         await tester.pumpWidget(
           MaterialApp(
@@ -258,23 +259,24 @@ void main() {
             ),
           ),
         );
-        var input1 =
-            tester.widget<TextField>(find.byKey(passwordInputKey));
-        var icon1 = tester.widget<InkWell>(find.byKey(passwordVisibilityIconKey));
+        var input1 = tester.widget<TextField>(find.byKey(passwordInputKey));
+        var icon1 =
+            tester.widget<InkWell>(find.byKey(passwordVisibilityIconKey));
         expect(input1.obscureText, true);
         expect(icon1.child.toString(), iconVisibility);
 
         await tester.tap(find.byKey(passwordVisibilityIconKey));
         await tester.pump();
 
-        var input2 =
-            tester.widget<TextField>(find.byKey(passwordInputKey));
-        var icon2 = tester.widget<InkWell>(find.byKey(passwordVisibilityIconKey));
+        var input2 = tester.widget<TextField>(find.byKey(passwordInputKey));
+        var icon2 =
+            tester.widget<InkWell>(find.byKey(passwordVisibilityIconKey));
         expect(icon2.child.toString(), iconVisibilityOff);
         expect(input2.obscureText, false);
       });
 
-      testWidgets('confirm password visible when visibility icon is pressed',
+      testWidgets(
+          'confirmPassword visible when confirmPassword visibility icon is pressed',
           (tester) async {
         await tester.pumpWidget(
           MaterialApp(
@@ -286,8 +288,10 @@ void main() {
             ),
           ),
         );
-        var input1 = tester.firstWidget<TextField>(find.byKey(confirmedPasswordInputKey));
-        var icon1 = tester.widget<InkWell>(find.byKey(confirmPasswordVisibilityIconKey));
+        var input1 = tester
+            .firstWidget<TextField>(find.byKey(confirmedPasswordInputKey));
+        var icon1 = tester
+            .widget<InkWell>(find.byKey(confirmPasswordVisibilityIconKey));
         expect(input1.obscureText, true);
         expect(icon1.child.toString(), iconVisibility);
 
@@ -296,36 +300,35 @@ void main() {
 
         var input2 = tester
             .firstWidget<TextField>(find.byKey(confirmedPasswordInputKey));
-        var icon2 = tester.widget<InkWell>(find.byKey(confirmPasswordVisibilityIconKey));
+        var icon2 = tester
+            .widget<InkWell>(find.byKey(confirmPasswordVisibilityIconKey));
         expect(input2.obscureText, false);
         expect(icon2.child.toString(), iconVisibilityOff);
       });
     });
 
-    group('navigates', () {
-      testWidgets('back to previous page when submission status is success',
-          (tester) async {
-        whenListen(
-          registerCubit,
-          Stream.fromIterable(const <RegisterState>[
-            RegisterState(status: FormzStatus.submissionInProgress),
-            RegisterState(status: FormzStatus.submissionSuccess),
-          ]),
-        );
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: BlocProvider.value(
-                value: registerCubit,
-                child: const RegisterForm(),
-              ),
+    testWidgets('navigates pop when submission status is success',
+        (tester) async {
+      whenListen(
+        registerCubit,
+        Stream.fromIterable(const <RegisterState>[
+          RegisterState(status: FormzStatus.submissionInProgress),
+          RegisterState(status: FormzStatus.submissionSuccess),
+        ]),
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: BlocProvider.value(
+              value: registerCubit,
+              child: const RegisterForm(),
             ),
           ),
-        );
-        expect(find.byType(RegisterForm), findsOneWidget);
-        await tester.pumpAndSettle();
-        expect(find.byType(RegisterForm), findsNothing);
-      });
+        ),
+      );
+      expect(find.byType(RegisterForm), findsOneWidget);
+      await tester.pumpAndSettle();
+      expect(find.byType(RegisterForm), findsNothing);
     });
   });
 }
