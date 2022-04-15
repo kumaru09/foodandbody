@@ -152,9 +152,10 @@ class _CameraState extends State<Camera> {
           ),
           _isBodyCamera
               ? Container(
-                  margin: EdgeInsets.all(20),
+                  margin: EdgeInsets.fromLTRB(
+                      20, MediaQuery.of(context).size.height * 0.05, 20, 20),
                   width: MediaQuery.of(context).size.width * 0.8,
-                  height: MediaQuery.of(context).size.height * 0.8,
+                  height: MediaQuery.of(context).size.height * 0.7,
                   decoration: BoxDecoration(
                     border: Border.all(
                         width: 5, color: Theme.of(context).primaryColor),
