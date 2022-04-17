@@ -243,8 +243,8 @@ class EditWeightDialog extends StatelessWidget {
       title: Text("แก้ไขน้ำหนัก",
           style: Theme.of(context)
               .textTheme
-              .headline6!
-              .merge(TextStyle(color: Theme.of(context).primaryColor))),
+              .subtitle1!
+              .merge(TextStyle(color: Theme.of(context).colorScheme.secondary))),
       content: BlocBuilder<BodyCubit, BodyState>(
           buildWhen: (previous, current) => previous.weight != current.weight,
           builder: (context, state) {
@@ -262,6 +262,16 @@ class EditWeightDialog extends StatelessWidget {
             );
           }),
       actions: <Widget>[
+        TextButton(
+            key: const Key("body_edit_weight_dialog_cancel_button"),
+            onPressed: () {
+              Navigator.pop(context, 'cancel');
+            },
+            child: Text("ยกเลิก",
+                style: Theme.of(context)
+                    .textTheme
+                    .button!
+                    .merge(TextStyle(color: Theme.of(context).colorScheme.secondary)))),
         BlocBuilder<BodyCubit, BodyState>(
             buildWhen: (previous, current) => previous.weight != current.weight,
             builder: (context, state) {
@@ -272,23 +282,13 @@ class EditWeightDialog extends StatelessWidget {
                     : null,
                 child: Text("ตกลง"),
                 style: TextButton.styleFrom(
-                  primary: Theme.of(context).primaryColor,
+                  primary: Theme.of(context).colorScheme.secondary,
                   onSurface: Theme.of(context)
                       .colorScheme
-                      .primaryVariant, // Disable color
+                      .secondaryVariant, // Disable color
                 ),
               );
             }),
-        TextButton(
-            key: const Key("body_edit_weight_dialog_cancel_button"),
-            onPressed: () {
-              Navigator.pop(context, 'cancel');
-            },
-            child: Text("ยกเลิก",
-                style: Theme.of(context)
-                    .textTheme
-                    .button!
-                    .merge(TextStyle(color: Theme.of(context).primaryColor))))
       ],
     );
   }
@@ -307,8 +307,8 @@ class EditHeightDialog extends StatelessWidget {
       title: Text("แก้ไขส่วนสูง",
           style: Theme.of(context)
               .textTheme
-              .headline6!
-              .merge(TextStyle(color: Theme.of(context).primaryColor))),
+              .subtitle1!
+              .merge(TextStyle(color: Theme.of(context).colorScheme.secondary))),
       content: BlocBuilder<BodyCubit, BodyState>(
           buildWhen: (previous, current) => previous.height != current.height,
           builder: (context, state) {
@@ -326,6 +326,16 @@ class EditHeightDialog extends StatelessWidget {
             );
           }),
       actions: <Widget>[
+        TextButton(
+            key: const Key("body_edit_height_dialog_cancel_button"),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text("ยกเลิก",
+                style: Theme.of(context)
+                    .textTheme
+                    .button!
+                    .merge(TextStyle(color: Theme.of(context).colorScheme.secondary)))),
         BlocBuilder<BodyCubit, BodyState>(
             buildWhen: (previous, current) => previous.height != current.height,
             builder: (context, state) {
@@ -336,23 +346,13 @@ class EditHeightDialog extends StatelessWidget {
                     : null,
                 child: Text("ตกลง"),
                 style: TextButton.styleFrom(
-                  primary: Theme.of(context).primaryColor,
+                  primary: Theme.of(context).colorScheme.secondary,
                   onSurface: Theme.of(context)
                       .colorScheme
-                      .primaryVariant, // Disable color
+                      .secondaryVariant, // Disable color
                 ),
               );
             }),
-        TextButton(
-            key: const Key("body_edit_height_dialog_cancel_button"),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text("ยกเลิก",
-                style: Theme.of(context)
-                    .textTheme
-                    .button!
-                    .merge(TextStyle(color: Theme.of(context).primaryColor))))
       ],
     );
   }

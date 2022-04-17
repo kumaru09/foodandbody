@@ -68,6 +68,16 @@ class AddExerciseDialog extends StatelessWidget {
         ],
       ),
       actions: <Widget>[
+        TextButton(
+          key: const Key("add_exercise_dialog_cancel_button"),
+          onPressed: () => Navigator.pop(context),
+          child: Text(
+            "ยกเลิก",
+            style: Theme.of(context).textTheme.button!.merge(
+                  TextStyle(color: Theme.of(context).colorScheme.secondary),
+                ),
+          ),
+        ),
         BlocBuilder<PlanBloc, PlanState>(
           buildWhen: (previous, current) =>
               previous.exerciseStatus != current.exerciseStatus,
@@ -83,23 +93,11 @@ class AddExerciseDialog extends StatelessWidget {
                   : null,
               child: Text("ตกลง"),
               style: TextButton.styleFrom(
-                primary: Theme.of(context).primaryColor,
-                onSurface: Theme.of(context)
-                    .colorScheme
-                    .primaryVariant, // Disable color
+                primary: Theme.of(context).colorScheme.secondary,
+                onSurface: Theme.of(context).colorScheme.secondaryVariant, // Disable color
               ),
             );
           },
-        ),
-        TextButton(
-          key: const Key("add_exercise_dialog_cancel_button"),
-          onPressed: () => Navigator.pop(context),
-          child: Text(
-            "ยกเลิก",
-            style: Theme.of(context).textTheme.button!.merge(
-                  TextStyle(color: Theme.of(context).primaryColor),
-                ),
-          ),
         ),
       ],
     );
