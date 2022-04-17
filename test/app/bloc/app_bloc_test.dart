@@ -18,28 +18,22 @@ class MockInfo extends Mock implements Info {}
 void main() {
   group('AppBloc', () {
     final user = MockUser();
-    final info = MockInfo();
     late AuthenRepository authenRepository;
     late UserRepository userRepository;
 
     setUp(() {
       authenRepository = MockAuthenRepository();
       userRepository = MockUserRepository();
-      when(() => authenRepository.user).thenAnswer(
-        (_) => Stream<User>.empty(),
-      );
-      when(
-        () => authenRepository.currentUser,
-      ).thenReturn(User.empty);
-      when(() => user.info).thenReturn(null);
+      when(() => authenRepository.user).thenAnswer((_) => Stream<User>.empty());
+      when(() => authenRepository.currentUser).thenReturn(User.empty);
     });
 
     test('initial state is unauthenticated when user is empty', () {
       expect(
         AppBloc(
-                authenRepository: authenRepository,
-                userRepository: userRepository)
-            .state,
+          authenRepository: authenRepository,
+          userRepository: userRepository,
+        ).state,
         AppState.unauthenticated(),
       );
     });
@@ -47,60 +41,53 @@ void main() {
     group('UserChanged', () {
       blocTest<AppBloc, AppState>(
         'emits authenticated when user is not empty and UserInfo is not empty',
-        build: () {
+        setUp: () {
           when(() => user.isNotEmpty).thenReturn(true);
-          when(() => authenRepository.user).thenAnswer(
-            (_) => Stream.value(user),
-          );
-          when(() => user.info).thenReturn(info);
-          when(() => userRepository.getInfo(user))
-              .thenAnswer((_) => Future(() => user));
-          return AppBloc(
-              authenRepository: authenRepository,
-              userRepository: userRepository);
+          when(() => user.emailVerified).thenReturn(true);
+          when(() => authenRepository.user)
+              .thenAnswer((_) => Stream.value(user));
+          when(() => authenRepository.currentUser).thenReturn(user);
         },
-        seed: () => AppState.unauthenticated(),
+        build: () => AppBloc(
+          authenRepository: authenRepository,
+          userRepository: userRepository,
+        ),
         expect: () => [AppState.authenticated(user)],
       );
 
       blocTest<AppBloc, AppState>(
-        'emit initialize when user is not empty and userInfo is null',
-        build: () {
+        'emits notverified when user is not empty and emailVerified is false',
+        setUp: () {
           when(() => user.isNotEmpty).thenReturn(true);
-          when(() => authenRepository.user).thenAnswer(
-            (_) => Stream.value(user),
-          );
-          when(() => userRepository.getInfo(user))
-              .thenAnswer((_) => Future(() => user));
-          return AppBloc(
-              authenRepository: authenRepository,
-              userRepository: userRepository);
+          when(() => user.emailVerified).thenReturn(false);
+          when(() => authenRepository.user)
+              .thenAnswer((_) => Stream.value(user));
+          when(() => authenRepository.currentUser).thenReturn(user);
         },
-        // seed: () => AppState.authenticated(user),
-        expect: () => [AppState.initialize(user)],
+        build: () => AppBloc(
+          authenRepository: authenRepository,
+          userRepository: userRepository,
+        ),
+        expect: () => [AppState.notverified(user)],
       );
 
       blocTest<AppBloc, AppState>(
         'emits unauthenticated when user is empty',
-        build: () {
-          when(() => authenRepository.user).thenAnswer(
-            (_) => Stream.value(User.empty),
-          );
-          return AppBloc(
-              authenRepository: authenRepository,
-              userRepository: userRepository);
-        },
+        setUp: () => when(() => authenRepository.user)
+            .thenAnswer((_) => Stream.value(User.empty)),
+        build: () => AppBloc(
+          authenRepository: authenRepository,
+          userRepository: userRepository,
+        ),
         expect: () => [AppState.unauthenticated()],
       );
     });
+
     group('LogoutRequested', () {
       blocTest<AppBloc, AppState>(
-        'invokes logOut',
-        build: () {
-          return AppBloc(
-              authenRepository: authenRepository,
-              userRepository: userRepository);
-        },
+        'call authenRepository logOut',
+        build: () => AppBloc(
+            authenRepository: authenRepository, userRepository: userRepository),
         act: (bloc) => bloc.add(AppLogoutRequested()),
         verify: (_) {
           verify(() => authenRepository.logOut()).called(1);
