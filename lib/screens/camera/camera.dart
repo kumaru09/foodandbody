@@ -219,18 +219,28 @@ class _CameraState extends State<Camera> {
               ),
               floatingActionButtonLocation:
                   FloatingActionButtonLocation.centerFloat,
-              floatingActionButton: FloatingActionButton(onPressed: () async {
-                if (_isBodyCamera) {
-                  await _playSignal();
-                  _startTimer();
-                  _takeBodyPhoto();
-                  context.loaderOverlay.show();
-                  context.read<CameraBloc>().add(GetBodyPredict(
-                      image: _bodyImage,
-                      height:
-                          context.read<UserRepository>().cache.get()!.height!));
-                }
-              }),
+              floatingActionButton: FloatingActionButton(
+                onPressed: () async {
+                  if (_isBodyCamera) {
+                    await _playSignal();
+                    _startTimer();
+                    await _takeBodyPhoto();
+                    context.loaderOverlay.show();
+                    context.read<CameraBloc>().add(GetBodyPredict(
+                        image: _bodyImage,
+                        height: context
+                            .read<UserRepository>()
+                            .cache
+                            .get()!
+                            .height!));
+                  }
+                },
+                elevation: 2,
+                backgroundColor: Colors.white,
+                shape: CircleBorder(
+                    side: BorderSide(
+                        width: 6, color: Colors.grey.withOpacity(0.5))),
+              ),
             )));
   }
 
