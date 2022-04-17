@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:camera/camera.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,9 +27,12 @@ class _CameraState extends State<Camera> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
   late AudioPlayer _audioPlayer;
+  late Timer _counterTimer;
+  Duration _duration = Duration(seconds: 5);
   int _selectedCamera = 1;
   bool _isBodyCamera = true;
   List<XFile> _bodyImage = [];
+  bool _isTakeImage = false;
 
   Future<void> _initializeCamera(int cameraIndex) async {
     try {
@@ -46,6 +52,7 @@ class _CameraState extends State<Camera> {
   void dispose() {
     _controller.dispose();
     _audioPlayer.dispose();
+    _counterTimer.cancel();
     super.dispose();
   }
 
@@ -61,8 +68,35 @@ class _CameraState extends State<Camera> {
     }
   }
 
+  void _startTimer() {
+    _counterTimer =
+        Timer.periodic(Duration(seconds: 1), (timer) => _setCountDown());
+  }
+
+  void _setCountDown() {
+    const int _reduceSeconds = 1;
+    setState(() {
+      final seconds = _duration.inSeconds - _reduceSeconds;
+      if (seconds < 0) {
+        _counterTimer.cancel();
+      } else {
+        _duration = Duration(seconds: seconds);
+      }
+    });
+  }
+
+  void _resetTimer() {
+    setState(() {
+      _counterTimer.cancel();
+      _duration = Duration(seconds: 5);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    String _digit(int n) => n.toString().padLeft(1);
+    final _seconds = _digit(_duration.inSeconds.remainder(60));
+
     return Scaffold(
       extendBody: true,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -118,15 +152,34 @@ class _CameraState extends State<Camera> {
           ),
           _isBodyCamera
               ? Container(
-                  margin: EdgeInsets.all(20),
+                  margin: EdgeInsets.fromLTRB(
+                      20, MediaQuery.of(context).size.height * 0.05, 20, 20),
                   width: MediaQuery.of(context).size.width * 0.8,
-                  height: MediaQuery.of(context).size.height * 0.8,
+                  height: MediaQuery.of(context).size.height * 0.7,
                   decoration: BoxDecoration(
                     border: Border.all(
                         width: 5, color: Theme.of(context).primaryColor),
                   ),
                 )
-              : Container()
+              : Container(),
+          _isBodyCamera
+              ? Text(
+                  "$_seconds",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 100,
+                      fontWeight: FontWeight.bold),
+                )
+              : Container(),
+          AnimatedOpacity(
+            opacity: _isTakeImage ? 1.0 : 0.0,
+            duration: Duration(milliseconds: 500),
+            child: Container(
+              color: Colors.white,
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+            ),
+          )
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -134,6 +187,7 @@ class _CameraState extends State<Camera> {
         onPressed: () async {
           if (_isBodyCamera) {
             await _playSignal();
+            _startTimer();
             _takeBodyPhoto();
           } else {
             _takeFoodPhoto();
@@ -160,17 +214,25 @@ class _CameraState extends State<Camera> {
   void _takeBodyPhoto() async {
     XFile _image;
     try {
-      // await _playSignal();
       await Future.delayed(Duration(seconds: 5), () async {
         _image = await _controller.takePicture();
         _bodyImage.add(_image);
+        setState(() => _isTakeImage = true);
         await _playSignal();
+        setState(() => _isTakeImage = false);
       });
+      _resetTimer();
+
+      _startTimer();
       await Future.delayed(Duration(seconds: 5), () async {
         _image = await _controller.takePicture();
         _bodyImage.add(_image);
+        setState(() => _isTakeImage = true);
         await _playSignal();
+        setState(() => _isTakeImage = false);
       });
+      _resetTimer();
+
       _showResult(isBodyCamera: _isBodyCamera);
       _bodyImage.clear();
     } catch (e) {
