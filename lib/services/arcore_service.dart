@@ -35,16 +35,6 @@ class ARCoreService {
     }
   }
 
-  Future<bool?> createSession() async {
-    try {
-      channel = const MethodChannel('ar.core.platform/depth');
-      return await channel.invokeMethod<bool>('trackingPlane');
-    } catch (e) {
-      print('createSession error: $e');
-      throw Exception();
-    }
-  }
-
   Future<Depth?> getDepth() async {
     try {
       channel = const MethodChannel('ar.core.platform/depth');

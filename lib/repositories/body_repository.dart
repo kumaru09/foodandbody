@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:foodandbody/models/body.dart';
 import 'package:foodandbody/models/body_entity.dart';
+import 'package:foodandbody/models/body_predict.dart';
 import 'package:foodandbody/models/weight_list.dart';
 
 class BodyRepository {
@@ -101,6 +102,25 @@ class BodyRepository {
         .collection('bodyhistories');
     try {
       await bodyHistories.add(body.toEntity().toJson());
+    } catch (e) {
+      throw Exception('error updating body');
+    }
+  }
+
+  Future<void> addBodyCamera(BodyPredict bodyPredict) async {
+    final CollectionReference bodyHistories = _firebaseFirestore
+        .collection('users')
+        .doc(_firebaseAuth.currentUser?.uid)
+        .collection('bodyhistories');
+    try {
+      await bodyHistories.add(Body(
+              date: Timestamp.now(),
+              shoulder: bodyPredict.shoulder,
+              chest: bodyPredict.chest,
+              waist: bodyPredict.waist,
+              hip: bodyPredict.hip)
+          .toEntity()
+          .toJson());
     } catch (e) {
       throw Exception('error updating body');
     }

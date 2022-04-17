@@ -704,7 +704,7 @@ class CameraView(private val activity: Activity, dartExecutor: DartExecutor) : D
 //                }
             }
         } catch (e: NotYetAvailableException) {
-            activity.runOnUiThread { if (event != null) event!!.success(false) }
+            activity.runOnUiThread { if (event != null) event!!.success("{\"hasPlane\":false, \"count\":0}") }
             containsNewDepthData = false
         }
 
@@ -712,7 +712,7 @@ class CameraView(private val activity: Activity, dartExecutor: DartExecutor) : D
                 ?: return
 
         activity.runOnUiThread {
-            if (event != null) event!!.success(true)
+            if (event != null) event!!.success("{\"hasPlane\":true, \"count\":${points.count}}")
         }
 
         if (isGetDepth) {
@@ -737,7 +737,7 @@ class CameraView(private val activity: Activity, dartExecutor: DartExecutor) : D
 
 //        DepthData.filterUsingPlanes(points, session!!.getAllTrackables(Plane::class.java))
 
-        depthRenderer.update(points)
+        depthRenderer.update(points.points)
         depthRenderer.draw(camera)
 //
 //        // Get projection matrix.

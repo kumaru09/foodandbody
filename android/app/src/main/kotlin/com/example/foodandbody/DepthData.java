@@ -40,7 +40,7 @@ import java.util.Collection;
 public class DepthData {
     public static final int FLOATS_PER_POINT = 4; // X,Y,Z,confidence.
 
-    public static FloatBuffer create(Frame frame, Anchor cameraPoseAnchor) {
+    public static Results create(Frame frame, Anchor cameraPoseAnchor) {
         try {
             Image depthImage = frame.acquireRawDepthImage();
             Image confidenceImage = frame.acquireRawDepthConfidenceImage();
@@ -51,7 +51,7 @@ public class DepthData {
             final CameraIntrinsics intrinsics = frame.getCamera().getTextureIntrinsics();
             float[] modelMatrix = new float[16];
             cameraPoseAnchor.getPose().toMatrix(modelMatrix, 0);
-            final FloatBuffer points = convertRawDepthImagesTo3dPointBuffer(
+            final Results points = convertRawDepthImagesTo3dPointBuffer(
                     depthImage, confidenceImage, intrinsics, modelMatrix);
 
             depthImage.close();
@@ -66,7 +66,7 @@ public class DepthData {
     }
 
     /** Applies camera intrinsics to convert depth image into a 3D pointcloud. */
-    private static FloatBuffer convertRawDepthImagesTo3dPointBuffer(
+    private static Results convertRawDepthImagesTo3dPointBuffer(
             Image depth, Image confidence, CameraIntrinsics cameraTextureIntrinsics, float[] modelMatrix) {
         // Java uses big endian so we have to change the endianess to ensure we extract
         // depth data in the correct byte order.
@@ -114,6 +114,8 @@ public class DepthData {
         float[] pointCamera = new float[4];
         float[] pointWorld = new float[4];
 
+        int count = 0;
+
         for (int y = 0; y < depthHeight; y += step) {
             for (int x = 0; x < depthWidth; x += step) {
                 // Depth images are tightly packed, so it's OK to not use row and pixel strides.
@@ -136,6 +138,8 @@ public class DepthData {
                     continue;
                 }
 
+                count++;
+
                 // Unprojects the depth into a 3D point in camera coordinates.
                 pointCamera[0] = depthMeters * (x - cx) / fx;
                 pointCamera[1] = depthMeters * (cy - y) / fy;
@@ -152,7 +156,7 @@ public class DepthData {
         }
 
         points.rewind();
-        return points;
+        return new Results(count, points);
     }
 
     public static void filterUsingPlanes(FloatBuffer points, Collection<Plane> allPlanes) {

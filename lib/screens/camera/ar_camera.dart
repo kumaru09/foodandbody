@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
@@ -29,16 +30,21 @@ class _State extends State<ARCamera> with WidgetsBindingObserver {
   late VisibilityDetector visibilityDetector;
   final _streamSubscription = <StreamSubscription<dynamic>>[];
   final _trackingStream = const EventChannel("ar.core.platform/tracking");
-  bool? hasPlane = false;
-  bool _isFoodCamera = true;
 
   void onPlatformViewCreated(int id) async {
     print('onPlatform');
     _streamSubscription
         .add(_trackingStream.receiveBroadcastStream().listen((event) {
-      if (event && !context.read<CameraBloc>().state.hasPlane) {
+      final res = json.decode(event);
+      bool hasPlane = res["hasPlane"];
+      int count = res["count"];
+      if (hasPlane &&
+          !context.read<CameraBloc>().state.hasPlane &&
+          count > 2000) {
         context.read<CameraBloc>().add(SetHasPlane(hasPlane: true));
-      } else if (!event && context.read<CameraBloc>().state.hasPlane) {
+      } else if (!hasPlane &&
+          context.read<CameraBloc>().state.hasPlane &&
+          count < 2000) {
         context.read<CameraBloc>().add(SetHasPlane(hasPlane: false));
       }
     }));
@@ -47,6 +53,10 @@ class _State extends State<ARCamera> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    context.loaderOverlay.show();
+    Future.delayed(Duration(seconds: 1), () {
+      context.loaderOverlay.hide();
+    });
     WidgetsBinding.instance!.addObserver(this);
     context.read<CameraBloc>().add(SetIsFlat(isFlat: 120));
     context.read<CameraBloc>().add(SetHasPlane(hasPlane: false));
@@ -66,12 +76,14 @@ class _State extends State<ARCamera> with WidgetsBindingObserver {
       final norm = sqrt(pow(event.x, 2) + pow(event.y, 2) + pow(event.z, 2));
       final inclination = (acos(event.z / norm) * (180 / pi)).round();
       if (inclination < 2 || inclination > 178) {
-        if (context.read<CameraBloc>().state.isFlat > inclination) {
+        if (context.read<CameraBloc>().state.isFlat > inclination &&
+            context.read<CameraBloc>().state.hasPlane) {
           context.read<CameraBloc>().add(SetIsFlat(isFlat: inclination));
         }
       } else {
         if (inclination < 10 || inclination > 170) {
-          context.read<CameraBloc>().add(SetIsFlat(isFlat: inclination));
+          if (context.read<CameraBloc>().state.hasPlane)
+            context.read<CameraBloc>().add(SetIsFlat(isFlat: inclination));
         }
       }
     }));
@@ -92,112 +104,122 @@ class _State extends State<ARCamera> with WidgetsBindingObserver {
     // final deviceRatio =
     //     MediaQuery.of(context).size.width / MediaQuery.of(context).size.height;
     // return Container();
-    return Scaffold(
-      extendBody: true,
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.close, color: Colors.white),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.of(context).pushReplacement(
-                  (MaterialPageRoute(builder: (context) => Camera())));
-            },
-            icon: Icon(
-              Icons.accessibility,
-              color: Colors.white,
+    return LoaderOverlay(
+        disableBackButton: false,
+        child: Scaffold(
+          extendBody: true,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          appBar: AppBar(
+            backgroundColor: Colors.black,
+            elevation: 0,
+            leading: IconButton(
+              icon: Icon(Icons.close, color: Colors.white),
+              onPressed: () {
+                Navigator.pop(context);
+              },
             ),
+            actions: [
+              IconButton(
+                onPressed: () {
+                  Navigator.of(context).pushReplacement(
+                      (MaterialPageRoute(builder: (context) => Camera())));
+                },
+                icon: Icon(
+                  Icons.accessibility,
+                  color: Colors.white,
+                ),
+              ),
+              IconButton(
+                onPressed: () {
+                  Navigator.push(
+                      context, MaterialPageRoute(builder: (context) => Help()));
+                },
+                icon: Icon(
+                  Icons.help_outline,
+                  color: Colors.white,
+                ),
+              ),
+            ],
           ),
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => Help()));
+          body: Stack(
+            alignment: Alignment.center,
+            children: <Widget>[
+              visibilityDetector,
+              Positioned.fill(
+                  bottom: MediaQuery.of(context).size.height * 0.12,
+                  child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: FittedBox(
+                          fit: BoxFit.fill,
+                          child: Container(
+                            padding: EdgeInsets.only(left: 16, right: 16),
+                            height: 32,
+                            child: Center(child:
+                                BlocBuilder<CameraBloc, CameraState>(
+                                    builder: (context, state) {
+                              if (!state.hasPlane) {
+                                return Text(
+                                  'กรุณาขยับกล้องขึ้นลงให้จุดสีเขียวขึ้นบนอาหาร',
+                                  style: TextStyle(
+                                      color: Color(0xFFFFFFFF), fontSize: 12),
+                                );
+                              }
+                              if (state.hasPlane &&
+                                  state.isFlat > 2 &&
+                                  state.isFlat < 178) {
+                                return Text(
+                                  'กรุณาขยับกล้องให้ขนานกับพื้น: ${state.isFlat}',
+                                  style: TextStyle(
+                                      color: Color(0xFFFFFFFF), fontSize: 12),
+                                );
+                              } else {
+                                return Text(
+                                  'พร้อมสำหรับถ่ายรูป',
+                                  style: TextStyle(
+                                      color: Color(0xFFFFFFFF), fontSize: 12),
+                                );
+                              }
+                            })),
+                            decoration: BoxDecoration(
+                                color: const Color(0xff232F34),
+                                borderRadius: BorderRadius.circular(10)),
+                          ))))
+            ],
+          ),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerFloat,
+          floatingActionButton: FloatingActionButton(
+            onPressed: () async {
+              try {
+                final depth = await widget.arCoreService.getDepth();
+                final image = await widget.arCoreService.takePicture();
+                if (image != null && depth != null) {
+                  context
+                      .read<CameraBloc>()
+                      .add(GetPredictonWithDepth(file: image, depth: depth));
+                  Navigator.of(context).pushReplacement((MaterialPageRoute(
+                      builder: (context) => ShowFoodResult())));
+                } else {
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(SnackBar(
+                      content: Text('ถ่ายไม่สำเร็จ กรุณาลองใหม่อีกครั้ง'),
+                    ));
+                }
+              } catch (e) {
+                ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(SnackBar(
+                    content: Text('ถ่ายไม่สำเร็จ กรุณาลองใหม่อีกครั้ง'),
+                  ));
+              }
             },
-            icon: Icon(
-              Icons.help_outline,
-              color: Colors.white,
-            ),
+            elevation: 2,
+            backgroundColor: Colors.white,
+            shape: CircleBorder(
+                side:
+                    BorderSide(width: 6, color: Colors.grey.withOpacity(0.5))),
           ),
-        ],
-      ),
-      body: Stack(
-        alignment: Alignment.center,
-        children: <Widget>[
-          visibilityDetector,
-          Positioned.fill(
-              bottom: MediaQuery.of(context).size.height * 0.12,
-              child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: FittedBox(
-                      fit: BoxFit.fill,
-                      child: Container(
-                        padding: EdgeInsets.only(left: 16, right: 16),
-                        height: 32,
-                        child: Center(child:
-                            BlocBuilder<CameraBloc, CameraState>(
-                                builder: (context, state) {
-                          if (!state.hasPlane) {
-                            return Text(
-                              'กรุณาขยับกล้องขึ้นลงให้จุดสีเขียวขึ้นบนอาหาร',
-                              style: TextStyle(
-                                  color: Color(0xFFFFFFFF), fontSize: 12),
-                            );
-                          }
-                          if (state.hasPlane &&
-                              state.isFlat > 2 &&
-                              state.isFlat < 178) {
-                            return Text(
-                              'กรุณาขยับกล้องให้ขนานกับพื้น: ${state.isFlat}',
-                              style: TextStyle(
-                                  color: Color(0xFFFFFFFF), fontSize: 12),
-                            );
-                          } else {
-                            return Text(
-                              'พร้อมสำหรับถ่ายรูป',
-                              style: TextStyle(
-                                  color: Color(0xFFFFFFFF), fontSize: 12),
-                            );
-                          }
-                        })),
-                        decoration: BoxDecoration(
-                            color: const Color(0xff232F34),
-                            borderRadius: BorderRadius.circular(10)),
-                      ))))
-        ],
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          try {
-            final depth = await widget.arCoreService.getDepth();
-            final image = await widget.arCoreService.takePicture();
-            if (image != null && depth != null) {
-              print(image.path);
-              // final img = File(image.path);
-              // final decode = await decodeImageFromList(img.readAsBytesSync());
-              // print("${decode.width}, ${decode.height}");
-              context
-                  .read<CameraBloc>()
-                  .add(GetPredictonWithDepth(file: image, depth: depth));
-              Navigator.of(context).pushReplacement((MaterialPageRoute(
-                  builder: (context) => ShowPredictResult())));
-            }
-          } catch (e) {
-            print("Take a photo failed: $e");
-          }
-        },
-        elevation: 2,
-        backgroundColor: Colors.white,
-        shape: CircleBorder(
-            side: BorderSide(width: 6, color: Colors.grey.withOpacity(0.5))),
-      ),
-    );
+        ));
   }
 }

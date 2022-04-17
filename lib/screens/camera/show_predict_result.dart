@@ -151,7 +151,7 @@ class _ShowPredictResultState extends State<ShowPredictResult> {
     );
   }
 
-  Widget _buildResultList(BuildContext context, List<PredictResult> results) {
+  Widget _buildResultList(BuildContext context, List<Predict> results) {
     return ListView.builder(
         shrinkWrap: true,
         itemCount: results.length,
@@ -186,7 +186,7 @@ class _ShowPredictResultState extends State<ShowPredictResult> {
                       child: Padding(
                         padding: EdgeInsets.zero,
                         child: Text(
-                          results[index].predict.name,
+                          results[index].name,
                           softWrap: false,
                           maxLines: 1,
                           overflow: TextOverflow.fade,
@@ -206,7 +206,7 @@ class _ShowPredictResultState extends State<ShowPredictResult> {
                           textAlign: TextAlign.right,
                           text: TextSpan(children: [
                             TextSpan(
-                              text: "${results[index].predict.calory.round()}",
+                              text: "${results[index].calory.round()}",
                               style:
                                   Theme.of(context).textTheme.headline5!.merge(
                                         TextStyle(
@@ -240,10 +240,10 @@ class _ShowPredictResultState extends State<ShowPredictResult> {
                       _isChecked[index] = value!;
                       print("before: $_totalCal / $value");
                       value
-                          ? _totalCal += results[index].predict.calory
-                          : _totalCal -= results[index].predict.calory;
+                          ? _totalCal += results[index].calory
+                          : _totalCal -= results[index].calory;
                       print(
-                          "after: $_totalCal ( +- ${results[index].predict.calory} )");
+                          "after: $_totalCal ( +- ${results[index].calory} )");
                     });
                   },
                   value: _isChecked[index],

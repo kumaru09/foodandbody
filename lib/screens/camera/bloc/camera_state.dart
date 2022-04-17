@@ -4,8 +4,8 @@ enum CameraStatus { initial, loading, success, failure }
 
 class CameraState extends Equatable {
   final CameraStatus status;
-  final List<MenuShow> results;
-  final List<PredictResult> predicts;
+  final BodyPredict? results;
+  final List<Predict> predicts;
   final int isFlat;
   final bool hasPlane;
   final bool? isSupportAR;
@@ -13,19 +13,19 @@ class CameraState extends Equatable {
 
   CameraState(
       {this.status = CameraStatus.initial,
-      List<MenuShow>? results,
-      List<PredictResult>? predicts,
+      BodyPredict? results,
+      List<Predict>? predicts,
       this.isFlat = 75,
       this.hasPlane = false,
       this.cal = const FoodCalory.pure(),
       this.isSupportAR})
-      : this.results = results ?? [],
+      : this.results = results ?? null,
         this.predicts = predicts ?? [];
 
   CameraState copyWith(
       {CameraStatus? status,
-      List<MenuShow>? results,
-      List<PredictResult>? predicts,
+      BodyPredict? results,
+      List<Predict>? predicts,
       int? isFlat,
       bool? hasPlane,
       bool? isSupportARm,

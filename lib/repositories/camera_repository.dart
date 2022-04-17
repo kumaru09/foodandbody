@@ -5,11 +5,20 @@ import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:foodandbody/models/body.dart';
+import 'package:foodandbody/models/body_predict.dart';
 import 'package:foodandbody/models/depth.dart';
 import 'package:foodandbody/models/menu_show.dart';
 import 'package:foodandbody/models/predict.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
+
+class PredictBodyFailure implements Exception {
+  @override
+  String toString() {
+    return 'ไม่สามารถวัดได้ กรุณาถ่ายภาพใหม่อีกครั้ง';
+  }
+}
 
 class CameraRepository {
   CameraRepository({FirebaseStorage? firebaseFirestore})
@@ -57,7 +66,7 @@ class CameraRepository {
     }
   }
 
-  Future<List<PredictResult>> getPredictionFoodWithDepth(
+  Future<List<Predict>> getPredictionFoodWithDepth(
       XFile file, Depth depth) async {
     try {
       final url = await uploadFoodPic(file);
@@ -65,11 +74,9 @@ class CameraRepository {
       final fromData = FormData.fromMap({
         "image": await MultipartFile.fromFile(file.path),
         "depth": depth.depth,
-        "fovW": depth.fovW,
-        "fovH": depth.fovH
       });
       final response = await dio.post(
-        "http://kumaru.trueddns.com:50310/api/depth/",
+        "http://kumaru.trueddns.com:50310/api/predict/test",
         data: fromData,
       );
       if (response.statusCode == 200) {
@@ -78,27 +85,55 @@ class CameraRepository {
             .map<Predict>((e) => Predict.fromJson(e))
             .toList();
         if (predictData.isNotEmpty) {
-          List<PredictResult> results = [];
+          // List<Predict> results = [];
           List<Map> predictMap = predictData.map((e) => e.toJson()).toList();
           print(predictData);
           await predict.add(
               {"predict": predictMap, "photo": url, "date": Timestamp.now()});
-          for (var i in predictData) {
-            final res = await http.get(Uri.parse(
-                "https://foodandbody-api.azurewebsites.net/api/Menu/name?name=${i.name}"));
-            if (res.statusCode == 200) {
-              results.add(PredictResult(
-                  predict: i,
-                  menuShow: MenuShow.fromJson(json.decode(res.body))));
-            }
-          }
-          return results;
+          // for (var i in predictData) {
+          //   final res = await http.get(Uri.parse(
+          //       "https://foodandbody-api.azurewebsites.net/api/Menu/name?name=${i.name}"));
+          //   if (res.statusCode == 200) {
+          //     results.add(PredictResult(
+          //         predict: i,
+          //         menuShow: MenuShow.fromJson(json.decode(res.body))));
+          //   }
+          // }
+          return predictData;
         }
       }
       return List.empty();
     } catch (e) {
       print(e);
       return List.empty();
+    }
+  }
+
+  Future<BodyPredict?> getPredictBody(
+      {required List<XFile> image, required int height}) async {
+    try {
+      final formData = FormData.fromMap({
+        "front": await MultipartFile.fromFile(image[0].path),
+        "side": await MultipartFile.fromFile(image[1].path),
+        "height": height
+      });
+      final res = await dio.post(
+          "http://kumaru.trueddns.com:50311/measure/test",
+          data: formData);
+      if (res.statusCode == 200) {
+        final List<BodyPredict> body = res.data["res"]
+            .map<BodyPredict>((e) => BodyPredict.fromJson(e))
+            .tolist();
+        if (body.isNotEmpty) {
+          return body.first;
+        } else {
+          throw PredictBodyFailure();
+        }
+      }
+      return throw PredictBodyFailure();
+    } catch (_) {
+      print("getpredict: $_");
+      throw PredictBodyFailure();
     }
   }
 }
