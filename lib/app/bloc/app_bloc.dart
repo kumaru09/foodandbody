@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:bloc/bloc.dart';
 import 'package:foodandbody/repositories/authen_repository.dart';
 import 'package:equatable/equatable.dart';
@@ -36,7 +35,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   void _userChanged(AppUserChanged event, Emitter<AppState> emit) async {
     if (event.user.isNotEmpty) {
       if (!event.user.emailVerified!) {
-        print('not have verified yet');
+        // print('not have verified yet');
         emit(AppState.notverified(event.user));
         return;
       }
