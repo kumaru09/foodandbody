@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:camera/camera.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/repositories/camera_repository.dart';
 import 'package:foodandbody/screens/camera/bloc/camera_bloc.dart';
@@ -12,41 +15,87 @@ class Camera extends StatefulWidget {
   _CameraState createState() => _CameraState();
 }
 
-class _CameraState extends State<Camera> with WidgetsBindingObserver {
-  List<CameraDescription> _cameras = [];
-  CameraController? _controller;
-  int _selected = 1;
-  bool _isFoodCamera = false;
-
+class _CameraState extends State<Camera> {
   @override
   void initState() {
-    setupCamera();
-    WidgetsBinding.instance?.addObserver(this);
+    _initializeCamera(_selectedCamera);
+    _audioPlayer = AudioPlayer();
     super.initState();
+  }
+
+  late List<CameraDescription> _cameras;
+  late CameraController _controller;
+  late Future<void> _initializeControllerFuture;
+  late AudioPlayer _audioPlayer;
+  late Timer _counterTimer;
+  Duration _duration = Duration(seconds: 5);
+  int _selectedCamera = 1;
+  bool _isBodyCamera = true;
+  List<XFile> _bodyImage = [];
+  bool _isTakeImage = false;
+
+  Future<void> _initializeCamera(int cameraIndex) async {
+    try {
+      _cameras = await availableCameras();
+      setState(() {
+        _controller = CameraController(
+            _cameras[cameraIndex], ResolutionPreset.high,
+            imageFormatGroup: ImageFormatGroup.jpeg);
+        _initializeControllerFuture = _controller.initialize();
+      });
+    } on CameraException catch (e) {
+      print("Error initializing camera: $e");
+    }
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance?.removeObserver(this);
-    _controller?.dispose();
+    _controller.dispose();
+    _audioPlayer.dispose();
+    _counterTimer.cancel();
     super.dispose();
   }
 
   void didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (_controller == null || !_controller!.value.isInitialized) {
+    if (!_controller.value.isInitialized) {
       return;
     }
 
     if (state == AppLifecycleState.inactive) {
-      _controller?.dispose();
+      _controller.dispose();
     } else if (state == AppLifecycleState.resumed) {
-      setupCamera();
+      _initializeCamera(_selectedCamera);
     }
+  }
+
+  void _startTimer() {
+    _counterTimer =
+        Timer.periodic(Duration(seconds: 1), (timer) => _setCountDown());
+  }
+
+  void _setCountDown() {
+    const int _reduceSeconds = 1;
+    setState(() {
+      final seconds = _duration.inSeconds - _reduceSeconds;
+      if (seconds < 0) {
+        _counterTimer.cancel();
+      } else {
+        _duration = Duration(seconds: seconds);
+      }
+    });
+  }
+
+  void _resetTimer() {
+    setState(() {
+      _counterTimer.cancel();
+      _duration = Duration(seconds: 5);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final CameraController? cameraController = _controller;
+    String _digit(int n) => n.toString().padLeft(1);
+    final _seconds = _digit(_duration.inSeconds.remainder(60));
 
     return Scaffold(
       extendBody: true,
@@ -65,40 +114,83 @@ class _CameraState extends State<Camera> with WidgetsBindingObserver {
             onPressed: () {
               if (_cameras.length > 1) {
                 setState(() {
-                  _isFoodCamera = !_isFoodCamera;
-                  _selected = _selected == 0 ? 1 : 0;
-                  selectCamera(_selected);
+                  _isBodyCamera = !_isBodyCamera;
+                  _selectedCamera = _selectedCamera == 1 ? 0 : 1;
+                  _initializeCamera(_selectedCamera);
                 });
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   content: Text("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง",
-                      style: TextStyle(color: Colors.white)),
-                  backgroundColor: Color(0x99000000),
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyText1!
+                          .merge(TextStyle(color: Colors.white))),
+                  backgroundColor: Color(0x77000000),
                   duration: Duration(seconds: 2),
                 ));
               }
             },
             icon: Icon(
-              _isFoodCamera ? Icons.fastfood : Icons.accessibility,
+              _isBodyCamera ? Icons.accessibility : Icons.fastfood,
               color: Colors.white,
             ),
           ),
         ],
       ),
-      body: (cameraController == null || !cameraController.value.isInitialized)
-          ? Center(child: CircularProgressIndicator())
-          : Center(
-              child: cameraController.buildPreview(),
+      body: Stack(
+        alignment: Alignment.center,
+        children: [
+          FutureBuilder<void>(
+            future: _initializeControllerFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                return _controller.buildPreview();
+              } else {
+                return Center(child: CircularProgressIndicator());
+              }
+            },
+          ),
+          _isBodyCamera
+              ? Container(
+                  margin: EdgeInsets.fromLTRB(
+                      20, MediaQuery.of(context).size.height * 0.05, 20, 20),
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  height: MediaQuery.of(context).size.height * 0.7,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                        width: 5, color: Theme.of(context).primaryColor),
+                  ),
+                )
+              : Container(),
+          _isBodyCamera
+              ? Text(
+                  "$_seconds",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 100,
+                      fontWeight: FontWeight.bold),
+                )
+              : Container(),
+          AnimatedOpacity(
+            opacity: _isTakeImage ? 1.0 : 0.0,
+            duration: Duration(milliseconds: 500),
+            child: Container(
+              color: Colors.white,
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
             ),
+          )
+        ],
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          try {
-            final image = await cameraController!.takePicture();
-            // context.read<CameraBloc>().add(GetPredicton(file: image!));
-            _showResult(isFoodCamera: _isFoodCamera, image: image);
-          } catch (e) {
-            print("Take a photo failed: $e");
+          if (_isBodyCamera) {
+            await _playSignal();
+            _startTimer();
+            _takeBodyPhoto();
+          } else {
+            _takeFoodPhoto();
           }
         },
         elevation: 2,
@@ -109,58 +201,61 @@ class _CameraState extends State<Camera> with WidgetsBindingObserver {
     );
   }
 
-  Future<void> setupCamera() async {
+  void _takeFoodPhoto() async {
     try {
-      _cameras = await availableCameras();
-      CameraController controller = await selectCamera(_selected);
-      setState(() {
-        _controller = controller;
+      final image = await _controller.takePicture();
+      context.read<CameraBloc>().add(GetPredicton(file: image));
+      _showResult(isBodyCamera: _isBodyCamera);
+    } catch (e) {
+      print("Take a photo failed: $e");
+    }
+  }
+
+  void _takeBodyPhoto() async {
+    XFile _image;
+    try {
+      await Future.delayed(Duration(seconds: 5), () async {
+        _image = await _controller.takePicture();
+        _bodyImage.add(_image);
+        setState(() => _isTakeImage = true);
+        await _playSignal();
+        setState(() => _isTakeImage = false);
       });
-      print("cameras list: $_cameras");
-    } on CameraException catch (e) {
-      print("error in fetching the camera: $e");
+      _resetTimer();
+
+      _startTimer();
+      await Future.delayed(Duration(seconds: 5), () async {
+        _image = await _controller.takePicture();
+        _bodyImage.add(_image);
+        setState(() => _isTakeImage = true);
+        await _playSignal();
+        setState(() => _isTakeImage = false);
+      });
+      _resetTimer();
+
+      _showResult(isBodyCamera: _isBodyCamera);
+      _bodyImage.clear();
+    } catch (e) {
+      print("Take a photo failed: $e");
     }
   }
 
-  selectCamera(int index) async {
-    try {
-      CameraController controller = CameraController(
-          _cameras[index], ResolutionPreset.high,
-          imageFormatGroup: ImageFormatGroup.jpeg);
-      await controller.initialize();
-      return controller;
-    } on CameraException catch (e) {
-      print("Error initializing camera: $e");
-    }
-  }
-
-  toggleCamera() async {
-    int newSelected = (_selected + 1) % _cameras.length;
-    _selected = newSelected;
-
-    CameraController controller = await selectCamera(_selected);
-    setState(() {
-      _controller = controller;
-    });
-  }
-
-  _showResult({required bool isFoodCamera, required XFile image}) {
-    return _isFoodCamera
-        ? Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => BlocProvider<CameraBloc>(
-                    create: (_) => CameraBloc(
-                        cameraRepository: context.read<CameraRepository>())
-                      ..add(GetPredicton(file: image)),
-                    child: const ShowFoodResult())))
-        : showModalBottomSheet(
+  _showResult({required bool isBodyCamera}) {
+    return _isBodyCamera
+        ? showModalBottomSheet(
             context: context,
             elevation: 6,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
             builder: (context) {
-              return ShowBodyResult(imagePath: image.path);
-            });
+              return ShowBodyResult();
+            })
+        : Navigator.push(
+            context, MaterialPageRoute(builder: (context) => ShowFoodResult()));
+  }
+
+  _playSignal() async {
+    await _audioPlayer.setAsset('assets/beep-sound.mp3');
+    _audioPlayer.play();
   }
 }
