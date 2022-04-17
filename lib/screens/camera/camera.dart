@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:camera/camera.dart';
 import 'package:foodandbody/models/body_predict.dart';
 import 'package:foodandbody/repositories/user_repository.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -30,9 +33,12 @@ class _CameraState extends State<Camera> {
   late CameraController _controller;
   Future<void>? _initializeControllerFuture;
   late AudioPlayer _audioPlayer;
+  late Timer _counterTimer;
+  Duration _duration = Duration(seconds: 5);
   int _selectedCamera = 1;
   bool _isBodyCamera = true;
   List<XFile> _bodyImage = [];
+  bool _isTakeImage = false;
 
   Future<void> _initializeCamera(int _selectedCamera) async {
     try {
@@ -54,6 +60,7 @@ class _CameraState extends State<Camera> {
   void dispose() {
     _controller.dispose();
     _audioPlayer.dispose();
+    _counterTimer.cancel();
     super.dispose();
   }
 
@@ -69,8 +76,34 @@ class _CameraState extends State<Camera> {
     }
   }
 
+  void _startTimer() {
+    _counterTimer =
+        Timer.periodic(Duration(seconds: 1), (timer) => _setCountDown());
+  }
+
+  void _setCountDown() {
+    const int _reduceSeconds = 1;
+    setState(() {
+      final seconds = _duration.inSeconds - _reduceSeconds;
+      if (seconds < 0) {
+        _counterTimer.cancel();
+      } else {
+        _duration = Duration(seconds: seconds);
+      }
+    });
+  }
+
+  void _resetTimer() {
+    setState(() {
+      _counterTimer.cancel();
+      _duration = Duration(seconds: 5);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    String _digit(int n) => n.toString().padLeft(1);
+    final _seconds = _digit(_duration.inSeconds.remainder(60));
     return BlocListener<CameraBloc, CameraState>(
         listener: ((context, state) {
           if (state.status == CameraStatus.success) {
@@ -127,23 +160,6 @@ class _CameraState extends State<Camera> {
                                 '${context.read<ARCoreService>().errorMessage}'),
                           ));
                       }
-                      // if (_cameras.length > 1) {
-                      //   setState(() {
-                      //     _isBodyCamera = !_isBodyCamera;
-                      //     _selectedCamera = _selectedCamera == 1 ? 0 : 1;
-                      //     _initializeCamera(_selectedCamera);
-                      //   });
-                      // } else {
-                      //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      //     content: Text("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง",
-                      //         style: Theme.of(context)
-                      //             .textTheme
-                      //             .bodyText1!
-                      //             .merge(TextStyle(color: Colors.white))),
-                      //     backgroundColor: Color(0x77000000),
-                      //     duration: Duration(seconds: 2),
-                      //   ));
-                      // }
                     },
                     icon: Icon(
                       _isBodyCamera ? Icons.accessibility : Icons.fastfood,
@@ -167,41 +183,54 @@ class _CameraState extends State<Camera> {
                   ),
                   _isBodyCamera
                       ? Container(
-                          margin: EdgeInsets.all(20),
+                          margin: EdgeInsets.fromLTRB(
+                              20,
+                              MediaQuery.of(context).size.height * 0.05,
+                              20,
+                              20),
                           width: MediaQuery.of(context).size.width * 0.8,
-                          height: MediaQuery.of(context).size.height * 0.8,
+                          height: MediaQuery.of(context).size.height * 0.7,
                           decoration: BoxDecoration(
                             border: Border.all(
                                 width: 5,
                                 color: Theme.of(context).primaryColor),
                           ),
                         )
-                      : Container()
+                      : Container(),
+                  _isBodyCamera
+                      ? Text(
+                          "$_seconds",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 100,
+                              fontWeight: FontWeight.bold),
+                        )
+                      : Container(),
+                  AnimatedOpacity(
+                    opacity: _isTakeImage ? 1.0 : 0.0,
+                    duration: Duration(milliseconds: 500),
+                    child: Container(
+                      color: Colors.white,
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height,
+                    ),
+                  )
                 ],
               ),
               floatingActionButtonLocation:
                   FloatingActionButtonLocation.centerFloat,
-              floatingActionButton: FloatingActionButton(
-                onPressed: () async {
-                  if (_isBodyCamera) {
-                    await _playSignal();
-                    await _takeBodyPhoto();
-                    context.loaderOverlay.show();
-                    context.read<CameraBloc>().add(GetBodyPredict(
-                        image: _bodyImage,
-                        height: context
-                            .read<UserRepository>()
-                            .cache
-                            .get()!
-                            .height!));
-                  }
-                },
-                elevation: 2,
-                backgroundColor: Colors.white,
-                shape: CircleBorder(
-                    side: BorderSide(
-                        width: 6, color: Colors.grey.withOpacity(0.5))),
-              ),
+              floatingActionButton: FloatingActionButton(onPressed: () async {
+                if (_isBodyCamera) {
+                  await _playSignal();
+                  _startTimer();
+                  _takeBodyPhoto();
+                  context.loaderOverlay.show();
+                  context.read<CameraBloc>().add(GetBodyPredict(
+                      image: _bodyImage,
+                      height:
+                          context.read<UserRepository>().cache.get()!.height!));
+                }
+              }),
             )));
   }
 
@@ -218,17 +247,24 @@ class _CameraState extends State<Camera> {
   Future<void> _takeBodyPhoto() async {
     XFile _image;
     try {
-      // await _playSignal();
       await Future.delayed(Duration(seconds: 5), () async {
         _image = await _controller.takePicture();
         _bodyImage.add(_image);
+        setState(() => _isTakeImage = true);
         await _playSignal();
+        setState(() => _isTakeImage = false);
       });
+      _resetTimer();
+
+      _startTimer();
       await Future.delayed(Duration(seconds: 5), () async {
         _image = await _controller.takePicture();
         _bodyImage.add(_image);
+        setState(() => _isTakeImage = true);
         await _playSignal();
+        setState(() => _isTakeImage = false);
       });
+      _resetTimer();
     } catch (e) {
       print("Take a photo failed: $e");
       ScaffoldMessenger.of(context)
