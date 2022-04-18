@@ -138,7 +138,7 @@ class _ShoulderInput extends StatelessWidget {
                 context.read<BodyCubit>().shoulderChanged(shoulder),
             keyboardType: TextInputType.number,
             textInputAction: TextInputAction.next,
-            initialValue: _shoulder,
+            initialValue: _shoulder == '0' ? null : _shoulder,
             decoration: InputDecoration(
               labelText: 'ไหล่',
               border: OutlineInputBorder(borderSide: BorderSide()),
@@ -163,7 +163,7 @@ class _ChestInput extends StatelessWidget {
             onChanged: (chest) => context.read<BodyCubit>().chestChanged(chest),
             keyboardType: TextInputType.number,
             textInputAction: TextInputAction.next,
-            initialValue: _chest,
+            initialValue: _chest == '0' ? null : _chest,
             decoration: InputDecoration(
               labelText: 'รอบอก',
               border: OutlineInputBorder(borderSide: BorderSide()),
@@ -188,7 +188,7 @@ class _WaistInput extends StatelessWidget {
             onChanged: (waist) => context.read<BodyCubit>().waistChanged(waist),
             keyboardType: TextInputType.number,
             textInputAction: TextInputAction.next,
-            initialValue: _waist,
+            initialValue: _waist == '0' ? null : _waist,
             decoration: InputDecoration(
               labelText: 'รอบเอว',
               border: OutlineInputBorder(borderSide: BorderSide()),
@@ -213,7 +213,7 @@ class _HipInput extends StatelessWidget {
             onChanged: (hip) => context.read<BodyCubit>().hipChanged(hip),
             keyboardType: TextInputType.number,
             textInputAction: TextInputAction.next,
-            initialValue: _hip,
+            initialValue: _hip == '0' ? null : _hip,
             decoration: InputDecoration(
               labelText: 'รอบสะโพก',
               border: OutlineInputBorder(borderSide: BorderSide()),

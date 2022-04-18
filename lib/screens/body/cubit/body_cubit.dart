@@ -111,10 +111,10 @@ class BodyCubit extends Cubit<BodyState> {
     required String hip,
   }) {
     emit(state.copyWith(
-      shoulder: BodyFigure.dirty(shoulder),
-      chest: BodyFigure.dirty(chest),
-      waist: BodyFigure.dirty(waist),
-      hip: BodyFigure.dirty(hip),
+      shoulder: shoulder == '0'? BodyFigure.pure(): BodyFigure.dirty(shoulder),
+      chest: chest == '0'? BodyFigure.pure(): BodyFigure.dirty(chest),
+      waist: waist == '0'? BodyFigure.pure(): BodyFigure.dirty(waist),
+      hip: hip == '0'? BodyFigure.pure(): BodyFigure.dirty(hip),
     ));
   }
 
