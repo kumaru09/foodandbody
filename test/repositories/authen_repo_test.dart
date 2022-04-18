@@ -233,7 +233,7 @@ void main() {
 
     test('calls deleteUser success', () async {
       try {
-        await auth.deleteUser('password');
+        await auth.deleteUser();
       } catch (_) {}
       verify(() => mockAuth.currentUser!.delete()).called(1);
     });
@@ -241,7 +241,7 @@ void main() {
     test('deleteUser throws when fail', () {
       when(() => mockAuth.currentUser!.delete()).thenThrow(DeleteUserFailure());
       expect(
-          () => auth.deleteUser('password'), throwsA(isA<DeleteUserFailure>()));
+          () => auth.deleteUser(), throwsA(isA<DeleteUserFailure>()));
     });
   });
 }
