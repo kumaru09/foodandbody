@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodandbody/models/menu_show.dart';
+import 'package:foodandbody/models/predict.dart';
 import 'package:foodandbody/screens/camera/bloc/camera_bloc.dart';
 import 'package:foodandbody/screens/camera/show_food_calory.dart';
 
@@ -14,7 +15,7 @@ class ShowFoodResult extends StatelessWidget {
         case CameraStatus.failure:
           return _failureWidget(context);
         case CameraStatus.success:
-          return FoodResult(allresult: state.results);
+          return FoodResult(allresult: state.predicts);
         default:
           return Center(child: CircularProgressIndicator());
       }
@@ -51,7 +52,7 @@ class ShowFoodResult extends StatelessWidget {
 class FoodResult extends StatefulWidget {
   const FoodResult({Key? key, required this.allresult}) : super(key: key);
 
-  final List<MenuShow> allresult;
+  final List<Predict> allresult;
 
   @override
   State<FoodResult> createState() => _FoodResultState();
@@ -59,9 +60,9 @@ class FoodResult extends StatefulWidget {
 
 class _FoodResultState extends State<FoodResult> {
   final _scrollController = ScrollController();
-  late List<MenuShow> _allResults;
+  late List<Predict> _allResults;
   late List<bool> _isChecked;
-  List<MenuShow> _selectResults = [];
+  List<Predict> _selectResults = [];
 
   @override
   void initState() {
@@ -166,13 +167,16 @@ class _FoodResultState extends State<FoodResult> {
             onPressed: _allResults.length == 0
                 ? () => Navigator.pop(context)
                 : _isChecked.contains(true)
-                    ? () {
+                    ? () async {
                         _mapIndexFilter();
                         Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ShowFoodCalory(
-                                    selectResult: [..._selectResults])));
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ShowFoodCalory(
+                                        selectResult: [..._selectResults])))
+                            .then((value) {
+                          if (value = true) Navigator.pop(context);
+                        });
                       }
                     : null,
           ),

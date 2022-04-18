@@ -13,20 +13,32 @@ import 'package:foodandbody/repositories/menu_card_repository.dart';
 import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:foodandbody/repositories/search_repository.dart';
 import 'package:foodandbody/repositories/user_repository.dart';
+import 'package:foodandbody/screens/body/cubit/body_cubit.dart';
 import 'package:foodandbody/screens/camera/bloc/camera_bloc.dart';
+import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
+import 'package:foodandbody/services/arcore_service.dart';
 import 'package:foodandbody/theme.dart';
 
 class App extends StatelessWidget {
-  const App({
-    Key? key,
-    required AuthenRepository authenRepository,
-    required UserRepository userRepository,
-  })  : _authenRepository = authenRepository,
+  App(
+      {Key? key,
+      required AuthenRepository authenRepository,
+      required UserRepository userRepository,
+      required ARCoreService arCoreService,
+      PlanRepository? planRepository,
+      BodyRepository? bodyRepository})
+      : _authenRepository = authenRepository,
         _userRepository = userRepository,
+        _arCoreService = arCoreService,
+        _planRepository = planRepository ?? PlanRepository(),
+        _bodyRepository = bodyRepository ?? BodyRepository(),
         super(key: key);
 
   final AuthenRepository _authenRepository;
   final UserRepository _userRepository;
+  final ARCoreService _arCoreService;
+  final PlanRepository _planRepository;
+  final BodyRepository _bodyRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -35,14 +47,14 @@ class App extends StatelessWidget {
         RepositoryProvider<AuthenRepository>(
             create: (context) => _authenRepository),
         RepositoryProvider<UserRepository>(
-            create: (context) => UserRepository(cache: InfoCache())),
+            create: (context) => _userRepository),
         RepositoryProvider<SearchRepository>(
             create: (context) =>
                 SearchRepository(SearchCache(), SearchClient())),
         RepositoryProvider<PlanRepository>(
-            create: (context) => PlanRepository()),
+            create: (context) => _planRepository),
         RepositoryProvider<BodyRepository>(
-            create: (context) => BodyRepository()),
+            create: (context) => _bodyRepository),
         RepositoryProvider<FavoriteRepository>(
             create: (context) => FavoriteRepository()),
         RepositoryProvider<MenuCardRepository>(
@@ -51,7 +63,8 @@ class App extends StatelessWidget {
         RepositoryProvider<HistoryRepository>(
             create: (context) => HistoryRepository()),
         RepositoryProvider<CameraRepository>(
-            create: (context) => CameraRepository())
+            create: (context) => CameraRepository()),
+        RepositoryProvider<ARCoreService>(create: (context) => _arCoreService)
       ],
       child: MultiBlocProvider(
         providers: [
@@ -60,7 +73,10 @@ class App extends StatelessWidget {
                   authenRepository: _authenRepository,
                   userRepository: _userRepository)),
           BlocProvider(
-              create: (_) => CameraBloc(cameraRepository: CameraRepository()))
+              create: (_) => CameraBloc(
+                  cameraRepository: CameraRepository(),
+                  planRepository: _planRepository,
+                  bodyRepository: _bodyRepository)),
         ],
         child: const AppView(),
       ),

@@ -8,6 +8,7 @@ import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:foodandbody/screens/body/body.dart';
 import 'package:foodandbody/screens/body/cubit/body_cubit.dart';
+import 'package:foodandbody/screens/camera/ar_camera.dart';
 import 'package:foodandbody/screens/camera/bloc/camera_bloc.dart';
 import 'package:foodandbody/screens/camera/camera.dart';
 import 'package:foodandbody/screens/history/bloc/history_bloc.dart';
@@ -19,6 +20,7 @@ import 'package:foodandbody/screens/main_screen/bottom_appbar.dart';
 import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
 import 'package:foodandbody/screens/plan/plan.dart';
 import 'package:foodandbody/screens/main_screen/bloc/info_bloc.dart';
+import 'package:foodandbody/services/arcore_service.dart';
 import 'package:foodandbody/widget/menu_card/bloc/menu_card_bloc.dart';
 
 class MainScreen extends StatelessWidget {
