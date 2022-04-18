@@ -278,10 +278,8 @@ class EditGoalDialog extends StatelessWidget {
       elevation: 0,
       backgroundColor: Colors.white,
       title: Text("แก้ไขเป้าหมายแคลอรี่",
-          style: Theme.of(context)
-              .textTheme
-              .headline6!
-              .merge(TextStyle(color: Theme.of(context).primaryColor))),
+          style: Theme.of(context).textTheme.subtitle1!.merge(
+              TextStyle(color: Theme.of(context).colorScheme.secondary))),
       content: BlocBuilder<PlanBloc, PlanState>(
           buildWhen: (previous, current) => previous.goal != current.goal,
           builder: (context, state) {
@@ -299,6 +297,16 @@ class EditGoalDialog extends StatelessWidget {
             );
           }),
       actions: <Widget>[
+        TextButton(
+            key: const Key("cancel_button_in_edit_goal_dialog"),
+            onPressed: () {
+              Navigator.pop(context, 'cancel');
+            },
+            child: Text("ยกเลิก",
+                style: Theme.of(context)
+                    .textTheme
+                    .button!
+                    .merge(TextStyle(color: Theme.of(context).colorScheme.secondary)))),
         BlocBuilder<PlanBloc, PlanState>(
             buildWhen: (previous, current) => previous.goal != current.goal,
             builder: (context, state) {
@@ -309,23 +317,13 @@ class EditGoalDialog extends StatelessWidget {
                     : null,
                 child: Text("ตกลง"),
                 style: TextButton.styleFrom(
-                  primary: Theme.of(context).primaryColor,
+                  primary: Theme.of(context).colorScheme.secondary,
                   onSurface: Theme.of(context)
                       .colorScheme
-                      .primaryVariant, // Disable color
+                      .secondaryVariant, // Disable color
                 ),
               );
             }),
-        TextButton(
-            key: const Key("cancel_button_in_edit_goal_dialog"),
-            onPressed: () {
-              Navigator.pop(context, 'cancel');
-            },
-            child: Text("ยกเลิก",
-                style: Theme.of(context)
-                    .textTheme
-                    .button!
-                    .merge(TextStyle(color: Theme.of(context).primaryColor))))
       ],
     );
   }

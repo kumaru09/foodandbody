@@ -73,6 +73,12 @@ class _MenuDialogState extends State<MenuDialog> {
       actionsOverflowButtonSpacing: 0,
       actions: <Widget>[
         TextButton(
+          onPressed: () => Navigator.pop(context, 'cancel'),
+          child: Text('ยกเลิก',
+              style: Theme.of(context).textTheme.button!.merge(
+                  TextStyle(color: Theme.of(context).colorScheme.secondary))),
+        ),
+        TextButton(
           key: const Key('menu_dialog_ok_button'),
           onPressed: _currentSliderValue == 0.0
               ? null
@@ -82,12 +88,6 @@ class _MenuDialogState extends State<MenuDialog> {
                   color: _currentSliderValue == 0.0
                       ? Theme.of(context).colorScheme.secondaryVariant
                       : Theme.of(context).colorScheme.secondary))),
-        ),
-        TextButton(
-          onPressed: () => Navigator.pop(context, 'cancel'),
-          child: Text('ยกเลิก',
-              style: Theme.of(context).textTheme.button!.merge(
-                  TextStyle(color: Theme.of(context).colorScheme.secondary))),
         ),
       ],
     );

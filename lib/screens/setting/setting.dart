@@ -18,7 +18,8 @@ class Setting extends StatelessWidget {
         body: SafeArea(
           child: BlocProvider(
             create: (context) =>
-                DeleteUserCubit(context.read<AuthenRepository>())..initialSetting(),
+                DeleteUserCubit(context.read<AuthenRepository>())
+                  ..initialSetting(),
             child: SettingPage(),
           ),
         ));
@@ -378,6 +379,19 @@ class _SettingPageState extends State<SettingPage> {
                                       actions: <Widget>[
                                         TextButton(
                                             key: const Key(
+                                                "setting_deleteAccount_dialog_cancel_button"),
+                                            onPressed: () => Navigator.pop(
+                                                context, 'cancel'),
+                                            child: Text("ยกเลิก",
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .button!
+                                                    .merge(TextStyle(
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .secondary)))),
+                                        TextButton(
+                                            key: const Key(
                                                 "setting_deleteAccount_dialog_ok_button"),
                                             onPressed: () =>
                                                 Navigator.pop(context, 'ok'),
@@ -389,19 +403,6 @@ class _SettingPageState extends State<SettingPage> {
                                                         color: Theme.of(context)
                                                             .colorScheme
                                                             .secondary)))),
-                                        TextButton(
-                                            key: const Key(
-                                                "setting_deleteAccount_dialog_cancel_button"),
-                                            onPressed: () => Navigator.pop(
-                                                context, 'cancel'),
-                                            child: Text("ยกเลิก",
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .button!
-                                                    .merge(TextStyle(
-                                                        color: Theme.of(context)
-                                                            .colorScheme
-                                                            .secondary))))
                                       ],
                                     ),
                                   );
