@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:foodandbody/screens/main_screen/bottom_appbar.dart';
-import 'package:mocktail_image_network/mocktail_image_network.dart';
+import 'package:network_image_mock/network_image_mock.dart';
 
 void main() {
   const bottomAppBarKey = Key('bottom_app_bar');
@@ -14,7 +14,7 @@ void main() {
 
   group("BottomNavigation", () {
     testWidgets("render BottomNavigation correct", (tester) async {
-      await mockNetworkImages(() async {
+     mockNetworkImagesFor(() async {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
@@ -35,7 +35,7 @@ void main() {
 
     group("render white button at", () {
       testWidgets("home button", (tester) async {
-        await mockNetworkImages(() async {
+       mockNetworkImagesFor(() async {
           await tester.pumpWidget(
             MaterialApp(
               home: Scaffold(
@@ -62,7 +62,7 @@ void main() {
       });
 
       testWidgets("plan button", (tester) async {
-        await mockNetworkImages(() async {
+       mockNetworkImagesFor(() async {
           await tester.pumpWidget(
             MaterialApp(
               home: Scaffold(
@@ -89,7 +89,7 @@ void main() {
       });
 
       testWidgets("body button", (tester) async {
-        await mockNetworkImages(() async {
+       mockNetworkImagesFor(() async {
           await tester.pumpWidget(
             MaterialApp(
               home: Scaffold(
@@ -116,7 +116,7 @@ void main() {
       });
 
       testWidgets("history button", (tester) async {
-        await mockNetworkImages(() async {
+       mockNetworkImagesFor(() async {
           await tester.pumpWidget(
             MaterialApp(
               home: Scaffold(

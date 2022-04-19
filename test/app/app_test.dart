@@ -16,12 +16,15 @@ import 'package:foodandbody/screens/camera/bloc/camera_bloc.dart';
 import 'package:foodandbody/screens/login/login.dart';
 import 'package:foodandbody/screens/main_screen/main_screen.dart';
 import 'package:foodandbody/screens/register/verify_email.dart';
+import 'package:foodandbody/services/arcore_service.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:firebase_core_platform_interface/firebase_core_platform_interface.dart';
 
 class MockUser extends Mock implements User {}
 
 class MockInfo extends Mock implements Info {}
+
+class MockARCoreService extends Mock implements ARCoreService {}
 
 class MockAuthenRepository extends Mock implements AuthenRepository {}
 
@@ -82,6 +85,7 @@ void main() {
   group('App', () {
     late AuthenRepository authenRepository;
     late UserRepository userRepository;
+    late ARCoreService arCoreService;
     late User user;
 
     setupCloudFirestoreMocks();
@@ -95,6 +99,7 @@ void main() {
     setUp(() async {
       userRepository = MockUserRepository();
       authenRepository = MockAuthenRepository();
+      arCoreService = MockARCoreService();
       user = MockUser();
       when(() => authenRepository.user).thenAnswer((_) => Stream.value(user));
       when(() => authenRepository.currentUser).thenReturn(user);
@@ -114,6 +119,7 @@ void main() {
           child: App(
             authenRepository: authenRepository,
             userRepository: userRepository,
+            arCoreService: arCoreService,
           ),
         ),
       );
