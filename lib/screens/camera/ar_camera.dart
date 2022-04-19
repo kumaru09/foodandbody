@@ -10,6 +10,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:foodandbody/screens/camera/bloc/camera_bloc.dart';
 import 'package:foodandbody/screens/camera/camera.dart';
+import 'package:foodandbody/screens/camera/camera_dialog.dart';
 import 'package:foodandbody/screens/camera/show_food_result.dart';
 import 'package:foodandbody/screens/camera/show_predict_result.dart';
 import 'package:foodandbody/screens/help/help.dart';
@@ -17,6 +18,7 @@ import 'package:foodandbody/services/arcore_service.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:provider/src/provider.dart';
 import 'package:sensors_plus/sensors_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 class ARCamera extends StatefulWidget {
@@ -40,11 +42,11 @@ class _State extends State<ARCamera> with WidgetsBindingObserver {
       int count = res["count"];
       if (hasPlane &&
           !context.read<CameraBloc>().state.hasPlane &&
-          count > 2000) {
+          count > 1000) {
         context.read<CameraBloc>().add(SetHasPlane(hasPlane: true));
       } else if (!hasPlane &&
           context.read<CameraBloc>().state.hasPlane &&
-          count < 2000) {
+          count < 1000) {
         context.read<CameraBloc>().add(SetHasPlane(hasPlane: false));
       }
     }));
@@ -53,10 +55,7 @@ class _State extends State<ARCamera> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    context.loaderOverlay.show();
-    Future.delayed(Duration(seconds: 1), () {
-      context.loaderOverlay.hide();
-    });
+    _showDialog();
     WidgetsBinding.instance!.addObserver(this);
     context.read<CameraBloc>().add(SetIsFlat(isFlat: 120));
     context.read<CameraBloc>().add(SetHasPlane(hasPlane: false));
@@ -87,6 +86,18 @@ class _State extends State<ARCamera> with WidgetsBindingObserver {
         }
       }
     }));
+  }
+
+  void _showDialog() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      bool? isFoodDialogChecked = prefs.getBool('isFoodDialogChecked');
+      if (isFoodDialogChecked == null) {
+        final value = await showDialog<bool>(
+            context: context, builder: (BuildContext context) => FoodDialog());
+        if (value!) prefs.setBool('isFoodDialogChecked', true);
+      }
+    } catch (_) {}
   }
 
   @override

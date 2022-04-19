@@ -2,5 +2,6 @@
 <resources>
 <string name="app_name">Foodandbody</string>
 <string name="facebook_app_id">3883172241783776</string> 
+<string name="facebook_client_token">1cc225d6225ca5e3f85d0121f61eb954</string>
 <string name="fb_login_protocol_scheme">fb3883172241783776</string>
 </resources>
