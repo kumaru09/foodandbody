@@ -33,7 +33,7 @@ class _CameraState extends State<Camera> {
   late CameraController _controller;
   Future<void>? _initializeControllerFuture;
   late AudioPlayer _audioPlayer;
-  late Timer _counterTimer;
+  Timer? _counterTimer;
   Duration _duration = Duration(seconds: 5);
   int _selectedCamera = 1;
   bool _isBodyCamera = true;
@@ -60,7 +60,10 @@ class _CameraState extends State<Camera> {
   void dispose() {
     _controller.dispose();
     _audioPlayer.dispose();
-    _counterTimer.cancel();
+    if (_counterTimer == null) {
+      _counterTimer!.cancel();
+    }
+
     super.dispose();
   }
 
@@ -86,7 +89,7 @@ class _CameraState extends State<Camera> {
     setState(() {
       final seconds = _duration.inSeconds - _reduceSeconds;
       if (seconds < 0) {
-        _counterTimer.cancel();
+        _counterTimer!.cancel();
       } else {
         _duration = Duration(seconds: seconds);
       }
@@ -95,7 +98,7 @@ class _CameraState extends State<Camera> {
 
   void _resetTimer() {
     setState(() {
-      _counterTimer.cancel();
+      _counterTimer!.cancel();
       _duration = Duration(seconds: 5);
     });
   }
@@ -104,6 +107,7 @@ class _CameraState extends State<Camera> {
   Widget build(BuildContext context) {
     String _digit(int n) => n.toString().padLeft(1);
     final _seconds = _digit(_duration.inSeconds.remainder(60));
+
     return BlocListener<CameraBloc, CameraState>(
         listener: ((context, state) {
           if (state.status == CameraStatus.success) {
@@ -151,6 +155,7 @@ class _CameraState extends State<Camera> {
                                       arCoreService:
                                           context.read<ARCoreService>()))));
                         });
+                        setState(() => _isBodyCamera = !_isBodyCamera);
                       } else {
                         context.loaderOverlay.hide();
                         ScaffoldMessenger.of(context)
