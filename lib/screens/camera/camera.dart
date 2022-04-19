@@ -122,7 +122,11 @@ class _CameraState extends State<Camera> {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(SnackBar(
-                content: Text('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง'),
+                content: Text('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง',
+                    style: Theme.of(context)
+                        .textTheme
+                        .caption!
+                        .merge(TextStyle(color: Colors.white))),
               ));
           }
         }),
@@ -164,7 +168,11 @@ class _CameraState extends State<Camera> {
                           ..hideCurrentSnackBar()
                           ..showSnackBar(SnackBar(
                             content: Text(
-                                '${context.read<ARCoreService>().errorMessage}'),
+                                '${context.read<ARCoreService>().errorMessage}',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .caption!
+                                    .merge(TextStyle(color: Colors.white))),
                           ));
                       }
                     },
@@ -287,10 +295,11 @@ class _CameraState extends State<Camera> {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(SnackBar(
-          content: Text(
-            'ถ่ายรูปไม่สำเร็จ กรุณาลองใหม่อีกครั้ง',
-            style: Theme.of(context).textTheme.bodyText1,
-          ),
+          content: Text('ถ่ายรูปไม่สำเร็จ กรุณาลองใหม่อีกครั้ง',
+              style: Theme.of(context)
+                  .textTheme
+                  .caption!
+                  .merge(TextStyle(color: Colors.white))),
         ));
     }
   }
