@@ -33,12 +33,13 @@ class _CameraState extends State<Camera> {
   late CameraController _controller;
   Future<void>? _initializeControllerFuture;
   late AudioPlayer _audioPlayer;
-  late Timer _counterTimer;
+  Timer? _counterTimer;
   Duration _duration = Duration(seconds: 5);
   int _selectedCamera = 1;
   bool _isBodyCamera = true;
   List<XFile> _bodyImage = [];
   bool _isTakeImage = false;
+  bool _isStartTimer = false;
 
   Future<void> _initializeCamera(int _selectedCamera) async {
     try {
@@ -60,7 +61,9 @@ class _CameraState extends State<Camera> {
   void dispose() {
     _controller.dispose();
     _audioPlayer.dispose();
-    _counterTimer.cancel();
+    if (_counterTimer == null) {
+      _counterTimer!.cancel();
+    }
     super.dispose();
   }
 
@@ -79,6 +82,7 @@ class _CameraState extends State<Camera> {
   void _startTimer() {
     _counterTimer =
         Timer.periodic(Duration(seconds: 1), (timer) => _setCountDown());
+    setState(() => _isStartTimer = true);
   }
 
   void _setCountDown() {
@@ -86,7 +90,7 @@ class _CameraState extends State<Camera> {
     setState(() {
       final seconds = _duration.inSeconds - _reduceSeconds;
       if (seconds < 0) {
-        _counterTimer.cancel();
+        _counterTimer!.cancel();
       } else {
         _duration = Duration(seconds: seconds);
       }
@@ -95,8 +99,9 @@ class _CameraState extends State<Camera> {
 
   void _resetTimer() {
     setState(() {
-      _counterTimer.cancel();
+      _counterTimer!.cancel();
       _duration = Duration(seconds: 5);
+      _isStartTimer = false;
     });
   }
 
@@ -104,6 +109,7 @@ class _CameraState extends State<Camera> {
   Widget build(BuildContext context) {
     String _digit(int n) => n.toString().padLeft(1);
     final _seconds = _digit(_duration.inSeconds.remainder(60));
+
     return BlocListener<CameraBloc, CameraState>(
         listener: ((context, state) {
           if (state.status == CameraStatus.success) {
@@ -116,7 +122,11 @@ class _CameraState extends State<Camera> {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(SnackBar(
-                content: Text('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง'),
+                content: Text('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง',
+                    style: Theme.of(context)
+                        .textTheme
+                        .caption!
+                        .merge(TextStyle(color: Colors.white))),
               ));
           }
         }),
@@ -151,13 +161,18 @@ class _CameraState extends State<Camera> {
                                       arCoreService:
                                           context.read<ARCoreService>()))));
                         });
+                        setState(() => _isBodyCamera = !_isBodyCamera);
                       } else {
                         context.loaderOverlay.hide();
                         ScaffoldMessenger.of(context)
                           ..hideCurrentSnackBar()
                           ..showSnackBar(SnackBar(
                             content: Text(
-                                '${context.read<ARCoreService>().errorMessage}'),
+                                '${context.read<ARCoreService>().errorMessage}',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .caption!
+                                    .merge(TextStyle(color: Colors.white))),
                           ));
                       }
                     },
@@ -197,7 +212,7 @@ class _CameraState extends State<Camera> {
                           ),
                         )
                       : Container(),
-                  _isBodyCamera
+                  _isBodyCamera && _isStartTimer
                       ? Text(
                           "$_seconds",
                           style: TextStyle(
@@ -280,7 +295,11 @@ class _CameraState extends State<Camera> {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(SnackBar(
-          content: Text('ถ่ายรูปไม่สำเร็จ กรุณาลองใหม่อีกครั้ง'),
+          content: Text('ถ่ายรูปไม่สำเร็จ กรุณาลองใหม่อีกครั้ง',
+              style: Theme.of(context)
+                  .textTheme
+                  .caption!
+                  .merge(TextStyle(color: Colors.white))),
         ));
     }
   }
