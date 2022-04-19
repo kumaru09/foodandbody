@@ -41,6 +41,7 @@ class _CameraState extends State<Camera> {
   bool _isBodyCamera = true;
   List<XFile> _bodyImage = [];
   bool _isTakeImage = false;
+  bool _isStartTimer = false;
 
   Future<void> _initializeCamera(int _selectedCamera) async {
     try {
@@ -93,6 +94,7 @@ class _CameraState extends State<Camera> {
   void _startTimer() {
     _counterTimer =
         Timer.periodic(Duration(seconds: 1), (timer) => _setCountDown());
+    setState(() => _isStartTimer = true);
   }
 
   void _setCountDown() {
@@ -111,6 +113,7 @@ class _CameraState extends State<Camera> {
     setState(() {
       _counterTimer!.cancel();
       _duration = Duration(seconds: 5);
+      _isStartTimer = false;
     });
   }
 
@@ -118,6 +121,7 @@ class _CameraState extends State<Camera> {
   Widget build(BuildContext context) {
     String _digit(int n) => n.toString().padLeft(1);
     final _seconds = _digit(_duration.inSeconds.remainder(60));
+
     return BlocListener<CameraBloc, CameraState>(
         listener: ((context, state) {
           if (state.status == CameraStatus.success) {
@@ -130,7 +134,11 @@ class _CameraState extends State<Camera> {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(SnackBar(
-                content: Text('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง'),
+                content: Text('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง',
+                    style: Theme.of(context)
+                        .textTheme
+                        .caption!
+                        .merge(TextStyle(color: Colors.white))),
               ));
           }
         }),
@@ -157,7 +165,7 @@ class _CameraState extends State<Camera> {
                         await context.read<ARCoreService>().isARCoreSupported();
                       if (context.read<ARCoreService>().isSupportDepth ==
                           ARStatus.support) {
-                        Future.delayed(Duration(seconds: 1), () {
+                        Future.delayed(Duration(seconds: 2), () {
                           context.loaderOverlay.hide();
                           Navigator.of(context).pushReplacement(
                               (MaterialPageRoute(
@@ -165,13 +173,18 @@ class _CameraState extends State<Camera> {
                                       arCoreService:
                                           context.read<ARCoreService>()))));
                         });
+                        setState(() => _isBodyCamera = !_isBodyCamera);
                       } else {
                         context.loaderOverlay.hide();
                         ScaffoldMessenger.of(context)
                           ..hideCurrentSnackBar()
                           ..showSnackBar(SnackBar(
                             content: Text(
-                                '${context.read<ARCoreService>().errorMessage}'),
+                                '${context.read<ARCoreService>().errorMessage}',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .caption!
+                                    .merge(TextStyle(color: Colors.white))),
                           ));
                       }
                     },
@@ -211,7 +224,7 @@ class _CameraState extends State<Camera> {
                           ),
                         )
                       : Container(),
-                  _isBodyCamera
+                  _isBodyCamera && _isStartTimer
                       ? Text(
                           "$_seconds",
                           style: TextStyle(
@@ -294,7 +307,11 @@ class _CameraState extends State<Camera> {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(SnackBar(
-          content: Text('ถ่ายรูปไม่สำเร็จ กรุณาลองใหม่อีกครั้ง'),
+          content: Text('ถ่ายรูปไม่สำเร็จ กรุณาลองใหม่อีกครั้ง',
+              style: Theme.of(context)
+                  .textTheme
+                  .caption!
+                  .merge(TextStyle(color: Colors.white))),
         ));
     }
   }
