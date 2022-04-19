@@ -23,7 +23,7 @@ import 'package:foodandbody/widget/menu_card/bloc/menu_card_bloc.dart';
 import 'package:foodandbody/widget/menu_card/menu_card.dart';
 import 'package:formz/formz.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:mocktail_image_network/mocktail_image_network.dart';
+import 'package:network_image_mock/network_image_mock.dart';
 
 class MockAppBloc extends MockBloc<AppEvent, AppState> implements AppBloc {}
 
@@ -136,7 +136,7 @@ void main() {
 
     group("render", () {
       testWidgets("calories circular progress", (tester) async {
-        await mockNetworkImages(() async {
+       mockNetworkImagesFor(() async {
           await tester.pumpWidget(MaterialApp(
             home: MultiBlocProvider(
               providers: [
@@ -154,7 +154,7 @@ void main() {
 
       testWidgets("fail calories circular progress when plan status is failure",
           (tester) async {
-        await mockNetworkImages(() async {
+       mockNetworkImagesFor(() async {
           when(() => planBloc.state).thenReturn(PlanState(
             status: PlanStatus.failure,
             plan: mockHistory,
@@ -178,7 +178,7 @@ void main() {
       });
 
       testWidgets("menu card", (tester) async {
-        await mockNetworkImages(() async {
+       mockNetworkImagesFor(() async {
           await tester.pumpWidget(MaterialApp(
             home: MultiBlocProvider(
               providers: [
@@ -197,7 +197,7 @@ void main() {
       }); //"menu card ListView"
 
       testWidgets("daily water card", (tester) async {
-        await mockNetworkImages(() async {
+       mockNetworkImagesFor(() async {
           await tester.pumpWidget(MaterialApp(
             home: MultiBlocProvider(
               providers: [
@@ -222,7 +222,7 @@ void main() {
 
       testWidgets("fail daily water card when home status is failure",
           (tester) async {
-        await mockNetworkImages(() async {
+       mockNetworkImagesFor(() async {
           when(() => homeBloc.state)
               .thenReturn(HomeState(status: HomeStatus.failure));
           await tester.pumpWidget(MaterialApp(
@@ -244,7 +244,7 @@ void main() {
       });
 
       testWidgets("exercise list", (tester) async {
-        await mockNetworkImages(() async {
+       mockNetworkImagesFor(() async {
           await tester.pumpWidget(MaterialApp(
             home: MultiBlocProvider(
               providers: [
@@ -265,7 +265,7 @@ void main() {
 
       testWidgets("fail exercise list when exerciseStatus is failure",
           (tester) async {
-        await mockNetworkImages(() async {
+       mockNetworkImagesFor(() async {
           when(() => planBloc.state).thenReturn(PlanState(
               exerciseStatus: FormzStatus.submissionFailure,
               plan: mockHistory));
@@ -291,7 +291,7 @@ void main() {
 
       testWidgets("dialog add exercise list when pressed add exercise icon",
           (tester) async {
-        await mockNetworkImages(() async {
+       mockNetworkImagesFor(() async {
           await tester.pumpWidget(MultiRepositoryProvider(
               providers: [
                 RepositoryProvider<PlanRepository>(
@@ -321,7 +321,7 @@ void main() {
     group("action", () {
       testWidgets("call DecreaseWaterEvent when pressed remove button",
           (tester) async {
-        await mockNetworkImages(() async {
+       mockNetworkImagesFor(() async {
           await tester.pumpWidget(MaterialApp(
             home: MultiBlocProvider(
               providers: [
@@ -342,7 +342,7 @@ void main() {
 
       testWidgets("call IncreaseWaterEvent when pressed add button",
           (tester) async {
-        await mockNetworkImages(() async {
+       mockNetworkImagesFor(() async {
           await tester.pumpWidget(MaterialApp(
             home: MultiBlocProvider(
               providers: [
@@ -363,7 +363,7 @@ void main() {
 
       testWidgets("call refresh function when drag screen down",
           (tester) async {
-        await mockNetworkImages(() async {
+       mockNetworkImagesFor(() async {
           await tester.pumpWidget(MaterialApp(
             home: MultiBlocProvider(
               providers: [
@@ -384,7 +384,7 @@ void main() {
 
       testWidgets("call LoadPlan when pressed try again at circle indicator",
           (tester) async {
-        await mockNetworkImages(() async {
+       mockNetworkImagesFor(() async {
           when(() => planBloc.state).thenReturn(
               PlanState(status: PlanStatus.failure, plan: mockHistory));
           await tester.pumpWidget(MaterialApp(
@@ -405,7 +405,7 @@ void main() {
 
       testWidgets("call LoadPlan when pressed try again at exercise list",
           (tester) async {
-        await mockNetworkImages(() async {
+       mockNetworkImagesFor(() async {
           when(() => planBloc.state).thenReturn(PlanState(
               exerciseStatus: FormzStatus.submissionFailure,
               plan: mockHistory));

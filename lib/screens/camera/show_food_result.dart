@@ -17,7 +17,11 @@ class ShowFoodResult extends StatelessWidget {
         case CameraStatus.success:
           return FoodResult(allresult: state.predicts);
         default:
-          return Center(child: CircularProgressIndicator());
+          return Scaffold(
+            extendBody: true,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            body: Center(child: CircularProgressIndicator()),
+          );
       }
     });
   }

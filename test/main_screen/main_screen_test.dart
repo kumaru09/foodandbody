@@ -10,7 +10,8 @@ import 'package:foodandbody/screens/initial_info/initial_info.dart';
 import 'package:foodandbody/screens/main_screen/bloc/info_bloc.dart';
 import 'package:foodandbody/screens/main_screen/main_screen.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:mocktail_image_network/mocktail_image_network.dart';
+import 'package:network_image_mock/network_image_mock.dart';
+// import 'package:mocktail_image_network/mocktail_image_network.dart';
 
 class MockUserRepository extends Mock implements UserRepository {}
 
@@ -59,7 +60,7 @@ void main() {
 
     testWidgets("render MainScreen when status is success and have info",
         (tester) async {
-      await mockNetworkImages(() async {
+      mockNetworkImagesFor(() async {
         await tester.pumpWidget(
           MultiRepositoryProvider(
             providers: [
@@ -83,7 +84,7 @@ void main() {
 
     testWidgets("render InitialInfo when status is success but not have info",
         (tester) async {
-      await mockNetworkImages(() async {
+     mockNetworkImagesFor(() async {
         when(() => infoBloc.state)
             .thenReturn(InfoState(status: InfoStatus.success, info: null));
         await tester.pumpWidget(
@@ -106,7 +107,7 @@ void main() {
 
     testWidgets("render failure widget when status is failure",
         (tester) async {
-      await mockNetworkImages(() async {
+     mockNetworkImagesFor(() async {
         when(() => infoBloc.state)
             .thenReturn(InfoState(status: InfoStatus.failure));
         await tester.pumpWidget(
@@ -131,7 +132,7 @@ void main() {
 
     testWidgets("call LoadInfo when pressed try again in failure status",
         (tester) async {
-      await mockNetworkImages(() async {
+     mockNetworkImagesFor(() async {
         when(() => infoBloc.state)
             .thenReturn(InfoState(status: InfoStatus.failure));
         await tester.pumpWidget(
