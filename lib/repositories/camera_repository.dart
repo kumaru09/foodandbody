@@ -74,9 +74,11 @@ class CameraRepository {
       final fromData = FormData.fromMap({
         "image": await MultipartFile.fromFile(file.path),
         "depth": depth.depth,
+        "fovH": depth.fovH,
+        "fovW": depth.fovW
       });
       final response = await dio.post(
-        "http://kumaru.trueddns.com:50310/api/predict/test",
+        "http://192.168.1.44:5000/api/depth/",
         data: fromData,
       );
       if (response.statusCode == 200) {

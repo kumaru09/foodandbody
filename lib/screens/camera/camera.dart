@@ -4,6 +4,7 @@ import 'package:camera/camera.dart';
 import 'package:foodandbody/models/body_predict.dart';
 import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:foodandbody/screens/camera/camera_dialog.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,6 +15,7 @@ import 'package:foodandbody/screens/camera/show_body_result.dart';
 import 'package:foodandbody/screens/camera/show_food_result.dart';
 import 'package:foodandbody/services/arcore_service.dart';
 import 'package:loader_overlay/loader_overlay.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Camera extends StatefulWidget {
   @override
@@ -33,7 +35,7 @@ class _CameraState extends State<Camera> {
   late CameraController _controller;
   Future<void>? _initializeControllerFuture;
   late AudioPlayer _audioPlayer;
-  late Timer _counterTimer;
+  Timer? _counterTimer;
   Duration _duration = Duration(seconds: 5);
   int _selectedCamera = 1;
   bool _isBodyCamera = true;
@@ -43,6 +45,18 @@ class _CameraState extends State<Camera> {
   Future<void> _initializeCamera(int _selectedCamera) async {
     try {
       _cameras = await availableCameras();
+      final prefs = await SharedPreferences.getInstance();
+      prefs.remove('isBodyDialogChecked');
+      bool? isBodyDialogChecked = prefs.getBool('isBodyDialogChecked');
+      if (isBodyDialogChecked == null) {
+        final value = await showDialog<bool>(
+            context: context,
+            barrierDismissible: false,
+            builder: (BuildContext context) => BodyDialog());
+        if (value!) {
+          prefs.setBool('isBodyDialogChecked', true);
+        }
+      }
       setState(() {
         _controller = CameraController(
             _cameras[_selectedCamera], ResolutionPreset.high,
@@ -60,7 +74,7 @@ class _CameraState extends State<Camera> {
   void dispose() {
     _controller.dispose();
     _audioPlayer.dispose();
-    _counterTimer.cancel();
+    if (_counterTimer != null) _counterTimer!.cancel();
     super.dispose();
   }
 
@@ -86,7 +100,7 @@ class _CameraState extends State<Camera> {
     setState(() {
       final seconds = _duration.inSeconds - _reduceSeconds;
       if (seconds < 0) {
-        _counterTimer.cancel();
+        _counterTimer!.cancel();
       } else {
         _duration = Duration(seconds: seconds);
       }
@@ -95,7 +109,7 @@ class _CameraState extends State<Camera> {
 
   void _resetTimer() {
     setState(() {
-      _counterTimer.cancel();
+      _counterTimer!.cancel();
       _duration = Duration(seconds: 5);
     });
   }
