@@ -78,7 +78,7 @@ class CameraRepository {
         "fovW": depth.fovW
       });
       final response = await dio.post(
-        "http://192.168.1.44:5000/api/depth/",
+        "http://kumaru.trueddns.com:50310/api/depth/",
         data: fromData,
       );
       if (response.statusCode == 200) {
@@ -119,8 +119,7 @@ class CameraRepository {
         "side": await MultipartFile.fromFile(image[1].path),
         "height": height
       });
-      final res = await dio.post(
-          "http://kumaru.trueddns.com:50311/measure/test",
+      final res = await dio.post("http://kumaru.trueddns.com:50311/measure",
           data: formData);
       if (res.statusCode == 200) {
         final List<BodyPredict> body = res.data["res"]

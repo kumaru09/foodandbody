@@ -142,8 +142,9 @@ class _State extends State<ARCamera> with WidgetsBindingObserver {
               ),
               IconButton(
                 onPressed: () {
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => Help()));
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) => FoodDialog());
                 },
                 icon: Icon(
                   Icons.help_outline,
