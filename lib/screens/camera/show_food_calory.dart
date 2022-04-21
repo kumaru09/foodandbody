@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:foodandbody/models/menu_show.dart';
 import 'package:foodandbody/models/predict.dart';
 import 'package:foodandbody/repositories/body_repository.dart';
 import 'package:foodandbody/repositories/camera_repository.dart';
 import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:foodandbody/screens/camera/bloc/camera_bloc.dart';
 import 'package:foodandbody/screens/main_screen/main_screen.dart';
-import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 
 class ShowFoodCalory extends StatefulWidget {
@@ -230,14 +228,14 @@ class _ShowFoodCaloryState extends State<ShowFoodCalory> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      "แคลอรี่รวม",
+                      "แคลอรีรวม",
                       style: Theme.of(context).textTheme.headline6!.merge(
                             TextStyle(color: Colors.white),
                           ),
                     ),
                     Expanded(
                       child: Text(
-                        "$_totalCal",
+                        "${_totalCal.toInt()}",
                         softWrap: false,
                         maxLines: 1,
                         textAlign: TextAlign.right,
@@ -293,7 +291,7 @@ class EditCalDialog extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       elevation: 0,
       backgroundColor: Colors.white,
-      title: Text("แก้ไขเแคลอรี่",
+      title: Text("แก้ไขแคลอรี",
           style: Theme.of(context).textTheme.subtitle1!.merge(
               TextStyle(color: Theme.of(context).colorScheme.secondary))),
       content: BlocBuilder<CameraBloc, CameraState>(

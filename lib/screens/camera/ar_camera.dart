@@ -12,7 +12,6 @@ import 'package:foodandbody/screens/camera/bloc/camera_bloc.dart';
 import 'package:foodandbody/screens/camera/camera.dart';
 import 'package:foodandbody/screens/camera/camera_dialog.dart';
 import 'package:foodandbody/screens/camera/show_food_result.dart';
-import 'package:foodandbody/screens/camera/show_predict_result.dart';
 import 'package:foodandbody/screens/help/help.dart';
 import 'package:foodandbody/services/arcore_service.dart';
 import 'package:loader_overlay/loader_overlay.dart';

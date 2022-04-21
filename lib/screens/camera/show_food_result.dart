@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:foodandbody/models/menu_show.dart';
 import 'package:foodandbody/models/predict.dart';
 import 'package:foodandbody/screens/camera/bloc/camera_bloc.dart';
 import 'package:foodandbody/screens/camera/show_food_calory.dart';
@@ -160,6 +159,7 @@ class _FoodResultState extends State<FoodResult> {
         child: SizedBox(
           width: double.infinity,
           child: ElevatedButton(
+            key: const Key('foodResult_elevatedButton'),
             child: Text('${_allResults.length == 0 ? "ถ่ายใหม่" : "ตกลง"}'),
             style: ElevatedButton.styleFrom(
               primary: Theme.of(context).primaryColor,
