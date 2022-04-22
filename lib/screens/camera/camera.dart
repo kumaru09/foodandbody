@@ -189,10 +189,7 @@ class _CameraState extends State<Camera> {
                           ));
                       }
                     },
-                    icon: Icon(
-                      _isBodyCamera ? Icons.accessibility : Icons.fastfood,
-                      color: Colors.white,
-                    ),
+                    icon: Icon(Icons.fastfood, color: Colors.white),
                   ),
                   IconButton(
                     onPressed: () {
