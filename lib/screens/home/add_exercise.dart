@@ -94,7 +94,9 @@ class AddExerciseDialog extends StatelessWidget {
               child: Text("ตกลง"),
               style: TextButton.styleFrom(
                 primary: Theme.of(context).colorScheme.secondary,
-                onSurface: Theme.of(context).colorScheme.secondaryVariant, // Disable color
+                onSurface: Theme.of(context)
+                    .colorScheme
+                    .secondaryVariant, // Disable color
               ),
             );
           },

@@ -50,14 +50,17 @@ class PlanBloc extends Bloc<PlanEvent, PlanState> {
         exerciseStatus: FormzStatus.submissionSuccess,
       ));
     } catch (e) {
-      emit(state.copyWith(status: PlanStatus.failure, exerciseStatus: FormzStatus.submissionFailure));
+      emit(state.copyWith(
+          status: PlanStatus.failure,
+          exerciseStatus: FormzStatus.submissionFailure));
       print('fetchPlan error: $e');
     }
   }
 
   Future<void> _deleteMenu(DeleteMenu event, Emitter<PlanState> emit) async {
     try {
-      emit(state.copyWith(deleteMenuStatus: DeleteMenuStatus.loading, isDeleteMenu: true));
+      emit(state.copyWith(
+          deleteMenuStatus: DeleteMenuStatus.loading, isDeleteMenu: true));
       await _planRepository.deletePlan(event.name, event.volume);
       emit(state.copyWith(deleteMenuStatus: DeleteMenuStatus.success));
     } catch (e) {
@@ -120,12 +123,15 @@ class PlanBloc extends Bloc<PlanEvent, PlanState> {
 
   Future<void> _updateGoal(UpdateGoal event, Emitter<PlanState> emit) async {
     try {
-      emit(state.copyWith(goalStatus: FormzStatus.submissionInProgress, isDeleteMenu: false));
+      emit(state.copyWith(
+          goalStatus: FormzStatus.submissionInProgress, isDeleteMenu: false));
       await _userRepository.updateGoalInfo(int.parse(event.goal));
       final info = await _userRepository.getInfo();
       emit(state.copyWith(
-          goalStatus: FormzStatus.submissionSuccess,
-          goal: Calory.dirty(info!.goal.toString())));
+        goalStatus: FormzStatus.submissionSuccess,
+        goal: Calory.dirty(info!.goal.toString()),
+        info: info,
+      ));
     } catch (e) {
       print('updateGoal: $e');
       emit(state.copyWith(goalStatus: FormzStatus.submissionFailure));
