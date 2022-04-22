@@ -49,7 +49,6 @@ class _CameraState extends State<Camera> {
     try {
       _cameras = await availableCameras();
       final prefs = await SharedPreferences.getInstance();
-      prefs.remove('isBodyDialogChecked');
       bool? isBodyDialogChecked = prefs.getBool('isBodyDialogChecked');
       if (isBodyDialogChecked == null) {
         final value = await showDialog<bool>(
@@ -192,6 +191,17 @@ class _CameraState extends State<Camera> {
                     },
                     icon: Icon(
                       _isBodyCamera ? Icons.accessibility : Icons.fastfood,
+                      color: Colors.white,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) => BodyDialog());
+                    },
+                    icon: Icon(
+                      Icons.help_outline,
                       color: Colors.white,
                     ),
                   ),
