@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:foodandbody/models/exercise_repo.dart';
+import 'package:foodandbody/screens/history/bloc/history_bloc.dart';
 import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
 import 'package:provider/src/provider.dart';
 
@@ -47,25 +48,25 @@ class _ExerciseListState extends State<ExerciseList> {
                       content: Text("คุณต้องการลบกิจกรรมนี้หรือไม่"),
                       actions: <Widget>[
                         TextButton(
-                          onPressed: () => Navigator.of(context).pop(true),
-                          child: Text(
-                            "ตกลง",
-                            style: Theme.of(context).textTheme.button!.merge(
-                                  TextStyle(
-                                      color: Theme.of(context).primaryColor),
-                                ),
-                          ),
-                        ),
-                        TextButton(
                           onPressed: () => Navigator.of(context).pop(false),
                           child: Text(
                             "ยกเลิก",
                             style: Theme.of(context).textTheme.button!.merge(
                                   TextStyle(
-                                      color: Theme.of(context).primaryColor),
+                                      color: Theme.of(context).colorScheme.secondary),
                                 ),
                           ),
-                        )
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(true),
+                          child: Text(
+                            "ตกลง",
+                            style: Theme.of(context).textTheme.button!.merge(
+                                  TextStyle(
+                                      color: Theme.of(context).colorScheme.secondary),
+                                ),
+                          ),
+                        ),
                       ],
                     );
                   });
@@ -75,6 +76,7 @@ class _ExerciseListState extends State<ExerciseList> {
                 context
                     .read<PlanBloc>()
                     .add(DeleteExercise(exerciseRepo: _exercise[index]));
+                context.read<HistoryBloc>().add(LoadHistory());
                 deleteItem(index);
               }
             },

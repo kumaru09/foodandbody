@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:foodandbody/models/exercise_repo.dart';
 import 'package:foodandbody/repositories/plan_repository.dart';
 import 'package:foodandbody/repositories/user_repository.dart';
+import 'package:foodandbody/screens/history/bloc/history_bloc.dart';
 import 'package:foodandbody/screens/home/exercise_list.dart';
 import 'package:foodandbody/screens/plan/bloc/plan_bloc.dart';
 import 'package:mocktail/mocktail.dart';
@@ -15,6 +16,12 @@ class MockPlanBloc extends MockBloc<PlanEvent, PlanState> implements PlanBloc {}
 class FakePlanEvent extends Fake implements PlanEvent {}
 
 class FakePlanState extends Fake implements PlanState {}
+
+class MockHistoryBloc extends MockBloc<HistoryEvent, HistoryState> implements HistoryBloc {}
+
+class FakeHistoryEvent extends Fake implements HistoryEvent {}
+
+class FakeHistoryState extends Fake implements HistoryState {}
 
 class MockPlanRepository extends Mock implements PlanRepository {}
 
@@ -32,16 +39,20 @@ void main() {
   ];
 
   late PlanBloc planBloc;
+  late HistoryBloc historyBloc;
   late PlanRepository planRepository;
   late UserRepository userRepository;
 
   setUpAll(() {
     registerFallbackValue<PlanEvent>(FakePlanEvent());
     registerFallbackValue<PlanState>(FakePlanState());
+    registerFallbackValue<HistoryEvent>(FakeHistoryEvent());
+    registerFallbackValue<HistoryState>(FakeHistoryState());
   });
 
   setUp(() async {
     planBloc = MockPlanBloc();
+    historyBloc = MockHistoryBloc();
     planRepository = MockPlanRepository();
     userRepository = MockUserRepository();
     planBloc = PlanBloc(
@@ -80,7 +91,8 @@ void main() {
       await tester.pumpWidget(MaterialApp(
         home: BlocProvider.value(
           value: planBloc,
-          child: ExerciseList(mockExercise),),
+          child: ExerciseList(mockExercise),
+        ),
       ));
       await tester.drag(find.byType(Card).first, Offset(-500, 0));
       await tester.pumpAndSettle();
@@ -95,7 +107,8 @@ void main() {
       await tester.pumpWidget(MaterialApp(
         home: BlocProvider.value(
           value: planBloc,
-          child: ExerciseList(mockExercise),),
+          child: ExerciseList(mockExercise),
+        ),
       ));
       await tester.drag(find.byType(Card).first, Offset(-500, 0));
       await tester.pumpAndSettle();
@@ -116,8 +129,11 @@ void main() {
         (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: BlocProvider.value(
-            value: planBloc,
+          home: MultiBlocProvider(
+            providers: [
+              BlocProvider.value(value: planBloc),
+              BlocProvider.value(value: historyBloc),
+            ],
             child: ExerciseList(mockExercise),
           ),
         ),
