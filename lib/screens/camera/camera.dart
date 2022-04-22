@@ -18,6 +18,8 @@ import 'package:loader_overlay/loader_overlay.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Camera extends StatefulWidget {
+  // const Camera([this.controller]);
+  // final CameraController? controller;
   @override
   _CameraState createState() => _CameraState();
 }
@@ -210,6 +212,7 @@ class _CameraState extends State<Camera> {
                   ),
                   _isBodyCamera
                       ? Container(
+                          key: const Key('camera_scope'),
                           margin: EdgeInsets.fromLTRB(
                               20,
                               MediaQuery.of(context).size.height * 0.05,
@@ -227,6 +230,7 @@ class _CameraState extends State<Camera> {
                   _isBodyCamera && _isStartTimer
                       ? Text(
                           "$_seconds",
+                          key: const Key('camera_timer'),
                           style: TextStyle(
                               color: Colors.white,
                               fontSize: 100,
@@ -234,6 +238,7 @@ class _CameraState extends State<Camera> {
                         )
                       : Container(),
                   AnimatedOpacity(
+                    key: const Key('camera_opacity'),
                     opacity: _isTakeImage ? 1.0 : 0.0,
                     duration: Duration(milliseconds: 500),
                     child: Container(
@@ -247,6 +252,7 @@ class _CameraState extends State<Camera> {
               floatingActionButtonLocation:
                   FloatingActionButtonLocation.centerFloat,
               floatingActionButton: FloatingActionButton(
+                key: const Key('camera_button'),
                 onPressed: () async {
                   if (_isBodyCamera) {
                     await _playSignal();

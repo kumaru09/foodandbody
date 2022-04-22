@@ -3,10 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:foodandbody/models/body_predict.dart';
-import 'package:foodandbody/repositories/body_repository.dart';
-import 'package:foodandbody/repositories/camera_repository.dart';
-import 'package:foodandbody/repositories/plan_repository.dart';
-import 'package:foodandbody/screens/body/edit_body_figure.dart';
 import 'package:foodandbody/screens/camera/bloc/camera_bloc.dart';
 import 'package:foodandbody/screens/camera/show_body_result.dart';
 import 'package:loader_overlay/loader_overlay.dart';
@@ -19,21 +15,12 @@ class FakeCameraEvent extends Fake implements CameraEvent {}
 
 class FakeCameraState extends Fake implements CameraState {}
 
-class MockPlanRepository extends Mock implements PlanRepository {}
-
-class MockCameraRepository extends Mock implements CameraRepository {}
-
-class MockBodyRepository extends Mock implements BodyRepository {}
-
 void main() {
   group('ShowBodyResult', () {
     final bodyPredict =
         BodyPredict(shoulder: 30, chest: 30, waist: 30, hip: 30);
 
     late CameraBloc cameraBloc;
-    late CameraRepository cameraRepository;
-    late PlanRepository planRepository;
-    late BodyRepository bodyRepository;
 
     setUpAll(() {
       registerFallbackValue<CameraEvent>(FakeCameraEvent());
@@ -42,9 +29,6 @@ void main() {
 
     setUp(() {
       cameraBloc = MockCameraBloc();
-      cameraRepository = MockCameraRepository();
-      planRepository = MockPlanRepository();
-      bodyRepository = MockBodyRepository();
       when(() => cameraBloc.state).thenReturn(CameraState());
     });
 
