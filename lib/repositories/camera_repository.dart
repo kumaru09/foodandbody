@@ -124,14 +124,14 @@ class CameraRepository {
       if (res.statusCode == 200) {
         final List<BodyPredict> body = res.data["res"]
             .map<BodyPredict>((e) => BodyPredict.fromJson(e))
-            .tolist();
+            .toList();
         if (body.isNotEmpty) {
           return body.first;
         } else {
           throw PredictBodyFailure();
         }
       }
-      return throw PredictBodyFailure();
+      throw PredictBodyFailure();
     } catch (_) {
       print("getpredict: $_");
       throw PredictBodyFailure();

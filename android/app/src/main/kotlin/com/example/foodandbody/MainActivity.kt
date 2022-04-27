@@ -38,10 +38,7 @@ class MainActivity : FlutterActivity() {
                 isSupported = isARCoreSupportedAndUpToDate()
                 if (isSupported) {
                     if (session == null) {
-                        if (!CameraPermissionHelper.hasCameraPermission(activity)) {
-                            CameraPermissionHelper.requestCameraPermission(activity)
-                            result.success("needCamera")
-                        } else {
+                        
                             session = Session(this)
                             if (!session!!.isDepthModeSupported(Config.DepthMode.AUTOMATIC)) {
                                 session = null
@@ -50,7 +47,7 @@ class MainActivity : FlutterActivity() {
                                 session = null
                                 result.success("support")
                             }
-                        }
+                        
                     }
                 } else if (!isSupported && isInstallRequest) {
                     flutterResult = result
@@ -87,18 +84,6 @@ class MainActivity : FlutterActivity() {
                 Log.d("ARCore:", "UNKNOWN")
                 false
             }
-        }
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (!CameraPermissionHelper.hasCameraPermission(this)) {
-            Toast.makeText(this, "Camera permission is needed to run this application", Toast.LENGTH_LONG).show()
-            if (!CameraPermissionHelper.shouldShowRequestPermissionRationale(this)) {
-                // Permission denied with checking "Do not ask again".
-                CameraPermissionHelper.launchPermissionSettings(this)
-            }
-            finish()
         }
     }
 }
