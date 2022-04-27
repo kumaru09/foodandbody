@@ -5,6 +5,7 @@ import 'package:foodandbody/models/body_predict.dart';
 import 'package:foodandbody/repositories/user_repository.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:foodandbody/screens/camera/camera_dialog.dart';
+import 'package:foodandbody/screens/camera/switch_page.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -135,7 +136,7 @@ class _CameraState extends State<Camera> {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(SnackBar(
-                content: Text('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง',
+                content: Text('ไม่สามารถวัดได้ กรุณาถ่ายภาพใหม่อีกครั้ง',
                     style: Theme.of(context)
                         .textTheme
                         .caption!
@@ -166,13 +167,16 @@ class _CameraState extends State<Camera> {
                         await context.read<ARCoreService>().isARCoreSupported();
                       if (context.read<ARCoreService>().isSupportDepth ==
                           ARStatus.support) {
-                        Future.delayed(Duration(seconds: 2), () {
+                        Future.delayed(Duration(seconds: 1), () {
                           context.loaderOverlay.hide();
                           Navigator.of(context).pushReplacement(
                               (MaterialPageRoute(
-                                  builder: (context) => ARCamera(
-                                      arCoreService:
-                                          context.read<ARCoreService>()))));
+                                  builder: (context) => SwitchPage())));
+                          // Navigator.of(context).pushReplacement(
+                          //     (MaterialPageRoute(
+                          //         builder: (context) => ARCamera(
+                          //             arCoreService:
+                          //                 context.read<ARCoreService>()))));
                         });
                         setState(() => _isBodyCamera = !_isBodyCamera);
                       } else {
