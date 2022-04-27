@@ -37,6 +37,7 @@ class _BodyDialogState extends State<BodyDialog> {
       ),
       actions: <Widget>[
         CheckboxListTile(
+            key: const Key('bodyDialog_checkBoxListTile'),
             contentPadding: EdgeInsets.only(left: 4),
             title: Transform.translate(
               offset: Offset(-16, 0),
@@ -128,6 +129,7 @@ class _FoodDialogState extends State<FoodDialog> {
       ),
       actions: <Widget>[
         CheckboxListTile(
+            key: const Key('foodDialog_checkBoxListTile'),
             contentPadding: EdgeInsets.only(left: 4),
             title: Transform.translate(
               offset: Offset(-16, 0),

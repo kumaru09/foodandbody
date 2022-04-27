@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodandbody/screens/history/bloc/history_bloc.dart';
 import 'package:foodandbody/screens/home/add_exercise.dart';
 import 'package:foodandbody/screens/home/bloc/home_bloc.dart';
 import 'package:foodandbody/screens/home/circular_cal_indicator.dart';
@@ -39,11 +40,16 @@ class _HomeState extends State<Home> {
           listener: (context, state) {
             if (state.exerciseStatus == FormzStatus.submissionFailure)
               _failUpdate(context);
+            else if (state.exerciseStatus == FormzStatus.submissionSuccess)
+              context.read<HistoryBloc>().add(LoadHistory());
           },
         ),
         BlocListener<HomeBloc, HomeState>(
           listener: (context, state) {
-            if (state.status == HomeStatus.failure) _failUpdate(context);
+            if (state.status == HomeStatus.failure)
+              _failUpdate(context);
+            else if (state.status == HomeStatus.success)
+              context.read<HistoryBloc>().add(LoadHistory());
           },
         ),
       ],

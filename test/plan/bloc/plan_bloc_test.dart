@@ -484,6 +484,7 @@ void main() {
             goalStatus: FormzStatus.submissionSuccess,
             goal: validGoal,
             isDeleteMenu: false,
+            info: mockInfo,
           )
         ],
         verify: (_) {
@@ -512,6 +513,7 @@ void main() {
             goalStatus: FormzStatus.submissionSuccess,
             goal: validGoal,
             isDeleteMenu: false,
+            info: mockInfo,
           )
         ],
         verify: (_) {

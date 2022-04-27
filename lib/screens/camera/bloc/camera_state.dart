@@ -28,7 +28,7 @@ class CameraState extends Equatable {
       List<Predict>? predicts,
       int? isFlat,
       bool? hasPlane,
-      bool? isSupportARm,
+      bool? isSupportAR,
       FoodCalory? cal}) {
     return CameraState(
       status: status ?? this.status,
