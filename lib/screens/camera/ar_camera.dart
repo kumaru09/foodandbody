@@ -54,7 +54,6 @@ class _State extends State<ARCamera> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    _showDialog();
     WidgetsBinding.instance!.addObserver(this);
     context.read<CameraBloc>().add(SetIsFlat(isFlat: 120));
     context.read<CameraBloc>().add(SetHasPlane(hasPlane: false));
@@ -85,18 +84,6 @@ class _State extends State<ARCamera> with WidgetsBindingObserver {
         }
       }
     }));
-  }
-
-  void _showDialog() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      bool? isFoodDialogChecked = prefs.getBool('isFoodDialogChecked');
-      if (isFoodDialogChecked == null) {
-        final value = await showDialog<bool>(
-            context: context, builder: (BuildContext context) => FoodDialog());
-        if (value!) prefs.setBool('isFoodDialogChecked', true);
-      }
-    } catch (_) {}
   }
 
   @override

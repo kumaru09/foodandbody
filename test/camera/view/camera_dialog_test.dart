@@ -21,7 +21,7 @@ void main() {
           findsOneWidget);
       expect(
           find.text(
-              'ในการถ่ายรูปโดยควรวางกล้องให้สามารถถ่ายเห็นทั้งตัว และยืนให้พอดีกับกรอบสีชมพูที่แสดงบนหน้าจอ'),
+              'ในการถ่ายรูปโดยควรวางกล้องให้สามารถถ่ายเห็นทั้งตัวหรือตั้งฉากกับพื้นให้มากที่สุด และยืนให้พอดีกับกรอบที่แสดงบนหน้าจอ'),
           findsOneWidget);
       expect(find.text('ไม่ต้องแสดงอีก'), findsOneWidget);
     });
@@ -31,7 +31,8 @@ void main() {
       await tester.pumpWidget(MaterialApp(home: BodyDialog()));
       await tester.tap(find.byKey(bodyCheckBox));
       await tester.pump();
-      final checkBox = tester.widget<CheckboxListTile>(find.byKey(bodyCheckBox));
+      final checkBox =
+          tester.widget<CheckboxListTile>(find.byKey(bodyCheckBox));
       expect(checkBox.value, true);
     });
 
@@ -55,7 +56,8 @@ void main() {
       await tester.pumpWidget(MaterialApp(home: FoodDialog()));
       await tester.tap(find.byKey(foodCheckBox));
       await tester.pump();
-      final checkBox = tester.widget<CheckboxListTile>(find.byKey(foodCheckBox));
+      final checkBox =
+          tester.widget<CheckboxListTile>(find.byKey(foodCheckBox));
       expect(checkBox.value, true);
     });
   });
