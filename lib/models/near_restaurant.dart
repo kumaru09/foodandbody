@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:equatable/equatable.dart';
 
 class NearRestaurant extends Equatable {
@@ -9,7 +7,10 @@ class NearRestaurant extends Equatable {
       this.distance,
       this.rating,
       this.open,
-      this.close});
+      this.close,
+      this.lat,
+      this.lng,
+      this.id});
 
   final String? name;
   final String? imageUrl;
@@ -17,7 +18,11 @@ class NearRestaurant extends Equatable {
   final double? rating;
   final String? open;
   final String? close;
+  final double? lat;
+  final double? lng;
+  final String? id;
 
   @override
-  List<Object?> get props => [name, distance, imageUrl, rating, open, close];
+  List<Object?> get props =>
+      [name, distance, imageUrl, rating, open, close, lat, lng, id];
 }

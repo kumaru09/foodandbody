@@ -10,6 +10,7 @@ import 'package:foodandbody/screens/main_screen/main_screen.dart';
 import 'package:foodandbody/screens/menu/menu_dialog.dart';
 import 'package:foodandbody/screens/menu/bloc/menu_bloc.dart';
 import 'package:foodandbody/widget/nutrient_detail.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MenuDetail extends StatefulWidget {
   MenuDetail({Key? key, required this.isPlanMenu, Menu? item})
@@ -315,73 +316,93 @@ class _NearRestaurantItem extends StatelessWidget {
     return distance.split(' ')[0];
   }
 
+  void _launchMapsUrl(
+      {required double lat, required double lng, required String id}) async {
+    final url = Uri.parse(
+        'https://www.google.com/maps/search/?api=1&query=$lat,$lng&query_place_id=$id');
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(bottom: 7),
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.all(Radius.circular(15)),
-            child: Image.network(
-              item.imageUrl == null ? defaultUrl : item.imageUrl!,
-              key: const Key('nearRestaurant_image'),
-              width: 100,
-              height: 100,
-              alignment: Alignment.center,
-              fit: BoxFit.cover,
-            ),
-          ),
-          SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('${item.name}',
-                    maxLines: 1,
-                    softWrap: false,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodyText2!.merge(
-                        TextStyle(
-                            color: Theme.of(context).colorScheme.secondary))),
-                Text('${_distance(item.distance)} กิโลเมตร',
-                    style: Theme.of(context).textTheme.caption!.merge(TextStyle(
-                        color: Theme.of(context).colorScheme.secondary))),
-                RatingBarIndicator(
-                  rating: item.rating ?? 0.0,
-                  itemBuilder: (context, index) => Icon(
-                    Icons.star,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                  itemCount: 5,
-                  itemSize: 24.0,
-                  direction: Axis.horizontal,
-                  unratedColor: Theme.of(context)
-                      .colorScheme
-                      .secondaryVariant
-                      .withAlpha(60),
+        padding: EdgeInsets.only(bottom: 7),
+        child: InkWell(
+          onTap: () {
+            _launchMapsUrl(lat: item.lat!, lng: item.lng!, id: item.id!);
+          },
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.all(Radius.circular(15)),
+                child: Image.network(
+                  item.imageUrl == null ? defaultUrl : item.imageUrl!,
+                  key: const Key('nearRestaurant_image'),
+                  width: 100,
+                  height: 100,
+                  alignment: Alignment.center,
+                  fit: BoxFit.cover,
                 ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.access_time,
-                        color: Theme.of(context).colorScheme.secondary),
-                    Text(
-                      " ${_showTime(item.open)} - ${_showTime(item.close)}",
-                      style: Theme.of(context).textTheme.caption!.merge(
+                    Text('${item.name}',
+                        maxLines: 1,
+                        softWrap: false,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodyText2!.merge(
                             TextStyle(
-                                color: Theme.of(context).colorScheme.secondary),
-                          ),
+                                color:
+                                    Theme.of(context).colorScheme.secondary))),
+                    Text('${_distance(item.distance)} กิโลเมตร',
+                        style: Theme.of(context).textTheme.caption!.merge(
+                            TextStyle(
+                                color:
+                                    Theme.of(context).colorScheme.secondary))),
+                    RatingBarIndicator(
+                      rating: item.rating ?? 0.0,
+                      itemBuilder: (context, index) => Icon(
+                        Icons.star,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      itemCount: 5,
+                      itemSize: 24.0,
+                      direction: Axis.horizontal,
+                      unratedColor: Theme.of(context)
+                          .colorScheme
+                          .secondaryVariant
+                          .withAlpha(60),
+                    ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Icon(Icons.access_time,
+                            color: Theme.of(context).colorScheme.secondary),
+                        Text(
+                          " ${_showTime(item.open)} - ${_showTime(item.close)}",
+                          style: Theme.of(context).textTheme.caption!.merge(
+                                TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .secondary),
+                              ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
+        ));
   }
 }
 

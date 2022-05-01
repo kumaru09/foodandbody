@@ -66,6 +66,7 @@ dependencies:
   firebase_auth_mocks: ^0.8.4
   google_sign_in_mocks: ^0.2.1
   shared_preferences: ^2.0.13
+  url_launcher: ^6.1.0
   
 
 dev_dependencies:
