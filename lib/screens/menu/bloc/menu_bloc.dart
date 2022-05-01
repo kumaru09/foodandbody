@@ -154,7 +154,10 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
               _locationData.longitude!),
           rating: e.rating,
           open: detail.result?.openingHours?.periods?.first.open?.time,
-          close: detail.result?.openingHours?.periods?.first.close?.time);
+          close: detail.result?.openingHours?.periods?.first.close?.time,
+          id: e.placeId,
+          lat: e.geometry!.location!.lat!,
+          lng: e.geometry!.location!.lng!);
     }).toList();
 
     return Future.wait(restaurantList);

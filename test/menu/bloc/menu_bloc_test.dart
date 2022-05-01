@@ -45,7 +45,10 @@ void main() {
           distance: '228 mi',
           rating: 5.0,
           open: '0900',
-          close: '1700')
+          close: '1700',
+          id: 'id',
+          lng: 1.0,
+          lat: 1.0)
     ];
     const mockPath = "กุ้งเผา";
     const mockMenu = MenuShow(
