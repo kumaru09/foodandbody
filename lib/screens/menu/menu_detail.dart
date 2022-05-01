@@ -330,7 +330,8 @@ class _NearRestaurantItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: EdgeInsets.only(bottom: 7),
+      padding: EdgeInsets.only(bottom: 7),
+      child: Material(
         child: InkWell(
           onTap: () {
             _launchMapsUrl(lat: item.lat!, lng: item.lng!, id: item.id!);
@@ -402,7 +403,9 @@ class _NearRestaurantItem extends StatelessWidget {
               ),
             ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 }
 
