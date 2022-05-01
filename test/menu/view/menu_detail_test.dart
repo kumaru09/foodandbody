@@ -25,9 +25,7 @@ class MockMenuBloc extends MockBloc<MenuEvent, MenuState> implements MenuBloc {}
 
 void main() {
   const addToPlanButtonKey = Key('menu_addToPlan_button');
-  const eatNowButtonKeyPlan = Key('menu_eatNow_outlinedButton');
-  const eatNowButtonKeyMenu = Key('menu_eatNow_elevatedButton');
-  const takePhotoButtonKey = Key('menu_takePhoto_button');
+  const eatNowButtonKey = Key('menu_eatNow_elevatedButton');
   const menuColumn = Key('menu_column');
   const dialogOkButtonKey = Key('menu_dialog_ok_button');
   const nearRestaurantImage = Key('nearRestaurant_image');
@@ -262,7 +260,7 @@ void main() {
             ),
           );
           expect(find.byKey(addToPlanButtonKey), findsOneWidget);
-          expect(find.byKey(eatNowButtonKeyMenu), findsOneWidget);
+          expect(find.byKey(eatNowButtonKey), findsOneWidget);
         });
       });
 
@@ -343,7 +341,7 @@ void main() {
               ),
             ),
           );
-          await tester.tap(find.byKey(eatNowButtonKeyMenu));
+          await tester.tap(find.byKey(eatNowButtonKey));
           await tester.pumpAndSettle();
           expect(find.byType(MenuDialog), findsOneWidget);
         });
@@ -371,7 +369,7 @@ void main() {
               ),
             ),
           );
-          await tester.tap(find.byKey(eatNowButtonKeyMenu));
+          await tester.tap(find.byKey(eatNowButtonKey));
           await tester.pumpAndSettle();
           expect(find.byType(MenuDialog), findsOneWidget);
           await tester.tap(find.byKey(dialogOkButtonKey));
@@ -386,8 +384,7 @@ void main() {
     });
 
     group('MenuPlan', () {
-      testWidgets(
-          'renders eatNow button and takePhoto button when isPlanMenu is true',
+      testWidgets('renders eatNow button when isPlanMenu is true',
           (tester) async {
         mockNetworkImagesFor(() async {
           when(() => menuBloc.state).thenReturn(MenuState(
@@ -402,8 +399,7 @@ void main() {
               ),
             ),
           );
-          expect(find.byKey(eatNowButtonKeyPlan), findsOneWidget);
-          expect(find.byKey(takePhotoButtonKey), findsOneWidget);
+          expect(find.byKey(eatNowButtonKey), findsOneWidget);
         });
       });
 
@@ -425,8 +421,8 @@ void main() {
               ),
             ),
           );
-          expect(find.byKey(eatNowButtonKeyPlan), findsOneWidget);
-          await tester.tap(find.byKey(eatNowButtonKeyPlan));
+          expect(find.byKey(eatNowButtonKey), findsOneWidget);
+          await tester.tap(find.byKey(eatNowButtonKey));
           await tester.pumpAndSettle();
         });
       });
@@ -454,7 +450,7 @@ void main() {
               ),
             ),
           );
-          await tester.tap(find.byKey(eatNowButtonKeyPlan));
+          await tester.tap(find.byKey(eatNowButtonKey));
           await tester.pumpAndSettle();
           expect(find.byType(MenuDialog), findsOneWidget);
           await tester.tap(find.byKey(dialogOkButtonKey));
@@ -467,31 +463,6 @@ void main() {
               ))).called(1);
         });
       });
-
-      // testWidgets('renders Camera when takePhoto button is pressed',
-      //     (tester) async {
-      //   mockNetworkImagesFor(() async {
-      //     when(() => menuBloc.state).thenReturn(MenuState(
-      //       status: MenuStatus.success,
-      //       menu: mockMenu,
-      //     ));
-      //     await tester.pumpWidget(
-      //       RepositoryProvider<PlanRepository>(
-      //         create: (_) => MockPlanRepository(),
-      //         child: MaterialApp(
-      //           home: BlocProvider.value(
-      //             value: menuBloc,
-      //             child: MenuDetail(isPlanMenu: true, item: mockMenuPlan),
-      //           ),
-      //         ),
-      //       ),
-      //     );
-      //     expect(find.byType(MenuDetail), findsOneWidget);
-      //     await tester.tap(find.byKey(takePhotoButtonKey));
-      //     await tester.pump(Duration(seconds: 1));
-      //     expect(find.byType(Camera), findsOneWidget);
-      //   });
-      // });
     });
   });
 }
