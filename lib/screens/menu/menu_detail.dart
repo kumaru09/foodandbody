@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:foodandbody/models/menu.dart';
 import 'package:foodandbody/models/near_restaurant.dart';
-import 'package:foodandbody/screens/camera/camera.dart';
 import 'package:foodandbody/screens/main_screen/main_screen.dart';
 import 'package:foodandbody/screens/menu/menu_dialog.dart';
 import 'package:foodandbody/screens/menu/bloc/menu_bloc.dart';
@@ -56,31 +55,18 @@ class _MenuDetailState extends State<MenuDetail> {
   }
 
   Widget _displayButton(String name, double serve, String unit) {
-    if (widget.isPlanMenu) {
-      return Row(
-        children: [
-          _EatNowButton(
-              name: name,
-              volumn: widget.menu.volumn,
-              unit: unit,
-              isPlanMenu: widget.isPlanMenu),
-          SizedBox(width: 16.0),
-          _TakePhotoButton(),
-        ],
-      );
-    } else {
-      return Row(
-        children: [
+    return Row(
+      children: [
+        if (!widget.isPlanMenu)
           _AddToPlanButton(name: name, serve: serve, unit: unit),
-          SizedBox(width: 16.0),
-          _EatNowButton(
-              name: name,
-              volumn: serve,
-              unit: unit,
-              isPlanMenu: widget.isPlanMenu),
-        ],
-      );
-    }
+        if (!widget.isPlanMenu) SizedBox(width: 16.0),
+        _EatNowButton(
+            name: name,
+            volumn: serve,
+            unit: unit,
+            isPlanMenu: widget.isPlanMenu),
+      ],
+    );
   }
 
   void _failAddMenu(BuildContext context) {
@@ -461,70 +447,38 @@ class _EatNowButton extends StatelessWidget {
       required this.isPlanMenu})
       : super(key: key);
 
-  _eatNowOnPressed(BuildContext context) async {
-    final value = await showDialog<String>(
-      context: context,
-      builder: (BuildContext context) =>
-          MenuDialog(serve: volumn, unit: unit, isEatNow: true),
-    );
-    if (value != 'cancel' && value != null) {
-      if (isPlanMenu) {
-        context.read<MenuBloc>().add(AddMenu(
-            name: name,
-            isEatNow: true,
-            oldVolume: volumn,
-            volumn: double.parse(value.toString())));
-      } else {
-        context.read<MenuBloc>().add(AddMenu(
-            name: name,
-            isEatNow: true,
-            volumn: double.parse(value.toString())));
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: isPlanMenu
-          ? OutlinedButton(
-              key: const Key('menu_eatNow_outlinedButton'),
-              child: Text('กินเลย'),
-              style: OutlinedButton.styleFrom(
-                primary: Theme.of(context).primaryColor,
-                shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(50))),
-              ),
-              onPressed: () => _eatNowOnPressed(context),
-            )
-          : ElevatedButton(
-              key: const Key('menu_eatNow_elevatedButton'),
-              child: Text('กินเลย'),
-              style: ElevatedButton.styleFrom(
-                primary: Theme.of(context).primaryColor,
-                shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(50))),
-              ),
-              onPressed: () => _eatNowOnPressed(context),
-            ),
-    );
-  }
-}
-
-class _TakePhotoButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: ElevatedButton(
-        key: const Key('menu_takePhoto_button'),
-        onPressed: () => Navigator.push(
-            context, MaterialPageRoute(builder: (context) => Camera())),
-        child: Text('ถ่ายรูป'),
+        key: const Key('menu_eatNow_elevatedButton'),
+        child: Text('กินเลย'),
         style: ElevatedButton.styleFrom(
           primary: Theme.of(context).primaryColor,
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(50))),
         ),
+        onPressed: () async {
+          final value = await showDialog<String>(
+            context: context,
+            builder: (BuildContext context) =>
+                MenuDialog(serve: volumn, unit: unit, isEatNow: true),
+          );
+          if (value != 'cancel' && value != null) {
+            if (isPlanMenu) {
+              context.read<MenuBloc>().add(AddMenu(
+                  name: name,
+                  isEatNow: true,
+                  oldVolume: volumn,
+                  volumn: double.parse(value.toString())));
+            } else {
+              context.read<MenuBloc>().add(AddMenu(
+                  name: name,
+                  isEatNow: true,
+                  volumn: double.parse(value.toString())));
+            }
+          }
+        },
       ),
     );
   }
