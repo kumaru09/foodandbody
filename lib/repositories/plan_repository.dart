@@ -10,10 +10,9 @@ import 'package:foodandbody/models/history_entity.dart';
 import 'package:foodandbody/models/menu.dart';
 import 'package:foodandbody/models/menu_show.dart';
 import 'package:foodandbody/models/predict.dart';
-import 'package:foodandbody/repositories/i_plan_repository.dart';
 import 'package:http/http.dart' as http;
 
-class PlanRepository implements IPlanRepository {
+class PlanRepository {
   PlanRepository({
     FirebaseFirestore? firebaseFirestore,
     FirebaseAuth? firebaseAuth,
